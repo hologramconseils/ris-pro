@@ -125,7 +125,8 @@ def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user:
     scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
-    if not (current_user.has_paid_access or current_user.is_admin):
+    enable_admin = os.getenv("ENABLE_ADMIN_BYPASS", "false").lower() == "true"
+    if not (current_user.has_paid_access or (current_user.is_admin and enable_admin)):
         raise HTTPException(status_code=403, detail="Vous devez payer 19€ pour accéder au rapport détaillé.")
     return scan
 @router.delete("/{scan_id}")

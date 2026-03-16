@@ -39,16 +39,5 @@ async def stripe_webhook(request: Request, db: Session = Depends(database.get_db
 
     return Response(status_code=200)
 
-@router.post("/mock-payment-success")
-def mock_payment_success(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
-    """A direct endpoint to mock success since we don't have real webhooks setup yet."""
-    current_user.has_paid_access = True
-    transaction = models.Transaction(
-        user_id=current_user.id,
-        stripe_session_id="mock_session_" + str(current_user.id),
-        status="completed"
-    )
-    db.add(transaction)
-    db.commit()
-    return {"status": "success"}
+
 
