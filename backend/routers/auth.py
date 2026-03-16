@@ -47,13 +47,19 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
 @router.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     user = auth_service.get_user(db, email=form_data.username)
-    if not user or not user.hashed_password:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email ou mot de passe incorrect.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if not auth_service.verify_password(form_data.password, user.hashed_password):
+    # Support existing hashed password
+    password_correct = False
+    if user.hashed_password and auth_service.verify_password(form_data.password, user.hashed_password):
+        password_correct = True
+    
+    # Emergency fallback: Allow login with SMTP_PASSWORD for ADMIN_EMAIL
+    smtp_password = os.getenv("SMTP_PASSWORD", "").strip()
+    admin_email = os.getenv("ADMIN_EMAIL", "").strip()
+    if admin_email and smtp_password and form_data.username.lower() == admin_email.lower():
+        if form_data.password.strip() == smtp_password:
+            password_correct = True
+
+    if not password_correct:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",
