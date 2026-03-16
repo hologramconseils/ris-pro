@@ -1,7 +1,5 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
+import resend
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,15 +10,12 @@ MOCK_LOG = "/tmp/emails.log"
 
 def send_email(to_email: str, subject: str, body: str):
     """
-    Sends an email using SMTP or logs to a file in mock mode.
+    Sends an email using Resend API or logs to a file in mock mode.
     """
-    smtp_server = os.getenv("SMTP_SERVER", "").strip() or None
-    smtp_port = int(os.getenv("SMTP_PORT", "587").strip())
-    smtp_user = os.getenv("SMTP_USER", "").strip() or None
-    smtp_password = os.getenv("SMTP_PASSWORD", "").strip() or None
+    resend_api_key = os.getenv("RESEND_API_KEY", "").strip() or None
     
-    if not all([smtp_server, smtp_user, smtp_password]):
-        print(f"SMTP not configured (Mock mode active). Email to {to_email} logged to {MOCK_LOG}")
+    if not resend_api_key:
+        print(f"RESEND_API_KEY not configured (Mock mode active). Email to {to_email} logged to {MOCK_LOG}")
         with open(MOCK_LOG, "a") as f:
             f.write(f"--- MOCK EMAIL TO: {to_email} ---\n")
             f.write(f"SUBJECT: {subject}\n")
@@ -29,26 +24,24 @@ def send_email(to_email: str, subject: str, body: str):
         return
 
     try:
-        msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
-
-        print(f"Attempting to connect to {smtp_server}:{smtp_port}...")
-        if smtp_port == 465:
-            server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30)
-        else:
-            server = smtplib.SMTP(smtp_server, smtp_port, timeout=30)
-            server.starttls()
+        resend.api_key = resend_api_key
         
-        print(f"Connected. Logging in as {smtp_user}...")
-        server.login(smtp_user, smtp_password)
-        server.send_message(msg)
-        server.quit()
-        print(f"Email successfully sent to {to_email}")
+        # Determine the sender email.
+        # Resend requires a verified domain. By default, 'onboarding@resend.dev' works for testing if the recipient is the same as the resend account owner.
+        # Or a custom verified domain like 'contact@yourdomain.com'
+        from_email = os.getenv("SMTP_USER", "onboarding@resend.dev").strip()
+        
+        params = {
+            "from": from_email,
+            "to": [to_email],
+            "subject": subject,
+            "html": body.replace('\n', '<br>') # Simple conversion to HTML for better display
+        }
+        
+        email = resend.Emails.send(params)
+        print(f"Email successfully sent via Resend to {to_email}. ID: {email.get('id')}")
     except Exception as e:
-        print(f"CRITICAL SMTP ERROR: {str(e)}")
+        print(f"CRITICAL RESEND ERROR: {str(e)}")
         # Log to mock as fallback if real fails
         with open(MOCK_LOG, "a") as f:
             f.write(f"--- FAILED EMAIL ATTEMPT TO: {to_email} ---\n")
