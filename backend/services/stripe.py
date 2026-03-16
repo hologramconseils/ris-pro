@@ -9,7 +9,7 @@ import models
 _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=_env_path, override=True)
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "").strip() or None
 
 def create_checkout_session(user: models.User, success_url: str, cancel_url: str):
     """
