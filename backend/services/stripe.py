@@ -15,6 +15,9 @@ def create_checkout_session(user: models.User, success_url: str, cancel_url: str
     """
     Create a Stripe checkout session for the user.
     """
+    # Always ensure the API key is fresh from environment
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "").strip() or stripe.api_key
+    
     # Using a fixed price for the analysis (19€)
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
