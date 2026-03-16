@@ -34,8 +34,9 @@ export default function FreeResult({ result, onReset }) {
         const res = await billingAPI.createCheckout(successUrl, cancelUrl)
         window.location.href = res.data.url
       } catch (err) {
-        setError('Impossible de créer la session de paiement. Vérifiez votre connexion.')
-        setLoading(false)
+        const errorMsg = err.response?.data?.detail || 'Impossible de créer la session de paiement. Vérifiez votre connexion.';
+        setError(errorMsg);
+        setLoading(false);
       }
     }
   }
