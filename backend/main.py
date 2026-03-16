@@ -9,7 +9,7 @@ from routers import auth, upload, stripe as stripe_router
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="RIS Scan Pro API",
+    title="RIS Pro API",
     description="API pour l'analyse des Relevés Individuels de Situation",
     version="1.0.0"
 )
@@ -31,7 +31,7 @@ app.include_router(stripe_router.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "RIS Scan Pro API v1.0"}
+    return {"message": "RIS Pro API v1.0"}
 
 @app.get("/health")
 def health_check():

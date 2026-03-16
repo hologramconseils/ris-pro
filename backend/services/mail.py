@@ -52,10 +52,10 @@ def send_email(to_email: str, subject: str, body: str):
         raise e
 
 def send_welcome_email(to_email: str, first_name: str):
-    subject = "Bienvenue sur RIS Scan Pro !"
+    subject = "Bienvenue sur RIS Pro !"
     body = f"""Bonjour {first_name},
 
-Bienvenue sur RIS Scan Pro ! Votre compte a été créé avec succès.
+Bienvenue sur RIS Pro ! Votre compte a été créé avec succès.
 
 Vous pouvez désormais analyser vos documents RIS et suivre l'historique de vos audits de carrière.
 Si vous avez besoin de modifier votre mot de passe, vous pouvez le faire à tout moment depuis votre espace client.
@@ -69,10 +69,10 @@ def send_reset_password_email(to_email: str, first_name: str, token: str):
     frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
     reset_link = f"{frontend_url}/reset-password?token={token}"
     
-    subject = "Réinitialisation de votre mot de passe - RIS Scan Pro"
+    subject = "Réinitialisation de votre mot de passe - RIS Pro"
     body = f"""Bonjour {first_name},
 
-Vous avez demandé la réinitialisation de votre mot de passe RIS Scan Pro.
+Vous avez demandé la réinitialisation de votre mot de passe RIS Pro.
 Veuillez cliquer sur le lien ci-dessous pour définir un nouveau mot de passe :
 
 {reset_link}

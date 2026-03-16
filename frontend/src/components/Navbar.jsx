@@ -14,7 +14,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <a className="navbar-brand" href="/">🔍 RIS Scan Pro</a>
+        <a className="navbar-brand" href="/">🔍 RIS Pro</a>
         <div className="navbar-actions">
           {user ? (
             <>

@@ -46,7 +46,7 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
               {mode === 'login' ? 'Connexion' : mode === 'register' ? 'Créer un compte' : 'Réinitialiser le mot de passe'}
             </h2>
             <p className="subtitle">
-              {mode === 'login' ? 'Accédez à vos analyses sauvegardées.' : mode === 'register' ? 'Rejoignez RIS Scan Pro gratuitement.' : 'Entrez votre email pour recevoir un lien.'}
+              {mode === 'login' ? 'Accédez à vos analyses sauvegardées.' : mode === 'register' ? 'Rejoignez RIS Pro gratuitement.' : 'Entrez votre email pour recevoir un lien.'}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>✕</button>
