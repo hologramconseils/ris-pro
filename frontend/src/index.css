@@ -305,8 +305,8 @@ input, textarea { font-family: inherit; }
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   width: 36px;
   height: 36px;
@@ -315,7 +315,7 @@ input, textarea { font-family: inherit; }
   justify-content: center;
   font-size: 18px;
   cursor: pointer;
-  opacity: 0.3;
+  opacity: 0.75;
   z-index: 10;
   transition: all 0.2s ease;
   color: var(--danger);
