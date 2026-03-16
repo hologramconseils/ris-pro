@@ -80,7 +80,7 @@ def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depend
         # We return 200 even if user doesn't exist for security
         return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé."}
     
-    token = auth_service.create_reset_password_token(user.email) # Wait, did I name it create_reset_token or create_reset_password_token?
+    token = auth_service.create_reset_token(user.email)
     # Actually I used create_reset_token in auth service.
     token = auth_service.create_reset_token(user.email)
     

@@ -14,18 +14,42 @@ def send_email(to_email: str, subject: str, body: str):
     """
     Sends an email using SMTP or logs to a file in mock mode.
     """
-    if USE_MOCK:
+    smtp_server = os.getenv("SMTP_SERVER")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    
+    if not all([smtp_server, smtp_user, smtp_password]):
+        print(f"SMTP not configured (Mock mode active). Email to {to_email} logged to {MOCK_LOG}")
         with open(MOCK_LOG, "a") as f:
-            f.write(f"--- EMAIL TO: {to_email} ---\n")
+            f.write(f"--- MOCK EMAIL TO: {to_email} ---\n")
             f.write(f"SUBJECT: {subject}\n")
             f.write(f"BODY:\n{body}\n")
             f.write("-" * 30 + "\n\n")
-        print(f"Mock email sent to {to_email} (logged to {MOCK_LOG})")
         return
 
-    # Real SMTP implementation (disabled for dev)
-    # ...
-    pass
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = smtp_user
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        print(f"Email successfully sent to {to_email}")
+    except Exception as e:
+        print(f"Error sending email to {to_email}: {str(e)}")
+        # Log to mock as fallback if real fails
+        with open(MOCK_LOG, "a") as f:
+            f.write(f"--- FAILED EMAIL ATTEMPT TO: {to_email} ---\n")
+            f.write(f"ERROR: {str(e)}\n")
+            f.write(f"SUBJECT: {subject}\n")
+            f.write(f"BODY:\n{body}\n")
+            f.write("-" * 30 + "\n\n")
 
 def send_welcome_email(to_email: str, first_name: str):
     subject = "Bienvenue sur RIS Scan Pro !"
