@@ -117,7 +117,7 @@ export default function History() {
                 >
                   🗑️
                 </button>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16, paddingRight: 40 }}>
                   <div style={{ fontSize: 24 }}>{scan.has_anomalies ? '⚠️' : '✅'}</div>
                   <div className={`badge ${scan.has_anomalies ? 'badge-danger' : 'badge-success'}`}>
                     {scan.has_anomalies ? 'Anomalies' : 'Correct'}
