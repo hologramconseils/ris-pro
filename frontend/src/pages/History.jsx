@@ -148,7 +148,7 @@ export default function History() {
               Voulez-vous vraiment supprimer l'analyse de <strong>{confirmingDelete.filename}</strong> ? 
               Cette action est irréversible.
             </p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button className="btn btn-secondary" onClick={() => setConfirmingDelete(null)}>Annuler</button>
               <button className="btn btn-primary" style={{ background: 'var(--danger)' }} onClick={confirmDelete}>
                 Supprimer définitivement
