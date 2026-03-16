@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -58,6 +59,14 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
             detail="Email ou mot de passe incorrect.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Auto-promote to admin if email matches ADMIN_EMAIL env var
+    admin_email = os.getenv("ADMIN_EMAIL")
+    if admin_email and user.email.lower() == admin_email.lower() and not user.is_admin:
+        user.is_admin = True
+        db.commit()
+        db.refresh(user)
+
     access_token_expires = timedelta(minutes=auth_service.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth_service.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
