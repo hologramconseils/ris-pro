@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { authAPI } from '../services/api'
 
 const AuthContext = createContext(null)
@@ -6,6 +6,40 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const timeoutRef = useRef(null)
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('access_token')
+    setUser(null)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+  }, [])
+
+  // Auto-logout after 10 minutes of inactivity
+  const resetTimeout = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (user) {
+      timeoutRef.current = setTimeout(() => {
+        logout()
+        // Optional: We can dispatch a custom event or redirect, but logout() clears state
+        window.location.href = '/' // Force back to landing
+      }, 10 * 60 * 1000) // 10 minutes
+    }
+  }, [user, logout])
+
+  useEffect(() => {
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
+    const handleActivity = () => resetTimeout()
+
+    if (user) {
+      resetTimeout()
+      events.forEach(e => window.addEventListener(e, handleActivity))
+    }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      events.forEach(e => window.removeEventListener(e, handleActivity))
+    }
+  }, [user, resetTimeout])
 
   useEffect(() => {
     const token = localStorage.getItem('access_token')
@@ -30,11 +64,6 @@ export function AuthProvider({ children }) {
   const register = async (data) => {
     await authAPI.register(data)
     return await login(data.email, data.password)
-  }
-
-  const logout = () => {
-    localStorage.removeItem('access_token')
-    setUser(null)
   }
 
   return (
