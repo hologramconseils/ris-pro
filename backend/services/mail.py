@@ -35,18 +35,20 @@ def send_email(to_email: str, subject: str, body: str):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
+        print(f"Attempting to connect to {smtp_server}:{smtp_port}...")
         if smtp_port == 465:
-            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30)
         else:
-            server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
+            server = smtplib.SMTP(smtp_server, smtp_port, timeout=30)
             server.starttls()
         
+        print(f"Connected. Logging in as {smtp_user}...")
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
         print(f"Email successfully sent to {to_email}")
     except Exception as e:
-        print(f"Error sending email to {to_email}: {str(e)}")
+        print(f"CRITICAL SMTP ERROR: {str(e)}")
         # Log to mock as fallback if real fails
         with open(MOCK_LOG, "a") as f:
             f.write(f"--- FAILED EMAIL ATTEMPT TO: {to_email} ---\n")
@@ -54,7 +56,7 @@ def send_email(to_email: str, subject: str, body: str):
             f.write(f"SUBJECT: {subject}\n")
             f.write(f"BODY:\n{body}\n")
             f.write("-" * 30 + "\n\n")
-        raise e # Raise to let the router know it failed
+        raise e
 
 def send_welcome_email(to_email: str, first_name: str):
     subject = "Bienvenue sur RIS Scan Pro !"
