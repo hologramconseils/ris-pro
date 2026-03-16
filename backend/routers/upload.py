@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request
 from sqlalchemy.orm import Session
 from typing import Optional, List
 import database, schemas, models
@@ -11,6 +11,7 @@ import uuid
 import os
 from services import ai_service
 import asyncio
+from limiter import limiter
 
 router = APIRouter(prefix="/scans", tags=["scans"])
 
@@ -33,7 +34,9 @@ def get_optional_user(authorization: Optional[str] = Header(None), db: Session =
         return None
 
 @router.post("/upload", response_model=schemas.ScanResultResponse)
+@limiter.limit("5/minute")
 async def upload_file(
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(database.get_db),
     user: Optional[models.User] = Depends(get_optional_user)

@@ -4,6 +4,10 @@ from database import engine
 import os
 import models
 from routers import auth, upload, stripe as stripe_router
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from fastapi import Request, Response
+from limiter import limiter
 
 # Create DB tables on startup
 models.Base.metadata.create_all(bind=engine)
@@ -13,6 +17,18 @@ app = FastAPI(
     description="API pour l'analyse des Relevés Individuels de Situation",
     version="1.0.0"
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response: Response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
 
 # CORS Settings - Use ALLOWED_ORIGINS env var for production
 allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173").split(",")]
