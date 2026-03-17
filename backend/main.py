@@ -31,7 +31,8 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 # CORS Settings - Use ALLOWED_ORIGINS env var for production
-allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173").split(",")]
+default_origins = "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173,https://ris.hologramconseils.com"
+allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", default_origins).split(",")]
 
 app.add_middleware(
     CORSMiddleware,

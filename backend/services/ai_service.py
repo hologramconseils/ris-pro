@@ -49,6 +49,9 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage, s'arrête, l'expert).
 - **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•) pour chaque point clé et des paragraphes segmentés pour une lisibilité maximale.
+- **RÈGLE CRITIQUE D'ANALYSE DES TRIMESTRES :** 
+    - Toute année comportant 4 trimestres validés DOIT être considérée comme **complète**.
+    - Toute année comportant moins de 4 trimestres (0, 1, 2, 3) DOIT être considérée comme **incomplète**.
 - Pour `justificatif_suggere`, utilise obligatoirement un format liste à puces (un point par document).
 
 --- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
