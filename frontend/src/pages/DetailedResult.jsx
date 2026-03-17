@@ -225,10 +225,10 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
         {/* Navbar Actions Portal */}
         {document.getElementById('navbar-portal-root') && createPortal(
           <>
-            <button className="btn btn-secondary btn-sm" onClick={handleDownloadWord} disabled={isExporting} style={{ padding: '8px 16px' }}>
+            <button className="btn btn-secondary btn-nav" onClick={handleDownloadWord} disabled={isExporting}>
               {isExporting ? '⏳' : '📄'} Word
             </button>
-            <button className="btn btn-secondary btn-sm" onClick={handleDownloadPDF} disabled={isExporting} style={{ padding: '8px 16px' }}>
+            <button className="btn btn-secondary btn-nav" onClick={handleDownloadPDF} disabled={isExporting}>
               {isExporting ? '⏳' : '📥'} PDF
             </button>
           </>,

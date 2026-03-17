@@ -64,6 +64,7 @@ input, textarea { font-family: inherit; }
 .btn-secondary:hover { background: var(--bg-card); border-color: var(--primary-light); }
 .btn-large { padding: 18px 40px; font-size: 17px; border-radius: 14px; }
 .btn-sm { padding: 10px 20px; font-size: 13px; border-radius: 8px; }
+.btn-nav { width: 130px; height: 38px; padding: 0 !important; font-size: 13px; border-radius: 8px; flex-shrink: 0; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 /* ---- Cards ---- */
