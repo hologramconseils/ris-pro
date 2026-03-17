@@ -13,18 +13,53 @@ export default function DetailedResult({ result, onReset }) {
   } catch { anomalies = [] }
 
   const handleDownloadPDF = async () => {
-    if (!contentRef.current) return
     setIsExporting(true)
-    const element = contentRef.current
+    
+    // Create a hidden printable version to ensure perfect margins and B&W
+    const printElement = document.createElement('div')
+    printElement.style.padding = '20mm' // Professional margins
+    printElement.style.color = '#000'
+    printElement.style.background = '#fff'
+    printElement.style.fontFamily = 'Arial, sans-serif'
+    printElement.style.lineHeight = '1.5'
+    
+    // Header
+    const title = document.createElement('h1')
+    title.innerText = "Rapport d'Analyse Détaillé RIS"
+    title.style.textAlign = 'center'
+    title.style.borderBottom = '1px solid #000'
+    title.style.paddingBottom = '10px'
+    printElement.appendChild(title)
+    
+    // Clone relevant content and strip colors
+    const content = contentRef.current.cloneNode(true)
+    
+    // Force B&W and remove UI elements
+    const allElements = content.querySelectorAll('*')
+    allElements.forEach(el => {
+      el.style.color = '#000'
+      el.style.backgroundColor = 'transparent'
+      el.style.borderColor = '#000'
+      el.style.boxShadow = 'none'
+      el.style.textShadow = 'none'
+    })
+    
+    printElement.appendChild(content)
+    
     const opt = {
-      margin: [10, 10, 10, 10],
+      margin: 15, // margins on the PDF page
       filename: `Rapport_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     }
-    await html2pdf().set(opt).from(element).save()
-    setIsExporting(false)
+    
+    try {
+      await html2pdf().set(opt).from(printElement).save()
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const handleDownloadWord = async () => {
@@ -39,10 +74,10 @@ export default function DetailedResult({ result, onReset }) {
 
       const children = []
 
-      // 1. Title
+      // 1. Header with Border
       children.push(
         new Paragraph({
-          text: "Rapport Détaillé d'Analyse RIS",
+          text: "RAPPORT D'EXPERTISE RETRAITE - RIS PRO",
           heading: HeadingLevel.TITLE,
           alignment: AlignmentType.CENTER,
           spacing: { after: 400 },
@@ -51,31 +86,27 @@ export default function DetailedResult({ result, onReset }) {
 
       children.push(
         new Paragraph({
-          text: `${anomalies.length} anomalie(s) identifiée(s) dans votre relevé de carrière.`,
-          heading: HeadingLevel.HEADING_2,
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 400 },
+          text: `Émis le ${new Date().toLocaleDateString('fr-FR')}`,
+          alignment: AlignmentType.RIGHT,
+          spacing: { after: 600 },
         })
       )
 
-      // 2. Diagnostic Expert
+      // 2. Summary
+      children.push(
+        new Paragraph({
+          text: "SYNTHÈSE DU DOSSIER",
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 400, after: 200 },
+        })
+      )
+
       if (aiData) {
         children.push(
           new Paragraph({
-            text: "Diagnostic Expert",
-            heading: HeadingLevel.HEADING_1,
-            spacing: { before: 400, after: 200 },
-          })
-        )
-        
-        children.push(
-          new Paragraph({
             children: [
-              new TextRun({ text: "Niveau de risque : ", bold: true }),
-              new TextRun({ 
-                text: aiData.niveau_risque || 'Non défini', 
-                color: aiData.niveau_risque === 'élevé' ? "CF1020" : (aiData.niveau_risque === 'moyen' ? "FFA500" : "008000") 
-              }),
+              new TextRun({ text: "Niveau de risque détecté : ", bold: true }),
+              new TextRun({ text: (aiData.niveau_risque || 'Non défini').toUpperCase() }),
             ],
             spacing: { after: 200 },
           })
@@ -85,110 +116,109 @@ export default function DetailedResult({ result, onReset }) {
           children.push(
             new Paragraph({
               text: aiData.resume_global,
-              spacing: { after: 200 },
+              spacing: { after: 400 },
+              alignment: AlignmentType.JUSTIFIED
             })
           )
         }
 
+        children.push(
+          new Paragraph({
+            text: "ANALYSE DÉTAILLÉE PAR ANOMALIE",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { before: 400, after: 200 },
+          })
+        )
+        
         if (aiData.compte_rendu) {
-          children.push(
-            new Paragraph({
-              text: "Rapport d'expertise détaillé",
-              heading: HeadingLevel.HEADING_2,
-              spacing: { before: 200, after: 200 },
-            })
-          )
-          
           const crText = aiData.compte_rendu.replace(/\*\*/g, '')
           const crLines = crText.split('\n')
           crLines.forEach(line => {
             if (line.trim()) {
+              const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-')
               children.push(
                 new Paragraph({
                   text: line.trim(),
-                  spacing: { after: 120 },
+                  bullet: isBullet ? { level: 0 } : undefined,
+                  spacing: { after: 150 },
+                  alignment: AlignmentType.JUSTIFIED
                 })
               )
             }
           })
         }
         
+        children.push(
+          new Paragraph({
+            text: "HISTORIQUE CHRONOLOGIQUE ET POINTS DE VIGILANCE",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { before: 600, after: 300 },
+          })
+        )
+
         if (aiData.full_timeline && aiData.full_timeline.length > 0) {
-          children.push(
-            new Paragraph({
-              text: "Chronologie détaillée",
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 400, after: 200 },
-            })
-          )
-          
           aiData.full_timeline.forEach(item => {
             children.push(
               new Paragraph({
                 children: [
-                  new TextRun({ 
-                    text: `Année ${item.annee} - ${item.statut.toUpperCase()}`, 
-                    bold: true, 
-                    color: item.statut !== 'complet' ? (item.statut === 'manquant' ? "CF1020" : "FFA500") : "008000" 
-                  }),
+                  new TextRun({ text: `ANNÉE ${item.annee}`, bold: true }),
+                  new TextRun({ text: ` - Statut : ${item.statut.toUpperCase()}` }),
                 ],
-                spacing: { before: 200, after: 120 },
+                spacing: { before: 300, after: 120 },
               })
             )
+            
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({ text: `Trimestres validés : ${item.trimestres_valides}/4` }),
-                  item.points_complementaires ? new TextRun({ text: ` | Points complémentaires : ${item.points_complementaires}` }) : new TextRun({ text: "" }),
-                ],
-                spacing: { after: 120 },
+                text: `Activité : ${item.activite || 'Non renseignée'}`,
+                spacing: { after: 80 },
               })
             )
+            
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({ text: `Activité : `, bold: true }),
-                  new TextRun({ text: item.activite || 'Non renseignée' }),
-                ],
-                spacing: { after: 120 },
+                text: `Trimestres : ${item.trimestres_valides}/4 ${item.points_complementaires ? `| Points compl. : ${item.points_complementaires}` : ''}`,
+                spacing: { after: 80 },
               })
             )
+
             if (item.statut !== 'complet') {
               children.push(
                 new Paragraph({
                   children: [
                     new TextRun({ 
-                      text: `ATTENTION: ${item.anomalie_specifique || `Il manque ${item.trimestres_manquants} trimestre(s).`}`, 
-                      color: "CF1020",
-                      bold: true
+                      text: `POINT DE VIGILANCE : ${item.anomalie_specifique || `Il manque ${item.trimestres_manquants} trimestre(s).`}`, 
+                      bold: true,
+                      italics: true
                     }),
                   ],
-                  spacing: { after: 120 },
+                  spacing: { after: 200 },
                 })
               )
             }
           })
         }
-      } else {
-        // Fallback for raw text
-        if (result.ai_analysis) {
-           const lines = result.ai_analysis.replace(/\*\*/g, '').split('\n');
-           lines.forEach(line => {
-             children.push(new Paragraph({ text: line, spacing: { after: 120 } }));
-           });
-        }
       }
 
       const doc = new Document({
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch = 1440 twips
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              },
+            },
+          },
           children: children
         }]
       })
 
       const blob = await Packer.toBlob(doc)
       const url = window.URL.createObjectURL(blob)
-      const filename = `Rapport_RIS_${new Date().toISOString().split('T')[0]}.docx`
+      const filename = `Rapport_Expert_RIS_${new Date().toISOString().split('T')[0]}.docx`
       
       const downloadLink = document.createElement("a")
       downloadLink.href = url
