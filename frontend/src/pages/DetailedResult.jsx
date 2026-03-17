@@ -10,10 +10,14 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
   const [isExporting, setIsExporting] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   
-  // Helper to clean text (strip Markdown asterisks)
+  // Helper to clean text (strip Markdown asterisks and ensure lists are on new lines)
   const cleanText = (text) => {
     if (!text) return ""
-    return String(text).replace(/\*\*/g, '').trim()
+    return String(text)
+      .replace(/\*\*/g, '')
+      .replace(/([^>\r\n])•/g, '$1\n•') // Add newline before bullet if not already there
+      .replace(/\n\n+/g, '\n')
+      .trim()
   }
 
   // Auto-refresh when analysis is missing

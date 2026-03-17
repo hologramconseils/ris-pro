@@ -108,7 +108,7 @@ Format de sortie attendu (JSON valide) :
 {{
   "anomalie_detectee": "oui/non",
   "niveau_risque": "faible/moyen/élevé",
-  "resume_global": "Synthèse structurée ultra-concise...",
+  "resume_global": "• Premier point\\n• Deuxième point...",
   "premiere_annee": "XXXX",
   "derniere_annee": "XXXX",
   "full_timeline": [
@@ -118,10 +118,10 @@ Format de sortie attendu (JSON valide) :
       "trimestres_valides": N,
       "activite": "Employeur / Statut",
       "anomalie_specifique": "Explication rapide",
-      "justificatif_suggere": "• Document"
+      "justificatif_suggere": "• Premier justificatif\\n• Deuxième justificatif"
     }}
   ],
-  "compte_rendu": "Analyse ciblée sur les anomalies détectées."
+  "compte_rendu": "• Observation 1\\n• Observation 2"
 }}
 
 **CONSIGNE DE RAPIDITÉ :** Ne génère un élément dans `full_timeline` QUE si c'est une anomalie (incomplet/manquant) ou un point critique. Ignore les années "complet" sans problème.
