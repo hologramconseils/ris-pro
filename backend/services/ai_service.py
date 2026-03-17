@@ -37,7 +37,7 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
         raw_text = "\n".join([f"- {a['title']}: {a['description']}" for a in anomalies])
     
     is_scan = (images is not None and len(images) > 0)
-    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données." if is_scan else ""
+    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données. C'est un SCAN." if is_scan else ""
     
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
@@ -47,23 +47,24 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
 - Ne mentionne JAMAIS que tu es une "Intelligence Artificielle" ou une "IA". Parle en tant qu'expert retraite.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
-- Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage, s'arrête, l'expert).
-- **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•) pour chaque point clé et des paragraphes segmentés pour une lisibilité maximale.
-- **RÈGLE CRITIQUE D'ANALYSE DES TRIMESTRES :** 
-    - 4 trimestres validés = **complet** (Statut : "complet")
-    - 1, 2 ou 3 trimestres validés = **incomplet** (Statut : "incomplet")
-    - 0 trimestre validé ou année vide = **manquant** (Statut : "manquant")
-- Pour `justificatif_suggere`, utilise obligatoirement un format liste à puces (un point par document).
+- Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
+- **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•).
+
+**RÈGLES D'ANALYSE DE L'EXPERT (LOGIQUE DE DÉTECTION SUR SCAN) :**
+1. **IDENTIFICATION DES EMPLOYÉURS** : Le nom de l'EMPLOYEUR ou de l'activité est toujours sur la ligne du DESSUS par rapport aux informations de dates et revenus.
+2. **DÉTECTION DES TROUS** : Si une année X est présente mais que l'année X+1 ou X+2 est totalement absente du tableau de détail ALORS QUE l'assuré n'est pas encore à la retraite, signale une année "manquante" comme anomalie.
+3. **VÉRIFICATION DES TRIMESTRES** : Si une année affiche moins de 4 trimestres, elle est "incomplet". Si elle affiche 0, elle est "manquant".
+4. **RÉGIMES PUBLICS** : Contractuel Université/CROUS/Mairie = **IRCANTEC**.
+
+**STATUTS DE L'ANALYSE :**
+- 4 trimestres = **complet**
+- 1-3 trimestres = **incomplet**
+- 0 trimestre ou année absente = **manquant**
 
 **RÈGLES MÉTIER CRITIQUES (Régimes Publics) :**
 - Fonctionnaire État ➔ **SRE**
 - Fonctionnaire territorial / hospitalier ➔ **CNRACL**
 - Contractuel public ➔ **IRCANTEC** (inclut : Universités, CROUS, Mairies)
-
-**RÈGLES D'EXTRACTION STRUCTURELLE (CRITIQUE) :**
-- DÉTAIL DE CARRIÈRE : Le nom de l'EMPLOYEUR ou l'ACTIVITÉ est toujours sur la ligne du DESSUS par rapport aux dates et revenus.
-- SYNTHÈSE : Les trimestres et points peuvent être sur des lignes décalées si multi-régimes. Agréger par année.
-- Analyse visuellement la structure pour ne pas rattacher un employeur à la mauvaise année.
 
 Lors de l'analyse, impute systématiquement les points au bon régime selon le statut.
 
@@ -96,7 +97,7 @@ Format de sortie attendu (JSON valide) :
 {{
   "anomalie_detectee": "oui/non",
   "niveau_risque": "faible/moyen/élevé",
-  "resume_global": "Synthèse structurée avec paragraphes clairs...",
+  "resume_global": "Synthèse structurée...",
   "premiere_annee": "XXXX",
   "derniere_annee": "XXXX",
   "full_timeline": [
@@ -105,11 +106,11 @@ Format de sortie attendu (JSON valide) :
       "statut": "complet/incomplet/manquant",
       "trimestres_valides": N,
       "activite": "Employeur / Statut",
-      "anomalie_specifique": "Explication claire sans markdown",
+      "anomalie_specifique": "Explication claire",
       "justificatif_suggere": "• Document A\n• Document B\n• Document C"
     }}
   ],
-  "compte_rendu": "Analyse détaillée de l'Expert Vision avec points clés (•) et paragraphes aérés."
+  "compte_rendu": "Analyse détaillée de l'expert retraite avec points clés (•) et paragraphes aérés."
 }}
 
 Données à analyser :

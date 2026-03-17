@@ -67,8 +67,8 @@ async def upload_file(
     db.commit()
     db.refresh(db_scan)
 
-    # Background the AI Audit for logged-in users to prevent timeouts
-    if user and (result["is_valid_ris"] or result["is_scanned"]):
+    # Background the AI Audit for all valid RIS or Scans (including guests for preview)
+    if result["is_valid_ris"] or result["is_scanned"]:
         background_tasks.add_task(
             run_ai_audit_background,
             db_scan.id,

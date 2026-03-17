@@ -160,6 +160,32 @@ export default function FreeResult({ result, onReset }) {
             </div>
           )}
 
+          {!hasAnomalies && result.is_scanned && (
+            <motion.div 
+              style={{ 
+                margin: '24px 0', padding: '20px', borderRadius: 16, 
+                background: 'rgba(79,70,229,0.05)', border: '1px dashed var(--primary-light)',
+                textAlign: 'center'
+              }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <div style={{ fontSize: 24, marginBottom: 12 }}>🤖</div>
+              <h4 style={{ marginBottom: 8 }}>Analyse visuelle approfondie en cours</h4>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
+                Votre document étant un scan, notre expert retraite réalise une analyse ligne par ligne. 
+                Cela peut prendre jusqu'à 60 secondes.
+              </p>
+              <button 
+                className="btn btn-secondary btn-sm" 
+                onClick={() => window.location.reload()}
+                style={{ fontSize: 12 }}
+              >
+                🔄 Actualiser le résultat
+              </button>
+            </motion.div>
+          )}
+
           {hasAnomalies && (
             <div className="cta-box shadow-glow">
               <div style={{ display: 'inline-block', padding: '12px', borderRadius: '50%', background: 'rgba(79,70,229,0.1)', marginBottom: 16 }}>
