@@ -125,11 +125,13 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
         </form>
 
         <div className="modal-footer" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {mode === 'login' ? (
-            <span>Pas encore de compte ? <a onClick={() => { setMode('register'); setError('') }}>S'inscrire gratuitement</a></span>
-          ) : (
-            <span>Déjà un compte ? <a onClick={() => { setMode('login'); setError('') }}>Se connecter</a></span>
-          )}
+          <div className="auth-switch-mode">
+            {mode === 'login' ? (
+              <>Pas encore de compte ? <a onClick={() => { setMode('register'); setError('') }}>S'inscrire gratuitement</a></>
+            ) : (
+              <>Déjà un compte ? <a onClick={() => { setMode('login'); setError('') }}>Se connecter</a></>
+            )}
+          </div>
           
           <button 
             type="button" 

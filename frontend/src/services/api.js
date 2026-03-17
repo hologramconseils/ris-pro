@@ -8,7 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL ||
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 15000 // 15 seconds timeout
+  timeout: 30000 // Increased to 30 seconds to handle cold-starts
 })
 
 // Attach JWT token automatically if available
@@ -25,6 +25,7 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      console.warn("Auth Error (401/403): Session expired or invalid.", error.response.data);
       // If unauthorized, clear token and we could redirect but better to let AuthContext handle it if it detects null token
       localStorage.removeItem('access_token')
       if (window.location.pathname !== '/') {

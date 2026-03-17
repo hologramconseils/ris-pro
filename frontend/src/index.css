@@ -315,6 +315,29 @@ input, textarea { font-family: inherit; }
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
+.auth-switch-mode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.auth-switch-mode a {
+  color: var(--primary-light);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.auth-switch-mode a:hover {
+  color: var(--accent-light);
+}
+
 .delete-scan-btn {
   position: absolute;
   top: 12px;

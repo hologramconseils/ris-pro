@@ -108,12 +108,30 @@ async def run_ai_audit_background(
         if not db_scan:
             return
 
-        ai_commentary = await ai_service.generate_ai_audit(
-            initial_report, 
-            filename,
-            raw_text=raw_text,
-            images=images
-        )
+        # Simple Retry Mechanism: 1 retry if AI fails or returns invalid JSON
+        ai_commentary = None
+        max_retries = 2
+        for attempt in range(max_retries):
+            try:
+                ai_commentary = await ai_service.generate_ai_audit(
+                    initial_report, 
+                    filename,
+                    raw_text=raw_text,
+                    images=images
+                )
+                if ai_service.is_valid_json(ai_commentary):
+                    break
+                print(f"Attempt {attempt + 1}: AI returned invalid JSON. Retrying...")
+            except Exception as e:
+                print(f"Attempt {attempt + 1}: AI service error: {e}")
+            
+            if attempt < max_retries - 1:
+                await asyncio.sleep(2)
+
+        if not ai_commentary or not ai_service.is_valid_json(ai_commentary):
+            print(f"AI Audit consistently failed for scan {scan_id}")
+            return
+
         db_scan.ai_analysis = ai_commentary
         
         # Experts AI Logic
@@ -134,8 +152,8 @@ async def run_ai_audit_background(
                     ]
                     if ai_anomalies:
                         db_scan.detailed_report = json.dumps(ai_anomalies)
-        except:
-            pass
+        except Exception as json_err:
+            print(f"Failed to parse AI JSON for scan {scan_id}: {json_err}")
             
         db.commit()
     except Exception as e:

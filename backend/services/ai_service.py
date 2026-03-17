@@ -137,7 +137,7 @@ Données à analyser :
 
 async def _call_gemini(prompt: str, images: list = None):
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=45.0) as client:
             parts = [{"text": prompt}]
             if images:
                 for img_b64 in images:
@@ -146,6 +146,14 @@ async def _call_gemini(prompt: str, images: list = None):
             response = await client.post(GEMINI_URL, json=payload)
             if response.status_code == 200:
                 text = response.json()['candidates'][0]['content']['parts'][0]['text']
+                # Better JSON extraction: find first '{' and last '}'
+                try:
+                    start = text.find('{')
+                    end = text.rfind('}') + 1
+                    if start != -1 and end != 0:
+                        return text[start:end]
+                except:
+                    pass
                 return text.strip().replace("```json", "").replace("```", "")
             return f"Erreur Gemini {response.status_code}"
     except Exception as e:
@@ -153,7 +161,7 @@ async def _call_gemini(prompt: str, images: list = None):
 
 async def _call_mistral(prompt: str):
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
             payload = {
                 "model": "mistral-small-latest",
@@ -162,7 +170,15 @@ async def _call_mistral(prompt: str):
             }
             response = await client.post(MISTRAL_URL, json=payload, headers=headers)
             if response.status_code == 200:
-                return response.json()['choices'][0]['message']['content']
+                text = response.json()['choices'][0]['message']['content']
+                try:
+                    start = text.find('{')
+                    end = text.rfind('}') + 1
+                    if start != -1 and end != 0:
+                        return text[start:end]
+                except:
+                    pass
+                return text
             return f"Erreur Mistral {response.status_code}"
     except Exception as e:
         return f"Erreur Mistral : {str(e)}"
