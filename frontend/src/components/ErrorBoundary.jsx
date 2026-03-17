@@ -40,19 +40,20 @@ class ErrorBoundary extends React.Component {
               >
                 Retour à l'accueil
               </button>
-              <pre style={{ 
-                marginTop: 24, 
-                padding: 12, 
-                background: 'rgba(0,0,0,0.2)', 
-                borderRadius: 8,
-                fontSize: 12,
-                textAlign: 'left',
-                overflow: 'auto',
-                maxHeight: 200,
-                color: '#fff'
-              }}>
-                {this.state.error?.toString()}
-              </pre>
+              {process.env.NODE_ENV === 'development' && (
+                <pre style={{ 
+                  marginTop: 24, 
+                  padding: 12, 
+                  background: 'rgba(0,0,0,0.2)', 
+                  borderRadius: 8,
+                  fontSize: 12,
+                  textAlign: 'left',
+                  overflow: 'auto',
+                  maxHeight: 200
+                }}>
+                  {this.state.error?.toString()}
+                </pre>
+              )}
             </div>
           </div>
         </div>
