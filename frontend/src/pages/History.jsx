@@ -72,7 +72,11 @@ export default function History() {
 
   if (selectedScan) {
     if ((user.has_paid_access || user.is_admin) && detailedData) {
-      return <DetailedResult result={detailedData} onReset={() => { setSelectedScan(null); setDetailedData(null); }} />
+      return <DetailedResult 
+        result={detailedData} 
+        onReset={() => { setSelectedScan(null); setDetailedData(null); }} 
+        onRefresh={() => handleViewScan(selectedScan)}
+      />
     }
     return <FreeResult result={selectedScan} onReset={() => setSelectedScan(null)} />
   }

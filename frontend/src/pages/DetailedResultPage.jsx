@@ -76,6 +76,7 @@ export default function DetailedResultPage() {
     <DetailedResult 
       result={result} 
       onReset={() => navigate('/')} 
+      onRefresh={loadResult}
     />
   )
 }

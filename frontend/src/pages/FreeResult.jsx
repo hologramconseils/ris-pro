@@ -58,7 +58,7 @@ export default function FreeResult({ result, onReset }) {
   }
 
   if (showDetailed && detailedData) {
-    return <DetailedResult result={detailedData} onReset={onReset} />
+    return <DetailedResult result={detailedData} onReset={onReset} onRefresh={loadDetailed} />
   }
 
   return (
