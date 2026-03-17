@@ -15,12 +15,12 @@ export default function DetailedResultPage() {
 
   useEffect(() => {
     if (id) {
-      loadResult()
+      loadResult(true) // Initial load with full screen loader
     }
   }, [id])
 
-  const loadResult = async () => {
-    setLoading(true)
+  const loadResult = async (silent = false) => {
+    if (!result) setLoading(true)
     setError('')
     try {
       const res = await scanAPI.getResult(id)
@@ -28,13 +28,12 @@ export default function DetailedResultPage() {
     } catch (err) {
       const msg = err.response?.data?.detail || 'Impossible de charger le rapport.'
       setError(msg)
-      // If unauthorized, we might stay here to show an error or redirect
     } finally {
-      setLoading(false)
+      if (!result) setLoading(false)
     }
   }
 
-  if (loading) {
+  if (loading && !result) {
     return (
       <div className="page">
         <div className="bg-dots" />

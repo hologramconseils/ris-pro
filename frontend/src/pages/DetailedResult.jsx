@@ -7,6 +7,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
   const { user } = useAuth()
   const contentRef = useRef(null)
   const [isExporting, setIsExporting] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   let anomalies = []
   try {
     anomalies = JSON.parse(result.detailed_report || '[]')
@@ -273,11 +274,35 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
               
               if (!result.ai_analysis) return (
                 <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
-                  <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
-                  <p style={{ fontWeight: 600 }}>L'Expert Vision analyse votre document en arrière-plan...</p>
-                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Cela peut prendre jusqu'à 1 minute. Veuillez rafraîchir la page.</p>
-                  <button className="btn btn-secondary btn-sm" style={{ marginTop: 12 }} onClick={() => onRefresh ? onRefresh() : window.location.reload()}>
-                    🔄 Rafraîchir l'expertise
+                  {!isRefreshing && <div className="spinner" style={{ margin: '0 auto 16px' }}></div>}
+                  {isRefreshing && <div className="spinner" style={{ margin: '0 auto 16px', borderColor: 'var(--primary-light) transparent transparent transparent' }}></div>}
+                  
+                  <p style={{ fontWeight: 600 }}>
+                    {isRefreshing ? "Mise à jour de l'expertise..." : "L'Expert Vision analyse votre document en arrière-plan..."}
+                  </p>
+                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>
+                    Cela peut prendre jusqu'à 1 minute.
+                  </p>
+                  
+                  <button 
+                    className={`btn ${isRefreshing ? 'btn-secondary' : 'btn-primary'} btn-sm`} 
+                    style={{ marginTop: 16, minWidth: 180 }} 
+                    disabled={isRefreshing}
+                    onClick={async () => {
+                      if (!onRefresh) {
+                        window.location.reload()
+                        return
+                      }
+                      setIsRefreshing(true)
+                      try {
+                        await onRefresh()
+                      } finally {
+                        // Give a small delay for smoother transition
+                        setTimeout(() => setIsRefreshing(false), 800)
+                      }
+                    }}
+                  >
+                    {isRefreshing ? '⌛ Recherche...' : '🔄 Rafraîchir l\'expertise'}
                   </button>
                 </div>
               )
