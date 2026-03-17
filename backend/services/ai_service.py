@@ -58,7 +58,13 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 **RÈGLES MÉTIER CRITIQUES (Régimes Publics) :**
 - Fonctionnaire État ➔ **SRE**
 - Fonctionnaire territorial / hospitalier ➔ **CNRACL**
-- Contractuel public ➔ **IRCANTEC** (inclu : Universités, CROUS)
+- Contractuel public ➔ **IRCANTEC** (inclut : Universités, CROUS, Mairies)
+
+**RÈGLES D'EXTRACTION STRUCTURELLE (CRITIQUE) :**
+- DÉTAIL DE CARRIÈRE : Le nom de l'EMPLOYEUR ou l'ACTIVITÉ est toujours sur la ligne du DESSUS par rapport aux dates et revenus.
+- SYNTHÈSE : Les trimestres et points peuvent être sur des lignes décalées si multi-régimes. Agréger par année.
+- Analyse visuellement la structure pour ne pas rattacher un employeur à la mauvaise année.
+
 Lors de l'analyse, impute systématiquement les points au bon régime selon le statut.
 
 --- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
