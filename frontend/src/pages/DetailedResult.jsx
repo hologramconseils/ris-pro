@@ -267,14 +267,29 @@ export default function DetailedResult({ result, onReset }) {
             )
           })()}
 
-          {/* Chronologie et Justificatifs */}
-          <div>
             <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24 }}>🔎 Chronologie et Pièces Justificatives</h3>
             
             {(() => {
               let aiData = null
               try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
-              if (!aiData?.full_timeline) return <p>Chargement de la chronologie...</p>
+              
+              if (!result.ai_analysis) return (
+                <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
+                  <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
+                  <p style={{ fontWeight: 600 }}>L'IA analyse votre document en arrière-plan...</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Cela peut prendre jusqu'à 1 minute. Veuillez rafraîchir la page.</p>
+                  <button className="btn btn-secondary btn-sm" style={{ marginTop: 12 }} onClick={() => window.location.reload()}>
+                    🔄 Rafraîchir l'analyse
+                  </button>
+                </div>
+              )
+
+              if (!aiData?.full_timeline) return (
+                <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,100,100,0.05)', borderRadius: 12 }}>
+                  <p style={{ fontWeight: 600, color: 'var(--danger)' }}>⚠️ Chronologie indisponible</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>L'analyse détaillée n'a pas pu être générée pour ce document ou le format est obsolète.</p>
+                </div>
+              )
 
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
