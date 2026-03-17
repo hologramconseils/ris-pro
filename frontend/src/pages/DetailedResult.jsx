@@ -242,7 +242,7 @@ export default function DetailedResult({ result, onReset }) {
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
         
         {/* Export Actions */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
           <button 
             className="btn btn-secondary btn-sm" 
             onClick={handleDownloadWord} 
