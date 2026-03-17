@@ -130,6 +130,9 @@ async def run_ai_audit_background(
 
         if not ai_commentary or not ai_service.is_valid_json(ai_commentary):
             print(f"AI Audit consistently failed for scan {scan_id}")
+            # Mark as complete but with error to stop spinner
+            db_scan.ai_analysis = json.dumps({"error": "AI Timeout or Invalid Response"})
+            db.commit()
             return
 
         db_scan.ai_analysis = ai_commentary
@@ -200,6 +203,33 @@ def get_history(db: Session = Depends(database.get_db), current_user: models.Use
             elif len(report) == 1:
                 s.preview_anomalies = [report[0]]
     return scans
+
+@router.get("/preview/{scan_id}", response_model=schemas.ScanResultResponse)
+def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
+    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Analyse non trouvée.")
+    
+    # Compute is_ai_complete for the response
+    scan.is_ai_complete = scan.ai_analysis is not None
+    
+    # Refresh preview anomalies if they were updated by AI
+    if scan.detailed_report:
+        try:
+            report = json.loads(scan.detailed_report)
+            scan.total_anomalies = len(report)
+            if len(report) >= 2:
+                oldest = report[0]
+                most_recent = report[-1]
+                if len(report) > 2:
+                    most_recent = report[-2]
+                scan.preview_anomalies = [oldest, most_recent]
+            elif len(report) == 1:
+                scan.preview_anomalies = [report[0]]
+        except:
+            pass
+            
+    return scan
 
 @router.get("/{scan_id}", response_model=schemas.ScanResultDetailedResponse)
 def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):

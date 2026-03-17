@@ -1,20 +1,46 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AuthModal from '../components/AuthModal'
 import DetailedResult from './DetailedResult'
 import { billingAPI, scanAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { motion } from 'framer-motion'
 
-export default function FreeResult({ result, onReset }) {
-  const { user, setUser } = useAuth()
+export default function FreeResult({ result: initialResult, onReset }) {
+  const { user } = useAuth()
+  const [result, setResult] = useState(initialResult)
   const [showAuth, setShowAuth] = useState(false)
   const [authMode, setAuthMode] = useState('register')
   const [loading, setLoading] = useState(false)
   const [showDetailed, setShowDetailed] = useState(false)
   const [detailedData, setDetailedData] = useState(null)
   const [error, setError] = useState('')
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const hasAnomalies = result.has_anomalies
+  const isAiComplete = result.is_ai_complete
+
+  const refreshResult = useCallback(async (silent = false) => {
+    if (!silent) setIsRefreshing(true)
+    try {
+      const res = await scanAPI.getPreview(result.id)
+      setResult(res.data)
+    } catch (err) {
+      console.error("Failed to refresh result", err)
+    } finally {
+      if (!silent) setIsRefreshing(false)
+    }
+  }, [result.id])
+
+  // Polling for scanned documents
+  useEffect(() => {
+    let interval;
+    if (result.is_scanned && !isAiComplete && !hasAnomalies) {
+      interval = setInterval(() => {
+        refreshResult(true)
+      }, 8000) // Poll every 8 seconds
+    }
+    return () => clearInterval(interval)
+  }, [result.is_scanned, isAiComplete, hasAnomalies, refreshResult])
 
   const handleGetDetailed = async () => {
     if (!user) {
@@ -160,7 +186,7 @@ export default function FreeResult({ result, onReset }) {
             </div>
           )}
 
-          {!hasAnomalies && result.is_scanned && (
+          {!hasAnomalies && result.is_scanned && !isAiComplete && (
             <motion.div 
               style={{ 
                 margin: '24px 0', padding: '20px', borderRadius: 16, 
@@ -178,10 +204,11 @@ export default function FreeResult({ result, onReset }) {
               </p>
               <button 
                 className="btn btn-secondary btn-sm" 
-                onClick={() => window.location.reload()}
+                onClick={() => refreshResult()}
+                disabled={isRefreshing}
                 style={{ fontSize: 12 }}
               >
-                🔄 Actualiser le résultat
+                {isRefreshing ? '⌛ Vérification...' : '🔄 Actualiser le résultat'}
               </button>
             </motion.div>
           )}

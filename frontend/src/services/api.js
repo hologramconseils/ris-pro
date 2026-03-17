@@ -60,6 +60,7 @@ export const scanAPI = {
     })
   },
   getResult: (scanId) => api.get(`/scans/${scanId}`),
+  getPreview: (scanId) => api.get(`/scans/preview/${scanId}`),
   listHistory: () => api.get('/scans/history'),
   deleteScan: (scanId) => api.delete(`/scans/${scanId}`),
 }

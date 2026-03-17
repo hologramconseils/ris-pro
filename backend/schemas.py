@@ -32,6 +32,7 @@ class ScanResultResponse(ScanResultBase):
     is_valid_ris: bool
     preview_anomalies: Optional[List[dict]] = None
     total_anomalies: int = 0
+    is_ai_complete: bool = False
     created_at: datetime
 
     class Config:
