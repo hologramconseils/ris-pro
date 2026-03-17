@@ -76,9 +76,7 @@ export default function DetailedResult({ result, onReset }) {
                 position: 'relative',
                 overflow: 'hidden'
               }}>
-                <div style={{ 
-                  position: 'absolute', top: -10, right: -10, fontSize: 60, opacity: 0.1, pointerEvents: 'none'
-                }}>🤖</div>
+
 
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
