@@ -83,7 +83,7 @@ export default function DetailedResult({ result, onReset }) {
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
                   <h3 style={{ fontSize: 18, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
-                    🧪 Analyse Expert IA <span className="badge badge-success" style={{ fontSize: 10 }}>Bêta</span>
+                    🧪 Diagnostic Expert <span className="badge badge-success" style={{ fontSize: 10 }}>Bêta</span>
                   </h3>
                   <span style={{ 
                     padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700,
@@ -128,9 +128,9 @@ export default function DetailedResult({ result, onReset }) {
                   </div>
                 )}
 
-                <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-subtle)', fontStyle: 'italic' }}>
-                  ℹ️ Cette analyse est générée automatiquement par notre intelligence artificielle et doit être validée par un conseiller.
-                </div>
+                <p style={{ fontSize: 11, fontStyle: 'italic', color: 'var(--text-muted)', marginTop: 12 }}>
+                  ℹ️ Cette analyse est générée automatiquement par notre algorithme de pointe et doit être validée par un conseiller.
+                </p>
               </div>
             )
           }
@@ -138,7 +138,7 @@ export default function DetailedResult({ result, onReset }) {
           // Fallback raw text
           return (
             <div className="card" style={{ marginBottom: 32 }}>
-               <h3>🧪 Analyse Expert IA</h3>
+               <h3>🧪 Diagnostic Expert</h3>
                <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>{result.ai_analysis}</pre>
             </div>
           )

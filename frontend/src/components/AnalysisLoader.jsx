@@ -6,7 +6,7 @@ const STEPS = [
   { label: 'Extraction du texte (OCR si nécessaire)…', icon: '🔍' },
   { label: 'Analyse des données de carrière…', icon: '📊' },
   { label: 'Détection des anomalies…', icon: '⚠️' },
-  { label: 'Génération de l\'audit expert (IA)…', icon: '🤖' },
+  { label: 'Génération du diagnostic avancé…', icon: '⚡' },
 ]
 
 export default function AnalysisLoader() {
