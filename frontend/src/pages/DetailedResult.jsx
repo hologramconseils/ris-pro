@@ -15,67 +15,43 @@ export default function DetailedResult({ result, onReset }) {
   const handleDownloadPDF = async () => {
     setIsExporting(true)
     
+    const element = contentRef.current
+
+    const opt = {
+      margin: 10,
+      filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        letterRendering: true,
+        onclone: (doc) => {
+          const all = doc.querySelectorAll('*')
+          all.forEach(el => {
+            el.style.color = '#000000'
+            el.style.background = '#ffffff'
+            el.style.backgroundImage = 'none'
+            el.style.boxShadow = 'none'
+            el.style.textShadow = 'none'
+            el.style.borderColor = '#000000'
+          })
+          doc.querySelectorAll('.btn, .delete-scan-btn, .bg-dots, .navbar').forEach(el => {
+            el.style.display = 'none'
+          })
+          doc.querySelectorAll('h1, h2, h3, h4').forEach(h => {
+             h.style.borderBottom = '1px solid #000'
+             h.style.paddingBottom = '10px'
+             h.style.marginBottom = '20px'
+             h.style.textAlign = 'center'
+             h.style.color = '#000'
+          })
+        }
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+
     try {
-      // 1. Create a clean, temporary container
-      const printContainer = document.createElement('div')
-      printContainer.style.position = 'absolute'
-      printContainer.style.left = '0'
-      printContainer.style.top = '0'
-      printContainer.style.zIndex = '-999'
-      printContainer.style.width = '700px'
-      printContainer.style.background = '#ffffff'
-      printContainer.style.color = '#000000'
-      printContainer.style.padding = '40px'
-      printContainer.style.fontFamily = 'Arial, sans-serif'
-      
-      // 2. Add Header
-      const header = document.createElement('div')
-      header.style.textAlign = 'center'
-      header.style.borderBottom = '2px solid #000'
-      header.style.marginBottom = '30px'
-      header.style.paddingBottom = '15px'
-      header.innerHTML = `
-        <h1 style="margin: 0; font-size: 24px; color: #000;">RAPPORT D'EXPERTISE RETRAITE</h1>
-        <p style="margin: 10px 0 0; font-size: 14px; color: #000;">Document généré par RIS Pro - Hologram Conseils</p>
-        <p style="margin: 5px 0 0; font-size: 12px; color: #666;">Date : ${new Date().toLocaleDateString('fr-FR')}</p>
-      `
-      printContainer.appendChild(header)
-      
-      // 3. Clone and Clean Content
-      const node = contentRef.current.cloneNode(true)
-      
-      // Remove noise
-      node.querySelectorAll('.btn, .delete-scan-btn, .bg-dots').forEach(el => el.remove())
-      
-      // Force B&W styles on all children
-      const allElements = node.querySelectorAll('*')
-      allElements.forEach(el => {
-        el.style.color = '#000'
-        el.style.background = 'transparent'
-        el.style.boxShadow = 'none'
-        el.style.textShadow = 'none'
-        el.style.borderColor = '#000'
-      })
-      
-      printContainer.appendChild(node)
-      document.body.appendChild(printContainer)
-      
-      const opt = {
-        margin: 10,
-        filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, 
-          useCORS: true, 
-          letterRendering: true,
-          scrollY: 0,
-          scrollX: 0
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }
-      
-      await html2pdf().set(opt).from(printContainer).save()
-      document.body.removeChild(printContainer)
+      await html2pdf().set(opt).from(element).save()
     } catch (err) {
       console.error("PDF Export Error:", err)
       alert("Une erreur est survenue lors de la génération du PDF.")
