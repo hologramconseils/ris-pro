@@ -55,7 +55,11 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
     - 0 trimestre validé ou année vide = **manquant** (Statut : "manquant")
 - Pour `justificatif_suggere`, utilise obligatoirement un format liste à puces (un point par document).
 
-**RÈGLE MÉTIER CRITIQUE :** Les emplois en **université** relèvent du secteur public (non-titulaire) et dépendent obligatoirement de l'**IRCANTEC**. Lors de l'analyse, impute systématiquement ces points à ce régime.
+**RÈGLES MÉTIER CRITIQUES (Régimes Publics) :**
+- Fonctionnaire État ➔ **SRE**
+- Fonctionnaire territorial / hospitalier ➔ **CNRACL**
+- Contractuel public ➔ **IRCANTEC** (inclu : Universités, CROUS)
+Lors de l'analyse, impute systématiquement les points au bon régime selon le statut.
 
 --- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
 Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :
