@@ -237,7 +237,7 @@ export default function DetailedResult({ result, onReset }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
                   marginBottom: 20, paddingBottom: 15, borderBottom: '1px solid var(--border)' 
                 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'Expert IA</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'Expert Vision</h3>
                   <div style={{ 
                     background: risk.bg, color: risk.text, padding: '6px 16px', 
                     borderRadius: 50, fontWeight: 800, fontSize: 13, border: `1px solid ${risk.text}33`
@@ -247,7 +247,7 @@ export default function DetailedResult({ result, onReset }) {
                 </div>
 
                 <div className="justificatif-box" style={{ background: 'rgba(255,255,255,0.02)', marginBottom: 24 }}>
-                   <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6 }}>{aiData.resume_global}</p>
+                   <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{aiData.resume_global}</p>
                 </div>
 
                 {aiData.compte_rendu && (
@@ -256,7 +256,7 @@ export default function DetailedResult({ result, onReset }) {
                     borderLeft: '4px solid var(--primary-light)'
                   }}>
                     <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 12 }}>
-                      📝 Synthèse détaillée par l'expert
+                      📝 Synthèse détaillée de l'Expert
                     </h4>
                     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                       {aiData.compte_rendu.replace(/\*\*/g, '')}
@@ -316,7 +316,7 @@ export default function DetailedResult({ result, onReset }) {
                                 <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>
                                   📄 Justificatif(s) à fournir :
                                 </div>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
                                   {item.justificatif_suggere}
                                 </div>
                               </div>

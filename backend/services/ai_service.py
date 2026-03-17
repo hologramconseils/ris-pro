@@ -39,11 +39,12 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     is_scan = (images is not None and len(images) > 0)
     vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données." if is_scan else ""
     
-    prompt = f"""Tu es un expert en audit de relevés de carrière retraite française ({filename}).
+    prompt = f"""Tu es l'Expert Vision Retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
 
 Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
-REGLE : Ne jamais utiliser de markdown (**).
+REGLE : Ne mentionne JAMAIS que tu es une "Intelligence Artificielle" ou une "IA". Parle en tant qu'Expert Vision Retraite.
+REGLE : Ne jamais utiliser de markdown (** ou __).
 
 --- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
 Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :
@@ -66,11 +67,11 @@ Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :
    - UE/EEE : "Formulaire européen E205 / P5000"
    - Hors UE : "Certificats d'emploi et Bulletins de salaire étrangers"
 
-Format de sortie :
+Format de sortie attendu (JSON valide) :
 {{
   "anomalie_detectee": "oui/non",
   "niveau_risque": "faible/moyen/élevé",
-  "resume_global": "synthèse concise",
+  "resume_global": "Synthèse structurée avec paragraphes clairs...",
   "premiere_annee": "XXXX",
   "derniere_annee": "XXXX",
   "full_timeline": [
@@ -78,13 +79,12 @@ Format de sortie :
       "annee": "XXXX",
       "statut": "complet/incomplet/manquant",
       "trimestres_valides": N,
-      "trimestres_manquants": M,
-      "activite": "Résumé de l'activité (ex: Salarié, Chômage, Indépendant)",
-      "anomalie_specifique": "explication claire",
-      "justificatif_suggere": "Liste précise des documents à fournir (ex: Bulletins de salaire, Attestation Pôle Emploi)"
+      "activite": "Employeur / Statut",
+      "anomalie_specifique": "Explication claire sans markdown",
+      "justificatif_suggere": "• Document A\n• Document B\n• Document C"
     }}
   ],
-  "compte_rendu": "Détails experts avec puces •"
+  "compte_rendu": "Analyse détaillée de l'Expert avec points clés (•) et paragraphes aérés."
 }}
 
 Données à analyser :

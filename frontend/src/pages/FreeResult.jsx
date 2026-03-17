@@ -110,7 +110,7 @@ export default function FreeResult({ result, onReset }) {
                       <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary-light)', marginBottom: 4 }}>
                         📄 PIÈCE(S) À FOURNIR :
                       </div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
                         {result.preview_anomalies[0].justificatif}
                       </div>
                     </div>
@@ -135,7 +135,7 @@ export default function FreeResult({ result, onReset }) {
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-light)', marginBottom: 4 }}>
                           📄 PIÈCE(S) À FOURNIR :
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
                           {result.preview_anomalies[1].justificatif}
                         </div>
                       </div>
