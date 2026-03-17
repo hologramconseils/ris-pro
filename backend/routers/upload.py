@@ -67,7 +67,6 @@ async def upload_file(
     db.refresh(db_scan)
 
     # NEW: AI Audit for logged-in users
-    # Always trigger for anything identified as a RIS or a scan
     if user and (result["is_valid_ris"] or result["is_scanned"]):
         try:
             ai_commentary = await ai_service.generate_ai_audit(
@@ -78,16 +77,21 @@ async def upload_file(
             )
             db_scan.ai_analysis = ai_commentary
             
-            # Sync has_anomalies flag and previews with AI findings (Expert AI is source of truth)
+            # Experts AI Logic
             try:
                 ai_data = json.loads(ai_commentary)
                 if ai_data.get("anomalie_detectee") == "oui":
                     db_scan.has_anomalies = True
                     
-                    # If parser missed everything, try to build preview from AI timeline
-                    if not result["detailed_report"] and ai_data.get("full_timeline"):
+                    # Store detailed list of anomalies with justificatifs in db_scan.detailed_report
+                    if ai_data.get("full_timeline"):
                         ai_anomalies = [
-                            {"year": item["annee"], "title": f"Année {item['annee']} : {item['statut']}", "description": item["anomalie_specifique"]}
+                            {
+                                "year": item["annee"], 
+                                "title": f"Année {item['annee']} : {item['statut']}", 
+                                "description": item["anomalie_specifique"],
+                                "justificatif": item.get("justificatif_suggere")
+                            }
                             for item in ai_data["full_timeline"] if item.get("statut") != "complet"
                         ]
                         if ai_anomalies:
@@ -104,12 +108,10 @@ async def upload_file(
         report = json.loads(db_scan.detailed_report)
         db_scan.total_anomalies = len(report)
         if len(report) >= 2:
-            # Sort by year (assuming title contains the year or report has a 'year' field)
-            # Find the most recent anomaly that is NOT the absolute last year
             oldest = report[0]
             most_recent = report[-1]
             if len(report) > 2:
-                most_recent = report[-2] # Default to second-to-last
+                most_recent = report[-2]
             db_scan.preview_anomalies = [oldest, most_recent]
         elif len(report) == 1:
             db_scan.preview_anomalies = [report[0]]
@@ -142,6 +144,7 @@ def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user:
     if not (current_user.has_paid_access or (current_user.is_admin and enable_admin)):
         raise HTTPException(status_code=403, detail="Vous devez payer 19€ pour accéder au rapport détaillé.")
     return scan
+
 @router.delete("/{scan_id}")
 def delete_scan(scan_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()

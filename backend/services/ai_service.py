@@ -20,10 +20,7 @@ def is_valid_json(text: str) -> bool:
 
 async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
     """
-    Routage IA Adaptatif (Stabilité & Quotas) :
-    1. PDF Natif (Tès bonne qualité) -> Mistral (Primaire)
-    2. Scan/Photo/Mauvaise qualité -> Gemini Vision (Primaire)
-    3. Si Gemini échoue (Quotas/Tokens) -> Bascule IMMÉDIATE sur Mistral
+    Routage IA Adaptatif (Stabilité & Quotas) + Détection Jusitifcatifs.
     """
     if not raw_text and not anomalies and not (images and len(images)>0):
         return json.dumps({
@@ -44,40 +41,58 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     
     prompt = f"""Tu es un expert en audit de relevés de carrière retraite française ({filename}).
 {vision_mode_desc}
+
 Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 REVENT : N'utilise jamais de markdown (**).
+
+Règles de suggestion de justificatifs :
+- Si anomalie liée à des trimestres manquants/incomplets (activité salarié) -> "Bulletins de salaire"
+- Si anomalie liée à une période de maladie -> "Indemnités Journalières de Sécurité Sociale (IJSS)"
+- Si anomalie liée à du chômage -> "Attestation d'indemnisation Pôle Emploi / Travail"
+- Si tout est OK -> null
+
+Format de sortie :
+{{
+  "anomalie_detectee": "oui/non",
+  "niveau_risque": "faible/moyen/élevé",
+  "resume_global": "synthèse concise",
+  "premiere_annee": "XXXX",
+  "derniere_annee": "XXXX",
+  "full_timeline": [
+    {{
+      "annee": "XXXX",
+      "statut": "complet/incomplet/manquant",
+      "trimestres_valides": N,
+      "trimestres_manquants": M,
+      "points_complementaires": "valeur",
+      "activite": "Résumé",
+      "anomalie_specifique": "explication ou null",
+      "justificatif_suggere": "Nom du document à fournir ou null"
+    }}
+  ],
+  "compte_rendu": "Détails experts avec puces •"
+}}
 
 Données :
 {raw_text}
 """
 
     # --- STRATÉGIE DE ROUTAGE ---
-
     if is_scan:
-        # A. C'est un scan/photo -> Gemini Vision en priorité
         if GEMINI_API_KEY:
             res = await _call_gemini(prompt, images)
             if is_valid_json(res): return res
-            print(f"⚠️ Gemini (Quota/Token ou erreur), bascule AUTO sur Mistral... ({res[:50]})")
-
-        # Fallback ou Quota Gemini -> Mistral (sur le texte OCR extrait)
         if MISTRAL_API_KEY:
             res = await _call_mistral(prompt)
             if is_valid_json(res): return res
-
     else:
-        # B. C'est un PDF natif "propre" -> Mistral AI en priorité (Expertise FR)
         if MISTRAL_API_KEY:
             res = await _call_mistral(prompt)
             if is_valid_json(res): return res
-            print(f"⚠️ Mistral a échoué, tentative avec Gemini... ({res[:50]})")
-
-        # Fallback Mistral -> Gemini
         if GEMINI_API_KEY:
             res = await _call_gemini(prompt, images)
             if is_valid_json(res): return res
 
-    # --- C. DERNIER RECOURS (Ollama local) ---
     return await _call_ollama(prompt)
 
 async def _call_gemini(prompt: str, images: list = None):

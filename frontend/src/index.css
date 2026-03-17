@@ -286,6 +286,20 @@ input, textarea { font-family: inherit; }
 .anomaly-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
 .anomaly-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
+.justificatif-badge {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(79, 70, 229, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--primary-light);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.justificatif-badge strong { color: var(--text); }
+
 /* ---- Auth Modal ---- */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 200;
@@ -440,4 +454,3 @@ input, textarea { font-family: inherit; }
 
 /* Animations Utilities */
 .stagger-entrance > * { opacity: 0; }
-
