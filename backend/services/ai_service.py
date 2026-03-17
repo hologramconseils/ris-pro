@@ -59,7 +59,7 @@ Format de sortie obligatoire :
 {{
   "anomalie_detectee": "oui/non",
   "niveau_risque": "faible/moyen/élevé",
-  "resume_global": "synthèse concise de l'état du relevé",
+  "resume_global": "synthèse concise et bien aérée de l'état du relevé (utilise des sauts de ligne \\n\\n pour séparer les idées)",
   "premiere_annee": "XXXX",
   "derniere_annee": "XXXX",
   "full_timeline": [
@@ -73,7 +73,7 @@ Format de sortie obligatoire :
       "anomalie_specifique": "explication précise si le statut n'est pas complet, sinon null"
     }}
   ],
-  "compte_rendu": "Compte-rendu d'expert structuré pour le client."
+  "compte_rendu": "Compte-rendu d'expert extrêmement détaillé. Si des anomalies sont détectées, TU DOIS OBLIGATOIREMENT utiliser des puces (•) pour lister chaque point de vigilance critique, et aérer le texte avec des sauts de ligne (\\n\\n) entre chaque anomalie."
 }}
 
 Réponds uniquement en JSON valide.
