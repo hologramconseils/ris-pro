@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useRef, useState } from 'react'
 import html2pdf from 'html2pdf.js'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
 
 export default function DetailedResult({ result, onReset }) {
   const { user } = useAuth()
@@ -26,37 +27,183 @@ export default function DetailedResult({ result, onReset }) {
     setIsExporting(false)
   }
 
-  const handleDownloadWord = () => {
-    if (!contentRef.current) return
+  const handleDownloadWord = async () => {
     setIsExporting(true)
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
-      "xmlns:w='urn:schemas-microsoft-com:office:word' " +
-      "xmlns='http://www.w3.org/TR/REC-html40'>" +
-      "<head><meta charset='utf-8'><title>Rapport RIS</title>" +
-      "<style>body { font-family: Arial, sans-serif; font-size: 11pt; } .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; } .badge { font-weight: bold; } h1, h2, h3, h4 { color: #333; } p { color: #555; }</style>" +
-      "</head><body>"
-    const footer = "</body></html>"
-    const sourceHTML = header + contentRef.current.innerHTML + footer
+    
+    try {
+      let anomalies = []
+      try { anomalies = JSON.parse(result.detailed_report || '[]') } catch { anomalies = [] }
+      
+      let aiData = null
+      try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
 
-    const blob = new Blob(['\ufeff', sourceHTML], {
-      type: 'application/msword'
-    })
-    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML)
-    const filename = `Rapport_RIS_${new Date().toISOString().split('T')[0]}.doc`
-    
-    const downloadLink = document.createElement("a")
-    document.body.appendChild(downloadLink)
-    
-    if (navigator.msSaveOrOpenBlob) {
-      navigator.msSaveOrOpenBlob(blob, filename)
-    } else {
+      const children = []
+
+      // 1. Title
+      children.push(
+        new Paragraph({
+          text: "Rapport Détaillé d'Analyse RIS",
+          heading: HeadingLevel.TITLE,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        })
+      )
+
+      children.push(
+        new Paragraph({
+          text: `${anomalies.length} anomalie(s) identifiée(s) dans votre relevé de carrière.`,
+          heading: HeadingLevel.HEADING_2,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        })
+      )
+
+      // 2. Diagnostic Expert
+      if (aiData) {
+        children.push(
+          new Paragraph({
+            text: "Diagnostic Expert",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { before: 400, after: 200 },
+          })
+        )
+        
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Niveau de risque : ", bold: true }),
+              new TextRun({ 
+                text: aiData.niveau_risque || 'Non défini', 
+                color: aiData.niveau_risque === 'élevé' ? "CF1020" : (aiData.niveau_risque === 'moyen' ? "FFA500" : "008000") 
+              }),
+            ],
+            spacing: { after: 200 },
+          })
+        )
+
+        if (aiData.resume_global) {
+          children.push(
+            new Paragraph({
+              text: aiData.resume_global,
+              spacing: { after: 200 },
+            })
+          )
+        }
+
+        if (aiData.compte_rendu) {
+          children.push(
+            new Paragraph({
+              text: "Rapport d'expertise détaillé",
+              heading: HeadingLevel.HEADING_2,
+              spacing: { before: 200, after: 200 },
+            })
+          )
+          
+          const crText = aiData.compte_rendu.replace(/\*\*/g, '')
+          const crLines = crText.split('\n')
+          crLines.forEach(line => {
+            if (line.trim()) {
+              children.push(
+                new Paragraph({
+                  text: line.trim(),
+                  spacing: { after: 120 },
+                })
+              )
+            }
+          })
+        }
+        
+        if (aiData.full_timeline && aiData.full_timeline.length > 0) {
+          children.push(
+            new Paragraph({
+              text: "Chronologie détaillée",
+              heading: HeadingLevel.HEADING_1,
+              spacing: { before: 400, after: 200 },
+            })
+          )
+          
+          aiData.full_timeline.forEach(item => {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({ 
+                    text: `Année ${item.annee} - ${item.statut.toUpperCase()}`, 
+                    bold: true, 
+                    color: item.statut !== 'complet' ? (item.statut === 'manquant' ? "CF1020" : "FFA500") : "008000" 
+                  }),
+                ],
+                spacing: { before: 200, after: 120 },
+              })
+            )
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({ text: `Trimestres validés : ${item.trimestres_valides}/4` }),
+                  item.points_complementaires ? new TextRun({ text: ` | Points complémentaires : ${item.points_complementaires}` }) : new TextRun({ text: "" }),
+                ],
+                spacing: { after: 120 },
+              })
+            )
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({ text: `Activité : `, bold: true }),
+                  new TextRun({ text: item.activite || 'Non renseignée' }),
+                ],
+                spacing: { after: 120 },
+              })
+            )
+            if (item.statut !== 'complet') {
+              children.push(
+                new Paragraph({
+                  children: [
+                    new TextRun({ 
+                      text: `ATTENTION: ${item.anomalie_specifique || `Il manque ${item.trimestres_manquants} trimestre(s).`}`, 
+                      color: "CF1020",
+                      bold: true
+                    }),
+                  ],
+                  spacing: { after: 120 },
+                })
+              )
+            }
+          })
+        }
+      } else {
+        // Fallback for raw text
+        if (result.ai_analysis) {
+           const lines = result.ai_analysis.replace(/\*\*/g, '').split('\n');
+           lines.forEach(line => {
+             children.push(new Paragraph({ text: line, spacing: { after: 120 } }));
+           });
+        }
+      }
+
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: children
+        }]
+      })
+
+      const blob = await Packer.toBlob(doc)
+      const url = window.URL.createObjectURL(blob)
+      const filename = `Rapport_RIS_${new Date().toISOString().split('T')[0]}.docx`
+      
+      const downloadLink = document.createElement("a")
       downloadLink.href = url
       downloadLink.download = filename
+      document.body.appendChild(downloadLink)
       downloadLink.click()
+      document.body.removeChild(downloadLink)
+      window.URL.revokeObjectURL(url)
+      
+    } catch (err) {
+      console.error("Error generating DOCX", err)
+      alert("Une erreur est survenue lors de la génération du document Word.")
+    } finally {
+      setIsExporting(false)
     }
-    
-    document.body.removeChild(downloadLink)
-    setIsExporting(false)
   }
 
   return (
