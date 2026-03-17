@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import Optional, List
 import database, schemas, models
@@ -37,6 +37,7 @@ def get_optional_user(authorization: Optional[str] = Header(None), db: Session =
 @limiter.limit("5/minute")
 async def upload_file(
     request: Request,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(database.get_db),
     user: Optional[models.User] = Depends(get_optional_user)
@@ -66,42 +67,81 @@ async def upload_file(
     db.commit()
     db.refresh(db_scan)
 
-    # NEW: AI Audit for logged-in users
+    # Background the AI Audit for logged-in users to prevent timeouts
     if user and (result["is_valid_ris"] or result["is_scanned"]):
-        try:
-            ai_commentary = await ai_service.generate_ai_audit(
-                result["detailed_report"], 
-                file.filename,
-                raw_text=result.get("raw_text", ""),
-                images=result.get("images", [])
-            )
-            db_scan.ai_analysis = ai_commentary
+        background_tasks.add_task(
+            run_ai_audit_background,
+            db_scan.id,
+            file.filename,
+            result["detailed_report"],
+            result.get("raw_text", ""),
+            result.get("images", [])
+        )
+
+    # Add preview anomalies for free results
+    if db_scan.detailed_report:
+        report = json.loads(db_scan.detailed_report)
+        db_scan.total_anomalies = len(report)
+        if len(report) >= 2:
+            oldest = report[0]
+            most_recent = report[-1]
+            if len(report) > 2:
+                most_recent = report[-2]
+            db_scan.preview_anomalies = [oldest, most_recent]
+        elif len(report) == 1:
+            db_scan.preview_anomalies = [report[0]]
             
-            # Experts AI Logic
-            try:
-                ai_data = json.loads(ai_commentary)
-                if ai_data.get("anomalie_detectee") == "oui":
-                    db_scan.has_anomalies = True
-                    
-                    # Store detailed list of anomalies with justificatifs in db_scan.detailed_report
-                    if ai_data.get("full_timeline"):
-                        ai_anomalies = [
-                            {
-                                "year": item["annee"], 
-                                "title": f"Année {item['annee']} : {item['statut']}", 
-                                "description": item["anomalie_specifique"],
-                                "justificatif": item.get("justificatif_suggere")
-                            }
-                            for item in ai_data["full_timeline"] if item.get("statut") != "complet"
-                        ]
-                        if ai_anomalies:
-                            db_scan.detailed_report = json.dumps(ai_anomalies)
-            except:
-                pass
+    return db_scan
+
+async def run_ai_audit_background(
+    scan_id: int, 
+    filename: str, 
+    initial_report: list, 
+    raw_text: str, 
+    images: list
+):
+    """Worker function to run expensive AI analysis in the background."""
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        db_scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+        if not db_scan:
+            return
+
+        ai_commentary = await ai_service.generate_ai_audit(
+            initial_report, 
+            filename,
+            raw_text=raw_text,
+            images=images
+        )
+        db_scan.ai_analysis = ai_commentary
+        
+        # Experts AI Logic
+        try:
+            ai_data = json.loads(ai_commentary)
+            if ai_data.get("anomalie_detectee") == "oui":
+                db_scan.has_anomalies = True
                 
-            db.commit()
-        except Exception as e:
-            print(f"AI Audit Failed: {e}")
+                if ai_data.get("full_timeline"):
+                    ai_anomalies = [
+                        {
+                            "year": item["annee"], 
+                            "title": f"Année {item['annee']} : {item['statut']}", 
+                            "description": item["anomalie_specifique"],
+                            "justificatif": item.get("justificatif_suggere")
+                        }
+                        for item in ai_data["full_timeline"] if item.get("statut") != "complet"
+                    ]
+                    if ai_anomalies:
+                        db_scan.detailed_report = json.dumps(ai_anomalies)
+        except:
+            pass
+            
+        db.commit()
+    except Exception as e:
+        print(f"Background AI Audit Failed for scan {scan_id}: {e}")
+    finally:
+        db.close()
 
     # Add preview anomalies for free results
     if db_scan.detailed_report:
