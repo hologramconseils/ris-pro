@@ -78,7 +78,7 @@ Format de sortie obligatoire :
 
 Réponds uniquement en JSON valide.
 N'ajoute aucun texte avant ou après.
-Pas de markdown.
+Pas de markdown (n'utilise JAMAIS d'astérisques ** pour mettre du texte en gras).
 Pas de bloc ```json.
 
 Voici les données textuelles (partielles si scan) :

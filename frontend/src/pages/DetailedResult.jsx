@@ -121,7 +121,7 @@ export default function DetailedResult({ result, onReset }) {
                       📝 Rapport d'expertise détaillé
                     </h4>
                     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
-                      {aiData.compte_rendu}
+                      {aiData.compte_rendu.replace(/\*\*/g, '')}
                     </p>
                   </div>
                 )}
@@ -137,7 +137,7 @@ export default function DetailedResult({ result, onReset }) {
           return (
             <div className="card" style={{ marginBottom: 32 }}>
                <h3>🧪 Diagnostic Expert</h3>
-               <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>{result.ai_analysis}</pre>
+               <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>{result.ai_analysis.replace(/\*\*/g, '')}</pre>
             </div>
           )
         })()}
