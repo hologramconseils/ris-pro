@@ -138,14 +138,14 @@ async def run_ai_audit_background(
                 "premiere_annee": "N/A",
                 "derniere_annee": "N/A",
                 "full_timeline": [],
-                "compte_rendu": "Le service d'analyse par intelligence artificielle est temporairement surchargé. Nos experts techniques ont été prévenus."
+                "compte_rendu": "Le service d'expertise est temporairement surchargé. Nos experts techniques ont été prévenus."
             })
             db.commit()
             return
 
         db_scan.ai_analysis = ai_commentary
         
-        # Experts AI Logic
+        # Logique Expertise
         try:
             ai_data = json.loads(ai_commentary)
             if ai_data.get("anomalie_detectee") == "oui":

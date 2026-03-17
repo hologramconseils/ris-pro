@@ -286,7 +286,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
                   marginBottom: 20, paddingBottom: 15, borderBottom: '1px solid var(--border)' 
                 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'expert retraite</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Analyse de l'expert retraite</h3>
                   <div style={{ 
                     background: risk.bg, color: risk.text, padding: '6px 16px', 
                     borderRadius: 50, fontWeight: 800, fontSize: 13, border: `1px solid ${risk.text}33`

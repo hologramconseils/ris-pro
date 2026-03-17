@@ -13,7 +13,7 @@
 L'application **RIS Scan Pro** est une plateforme SaaS (Software as a Service) permettant aux particuliers et professionnels d'automatiser l'audit de leurs Relevés Individuels de Situation (RIS) de retraite. Elle identifie les anomalies, les trimestres manquants et les absences de points complémentaires.
 
 ### 1.2 Vision
-Transformer un document administratif complexe (PDF de 10 à 60 pages) en un diagnostic clair, actionnable et professionnel grâce à une analyse hybride (Parsing déterministe + Intelligence Artificielle Multimodale).
+Transformer un document administratif complexe (PDF de 10 à 60 pages) en un diagnostic clair, actionnable et professionnel grâce à une analyse hybride (Parsing déterministe + Expertise Algorithmique Multimodale).
 
 ---
 

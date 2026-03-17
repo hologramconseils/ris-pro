@@ -20,7 +20,7 @@ def is_valid_json(text: str) -> bool:
 
 async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
     """
-    Routage IA Adaptatif (Stabilité & Quotas) + Détection Jusitifcatifs Exhaustive.
+    Routage Expertise Adaptatif (Stabilité & Quotas) + Détection Justinificatifs Exhaustive.
     """
     if not raw_text and not anomalies and not (images and len(images)>0):
         return json.dumps({
@@ -45,7 +45,7 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
-- Ne mentionne JAMAIS que tu es une "Intelligence Artificielle" ou une "IA". Parle en tant qu'expert retraite.
+- Ne mentionne JAMAIS ton mode de fonctionnement technique. Parle exclusivement en tant qu'expert retraite de Hologram Conseils.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
 - **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•).

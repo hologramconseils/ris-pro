@@ -196,7 +196,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <div style={{ fontSize: 24, marginBottom: 12 }}>🤖</div>
+              <div style={{ fontSize: 24, marginBottom: 12 }}>🔍</div>
               <h4 style={{ marginBottom: 8 }}>Analyse visuelle approfondie en cours</h4>
               <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                 Votre document étant un scan, notre expert retraite réalise une analyse ligne par ligne. 
