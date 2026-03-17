@@ -13,9 +13,7 @@ export default function Navbar() {
   const openRegister = () => { setAuthMode('register'); setShowAuth(true) }
 
   const handleAuthSuccess = () => {
-    if (window.location.pathname === '/') {
-      navigate('/history')
-    }
+    navigate('/')
   }
 
   return (
