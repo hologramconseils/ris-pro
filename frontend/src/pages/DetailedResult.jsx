@@ -17,38 +17,72 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     setIsExporting(true)
     const element = contentRef.current
     const opt = {
-      margin: 10,
+      margin: [15, 12, 15, 12],
       filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true, 
         letterRendering: true,
+        logging: false,
         onclone: (doc) => {
-          const all = doc.querySelectorAll('*')
-          all.forEach(el => {
-            el.style.color = '#000000'
-            el.style.background = '#ffffff'
-            el.style.backgroundImage = 'none'
-            el.style.boxShadow = 'none'
-            el.style.textShadow = 'none'
-            el.style.borderColor = '#000000'
+          const style = doc.createElement('style')
+          style.innerHTML = `
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+            * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; }
+            .page { padding: 0 !important; background: #fff !important; }
+            .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; background: #fff !important; padding: 0 !important; }
+            .bg-dots, .navbar, .btn, .delete-scan-btn, .badge-success { display: none !important; }
+            
+            h1 { font-size: 28pt !important; color: #1e1b4b !important; margin-bottom: 8pt !important; text-align: center !important; }
+            h3 { font-size: 16pt !important; color: #1e1b4b !important; border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8pt !important; margin-top: 24pt !important; }
+            h4 { font-size: 12pt !important; color: #4338ca !important; margin-bottom: 8pt !important; }
+            
+            .justificatif-box { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6pt !important; padding: 12pt !important; margin-bottom: 15pt !important; }
+            .anomaly-card { page-break-inside: avoid !important; margin-bottom: 20pt !important; border: 1px solid #f1f5f9 !important; border-radius: 8pt !important; padding: 15pt !important; background: #fff !important; }
+            .anomaly-id { color: #1e1b4b !important; }
+            
+            .pdf-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 3px solid #4338ca; padding-bottom: 15pt; margin-bottom: 30pt; }
+            .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 9pt; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10pt; }
+          `
+          doc.head.appendChild(style)
+
+          const content = doc.querySelector('.card')
+          
+          // Create Professional Header
+          const header = doc.createElement('div')
+          header.className = 'pdf-header'
+          header.innerHTML = `
+            <div style="font-weight: 800; font-size: 14pt; color: #4338ca;">HOLOGRAM CONSEILS</div>
+            <div style="text-align: right; font-size: 10pt; color: #64748b;">
+              <strong>Rapport d'Expertise Retraite</strong><br/>
+              Émis le ${new Date().toLocaleDateString('fr-FR')}
+            </div>
+          `
+          content.prepend(header)
+
+          // Add Footer
+          const footer = doc.createElement('div')
+          footer.className = 'pdf-footer'
+          footer.innerHTML = `Hologram Conseils - Expertise RIS - Document confidentiel - Page 1`
+          content.appendChild(footer)
+          
+          // Refine text colors for print
+          doc.querySelectorAll('p, span, div').forEach(el => {
+            if (!el.classList.contains('badge')) {
+              el.style.color = '#334155'
+            }
           })
-          doc.querySelectorAll('.btn, .delete-scan-btn, .bg-dots, .navbar').forEach(el => {
-            el.style.display = 'none'
-          })
-          doc.querySelectorAll('h1, h2, h3, h4').forEach(h => {
-             h.style.borderBottom = '1px solid #000'
-             h.style.paddingBottom = '10px'
-             h.style.marginBottom = '20px'
-             h.style.textAlign = 'center'
-             h.style.color = '#000'
-          })
-          // Special PDF styling for justificatif boxes
-          doc.querySelectorAll('.justificatif-box').forEach(box => {
-            box.style.border = '1px solid #ddd'
-            box.style.padding = '10px'
-            box.style.marginTop = '10px'
+          
+          // Specific adjustments for risk badges in PDF
+          doc.querySelectorAll('.badge-warning').forEach(b => {
+             b.style.background = '#fef3c7'
+             b.style.color = '#92400e'
+             b.style.border = '1px solid #f59e0b'
+             b.style.display = 'inline-block'
+             b.style.padding = '4px 10px'
+             b.style.borderRadius = '20px'
           })
         }
       },
