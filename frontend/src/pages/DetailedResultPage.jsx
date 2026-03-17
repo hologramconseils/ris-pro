@@ -20,7 +20,7 @@ export default function DetailedResultPage() {
   }, [id])
 
   const loadResult = async (silent = false) => {
-    if (!result) setLoading(true)
+    if (!result && !silent) setLoading(true)
     setError('')
     try {
       const res = await scanAPI.getResult(id)
@@ -29,47 +29,30 @@ export default function DetailedResultPage() {
       const msg = err.response?.data?.detail || 'Impossible de charger le rapport.'
       setError(msg)
     } finally {
-      if (!result) setLoading(false)
+      setLoading(false)
     }
   }
 
-  if (loading && !result) {
+  if (loading || !result) {
     return (
       <div className="page">
         <div className="bg-dots" />
         <div className="container" style={{ maxWidth: 580, position: 'relative' }}>
           <AnalysisLoader />
           <p style={{ textAlign: 'center', marginTop: 20, color: 'var(--text-muted)' }}>
-            Chargement de votre rapport détaillé...
+            {error ? error : "Chargement de votre rapport détaillé..."}
           </p>
+          {error && (
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
+              <button className="btn btn-primary" onClick={() => navigate('/')}>
+                Retour à l'accueil
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
   }
-
-  if (error) {
-    return (
-      <div className="page">
-        <div className="bg-dots" />
-        <div className="container" style={{ maxWidth: 500, textAlign: 'center' }}>
-          <div className="card">
-            <span style={{ fontSize: 48 }}>🚫</span>
-            <h2 style={{ marginTop: 16 }}>Accès restreint</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
-              {error === 'Not enough permissions' 
-                ? "Vous n'avez pas encore accès à ce rapport détaillé. Veuillez procéder au paiement pour le débloquer."
-                : error}
-            </p>
-            <button className="btn btn-primary" onClick={() => navigate('/')}>
-              Retour à l'accueil
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!result) return null
 
   return (
     <DetailedResult 
