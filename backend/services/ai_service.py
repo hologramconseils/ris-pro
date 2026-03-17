@@ -32,6 +32,10 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     """
     Routage Expertise Adaptatif (Stabilité & Quotas) + Détection Justinificatifs Exhaustive.
     """
+    from datetime import datetime
+    current_year = datetime.now().year
+    target_year = current_year - 1
+
     if not raw_text and not anomalies and not (images and len(images)>0):
         return json.dumps({
             "anomalie_detectee": "non",
@@ -52,14 +56,17 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
 
-Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
+**MISSION ET PÉRIODE D'ANALYSE :**
+- Analyse la carrière de la toute première activité détectée jusqu'à l'année **{target_year}** (N-1 par rapport à aujourd'hui).
+- **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
+- **INTRODUCTION PERSONNALISÉE :** Détecte le nom et prénom de l'assuré dans le document. Commence impérativement ton `resume_global` par une phrase d'accueil citant son identité (ex: "Bonjour [Prénom] [Nom], j'ai analysé votre situation...").
 - Ne mentionne JAMAIS ton mode de fonctionnement technique. Parle exclusivement en tant qu'expert retraite de Hologram Conseils.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
 - **INTERDICTION FORMELLE DE FORMATAGE MARKDOWN** : N'utilise JAMAIS d'astérisques (**) pour mettre en gras, de dièses (#) pour les titres, ou de tout autre symbole de formatage technique. Le texte doit être du texte brut pur et professionnel.
-- **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces simples (•).
+- **STRUCTURE DES LISTES :** Pour `resume_global`, `compte_rendu` et `justificatif_suggere`, tu DOIS utiliser des listes à puces (•). Chaque point DOIT être sur sa propre ligne (retour à la ligne obligatoire après chaque point).
 
 **RÈGLES D'ANALYSE DE L'EXPERT (LOGIQUE DE DÉTECTION SUR SCAN) :**
 1. **IDENTIFICATION DES EMPLOYÉURS** : Le nom de l'EMPLOYEUR ou de l'activité est toujours sur la ligne du DESSUS par rapport aux informations de dates et revenus.
