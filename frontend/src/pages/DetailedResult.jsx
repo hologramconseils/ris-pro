@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import html2pdf from 'html2pdf.js'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
 
@@ -221,16 +222,19 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     <div className="page" style={{ paddingBottom: 100 }}>
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
+        {/* Navbar Actions Portal */}
+        {document.getElementById('navbar-portal-root') && createPortal(
+          <>
+            <button className="btn btn-secondary btn-sm" onClick={handleDownloadWord} disabled={isExporting} style={{ padding: '8px 16px' }}>
+              {isExporting ? '⏳' : '📄'} Word
+            </button>
+            <button className="btn btn-secondary btn-sm" onClick={handleDownloadPDF} disabled={isExporting} style={{ padding: '8px 16px' }}>
+              {isExporting ? '⏳' : '📥'} PDF
+            </button>
+          </>,
+          document.getElementById('navbar-portal-root')
+        )}
         
-        {/* Actions Float */}
-        <div style={{ position: 'sticky', top: 80, zIndex: 50, marginBottom: 24, display: 'flex', justifyContent: 'center', gap: 12 }}>
-          <button className="btn btn-secondary btn-sm shadow-expert" onClick={handleDownloadWord} disabled={isExporting}>
-            {isExporting ? '⏳' : '📄'} Word
-          </button>
-          <button className="btn btn-secondary btn-sm shadow-expert" onClick={handleDownloadPDF} disabled={isExporting}>
-            {isExporting ? '⏳' : '📥'} PDF
-          </button>
-        </div>
 
         {/* Content */}
         <div ref={contentRef} className="card shadow-expert" style={{ background: 'var(--bg-card)', padding: '40px' }}>

@@ -21,6 +21,7 @@ export default function Navbar() {
       <nav className="navbar">
         <a className="navbar-brand" href="/">🔍 RIS Pro</a>
         <div className="navbar-actions">
+          <div id="navbar-portal-root" style={{ display: 'flex', gap: 10, marginRight: 10 }}></div>
           {user ? (
             <>
               <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
