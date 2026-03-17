@@ -127,7 +127,7 @@ export default function History() {
                   {scan.filename}
                 </h4>
                 <p style={{ fontSize: 13, color: 'var(--text-subtle)', marginBottom: 16 }}>
-                  Analysé le {new Date(scan.created_at).toLocaleDateString('fr-FR')}
+                  Analysé le {new Date(scan.created_at).toLocaleDateString('fr-FR')} à {new Date(scan.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 </p>
                 <div style={{ display: 'flex', gap: 8 }}>
                   {scan.is_scanned && <span className="badge badge-warning">Scan</span>}

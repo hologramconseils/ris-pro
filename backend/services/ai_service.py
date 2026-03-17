@@ -97,7 +97,7 @@ Format de sortie attendu (JSON valide) :
       "justificatif_suggere": "• Document A\n• Document B\n• Document C"
     }}
   ],
-  "compte_rendu": "Analyse détaillée de l'Expert avec points clés (•) et paragraphes aérés."
+  "compte_rendu": "Analyse détaillée de l'Expert Vision avec points clés (•) et paragraphes aérés."
 }}
 
 Données à analyser :

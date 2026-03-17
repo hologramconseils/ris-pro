@@ -273,16 +273,14 @@ export default function DetailedResult({ result, onReset }) {
               let aiData = null
               try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
               
-              if (!result.ai_analysis) return (
                 <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
                   <div className="spinner" style={{ margin: '0 auto 16px' }}></div>
-                  <p style={{ fontWeight: 600 }}>L'IA analyse votre document en arrière-plan...</p>
+                  <p style={{ fontWeight: 600 }}>L'Expert Vision analyse votre document en arrière-plan...</p>
                   <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>Cela peut prendre jusqu'à 1 minute. Veuillez rafraîchir la page.</p>
                   <button className="btn btn-secondary btn-sm" style={{ marginTop: 12 }} onClick={() => window.location.reload()}>
-                    🔄 Rafraîchir l'analyse
+                    🔄 Rafraîchir l'expertise
                   </button>
                 </div>
-              )
 
               if (!aiData?.full_timeline) return (
                 <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,100,100,0.05)', borderRadius: 12 }}>
