@@ -142,6 +142,14 @@ async def run_ai_audit_background(
         print(f"Background AI Audit Failed for scan {scan_id}: {e}")
     finally:
         db.close()
+        # Cleanup: Delete the uploaded file to save space
+        try:
+            file_path = os.path.join(UPLOAD_DIR, filename) 
+            # Note: filename here is actually the safe_filename passed from upload_file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as cleanup_err:
+            print(f"Cleanup failed for {filename}: {cleanup_err}")
 
     # Add preview anomalies for free results
     if db_scan.detailed_report:

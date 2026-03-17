@@ -56,14 +56,12 @@ export default function History() {
   const confirmDelete = async () => {
     if (!confirmingDelete) return
     const scanId = confirmingDelete.id
-    console.log('Confirmed deletion for scan:', scanId)
     
     try {
       await scanAPI.deleteScan(scanId)
       setScans(scans.filter(s => s.id !== scanId))
       setConfirmingDelete(null)
     } catch (err) {
-      console.error('Deletion failed:', err)
       const msg = err.response?.data?.detail || 'Erreur lors de la suppression.'
       alert(`Erreur: ${msg}`)
       setConfirmingDelete(null)

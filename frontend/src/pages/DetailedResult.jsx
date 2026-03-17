@@ -57,7 +57,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     try {
       await html2pdf().set(opt).from(element).save()
     } catch (err) {
-      console.error("PDF Export Error:", err)
       alert("Erreur lors de la génération du PDF.")
     } finally {
       setIsExporting(false)
@@ -177,7 +176,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
       document.body.removeChild(downloadLink)
       window.URL.revokeObjectURL(url)
     } catch (err) {
-      console.error("Error generating DOCX", err)
       alert("Une erreur est survenue lors de la génération du document Word.")
     } finally {
       setIsExporting(false)

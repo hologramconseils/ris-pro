@@ -24,14 +24,14 @@ class ScanResult(Base):
     __tablename__ = "scan_results"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
     filename = Column(String)
     has_anomalies = Column(Boolean, default=False)
     is_scanned = Column(Boolean, default=False)
     is_valid_ris = Column(Boolean, default=False)
     detailed_report = Column(Text, nullable=True) # JSON stored as string for simplicity
     ai_analysis = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
 
     user = relationship("User", back_populates="scans")
 
