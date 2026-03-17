@@ -33,6 +33,37 @@ export default function DetailedResultPage() {
     }
   }
 
+  if (error) {
+    return (
+      <div className="page">
+        <div className="bg-dots" />
+        <div className="container" style={{ maxWidth: 500, textAlign: 'center' }}>
+          <div className="card shadow-expert" style={{ padding: '40px' }}>
+            <span style={{ fontSize: 64, marginBottom: 24, display: 'block' }}>🚫</span>
+            <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 16, letterSpacing: -0.5 }}>
+              Dossier Restreint
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.6, marginBottom: 32 }}>
+              {error.includes('payer 19€') 
+                ? "L'accès aux détails de cet audit nécessite un déblocage. Vous pourrez ensuite consulter et exporter votre rapport complet."
+                : error}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {error.includes('payer 19€') && (
+                <button className="btn btn-primary btn-large" onClick={() => navigate('/')}>
+                  Débloquer mon audit (19€)
+                </button>
+              )}
+              <button className="btn btn-secondary" onClick={() => navigate('/')}>
+                Retour à l'accueil
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loading || !result) {
     return (
       <div className="page">
@@ -40,15 +71,8 @@ export default function DetailedResultPage() {
         <div className="container" style={{ maxWidth: 580, position: 'relative' }}>
           <AnalysisLoader />
           <p style={{ textAlign: 'center', marginTop: 20, color: 'var(--text-muted)' }}>
-            {error ? error : "Chargement de votre rapport détaillé..."}
+            Chargement de votre rapport détaillé...
           </p>
-          {error && (
-            <div style={{ textAlign: 'center', marginTop: 20 }}>
-              <button className="btn btn-primary" onClick={() => navigate('/')}>
-                Retour à l'accueil
-              </button>
-            </div>
-          )}
         </div>
       </div>
     )

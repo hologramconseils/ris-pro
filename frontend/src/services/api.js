@@ -24,9 +24,8 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      console.warn("Auth Error (401/403): Session expired or invalid.", error.response.data);
-      // If unauthorized, clear token and we could redirect but better to let AuthContext handle it if it detects null token
+    if (error.response && error.response.status === 401) {
+      console.warn("Auth Error (401): Session expired or invalid.");
       localStorage.removeItem('access_token')
       if (window.location.pathname !== '/') {
         window.location.href = '/'
