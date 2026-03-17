@@ -151,7 +151,7 @@ export default function FreeResult({ result, onReset }) {
               )}
 
               <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-subtle)' }}>
-                🔒 Paiement sécurisé via Stripe · Remboursé sous 14 jours si insatisfait
+                🔒 Paiement sécurisé via Stripe · Support client expert 7j/7
               </div>
 
               {!user && (
