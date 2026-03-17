@@ -50,6 +50,14 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(d
 @limiter.limit("10/minute")
 def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     user = auth_service.get_user(db, email=form_data.username)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou mot de passe incorrect.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # Support existing hashed password
     password_correct = False
     if user.hashed_password and auth_service.verify_password(form_data.password, user.hashed_password):
