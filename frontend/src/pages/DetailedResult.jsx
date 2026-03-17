@@ -1,17 +1,92 @@
 import { useAuth } from '../context/AuthContext'
+import { useRef, useState } from 'react'
+import html2pdf from 'html2pdf.js'
 
 export default function DetailedResult({ result, onReset }) {
   const { user } = useAuth()
+  const contentRef = useRef(null)
+  const [isExporting, setIsExporting] = useState(false)
   let anomalies = []
   try {
     anomalies = JSON.parse(result.detailed_report || '[]')
   } catch { anomalies = [] }
 
+  const handleDownloadPDF = async () => {
+    if (!contentRef.current) return
+    setIsExporting(true)
+    const element = contentRef.current
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `Rapport_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+    await html2pdf().set(opt).from(element).save()
+    setIsExporting(false)
+  }
+
+  const handleDownloadWord = () => {
+    if (!contentRef.current) return
+    setIsExporting(true)
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+      "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+      "xmlns='http://www.w3.org/TR/REC-html40'>" +
+      "<head><meta charset='utf-8'><title>Rapport RIS</title>" +
+      "<style>body { font-family: Arial, sans-serif; font-size: 11pt; } .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; } .badge { font-weight: bold; } h1, h2, h3, h4 { color: #333; } p { color: #555; }</style>" +
+      "</head><body>"
+    const footer = "</body></html>"
+    const sourceHTML = header + contentRef.current.innerHTML + footer
+
+    const blob = new Blob(['\ufeff', sourceHTML], {
+      type: 'application/msword'
+    })
+    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML)
+    const filename = `Rapport_RIS_${new Date().toISOString().split('T')[0]}.doc`
+    
+    const downloadLink = document.createElement("a")
+    document.body.appendChild(downloadLink)
+    
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, filename)
+    } else {
+      downloadLink.href = url
+      downloadLink.download = filename
+      downloadLink.click()
+    }
+    
+    document.body.removeChild(downloadLink)
+    setIsExporting(false)
+  }
+
   return (
     <div className="page">
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
-        {/* Header */}
+        
+        {/* Export Actions */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginBottom: 16 }}>
+          <button 
+            className="btn btn-secondary btn-sm" 
+            onClick={handleDownloadWord} 
+            disabled={isExporting}
+            style={{ fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            {isExporting ? '⏳' : '📄'} Télécharger Word
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm" 
+            onClick={handleDownloadPDF} 
+            disabled={isExporting}
+            style={{ fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            {isExporting ? '⏳' : '📥'} Télécharger PDF
+          </button>
+        </div>
+
+        {/* Content to Export */}
+        <div ref={contentRef} style={{ background: 'var(--bg)', borderRadius: 12, padding: '10px 0' }}>
+          {/* Header */}
         <div style={{ marginBottom: 32, textAlign: 'center' }}>
           <span style={{ fontSize: 56 }}>📊</span>
           <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: -1, marginTop: 12, marginBottom: 8 }}>
@@ -212,8 +287,9 @@ export default function DetailedResult({ result, onReset }) {
             ))
           })()}
         </div>
+        </div> {/* End of Export Content */}
 
-        {/* Actions */}
+        {/* Actions (Not Exported) */}
         <div className="card" style={{ marginTop: 28, textAlign: 'center' }}>
           <h3 style={{ fontWeight: 700, marginBottom: 8 }}>💼 Besoin d'accompagnement ?</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
