@@ -279,8 +279,16 @@ export default function DetailedResult({ result, onReset }) {
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   {aiData.full_timeline.map((item, i) => {
-                    const isError = item.statut !== 'complet'
-                    const borderColor = item.statut === 'complet' ? 'var(--success)' : (item.statut === 'manquant' ? 'var(--danger)' : 'var(--warning)')
+                    // Normalization fail-safe: Ensure status matches quarter count regardless of AI output
+                    const qCount = parseInt(item.trimestres_valides) || 0
+                    let actualStatut = item.statut?.toLowerCase()
+                    
+                    if (qCount === 4) actualStatut = 'complet'
+                    else if (qCount > 0) actualStatut = 'incomplet'
+                    else actualStatut = 'manquant'
+
+                    const isError = actualStatut !== 'complet'
+                    const borderColor = actualStatut === 'complet' ? 'var(--success)' : (actualStatut === 'manquant' ? 'var(--danger)' : 'var(--warning)')
                     
                     return (
                       <div key={i} className="anomaly-card" style={{ 
@@ -296,7 +304,7 @@ export default function DetailedResult({ result, onReset }) {
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
-                            <div style={{ color: borderColor, fontWeight: 800, fontSize: 13, textTransform: 'uppercase' }}>{item.statut}</div>
+                            <div style={{ color: borderColor, fontWeight: 800, fontSize: 13, textTransform: 'uppercase' }}>{actualStatut}</div>
                             <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{item.trimestres_valides}/4 trimestres</div>
                           </div>
                         </div>
