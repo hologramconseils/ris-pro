@@ -49,10 +49,11 @@ export default function Legal() {
 
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>4. Propriété Intellectuelle</h2>
-          <p>
+          <p style={{ marginBottom: 15 }}>
             L'intégralité du contenu de ce site (code, design, textes, algorithmes) est la propriété exclusive de Hologram Conseils. Toute reproduction ou exploitation sans autorisation préalable est interdite.
           </p>
-Section 5: Responsibility
+        </section>
+
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>5. Responsabilité</h2>
           <p>
