@@ -42,7 +42,7 @@ export default function Privacy() {
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>4. Vos droits (RGPD)</h2>
           <p style={{ marginBottom: 15 }}>
-            Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits, vous pouvez nous contacter à : <strong>[VOTRE EMAIL DE CONTACT]</strong>.
+            Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits, vous pouvez nous contacter à : <strong>bertrand.saulnerond@hologramconseils.com</strong>.
           </p>
         </section>
 

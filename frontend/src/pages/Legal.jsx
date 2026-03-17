@@ -13,13 +13,12 @@ export default function Legal() {
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>1. Éditeur de la plateforme</h2>
           <p style={{ marginBottom: 10 }}>Conformément à l'article 6 de la loi n° 2004-575 du 21 juin 2004 :</p>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            <li><strong>Dénomination sociale :</strong> [NOM DE VOTRE SOCIÉTÉ - Ex: Hologram Conseils]</li>
-            <li><strong>Forme juridique :</strong> [FORME JURIDIQUE - Ex: SAS / SARL]</li>
-            <li><strong>Capital social :</strong> [MONTANT DU CAPITAL] €</li>
-            <li><strong>Siège social :</strong> [ADRESSE DU SIÈGE]</li>
-            <li><strong>SIRET :</strong> [NUMÉRO SIRET]</li>
-            <li><strong>Directeur de la publication :</strong> [NOM DU DIRECTEUR]</li>
-            <li><strong>Contact :</strong> [EMAIL DE CONTACT]</li>
+            <li><strong>Dénomination sociale :</strong> Hologram Conseils</li>
+            <li><strong>Forme juridique :</strong> Entreprise individuelle (EI)</li>
+            <li><strong>Siège social :</strong> 7 rue javary, entrée D, 59800 Lille</li>
+            <li><strong>SIRET :</strong> 89986431800030</li>
+            <li><strong>Directeur de la publication :</strong> Bertrand Saulnerond</li>
+            <li><strong>Contact :</strong> bertrand.saulnerond@hologramconseils.com</li>
           </ul>
         </section>
 
@@ -51,7 +50,13 @@ export default function Legal() {
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>4. Propriété Intellectuelle</h2>
           <p>
-            L'intégralité du contenu de ce site (code, design, textes, algorithmes) est la propriété exclusive de [NOM DE VOTRE SOCIÉTÉ]. Toute reproduction ou exploitation sans autorisation préalable est interdite.
+            L'intégralité du contenu de ce site (code, design, textes, algorithmes) est la propriété exclusive de Hologram Conseils. Toute reproduction ou exploitation sans autorisation préalable est interdite.
+          </p>
+Section 5: Responsibility
+        <section style={{ marginBottom: 40 }}>
+          <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>5. Responsabilité</h2>
+          <p>
+            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé et sont données à titre indicatif. Elles ne remplacent en aucun cas un conseil juridique ou une attestation officielle des caisses de retraite. Hologram Conseils ne peut être tenu responsable des décisions prises sur la base de ces analyses.
           </p>
         </section>
       </motion.div>
