@@ -12,11 +12,18 @@ GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-fl
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 
+def is_valid_json(text: str) -> bool:
+    """Vérifie si la réponse ressemble à un JSON valide."""
+    if not text: return False
+    text = text.strip()
+    return text.startswith("{") and text.endswith("}")
+
 async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
     """
-    Routage Intelligent : 
-    - Si IMAGES (Scan) : GEMINI (Primaire/Vision) -> MISTRAL (Fallback)
-    - Si TEXTE (Natif) : MISTRAL (Primaire/Français) -> GEMINI (Fallback)
+    Routage IA Adaptatif (Stabilité & Quotas) :
+    1. PDF Natif (Tès bonne qualité) -> Mistral (Primaire)
+    2. Scan/Photo/Mauvaise qualité -> Gemini Vision (Primaire)
+    3. Si Gemini échoue (Quotas/Tokens) -> Bascule IMMÉDIATE sur Mistral
     """
     if not raw_text and not anomalies and not (images and len(images)>0):
         return json.dumps({
@@ -33,43 +40,44 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
         raw_text = "\n".join([f"- {a['title']}: {a['description']}" for a in anomalies])
     
     is_scan = (images is not None and len(images) > 0)
-    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données." if is_scan else ""
+    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images." if is_scan else ""
     
-    prompt = f"""Tu es un expert en audit de relevés de carrière retraite française.
+    prompt = f"""Tu es un expert en audit de relevés de carrière retraite française ({filename}).
 {vision_mode_desc}
-
-Mission : Analyse EXHAUSTIVE du RIS ({filename}). JSON uniquement. 
-Règle : Analyse année par année de la première à la dernière. Pas de markdown (**).
+Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
+REVENT : N'utilise jamais de markdown (**).
 
 Données :
 {raw_text}
 """
 
-    # --- ROUTAGE INTELLIGENT ---
-    
+    # --- STRATÉGIE DE ROUTAGE ---
+
     if is_scan:
-        # 1. SCAN/IMAGE : Gemini gagne (Vision)
+        # A. C'est un scan/photo -> Gemini Vision en priorité
         if GEMINI_API_KEY:
             res = await _call_gemini(prompt, images)
-            if not res.startswith("Erreur"): return res
-            print(f"⚠️ Gemini Vision failed, using Mistral OCR... ({res[:50]})")
+            if is_valid_json(res): return res
+            print(f"⚠️ Gemini (Quota/Token ou erreur), bascule AUTO sur Mistral... ({res[:50]})")
 
+        # Fallback ou Quota Gemini -> Mistral (sur le texte OCR extrait)
         if MISTRAL_API_KEY:
             res = await _call_mistral(prompt)
-            if not res.startswith("Erreur"): return res
+            if is_valid_json(res): return res
 
     else:
-        # 2. TEXTE NATIF : Mistral gagne (Expertise FR)
+        # B. C'est un PDF natif "propre" -> Mistral AI en priorité (Expertise FR)
         if MISTRAL_API_KEY:
             res = await _call_mistral(prompt)
-            if not res.startswith("Erreur"): return res
-            print(f"⚠️ Mistral failed, falling back to Gemini... ({res[:50]})")
+            if is_valid_json(res): return res
+            print(f"⚠️ Mistral a échoué, tentative avec Gemini... ({res[:50]})")
 
+        # Fallback Mistral -> Gemini
         if GEMINI_API_KEY:
             res = await _call_gemini(prompt, images)
-            if not res.startswith("Erreur"): return res
+            if is_valid_json(res): return res
 
-    # --- 3. ULTIME RECOURS ---
+    # --- C. DERNIER RECOURS (Ollama local) ---
     return await _call_ollama(prompt)
 
 async def _call_gemini(prompt: str, images: list = None):
@@ -82,8 +90,9 @@ async def _call_gemini(prompt: str, images: list = None):
             payload = {"contents": [{"parts": parts}]}
             response = await client.post(GEMINI_URL, json=payload)
             if response.status_code == 200:
-                return response.json()['candidates'][0]['content']['parts'][0]['text']
-            return f"Erreur Gemini ({response.status_code})"
+                text = response.json()['candidates'][0]['content']['parts'][0]['text']
+                return text.strip().replace("```json", "").replace("```", "")
+            return f"Erreur Gemini {response.status_code}"
     except Exception as e:
         return f"Erreur Gemini : {str(e)}"
 
@@ -99,7 +108,7 @@ async def _call_mistral(prompt: str):
             response = await client.post(MISTRAL_URL, json=payload, headers=headers)
             if response.status_code == 200:
                 return response.json()['choices'][0]['message']['content']
-            return f"Erreur Mistral ({response.status_code})"
+            return f"Erreur Mistral {response.status_code}"
     except Exception as e:
         return f"Erreur Mistral : {str(e)}"
 
@@ -111,6 +120,6 @@ async def _call_ollama(prompt: str):
                 text = response.json().get("response", "")
                 if "<think>" in text: text = text.split("</think>")[-1].strip()
                 return text
-            return f"Erreur Ollama ({response.status_code})"
+            return f"Erreur Ollama {response.status_code}"
     except Exception as e:
-        return f"Service IA non disponible : {str(e)}"
+        return f"Service non disponible : {str(e)}"
