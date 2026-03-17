@@ -157,7 +157,7 @@ Données à analyser :
 
 async def _call_gemini(prompt: str, images: list = None):
     try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             parts = [{"text": prompt}]
             if images:
                 for img_b64 in images:
@@ -181,7 +181,7 @@ async def _call_gemini(prompt: str, images: list = None):
 
 async def _call_mistral(prompt: str):
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
             payload = {
                 "model": "mistral-small-latest",
