@@ -362,7 +362,6 @@ export default function DetailedResult({ result, onReset }) {
               )
             })()}
           </div>
-        </div>
 
         {/* Footer actions */}
         <div style={{ marginTop: 40, textAlign: 'center' }}>
