@@ -23,16 +23,16 @@ def parse_ris_file(file_path: str):
             doc_text += page.get_text()
         
         # Detection of scanned PDF (OCR fallback needed)
-        # If very little text is extracted (< 1000 chars), we treat it as a scan
-        if len(doc_text.strip()) < 1000:
+        # Increased threshold to 2000 to catch documents with sparse text or empty headers
+        if len(doc_text.strip()) < 2000:
             is_scanned = True
             # Convert first 15 pages to images for Gemini Vision
             # This allows the AI to "see" the document even if no text is extractable
             for i in range(min(15, len(doc))):
                 page = doc[i]
                 # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
-                pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
-                img_data = pix.tobytes("png")
+                # Use JPG instead of PNG to save payload size (allowing 15 pages)
+                img_data = pix.tobytes("jpg", jpg_quality=80)
                 base64_img = base64.b64encode(img_data).decode('utf-8')
                 images.append(base64_img)
         
