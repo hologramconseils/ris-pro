@@ -1,15 +1,22 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AuthModal from './AuthModal'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const [showAuth, setShowAuth] = useState(false)
   const [authMode, setAuthMode] = useState('login')
+  const navigate = useNavigate()
 
   const openLogin = () => { setAuthMode('login'); setShowAuth(true) }
   const openRegister = () => { setAuthMode('register'); setShowAuth(true) }
+
+  const handleAuthSuccess = () => {
+    if (window.location.pathname === '/') {
+      navigate('/history')
+    }
+  }
 
   return (
     <>
@@ -37,6 +44,7 @@ export default function Navbar() {
         <AuthModal
           mode={authMode}
           onClose={() => setShowAuth(false)}
+          onSuccess={handleAuthSuccess}
         />
       )}
     </>
