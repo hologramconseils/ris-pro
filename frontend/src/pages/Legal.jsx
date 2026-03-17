@@ -27,7 +27,7 @@ export default function Legal() {
           <p>
             L'hébergement de l'application est assuré par :<br />
             <strong>Backend :</strong> Render.com<br />
-            <strong>Frontend :</strong> Vercel Inc., 340 S Lemon Ave #4133 Walnut, CA 91789, USA.
+            <strong>Frontend :</strong> Vercel Inc.
           </p>
         </section>
 
