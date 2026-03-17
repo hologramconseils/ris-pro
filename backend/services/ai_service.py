@@ -51,7 +51,11 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
         raw_text = "\n".join([f"- {a['title']}: {a['description']}" for a in anomalies])
     
     is_scan = (images is not None and len(images) > 0)
-    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données. C'est un SCAN." if is_scan else ""
+    vision_mode_desc = """⚠️ MODE VISION ACTIVÉ : Tu analyses des IMAGES (scans ou photos).
+- **CONSIGNE VISION :** Les documents peuvent être de travers, flous ou avoir un faible contraste.
+- **EXTRACTION :** Analyse très précisément chaque ligne du tableau de carrière. Si tu vois une année, regarde les colonnes à droite pour les trimestres et les points.
+- **IDENTITÉ :** Cherche le nom de l'assuré en haut des pages (près de 'Nom d'usage' ou 'Prénom').
+- **TABLEAUX :** Fais attention aux décalages visuels. L'année est à gauche, l'employeur au milieu, les trimestres/points à droite.""" if is_scan else ""
     
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}

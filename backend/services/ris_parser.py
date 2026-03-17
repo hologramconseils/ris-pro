@@ -26,11 +26,12 @@ def parse_ris_file(file_path: str):
         # If very little text is extracted (< 1000 chars), we treat it as a scan
         if len(doc_text.strip()) < 1000:
             is_scanned = True
-            # Convert first 10 pages to images for Gemini Vision
+            # Convert first 15 pages to images for Gemini Vision
             # This allows the AI to "see" the document even if no text is extractable
-            for i in range(min(10, len(doc))):
+            for i in range(min(15, len(doc))):
                 page = doc[i]
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2)) # 2x zoom for readability
+                # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
+                pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
                 img_data = pix.tobytes("png")
                 base64_img = base64.b64encode(img_data).decode('utf-8')
                 images.append(base64_img)
@@ -43,9 +44,9 @@ def parse_ris_file(file_path: str):
             "detailed_report": []
         }
 
-    # Basic validation
-    if not doc_text.strip():
-        doc_text = "[MODE SCAN DETECTÉ - ANALYSE VISUELLE EN COURS]"
+    # Basic validation and Scan labeling
+    if is_scanned:
+        doc_text = f"[MODE SCAN DETECTÉ - ANALYSE VISUELLE PRIORITAIRE]\n{doc_text}"
 
     # Check for document type (fallback to true for scans to allow AI analysis)
     is_ris = is_scanned or any(keyword in doc_text.lower() for keyword in ["relevé individuel", "ris", "retraites", "assurance vieillesse", "carrière"])
