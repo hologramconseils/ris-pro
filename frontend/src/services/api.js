@@ -16,6 +16,21 @@ api.interceptors.request.use(config => {
   return config
 })
 
+// Global Error Handler: handle session expiration
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // If unauthorized, clear token and we could redirect but better to let AuthContext handle it if it detects null token
+      localStorage.removeItem('access_token')
+      if (window.location.pathname !== '/') {
+        window.location.href = '/'
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (email, password) => {
@@ -49,7 +64,6 @@ export const billingAPI = {
     api.post('/billing/create-checkout-session', null, {
       params: { success_url: successUrl, cancel_url: cancelUrl }
     }),
-  mockSuccess: () => api.post('/billing/mock-payment-success'),
 }
 
 export default api

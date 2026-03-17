@@ -67,11 +67,13 @@ def handle_checkout_session(session, db: Session):
         user = db.query(models.User).filter(models.User.id == int(user_id)).first()
         if user:
             user.has_paid_access = True
-            # Log transaction
-            transaction = models.Transaction(
-                user_id=user.id,
-                stripe_session_id=session.get('id'),
-                status="completed"
-            )
-            db.add(transaction)
-            db.commit()
+            # Check for existing transaction to ensure idempotency
+            existing = db.query(models.Transaction).filter(models.Transaction.stripe_session_id == session.get('id')).first()
+            if not existing:
+                transaction = models.Transaction(
+                    user_id=user.id,
+                    stripe_session_id=session.get('id'),
+                    status="completed"
+                )
+                db.add(transaction)
+                db.commit()

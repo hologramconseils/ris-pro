@@ -6,14 +6,32 @@ export default function UploadZone({ onFileSelect, file }) {
   const handleDrop = useCallback((e) => {
     e.preventDefault(); setDrag(false)
     const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile?.type === 'application/pdf') {
+    if (droppedFile) {
+      if (droppedFile.type !== 'application/pdf') {
+        alert("Seuls les fichiers PDF sont acceptés.");
+        return;
+      }
+      if (droppedFile.size > 10 * 1024 * 1024) {
+        alert("Le fichier est trop volumineux (max 10 Mo).");
+        return;
+      }
       onFileSelect(droppedFile)
     }
   }, [onFileSelect])
 
   const handleChange = (e) => {
     const selectedFile = e.target.files[0]
-    if (selectedFile) onFileSelect(selectedFile)
+    if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        alert("Seuls les fichiers PDF sont acceptés.");
+        return;
+      }
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        alert("Le fichier est trop volumineux (max 10 Mo).");
+        return;
+      }
+      onFileSelect(selectedFile)
+    }
   }
 
   const zoneClass = `upload-zone ${drag ? 'drag-active' : ''} ${file ? 'has-file' : ''}`

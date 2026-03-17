@@ -3,6 +3,7 @@ import random
 import fitz # PyMuPDF
 import re
 import base64
+import datetime
 
 def parse_ris_file(file_path: str):
     """
@@ -165,7 +166,7 @@ def parse_ris_file(file_path: str):
             if birth_year is not None:
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
-            FINAL_YEAR = 2026
+            FINAL_YEAR = datetime.date.today().year
             main_regime = "Agirc-Arrco"
             for _, r_name in found_points.values():
                 if r_name != "Complémentaire":
