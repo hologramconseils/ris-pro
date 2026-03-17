@@ -59,7 +59,7 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :
 
 1. ANNÉES VIDES OU TOTALEMENT ABSENTES DU RIS :
-   - "Attestation sur l'honneur de recherche de justificatifs"
+   - "Attestation sur l'honneur d'activité ou de non activité pour la période concernée"
    - ET soit : "Justificatif d'activité déclarée (Bulletin de salaire, Contrat)"
    - OU : "Attestation de non-activité pour la période concernée"
 
