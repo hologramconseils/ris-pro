@@ -6,21 +6,29 @@ import PaymentSuccess from './pages/PaymentSuccess'
 import History from './pages/History'
 import ResetPassword from './pages/ResetPassword'
 import DetailedResultPage from './pages/DetailedResultPage'
+import Legal from './pages/Legal'
+import Privacy from './pages/Privacy'
+import Footer from './components/Footer'
 
 function AppContent() {
   const [searchParams] = useSearchParams()
   const isPaymentSuccess = searchParams.get('payment_success') === '1'
 
   return (
-    <>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      <Routes>
-        <Route path="/" element={isPaymentSuccess ? <PaymentSuccess /> : <LandingPage />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
-      </Routes>
-    </>
+      <div style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={isPaymentSuccess ? <PaymentSuccess /> : <LandingPage />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Routes>
+      </div>
+      <Footer />
+    </div>
   )
 }
 
