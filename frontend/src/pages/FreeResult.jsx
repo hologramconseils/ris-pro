@@ -75,8 +75,8 @@ export default function FreeResult({ result, onReset }) {
             </div>
             <p className="verdict-subtitle">
               {hasAnomalies
-                ? 'Notre moteur IA a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
-                : 'Félicitations ! Aucune anomalie majeure n\'a été détectée dans votre relevé actuel.'}
+                ? 'Notre moteur d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                : 'Félicitations ! Aucune anomalie majeure n’a été détectée dans votre relevé actuel.'}
             </p>
           </div>
           
@@ -165,7 +165,7 @@ export default function FreeResult({ result, onReset }) {
               <div style={{ display: 'inline-block', padding: '12px', borderRadius: '50%', background: 'rgba(79,70,229,0.1)', marginBottom: 16 }}>
                 <span style={{ fontSize: 32 }}>📑</span>
               </div>
-              <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Votre dossier de régularisation prêt en 1 clic</h3>
+              <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Votre dossier de régularisation prêt en un clic</h3>
               <p style={{ fontSize: 16, lineHeight: 1.5, marginBottom: 24 }}>
                 Le rapport détaillé vous donne la <strong>liste exhaustive</strong> des pièces à fournir pour chaque année en anomalie selon votre situation (salarié, indépendant, étranger, etc).
               </p>
