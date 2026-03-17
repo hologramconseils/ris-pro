@@ -15,48 +15,97 @@ export default function DetailedResult({ result, onReset }) {
   const handleDownloadPDF = async () => {
     setIsExporting(true)
     
-    // Create a hidden printable version to ensure perfect margins and B&W
-    const printElement = document.createElement('div')
-    printElement.style.padding = '20mm' // Professional margins
-    printElement.style.color = '#000'
-    printElement.style.background = '#fff'
-    printElement.style.fontFamily = 'Arial, sans-serif'
-    printElement.style.lineHeight = '1.5'
-    
-    // Header
-    const title = document.createElement('h1')
-    title.innerText = "Rapport d'Analyse Détaillé RIS"
-    title.style.textAlign = 'center'
-    title.style.borderBottom = '1px solid #000'
-    title.style.paddingBottom = '10px'
-    printElement.appendChild(title)
-    
-    // Clone relevant content and strip colors
-    const content = contentRef.current.cloneNode(true)
-    
-    // Force B&W and remove UI elements
-    const allElements = content.querySelectorAll('*')
-    allElements.forEach(el => {
-      el.style.color = '#000'
-      el.style.backgroundColor = 'transparent'
-      el.style.borderColor = '#000'
-      el.style.boxShadow = 'none'
-      el.style.textShadow = 'none'
-    })
-    
-    printElement.appendChild(content)
-    
-    const opt = {
-      margin: 15, // margins on the PDF page
-      filename: `Rapport_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 1 },
-      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    }
-    
     try {
-      await html2pdf().set(opt).from(printElement).save()
+      // Create a hidden container for the printable version
+      const printContainer = document.createElement('div')
+      printContainer.id = 'ris-pdf-export'
+      printContainer.style.position = 'absolute'
+      printContainer.style.left = '-9999px'
+      printContainer.style.top = '-9999px'
+      printContainer.style.width = '800px'
+      printContainer.style.background = '#ffffff'
+      printContainer.style.color = '#000000'
+      printContainer.style.padding = '40px'
+      
+      // Inject CSS overrides for the PDF
+      const style = document.createElement('style')
+      style.innerHTML = `
+        #ris-pdf-export {
+          font-family: Arial, sans-serif !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+        }
+        #ris-pdf-export * {
+          color: #000000 !important;
+          background-color: transparent !important;
+          background-image: none !important;
+          box-shadow: none !important;
+          text-shadow: none !important;
+          border-color: #000000 !important;
+          -webkit-print-color-adjust: exact;
+        }
+        #ris-pdf-export h1, #ris-pdf-export h2, #ris-pdf-export h3, #ris-pdf-export h4 {
+          color: #000000 !important;
+          border-bottom: 2px solid #000 !important;
+          padding-bottom: 10px !important;
+          margin-bottom: 20px !important;
+          text-align: center !important;
+        }
+        #ris-pdf-export .badge {
+          border: 1px solid #000 !important;
+          padding: 4px 10px !important;
+          border-radius: 4px !important;
+          font-weight: bold !important;
+          font-size: 12px !important;
+        }
+        #ris-pdf-export .anomaly-card {
+          border: 1px solid #000 !important;
+          border-left: 12px solid #000 !important;
+          margin-bottom: 25px !important;
+          padding: 20px !important;
+          page-break-inside: avoid !important;
+        }
+        #ris-pdf-export .btn, #ris-pdf-export .modal-close, #ris-pdf-export .bg-dots, #ris-pdf-export .delete-scan-btn {
+          display: none !important;
+        }
+        #ris-pdf-export .card {
+          border: 1px solid #000 !important;
+          background: #fff !important;
+          margin-bottom: 20px !important;
+        }
+      `
+      printContainer.appendChild(style)
+      
+      // Header for PDF
+      const header = document.createElement('div')
+      header.innerHTML = `
+        <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #000; padding-bottom: 20px;">
+          <h1 style="margin: 0; font-size: 32px; border: none !important;">RAPPORT D'EXPERTISE RETRAITE</h1>
+          <p style="margin: 15px 0 0; font-size: 16px; font-weight: bold;">Analyse de votre Relevé Individuel de Situation (RIS)</p>
+          <p style="margin: 5px 0 0; font-size: 14px; color: #666 !important;">Généré par RIS Pro — Hologram Conseils le ${new Date().toLocaleDateString('fr-FR')}</p>
+        </div>
+      `
+      printContainer.appendChild(header)
+      
+      // Clone only the content Part (avoiding actions/header duplicate)
+      const content = contentRef.current.cloneNode(true)
+      printContainer.appendChild(content)
+      
+      document.body.appendChild(printContainer)
+      
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }
+      
+      await html2pdf().set(opt).from(printContainer).save()
+      document.body.removeChild(printContainer)
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      alert("Une erreur est survenue lors de la génération du PDF professionnel.")
     } finally {
       setIsExporting(false)
     }
