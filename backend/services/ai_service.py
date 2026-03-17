@@ -130,32 +130,36 @@ Données à analyser :
 {raw_text}
 """
 
-    # --- STRATÉGIE DE ROUTAGE STRICTE ---
-    # Scans (Images) -> Gemini Vision uniquement
-    # PDF Natif (Texte) -> Mistral uniquement
+    # --- STRATÉGIE DE ROUTAGE HIÉRARCHIQUE (Gemini > Mistral > Ollama) ---
+    res = None
     
-    if is_scan:
-        if not GEMINI_API_KEY:
-            return json.dumps({"error": "Gemini API Key manquante pour l'analyse visuelle."})
+    # 1. Tentative avec GEMINI (Primaire par défaut pour tout)
+    if GEMINI_API_KEY:
         res = await _call_gemini(prompt, images)
-    else:
-        if not MISTRAL_API_KEY:
-            if GEMINI_API_KEY:
-                res = await _call_gemini(prompt, None)
-            else:
-                return json.dumps({"error": "Aucun service d'analyse disponible."})
-        else:
-            res = await _call_mistral(prompt)
+        if is_valid_json(res):
+            return await _finalize_response(res)
     
-    # Sanitisation finale (Suppression des astérisques)
+    # 2. Backup 1 : MISTRAL (Si Gemini échoue ou pas de clé)
+    if MISTRAL_API_KEY:
+        res = await _call_mistral(prompt)
+        if is_valid_json(res):
+            return await _finalize_response(res)
+            
+    # 3. Backup 2 : OLLAMA (Local, si tout le reste échoue)
+    res = await _call_ollama(prompt)
     if is_valid_json(res):
-        try:
-            data = json.loads(res)
-            cleaned_data = strip_markdown(data)
-            return json.dumps(cleaned_data, ensure_ascii=False)
-        except:
-            return res
-    return res
+        return await _finalize_response(res)
+        
+    return res or json.dumps({"error": "Aucun service d'analyse disponible ou fonctionnel."})
+
+async def _finalize_response(res: str):
+    """Nettoyage et formatage final du JSON."""
+    try:
+        data = json.loads(res)
+        cleaned_data = strip_markdown(data)
+        return json.dumps(cleaned_data, ensure_ascii=False)
+    except:
+        return res
 
 async def _call_gemini(prompt: str, images: list = None):
     try:
