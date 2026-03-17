@@ -172,7 +172,6 @@ export default function FreeResult({ result, onReset }) {
               
               <div style={{ position: 'relative', display: 'inline-block', marginBottom: 32 }}>
                  <span className="cta-price" style={{ fontSize: 56 }}>19€</span>
-                 <span style={{ position: 'absolute', top: -5, right: -30, background: 'var(--danger)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, transform: 'rotate(15deg)' }}>PROMO</span>
               </div>
               
               <div className="cta-price-label">Accès illimité à vie · Support expert inclus</div>
@@ -195,7 +194,7 @@ export default function FreeResult({ result, onReset }) {
                 </div>
                 <div style={{ width: 1, height: 12, background: 'var(--border)' }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-subtle)' }}>
-                  <span>🤝</span> Partenaire Hologram
+                  <span>🤝</span> Hologram Conseils
                 </div>
               </div>
             </div>
