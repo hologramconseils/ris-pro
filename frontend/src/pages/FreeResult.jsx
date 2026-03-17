@@ -62,11 +62,11 @@ export default function FreeResult({ result, onReset }) {
   }
 
   return (
-    <div className="page">
+    <div className="page" style={{ paddingBottom: 100 }}>
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 680, position: 'relative' }}>
 
-        <div className="card">
+        <div className="card shadow-expert">
           <div className="result-verdict">
             <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
             <div className="verdict-label">Rapport Standard RIS</div>
@@ -75,31 +75,44 @@ export default function FreeResult({ result, onReset }) {
             </div>
             <p className="verdict-subtitle">
               {hasAnomalies
-                ? 'Notre analyse a détecté plusieurs anomalies dans votre relevé de carrière. Obtenez le rapport détaillé pour identifier et corriger ces erreurs.'
-                : 'Aucune anomalie majeure n\'a été détectée. Votre carrière semble correctement enregistrée.'}
+                ? 'Notre moteur IA a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                : 'Félicitations ! Aucune anomalie majeure n\'a été détectée dans votre relevé actuel.'}
             </p>
           </div>
           
           {hasAnomalies && result.preview_anomalies && result.preview_anomalies.length > 0 && (
             <div style={{ marginBottom: 32 }}>
-              <h4 style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 16, letterSpacing: 1 }}>
-                🔍 Aperçu des anomalies et justificatifs requis
-              </h4>
+              <div style={{ 
+                display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20,
+                borderBottom: '1px solid var(--border)', paddingBottom: 12
+              }}>
+                <span style={{ fontSize: 20 }}>🔍</span>
+                <h4 style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>
+                  Aperçu des justificatifs à préparer
+                </h4>
+              </div>
+
               <div className="anomaly-list">
                 <motion.div 
                   className="anomaly-card"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 6, letterSpacing: 0.5 }}>
                     ANOMALIE ANCIENNE
                   </div>
-                  <h4>{result.preview_anomalies[0].title}</h4>
-                  <p>{result.preview_anomalies[0].description}</p>
+                  <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[0].title}</h4>
+                  <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[0].description}</p>
+                  
                   {result.preview_anomalies[0].justificatif && (
-                    <div className="justificatif-badge">
-                      📄 À prévoir : <strong>{result.preview_anomalies[0].justificatif}</strong>
+                    <div className="justificatif-box">
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary-light)', marginBottom: 4 }}>
+                        📄 PIÈCE(S) À FOURNIR :
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {result.preview_anomalies[0].justificatif}
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -107,57 +120,83 @@ export default function FreeResult({ result, onReset }) {
                 {result.preview_anomalies.length > 1 && (
                   <motion.div 
                     className="anomaly-card"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-light)', marginBottom: 4 }}>
-                      ANOMALIE RÉCENTE (Intermédiaire)
+                    <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-light)', marginBottom: 6, letterSpacing: 0.5 }}>
+                      POINT DE VIGILANCE INTERMÉDIAIRE
                     </div>
-                    <h4>{result.preview_anomalies[1].title}</h4>
-                    <p>{result.preview_anomalies[1].description}</p>
+                    <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[1].title}</h4>
+                    <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[1].description}</p>
+                    
                     {result.preview_anomalies[1].justificatif && (
-                      <div className="justificatif-badge">
-                        📄 À prévoir : <strong>{result.preview_anomalies[1].justificatif}</strong>
+                      <div className="justificatif-box">
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-light)', marginBottom: 4 }}>
+                          📄 PIÈCE(S) À FOURNIR :
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                          {result.preview_anomalies[1].justificatif}
+                        </div>
                       </div>
                     )}
                   </motion.div>
                 )}
               </div>
-              <motion.p 
-                style={{ marginTop: 16, fontSize: 13, textAlign: 'center', color: 'var(--text-subtle)', fontStyle: 'italic' }}
+
+              <motion.div 
+                style={{ 
+                  marginTop: 20, padding: '12px', borderRadius: 12, 
+                  background: 'rgba(255,255,255,0.03)', textAlign: 'center'
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.6 }}
               >
-                + {Math.max(0, (result.total_anomalies || result.preview_anomalies.length) - 2)} autres anomalies et justificatifs dans le rapport complet...
-              </motion.p>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  + <strong>{Math.max(0, (result.total_anomalies || result.preview_anomalies.length) - 2)}</strong> autres anomalies identifiées dans le rapport complet
+                </div>
+              </motion.div>
             </div>
           )}
 
           {hasAnomalies && (
-            <div className="cta-box">
-              <h3>🔎 Obtenez la liste complète des pièces à fournir</h3>
-              <p>
-                Le rapport détaillé vous donne la liste précise des documents à envoyer à votre caisse pour chaque année en anomalie.
+            <div className="cta-box shadow-glow">
+              <div style={{ display: 'inline-block', padding: '12px', borderRadius: '50%', background: 'rgba(79,70,229,0.1)', marginBottom: 16 }}>
+                <span style={{ fontSize: 32 }}>📑</span>
+              </div>
+              <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Votre dossier de régularisation prêt en 1 clic</h3>
+              <p style={{ fontSize: 16, lineHeight: 1.5, marginBottom: 24 }}>
+                Le rapport détaillé vous donne la <strong>liste exhaustive</strong> des pièces à fournir pour chaque année en anomalie selon votre situation (salarié, indépendant, étranger, etc).
               </p>
-              <span className="cta-price">19€</span>
-              <div className="cta-price-label">Accès illimité · Support expert</div>
+              
+              <div style={{ position: 'relative', display: 'inline-block', marginBottom: 32 }}>
+                 <span className="cta-price" style={{ fontSize: 56 }}>19€</span>
+                 <span style={{ position: 'absolute', top: -5, right: -30, background: 'var(--danger)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, transform: 'rotate(15deg)' }}>PROMO</span>
+              </div>
+              
+              <div className="cta-price-label">Accès illimité à vie · Support expert inclus</div>
 
               {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>⚠️ {error}</div>}
 
               {user?.has_paid_access || user?.is_admin ? (
-                <button className="btn btn-primary btn-large" onClick={loadDetailed} disabled={loading}>
-                  {loading ? 'Chargement…' : '📋 Voir mon rapport détaillé'}
+                <button className="btn btn-primary btn-large btn-glow" onClick={loadDetailed} disabled={loading}>
+                  {loading ? 'Chargement en cours…' : '📋 Accéder à mon rapport expert'}
                 </button>
               ) : (
-                <button className="btn btn-primary btn-large" onClick={handleGetDetailed} disabled={loading}>
-                  {loading ? 'Redirection…' : '💳 Payer 19€ pour le rapport d\'expertise'}
+                <button className="btn btn-primary btn-large btn-glow" onClick={handleGetDetailed} disabled={loading}>
+                  {loading ? 'Redirection sécurisée…' : '💳 Débloquer mon expertise complète'}
                 </button>
               )}
 
-              <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-subtle)' }}>
-                🔒 Paiement sécurisé via Stripe · Partenaire Hologram Conseils
+              <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-subtle)' }}>
+                  <span>🔒</span> Paiement Stripe
+                </div>
+                <div style={{ width: 1, height: 12, background: 'var(--border)' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-subtle)' }}>
+                  <span>🤝</span> Partenaire Hologram
+                </div>
               </div>
             </div>
           )}
@@ -165,7 +204,7 @@ export default function FreeResult({ result, onReset }) {
           <div className="divider" />
           <div style={{ textAlign: 'center' }}>
             <button className="btn btn-secondary btn-sm" onClick={onReset}>
-              ← Analyser un autre fichier
+              ← Retour au scanner
             </button>
           </div>
         </div>

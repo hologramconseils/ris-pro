@@ -20,7 +20,7 @@ def is_valid_json(text: str) -> bool:
 
 async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
     """
-    Routage IA Adaptatif (Stabilité & Quotas) + Détection Jusitifcatifs.
+    Routage IA Adaptatif (Stabilité & Quotas) + Détection Jusitifcatifs Exhaustive.
     """
     if not raw_text and not anomalies and not (images and len(images)>0):
         return json.dumps({
@@ -37,19 +37,34 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
         raw_text = "\n".join([f"- {a['title']}: {a['description']}" for a in anomalies])
     
     is_scan = (images is not None and len(images) > 0)
-    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images." if is_scan else ""
+    vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données." if is_scan else ""
     
     prompt = f"""Tu es un expert en audit de relevés de carrière retraite française ({filename}).
 {vision_mode_desc}
 
 Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
-REVENT : N'utilise jamais de markdown (**).
+REGLE : Ne jamais utiliser de markdown (**).
 
-Règles de suggestion de justificatifs :
-- Si anomalie liée à des trimestres manquants/incomplets (activité salarié) -> "Bulletins de salaire"
-- Si anomalie liée à une période de maladie -> "Indemnités Journalières de Sécurité Sociale (IJSS)"
-- Si anomalie liée à du chômage -> "Attestation d'indemnisation Pôle Emploi / Travail"
-- Si tout est OK -> null
+--- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
+Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :
+
+1. ACTIVITÉ SALARIÉE (Année incomplète ou absente) :
+   - Priorité : "Bulletins de salaire, Certificats de travail, Contrats de travail"
+   - Si entreprise disparue : "Attestation AGS ou Jugement de liquidation"
+   - Si cotisations non déclarées : "Relevés bancaires montrant le versement du salaire"
+
+2. INDÉPENDANTS / NON SALARIÉ (Artisan, Libéral, Auto-entrepreneur) :
+   - "Extrait Kbis, Attestation URSSAF, Déclarations fiscales professionnelles"
+
+3. PÉRIODES D'INACTIVITÉ :
+   - Chômage : "Attestation Pôle Emploi (Historique d'indemnisation / Notification ARE/ASS)"
+   - Maladie / Maternité : "Attestation CPAM, Relevés d'Indemnités Journalières (IJSS)"
+   - Congé Parental : "Attestation CAF et Attestation employeur"
+   - Service National : "État signalétique et des services ou Livret militaire"
+
+4. ACTIVITÉ À L'ÉTRANGER :
+   - UE/EEE : "Formulaire européen E205 / P5000"
+   - Hors UE : "Certificats d'emploi et Bulletins de salaire étrangers"
 
 Format de sortie :
 {{
@@ -64,16 +79,15 @@ Format de sortie :
       "statut": "complet/incomplet/manquant",
       "trimestres_valides": N,
       "trimestres_manquants": M,
-      "points_complementaires": "valeur",
-      "activite": "Résumé",
-      "anomalie_specifique": "explication ou null",
-      "justificatif_suggere": "Nom du document à fournir ou null"
+      "activite": "Résumé de l'activité (ex: Salarié, Chômage, Indépendant)",
+      "anomalie_specifique": "explication claire",
+      "justificatif_suggere": "Liste précise des documents à fournir (ex: Bulletins de salaire, Attestation Pôle Emploi)"
     }}
   ],
   "compte_rendu": "Détails experts avec puces •"
 }}
 
-Données :
+Données à analyser :
 {raw_text}
 """
 

@@ -14,9 +14,7 @@ export default function DetailedResult({ result, onReset }) {
 
   const handleDownloadPDF = async () => {
     setIsExporting(true)
-    
     const element = contentRef.current
-
     const opt = {
       margin: 10,
       filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
@@ -45,6 +43,12 @@ export default function DetailedResult({ result, onReset }) {
              h.style.textAlign = 'center'
              h.style.color = '#000'
           })
+          // Special PDF styling for justificatif boxes
+          doc.querySelectorAll('.justificatif-box').forEach(box => {
+            box.style.border = '1px solid #ddd'
+            box.style.padding = '10px'
+            box.style.marginTop = '10px'
+          })
         }
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -54,7 +58,7 @@ export default function DetailedResult({ result, onReset }) {
       await html2pdf().set(opt).from(element).save()
     } catch (err) {
       console.error("PDF Export Error:", err)
-      alert("Une erreur est survenue lors de la génération du PDF.")
+      alert("Erreur lors de la génération du PDF.")
     } finally {
       setIsExporting(false)
     }
@@ -62,14 +66,11 @@ export default function DetailedResult({ result, onReset }) {
 
   const handleDownloadWord = async () => {
     setIsExporting(true)
-    
     try {
       let aiData = null
       try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
 
       const children = []
-
-      // 1. Header
       children.push(
         new Paragraph({
           text: "RAPPORT D'EXPERTISE RETRAITE - RIS PRO",
@@ -87,79 +88,57 @@ export default function DetailedResult({ result, onReset }) {
         })
       )
 
-      // 2. Summary
-      children.push(
-        new Paragraph({
-          text: "SYNTHÈSE DU DOSSIER",
-          heading: HeadingLevel.HEADING_1,
-          spacing: { before: 400, after: 200 },
-        })
-      )
-
       if (aiData) {
+        children.push(
+          new Paragraph({
+            text: "SYNTHÈSE DU DOSSIER",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { before: 400, after: 200 },
+          })
+        )
+
         children.push(
           new Paragraph({
             children: [
               new TextRun({ text: "Niveau de risque détecté : ", bold: true }),
-              new TextRun({ text: (aiData.niveau_risque || 'Non défini').toUpperCase() }),
+              new TextRun({ text: (aiData.niveau_risque || 'Non défini').toUpperCase(), color: aiData.niveau_risque === 'élevé' ? 'FF0000' : '000000' }),
             ],
             spacing: { after: 200 },
           })
         )
 
         if (aiData.resume_global) {
-          children.push(
-            new Paragraph({
-              text: aiData.resume_global,
-              spacing: { after: 400 },
-              alignment: AlignmentType.JUSTIFIED
-            })
-          )
+          children.push(new Paragraph({ text: aiData.resume_global, spacing: { after: 400 }, alignment: AlignmentType.JUSTIFIED }))
         }
 
         children.push(
           new Paragraph({
-            text: "HISTORIQUE CHRONOLOGIQUE ET POINTS DE VIGILANCE",
+            text: "CHRONOLOGIE ET PIÈCES À FOURNIR",
             heading: HeadingLevel.HEADING_1,
             spacing: { before: 600, after: 300 },
           })
         )
 
-        if (aiData.full_timeline && aiData.full_timeline.length > 0) {
+        if (aiData.full_timeline) {
           aiData.full_timeline.forEach(item => {
+            const isAnom = item.statut !== 'complet'
             children.push(
               new Paragraph({
                 children: [
                   new TextRun({ text: `ANNÉE ${item.annee}`, bold: true }),
-                  new TextRun({ text: ` - Statut : ${item.statut.toUpperCase()}` }),
+                  new TextRun({ text: ` - ${item.statut.toUpperCase()}` }),
+                  new TextRun({ text: ` (${item.trimestres_valides}/4 trim. | ${item.activite || 'N/A'})`, italics: true }),
                 ],
-                spacing: { before: 300, after: 120 },
+                spacing: { before: 200, after: 100 },
               })
             )
             
-            children.push(
-              new Paragraph({
-                text: `Activité : ${item.activite || 'Non renseignée'}`,
-                spacing: { after: 80 },
-              })
-            )
-            
-            children.push(
-              new Paragraph({
-                text: `Trimestres : ${item.trimestres_valides}/4 ${item.points_complementaires ? `| Points compl. : ${item.points_complementaires}` : ''}`,
-                spacing: { after: 80 },
-              })
-            )
-
-            if (item.statut !== 'complet') {
+            if (isAnom) {
               children.push(
                 new Paragraph({
                   children: [
-                    new TextRun({ 
-                      text: `⚠️ POINT DE VIGILANCE : ${item.anomalie_specifique || `Il manque ${item.trimestres_manquants} trimestre(s).`}`, 
-                      bold: true,
-                      italics: true
-                    }),
+                    new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }),
+                    new TextRun({ text: item.anomalie_specifique || "Trimestres manquants" }),
                   ],
                   spacing: { after: 80 },
                 })
@@ -169,7 +148,7 @@ export default function DetailedResult({ result, onReset }) {
                 children.push(
                   new Paragraph({
                     children: [
-                      new TextRun({ text: `➡ Justificatif à fournir : `, bold: true, color: "0000FF" }),
+                      new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }),
                       new TextRun({ text: item.justificatif_suggere, bold: true }),
                     ],
                     spacing: { after: 200 },
@@ -183,27 +162,20 @@ export default function DetailedResult({ result, onReset }) {
 
       const doc = new Document({
         sections: [{
-          properties: {
-            page: {
-              margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
-            },
-          },
+          properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
           children: children
         }]
       })
 
       const blob = await Packer.toBlob(doc)
       const url = window.URL.createObjectURL(blob)
-      const filename = `Rapport_Expert_RIS_${new Date().toISOString().split('T')[0]}.docx`
-      
       const downloadLink = document.createElement("a")
       downloadLink.href = url
-      downloadLink.download = filename
+      downloadLink.download = `Rapport_Expert_RIS_${new Date().toISOString().split('T')[0]}.docx`
       document.body.appendChild(downloadLink)
       downloadLink.click()
       document.body.removeChild(downloadLink)
       window.URL.revokeObjectURL(url)
-      
     } catch (err) {
       console.error("Error generating DOCX", err)
       alert("Une erreur est survenue lors de la génération du document Word.")
@@ -213,189 +185,158 @@ export default function DetailedResult({ result, onReset }) {
   }
 
   return (
-    <div className="page">
+    <div className="page" style={{ paddingBottom: 100 }}>
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
         
-        {/* Export Actions */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
-          <button 
-            className="btn btn-secondary btn-sm" 
-            onClick={handleDownloadWord} 
-            disabled={isExporting}
-            style={{ fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            {isExporting ? '⏳' : '📄'} Télécharger Word
+        {/* Actions Float */}
+        <div style={{ position: 'sticky', top: 80, zIndex: 50, marginBottom: 24, display: 'flex', justifyContent: 'center', gap: 12 }}>
+          <button className="btn btn-secondary btn-sm shadow-expert" onClick={handleDownloadWord} disabled={isExporting}>
+            {isExporting ? '⏳' : '📄'} Word
           </button>
-          <button 
-            className="btn btn-secondary btn-sm" 
-            onClick={handleDownloadPDF} 
-            disabled={isExporting}
-            style={{ fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            {isExporting ? '⏳' : '📥'} Télécharger PDF
+          <button className="btn btn-secondary btn-sm shadow-expert" onClick={handleDownloadPDF} disabled={isExporting}>
+            {isExporting ? '⏳' : '📥'} PDF
           </button>
         </div>
 
-        {/* Content to Export */}
-        <div ref={contentRef} style={{ background: 'var(--bg)', borderRadius: 12, padding: '10px 0' }}>
+        {/* Content */}
+        <div ref={contentRef} className="card shadow-expert" style={{ background: 'var(--bg-card)', padding: '40px' }}>
           {/* Header */}
-          <div style={{ marginBottom: 32, textAlign: 'center' }}>
-            <span style={{ fontSize: 56 }}>📊</span>
-            <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: -1, marginTop: 12, marginBottom: 8 }}>
-              Rapport Détaillé
-            </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>
-              {anomalies.length} anomalie{anomalies.length > 1 ? 's' : ''} identifiée{anomalies.length > 1 ? 's' : ''} dans votre relevé de carrière
-            </p>
-            {user && (
-              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center', gap: 8 }}>
-                <span className="badge badge-success">✦ Accès Pro activé</span>
-                {result.is_scanned && <span className="badge badge-warning">📄 Scan détecté</span>}
-              </div>
-            )}
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{ 
+              width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,70,229,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+              fontSize: 40
+            }}>
+              📊
+            </div>
+            <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Rapport d'Expertise RIS</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Analyse exhaustive de votre situation de retraite</p>
+            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', gap: 12 }}>
+              <span className="badge badge-success">✦ Accès Expert Illimité</span>
+              {result.is_scanned && <span className="badge badge-warning">📄 Document Scanné</span>}
+            </div>
           </div>
 
-          {/* AI Expert Audit */}
+          {/* AI Diagnostic */}
           {result.ai_analysis && (() => {
             let aiData = null
             try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
+            if (!aiData) return null
 
             const riskColors = {
-              'faible': { bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.3)', text: '#22c55e', label: '🟢 Risque faible' },
-              'moyen': { bg: 'rgba(234,179,8,0.1)', border: 'rgba(234,179,8,0.3)', text: '#eab308', label: '🟡 Risque moyen' },
-              'élevé': { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)', text: '#ef4444', label: '🔴 Risque élevé' },
+              'faible': { bg: 'rgba(34,197,94,0.1)', text: '#22c55e', icon: '🟢' },
+              'moyen': { bg: 'rgba(234,179,8,0.1)', text: '#eab308', icon: '🟡' },
+              'élevé': { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', icon: '🔴' },
             }
+            const risk = riskColors[aiData.niveau_risque] || riskColors['moyen']
 
-            if (aiData && (aiData.resume_global || aiData.compte_rendu)) {
-              const risk = riskColors[aiData.niveau_risque] || riskColors['moyen']
-              const sectionStyle = {
-                background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '12px 16px', marginBottom: 16
-              }
-
-              return (
-                <div className="card" style={{ 
-                  marginBottom: 32, 
-                  background: 'linear-gradient(135deg, rgba(79,70,229,0.08), rgba(6,182,212,0.08))',
-                  borderColor: 'var(--primary-light)'
+            return (
+              <div style={{ marginBottom: 48 }}>
+                <div style={{ 
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                  marginBottom: 20, paddingBottom: 15, borderBottom: '1px solid var(--border)' 
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
-                      🧪 Diagnostic Expert
-                    </h3>
-                    <span style={{ 
-                      padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700,
-                      background: risk.bg, border: `1px solid ${risk.border}`, color: risk.text
-                    }}>
-                      {risk.label}
-                    </span>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'Expert IA</h3>
+                  <div style={{ 
+                    background: risk.bg, color: risk.text, padding: '6px 16px', 
+                    borderRadius: 50, fontWeight: 800, fontSize: 13, border: `1px solid ${risk.text}33`
+                  }}>
+                    {risk.icon} RISQUE {aiData.niveau_risque.toUpperCase()}
                   </div>
-
-                  {aiData.resume_global && (
-                    <div style={{ ...sectionStyle, borderLeft: `3px solid ${risk.border}` }}>
-                      <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>{aiData.resume_global}</p>
-                    </div>
-                  )}
-
-                  {aiData.compte_rendu && (
-                    <div style={{ ...sectionStyle, borderLeft: '3px solid var(--primary-light)' }}>
-                      <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: 'var(--primary-light)' }}>
-                        📝 Rapport d'expertise détaillé
-                      </h4>
-                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                        {aiData.compte_rendu.replace(/\*\*/g, '')}
-                      </p>
-                    </div>
-                  )}
                 </div>
-              )
-            }
-            return null
+
+                <div className="justificatif-box" style={{ background: 'rgba(255,255,255,0.02)', marginBottom: 24 }}>
+                   <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6 }}>{aiData.resume_global}</p>
+                </div>
+
+                {aiData.compte_rendu && (
+                  <div style={{ 
+                    padding: '20px', borderRadius: 12, background: 'rgba(79,70,229,0.03)', 
+                    borderLeft: '4px solid var(--primary-light)'
+                  }}>
+                    <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 12 }}>
+                      📝 Synthèse détaillée par l'expert
+                    </h4>
+                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                      {aiData.compte_rendu.replace(/\*\*/g, '')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
           })()}
 
-          {/* Timeline */}
-          <div className="anomaly-list" style={{ padding: '0 20px' }}>
-            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, marginTop: 40, letterSpacing: -0.5 }}>
-              🔎 Chronologie et Justificatifs
-            </h2>
-
+          {/* Chronologie et Justificatifs */}
+          <div>
+            <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24 }}>🔎 Chronologie et Pièces Justificatives</h3>
+            
             {(() => {
               let aiData = null
               try { aiData = JSON.parse(result.ai_analysis) } catch { aiData = null }
+              if (!aiData?.full_timeline) return <p>Chargement de la chronologie...</p>
 
-              if (aiData && aiData.full_timeline) {
-                return (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {aiData.full_timeline.map((item, i) => {
-                      const isWarning = item.statut !== 'complet'
-                      const borderColor = item.statut === 'complet' ? '#22c55e' : (item.statut === 'manquant' ? '#ef4444' : '#eab308')
-                      const badgeClass = item.statut === 'complet' ? 'badge-success' : 'badge-danger'
-                      
-                      return (
-                        <div key={i} className="anomaly-card" style={{
-                          borderLeft: `5px solid ${borderColor}`,
-                          background: isWarning ? 'rgba(239,68,68,0.02)' : 'rgba(255,255,255,0.02)',
-                          padding: '20px'
-                        }}>
-                          <div className="anomaly-header" style={{ marginBottom: 12 }}>
-                            <span className={`badge ${badgeClass}`} style={{ textTransform: 'capitalize' }}>
-                              {item.statut}
-                            </span>
-                            <span className="anomaly-id">Année {item.annee}</span>
-                          </div>
-                          <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 8 }}>
-                            {item.trimestres_valides}/4 trimestres ({item.activite || 'N/A'})
-                          </h3>
-                          
-                          {isWarning && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
-                              <div style={{ 
-                                padding: '12px 16px', borderRadius: 8, 
-                                background: item.statut === 'manquant' ? 'rgba(239,68,68,0.08)' : 'rgba(234,179,8,0.08)',
-                                border: `1px solid ${item.statut === 'manquant' ? 'rgba(239,68,68,0.1)' : 'rgba(234,179,8,0.1)'}`,
-                                fontSize: 14, color: item.statut === 'manquant' ? '#ef4444' : '#eab308', fontWeight: 600
-                              }}>
-                                ⚠️ Anomalie : {item.anomalie_specifique || `Manque ${item.trimestres_manquants} trimestre(s).`}
-                              </div>
-                              
-                              {item.justificatif_suggere && (
-                                <div style={{ 
-                                  padding: '12px 16px', borderRadius: 8, 
-                                  background: 'rgba(79,70,229,0.08)',
-                                  border: '1px solid rgba(79,70,229,0.2)',
-                                  fontSize: 14, color: 'var(--primary-light)', fontWeight: 700,
-                                  display: 'flex', alignItems: 'center', gap: 8
-                                }}>
-                                  📄 Justificatif à fournir : <span style={{ color: 'var(--text)' }}>{item.justificatif_suggere}</span>
-                                </div>
-                              )}
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {aiData.full_timeline.map((item, i) => {
+                    const isError = item.statut !== 'complet'
+                    const borderColor = item.statut === 'complet' ? 'var(--success)' : (item.statut === 'manquant' ? 'var(--danger)' : 'var(--warning)')
+                    
+                    return (
+                      <div key={i} className="anomaly-card" style={{ 
+                        borderLeft: `5px solid ${borderColor}`,
+                        background: isError ? 'rgba(255,255,255,0.03)' : 'transparent',
+                        padding: '24px'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                          <div>
+                            <span className="anomaly-id" style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>ANNÉE {item.annee}</span>
+                            <div style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>
+                              {item.activite || 'Activité non spécifiée'}
                             </div>
-                          )}
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ color: borderColor, fontWeight: 800, fontSize: 13, textTransform: 'uppercase' }}>{item.statut}</div>
+                            <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{item.trimestres_valides}/4 trimestres</div>
+                          </div>
                         </div>
-                      )
-                    })}
-                  </div>
-                )
-              }
-              return null
+
+                        {isError && (
+                          <div style={{ marginTop: 16 }}>
+                            <div style={{ 
+                              padding: '12px 16px', borderRadius: 8, 
+                              background: 'rgba(234,179,8,0.05)', border: '1px solid rgba(234,179,8,0.1)',
+                              fontSize: 14, color: 'var(--warning)', fontWeight: 600, marginBottom: 12
+                            }}>
+                              ⚠️ {item.anomalie_specifique || "Régularisation requise"}
+                            </div>
+                            
+                            {item.justificatif_suggere && (
+                              <div className="justificatif-box" style={{ borderColor: 'var(--primary-light)', padding: '16px' }}>
+                                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>
+                                  📄 Justificatif(s) à fournir :
+                                </div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>
+                                  {item.justificatif_suggere}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )
             })()}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="card" style={{ marginTop: 28, textAlign: 'center' }}>
-          <h3 style={{ fontWeight: 700, marginBottom: 8 }}>💼 Besoin d'accompagnement ?</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
-            Nos conseillers chez Hologram Conseils peuvent vous aider à régulariser ces anomalies.
-          </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="https://www.hologramconseils.com/contact/" target="_blank" rel="noreferrer" className="btn btn-primary">
-              🤝 Prendre rendez-vous
-            </a>
-            <button className="btn btn-secondary btn-sm" onClick={onReset}>
-              ← Analyser un autre fichier
-            </button>
-          </div>
+        {/* Footer actions */}
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <button className="btn btn-secondary" onClick={onReset}>
+            ← Analyser un autre RIS
+          </button>
         </div>
       </div>
     </div>
