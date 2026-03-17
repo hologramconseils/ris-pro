@@ -10,6 +10,12 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
   const [isExporting, setIsExporting] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   
+  // Helper to clean text (strip Markdown asterisks)
+  const cleanText = (text) => {
+    if (!text) return ""
+    return String(text).replace(/\*\*/g, '').trim()
+  }
+
   // Auto-refresh when analysis is missing
   useEffect(() => {
     let interval;
@@ -92,9 +98,9 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
 
       if (aiData) {
         children.push(new Paragraph({ text: "SYNTHÈSE DU DOSSIER", heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }))
-        children.push(new Paragraph({ children: [new TextRun({ text: "Niveau de risque détecté : ", bold: true }), new TextRun({ text: String(aiData.niveau_risque || 'Non défini').toUpperCase(), color: aiData.niveau_risque === 'élevé' ? 'FF0000' : '000000' })], spacing: { after: 200 } }))
+        children.push(new Paragraph({ children: [new TextRun({ text: "Niveau de risque détecté : ", bold: true }), new TextRun({ text: cleanText(aiData.niveau_risque || 'Non défini').toUpperCase(), color: aiData.niveau_risque === 'élevé' ? 'FF0000' : '000000' })], spacing: { after: 200 } }))
         if (aiData.resume_global) {
-          children.push(new Paragraph({ text: String(aiData.resume_global), spacing: { after: 400 }, alignment: AlignmentType.JUSTIFIED }))
+          children.push(new Paragraph({ text: cleanText(aiData.resume_global), spacing: { after: 400 }, alignment: AlignmentType.JUSTIFIED }))
         }
         if (aiData.full_timeline) {
           aiData.full_timeline.forEach(item => {
@@ -102,9 +108,9 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
             const isAnom = String(item.statut || '').toLowerCase() !== 'complet'
             children.push(new Paragraph({ children: [new TextRun({ text: `ANNÉE ${item.annee}`, bold: true }), new TextRun({ text: ` - ${String(item.statut || '').toUpperCase()}` }), new TextRun({ text: ` (${item.trimestres_valides}/4 trim. | ${item.activite || 'N/A'})`, italics: true })], spacing: { before: 200, after: 100 } }))
             if (isAnom) {
-              children.push(new Paragraph({ children: [new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }), new TextRun({ text: String(item.anomalie_specifique || "Trimestres manquants") })], spacing: { after: 80 } }))
+              children.push(new Paragraph({ children: [new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }), new TextRun({ text: cleanText(item.anomalie_specifique || "Trimestres manquants") })], spacing: { after: 80 } }))
               if (item.justificatif_suggere) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }), new TextRun({ text: String(item.justificatif_suggere), bold: true })], spacing: { after: 200 } }))
+                children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }), new TextRun({ text: cleanText(item.justificatif_suggere), bold: true })], spacing: { after: 200 } }))
               }
             }
           })
@@ -172,12 +178,16 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                 </div>
               </div>
               <div className="justificatif-box" style={{ background: 'rgba(255,255,255,0.02)', marginBottom: 24 }}>
-                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{typeof aiData.resume_global === 'string' ? aiData.resume_global : "Synthèse indisponible"}</p>
+                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                   {cleanText(aiData.resume_global || aiData.resume || "Synthèse en cours de finalisation...")}
+                 </p>
               </div>
-              {aiData.compte_rendu && (
+              {(aiData.compte_rendu || aiData.analyse_detaillee) && (
                 <div style={{ padding: '20px', borderRadius: 12, background: 'rgba(79,70,229,0.03)', borderLeft: '4px solid var(--primary-light)' }}>
                   <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 12 }}>📝 Synthèse détaillée</h4>
-                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{typeof aiData.compte_rendu === 'string' ? aiData.compte_rendu.replace(/\*\*/g, '') : ""}</p>
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                    {cleanText(aiData.compte_rendu || aiData.analyse_detaillee)}
+                  </p>
                 </div>
               )}
             </div>
@@ -212,7 +222,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <span style={{ fontSize: 18, fontWeight: 800 }}>ANNÉE {item.annee}</span>
-                        <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>{item.activite || 'N/A'}</div>
+                        <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>{cleanText(item.activite || 'N/A')}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ color: borderColor, fontWeight: 800, fontSize: 13 }}>{stat.toUpperCase()}</div>
@@ -222,11 +232,11 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     </div>
                     {isErr && (
                       <div style={{ marginTop: 16 }}>
-                        <div style={{ padding: '12px', borderRadius: 8, background: 'rgba(234,179,8,0.05)', color: 'var(--warning)', fontWeight: 600, marginBottom: 12 }}>⚠️ {item.anomalie_specifique || "Régularisation requise"}</div>
+                        <div style={{ padding: '12px', borderRadius: 8, background: 'rgba(234,179,8,0.05)', color: 'var(--warning)', fontWeight: 600, marginBottom: 12 }}>⚠️ {cleanText(item.anomalie_specifique || "Régularisation requise")}</div>
                         {item.justificatif_suggere && (
                           <div className="justificatif-box" style={{ borderColor: 'var(--primary-light)', padding: '16px' }}>
                             <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 6 }}>📄 Justificatif(s) :</div>
-                            <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap' }}>{String(item.justificatif_suggere)}</div>
+                            <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap' }}>{cleanText(item.justificatif_suggere)}</div>
                           </div>
                         )}
                       </div>

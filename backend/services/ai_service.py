@@ -18,6 +18,16 @@ def is_valid_json(text: str) -> bool:
     text = text.strip()
     return text.startswith("{") and text.endswith("}")
 
+def strip_markdown(data):
+    """Supprime les astérisques de formatage Markdown récursivement."""
+    if isinstance(data, str):
+        return data.replace("**", "")
+    elif isinstance(data, list):
+        return [strip_markdown(item) for item in data]
+    elif isinstance(data, dict):
+        return {k: strip_markdown(v) for k, v in data.items()}
+    return data
+
 async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
     """
     Routage Expertise Adaptatif (Stabilité & Quotas) + Détection Justinificatifs Exhaustive.
@@ -48,7 +58,8 @@ Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 - Ne mentionne JAMAIS ton mode de fonctionnement technique. Parle exclusivement en tant qu'expert retraite de Hologram Conseils.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
-- **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•).
+- **INTERDICTION FORMELLE DE FORMATAGE MARKDOWN** : N'utilise JAMAIS d'astérisques (**) pour mettre en gras, de dièses (#) pour les titres, ou de tout autre symbole de formatage technique. Le texte doit être du texte brut pur et professionnel.
+- **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces simples (•).
 
 **RÈGLES D'ANALYSE DE L'EXPERT (LOGIQUE DE DÉTECTION SUR SCAN) :**
 1. **IDENTIFICATION DES EMPLOYÉURS** : Le nom de l'EMPLOYEUR ou de l'activité est toujours sur la ligne du DESSUS par rapport aux informations de dates et revenus.
@@ -124,14 +135,25 @@ Données à analyser :
     if is_scan:
         if not GEMINI_API_KEY:
             return json.dumps({"error": "Gemini API Key manquante pour l'analyse visuelle."})
-        return await _call_gemini(prompt, images)
+        res = await _call_gemini(prompt, images)
     else:
         if not MISTRAL_API_KEY:
-            # Fallback exceptionnel si Mistral est offline mais Gemini dispo (en texte pur)
             if GEMINI_API_KEY:
-                return await _call_gemini(prompt, None)
-            return json.dumps({"error": "Aucun service d'analyse disponible."})
-        return await _call_mistral(prompt)
+                res = await _call_gemini(prompt, None)
+            else:
+                return json.dumps({"error": "Aucun service d'analyse disponible."})
+        else:
+            res = await _call_mistral(prompt)
+    
+    # Sanitisation finale (Suppression des astérisques)
+    if is_valid_json(res):
+        try:
+            data = json.loads(res)
+            cleaned_data = strip_markdown(data)
+            return json.dumps(cleaned_data, ensure_ascii=False)
+        except:
+            return res
+    return res
 
 async def _call_gemini(prompt: str, images: list = None):
     try:
