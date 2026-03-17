@@ -24,9 +24,10 @@ export default function Navbar() {
           {user ? (
             <>
               <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                {user.has_paid_access && <span style={{ color: 'var(--success)', marginRight: 8 }}>✦ Accès Pro</span>}
+                {user.is_admin && <span style={{ color: 'var(--primary-light)', marginRight: 8, fontWeight: 'bold' }}>✦ Admin</span>}
+                {user.has_paid_access && !user.is_admin && <span style={{ color: 'var(--success)', marginRight: 8 }}>✦ Accès Pro</span>}
                 {user.first_name}
-              </span>
+</span>
               <Link to="/history" className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}>Historique</Link>
               <button className="btn btn-secondary btn-sm" onClick={logout}>Déconnexion</button>
             </>
