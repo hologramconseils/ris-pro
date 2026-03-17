@@ -278,7 +278,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
               'moyen': { bg: 'rgba(234,179,8,0.1)', text: '#eab308', icon: '🟡' },
               'élevé': { bg: 'rgba(239,68,68,0.1)', text: '#ef4444', icon: '🔴' },
             }
-            const risk = riskColors[aiData.niveau_risque] || riskColors['moyen']
+            const risk = riskColors[aiData.niveau_risque?.toLowerCase()] || riskColors['moyen']
 
             return (
               <div style={{ marginBottom: 48 }}>
@@ -291,12 +291,12 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     background: risk.bg, color: risk.text, padding: '6px 16px', 
                     borderRadius: 50, fontWeight: 800, fontSize: 13, border: `1px solid ${risk.text}33`
                   }}>
-                    {risk.icon} RISQUE {aiData.niveau_risque.toUpperCase()}
+                    {risk.icon} RISQUE {(aiData.niveau_risque || 'moyen').toUpperCase()}
                   </div>
                 </div>
 
                 <div className="justificatif-box" style={{ background: 'rgba(255,255,255,0.02)', marginBottom: 24 }}>
-                   <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{aiData.resume_global}</p>
+                   <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{aiData.resume_global || "Synthèse en cours de génération..."}</p>
                 </div>
 
                 {aiData.compte_rendu && (
@@ -308,7 +308,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                       📝 Synthèse détaillée de l'expert retraite
                     </h4>
                     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                      {aiData.compte_rendu.replace(/\*\*/g, '')}
+                      {(aiData.compte_rendu || '').replace(/\*\*/g, '')}
                     </p>
                   </div>
                 )}

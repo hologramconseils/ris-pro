@@ -32,10 +32,14 @@ function AppContent() {
   )
 }
 
+import ErrorBoundary from './components/ErrorBoundary'
+
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
