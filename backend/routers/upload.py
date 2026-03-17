@@ -104,7 +104,13 @@ async def upload_file(
         report = json.loads(db_scan.detailed_report)
         db_scan.total_anomalies = len(report)
         if len(report) >= 2:
-            db_scan.preview_anomalies = [report[0], report[-1]]
+            # Sort by year (assuming title contains the year or report has a 'year' field)
+            # Find the most recent anomaly that is NOT the absolute last year
+            oldest = report[0]
+            most_recent = report[-1]
+            if len(report) > 2:
+                most_recent = report[-2] # Default to second-to-last
+            db_scan.preview_anomalies = [oldest, most_recent]
         elif len(report) == 1:
             db_scan.preview_anomalies = [report[0]]
             
@@ -118,7 +124,11 @@ def get_history(db: Session = Depends(database.get_db), current_user: models.Use
             report = json.loads(s.detailed_report)
             s.total_anomalies = len(report)
             if len(report) >= 2:
-                s.preview_anomalies = [report[0], report[-1]]
+                oldest = report[0]
+                most_recent = report[-1]
+                if len(report) > 2:
+                    most_recent = report[-2]
+                s.preview_anomalies = [oldest, most_recent]
             elif len(report) == 1:
                 s.preview_anomalies = [report[0]]
     return scans
