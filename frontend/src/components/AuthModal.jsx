@@ -124,12 +124,27 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
           </button>
         </form>
 
-        <div className="modal-footer">
+        <div className="modal-footer" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {mode === 'login' ? (
             <span>Pas encore de compte ? <a onClick={() => { setMode('register'); setError('') }}>S'inscrire gratuitement</a></span>
           ) : (
             <span>Déjà un compte ? <a onClick={() => { setMode('login'); setError('') }}>Se connecter</a></span>
           )}
+          
+          <button 
+            type="button" 
+            onClick={() => {
+              localStorage.clear();
+              sessionStorage.clear();
+              window.location.reload();
+            }}
+            style={{ 
+              background: 'none', border: 'none', color: 'var(--text-subtle)', 
+              fontSize: 11, cursor: 'pointer', textDecoration: 'underline', marginTop: 8 
+            }}
+          >
+            🔌 Problème de connexion ? Nettoyer le cache & réinitialiser
+          </button>
         </div>
       </div>
     </div>
