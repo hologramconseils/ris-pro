@@ -39,13 +39,13 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     is_scan = (images is not None and len(images) > 0)
     vision_mode_desc = "⚠️ MODE VISION : Analyse VISUELLEMENT les images pour extraire les données." if is_scan else ""
     
-    prompt = f"""Tu es l'Expert Vision Retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
+    prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
 
 Mission : Analyse EXHAUSTIVE année par année. JSON valide uniquement.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
-- Ne mentionne JAMAIS que tu es une "Intelligence Artificielle" ou une "IA". Parle en tant qu'Expert Vision Retraite.
+- Ne mentionne JAMAIS que tu es une "Intelligence Artificielle" ou une "IA". Parle en tant qu'expert retraite.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage, s'arrête, l'expert).
 - **STRUCTURE DE LA SYNTHÈSE :** Pour `resume_global` et `compte_rendu`, tu DOIS utiliser des listes à puces (•) pour chaque point clé et des paragraphes segmentés pour une lisibilité maximale.

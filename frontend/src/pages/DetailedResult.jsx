@@ -236,7 +236,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
                   marginBottom: 20, paddingBottom: 15, borderBottom: '1px solid var(--border)' 
                 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'Expert Vision</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>🧠 Analyse de l'expert retraite</h3>
                   <div style={{ 
                     background: risk.bg, color: risk.text, padding: '6px 16px', 
                     borderRadius: 50, fontWeight: 800, fontSize: 13, border: `1px solid ${risk.text}33`
@@ -255,7 +255,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     borderLeft: '4px solid var(--primary-light)'
                   }}>
                     <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 12 }}>
-                      📝 Synthèse détaillée de l'Expert
+                      📝 Synthèse détaillée de l'expert retraite
                     </h4>
                     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                       {aiData.compte_rendu.replace(/\*\*/g, '')}
@@ -278,7 +278,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                   {isRefreshing && <div className="spinner" style={{ margin: '0 auto 16px', borderColor: 'var(--primary-light) transparent transparent transparent' }}></div>}
                   
                   <p style={{ fontWeight: 600 }}>
-                    {isRefreshing ? "Mise à jour de l'expertise..." : "L'Expert Vision analyse votre document en arrière-plan..."}
+                    {isRefreshing ? "Mise à jour de l'expertise..." : "L'expert retraite analyse votre document en arrière-plan..."}
                   </p>
                   <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>
                     Cela peut prendre jusqu'à 1 minute.
