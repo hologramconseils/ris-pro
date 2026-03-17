@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import html2pdf from 'html2pdf.js'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
@@ -9,6 +9,18 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
   const contentRef = useRef(null)
   const [isExporting, setIsExporting] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  
+  // Auto-refresh when AI analysis is missing
+  useEffect(() => {
+    let interval;
+    if (!result.ai_analysis) {
+      interval = setInterval(() => {
+        if (onRefresh) onRefresh();
+      }, 5000); // Poll every 5 seconds
+    }
+    return () => clearInterval(interval);
+  }, [result.ai_analysis, onRefresh]);
+
   let anomalies = []
   try {
     anomalies = JSON.parse(result.detailed_report || '[]')

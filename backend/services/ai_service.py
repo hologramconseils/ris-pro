@@ -117,23 +117,21 @@ Données à analyser :
 {raw_text}
 """
 
-    # --- STRATÉGIE DE ROUTAGE ---
+    # --- STRATÉGIE DE ROUTAGE STRICTE ---
+    # Scans (Images) -> Gemini Vision uniquement
+    # PDF Natif (Texte) -> Mistral uniquement
+    
     if is_scan:
-        if GEMINI_API_KEY:
-            res = await _call_gemini(prompt, images)
-            if is_valid_json(res): return res
-        if MISTRAL_API_KEY:
-            res = await _call_mistral(prompt)
-            if is_valid_json(res): return res
+        if not GEMINI_API_KEY:
+            return json.dumps({"error": "Gemini API Key manquante pour l'analyse visuelle."})
+        return await _call_gemini(prompt, images)
     else:
-        if MISTRAL_API_KEY:
-            res = await _call_mistral(prompt)
-            if is_valid_json(res): return res
-        if GEMINI_API_KEY:
-            res = await _call_gemini(prompt, images)
-            if is_valid_json(res): return res
-
-    return await _call_ollama(prompt)
+        if not MISTRAL_API_KEY:
+            # Fallback exceptionnel si Mistral est offline mais Gemini dispo (en texte pur)
+            if GEMINI_API_KEY:
+                return await _call_gemini(prompt, None)
+            return json.dumps({"error": "Aucun service d'analyse disponible."})
+        return await _call_mistral(prompt)
 
 async def _call_gemini(prompt: str, images: list = None):
     try:
