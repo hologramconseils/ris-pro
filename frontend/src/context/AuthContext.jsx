@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
         logout()
         // Optional: We can dispatch a custom event or redirect, but logout() clears state
         window.location.href = '/' // Force back to landing
-      }, 10 * 60 * 1000) // 10 minutes
+      }, 24 * 60 * 60 * 1000) // 24 hours
     }
   }, [user, logout])
 

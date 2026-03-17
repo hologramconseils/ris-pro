@@ -169,14 +169,28 @@ async def run_ai_audit_background(
         db.commit()
     except Exception as e:
         print(f"Background AI Audit Failed for scan {scan_id}: {e}")
+        # Mark as failed to stop spinner in frontend
+        try:
+            db_scan.ai_analysis = json.dumps({
+                "anomalie_detectee": "non",
+                "niveau_risque": "moyen",
+                "resume_global": "Une erreur technique est survenue lors de l'analyse.",
+                "premiere_annee": "N/A",
+                "derniere_annee": "N/A",
+                "full_timeline": [],
+                "compte_rendu": f"Erreur système : {str(e)}"
+            })
+            db.commit()
+        except:
+            pass
     finally:
         db.close()
-        # Cleanup: Delete the uploaded file to save space
+        # Cleanup: ALWAYS delete the uploaded file to save space
         try:
             file_path = os.path.join(UPLOAD_DIR, filename) 
-            # Note: filename here is actually the safe_filename passed from upload_file
             if os.path.exists(file_path):
                 os.remove(file_path)
+                print(f"Successfully cleaned up: {filename}")
         except Exception as cleanup_err:
             print(f"Cleanup failed for {filename}: {cleanup_err}")
 

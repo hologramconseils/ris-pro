@@ -76,4 +76,6 @@ def handle_checkout_session(session, db: Session):
                     status="completed"
                 )
                 db.add(transaction)
-                db.commit()
+            
+            db.commit()
+            db.refresh(user)

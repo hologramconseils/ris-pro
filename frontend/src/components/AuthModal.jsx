@@ -22,8 +22,7 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
       } else if (mode === 'forgot') {
         const { authAPI } = await import('../services/api')
         await authAPI.forgotPassword(form.email)
-        alert('Si votre email existe, vous recevrez un lien de réinitialisation d\'ici quelques instants.')
-        setMode('login')
+        setMode('forgot-success')
       }
       if (mode !== 'forgot') {
         onSuccess?.()
@@ -52,8 +51,20 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
-        <form className="modal-form" onSubmit={submit}>
-          {mode === 'register' && (
+        {mode === 'forgot-success' ? (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <span style={{ fontSize: 48, display: 'block', marginBottom: 16 }}>📧</span>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text-muted)' }}>
+              Si cet email existe dans notre base, un lien de réinitialisation vous a été envoyé. 
+              Veuillez vérifier vos courriers indésirables si vous ne recevez rien d'ici 5 minutes.
+            </p>
+            <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => setMode('login')}>
+              Retour à la connexion
+            </button>
+          </div>
+        ) : (
+          <form className="modal-form" onSubmit={submit}>
+            {mode === 'register' && (
             <>
               <div className="input-group">
                 <label>Prénom *</label>
@@ -122,16 +133,19 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : mode === 'register' ? 'Créer mon compte' : 'Envoyer le lien'}
           </button>
-        </form>
+          </form>
+        )}
 
         <div className="modal-footer" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div className="auth-switch-mode">
-            {mode === 'login' ? (
-              <>Pas encore de compte ? <a onClick={() => { setMode('register'); setError('') }}>S'inscrire gratuitement</a></>
-            ) : (
-              <>Déjà un compte ? <a onClick={() => { setMode('login'); setError('') }}>Se connecter</a></>
-            )}
-          </div>
+          {mode !== 'forgot-success' && (
+            <div className="auth-switch-mode">
+              {mode === 'login' ? (
+                <>Pas encore de compte ? <a onClick={() => { setMode('register'); setError('') }}>S'inscrire gratuitement</a></>
+              ) : (
+                <>Déjà un compte ? <a onClick={() => { setMode('login'); setError('') }}>Se connecter</a></>
+              )}
+            </div>
+          )}
           
           <button 
             type="button" 
