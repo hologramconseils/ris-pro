@@ -31,7 +31,7 @@ export default function Navbar() {
               <span style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                 {user.is_admin && <span style={{ color: 'var(--primary-light)', fontWeight: 'bold' }}>✦ Admin</span>}
                 {user.has_paid_access && !user.is_admin && <span style={{ color: 'var(--success)' }}>✦ Accès Pro</span>}
-                <span>{user.first_name}</span>
+                <span className="user-name-mobile">{user.first_name}</span>
               </span>
               <Link to="/history" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none' }}>Historique</Link>
               <button className="btn btn-secondary btn-nav" onClick={logout}>Déconnexion</button>
