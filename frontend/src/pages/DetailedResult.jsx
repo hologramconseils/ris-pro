@@ -306,6 +306,15 @@ export default function DetailedResult({ result, onReset }) {
                           <div style={{ textAlign: 'right' }}>
                             <div style={{ color: borderColor, fontWeight: 800, fontSize: 13, textTransform: 'uppercase' }}>{actualStatut}</div>
                             <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{item.trimestres_valides}/4 trimestres</div>
+                            {item.points_complementaires !== undefined && (
+                              <div style={{ 
+                                marginTop: 4, fontSize: 11, fontWeight: 700, 
+                                color: 'var(--primary-light)', background: 'rgba(79,70,229,0.08)',
+                                padding: '2px 8px', borderRadius: 4, display: 'inline-block'
+                              }}>
+                                🪙 {item.points_complementaires} points
+                              </div>
+                            )}
                           </div>
                         </div>
 
