@@ -80,7 +80,11 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
     access_token = auth_service.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user": user
+    }
 
 @router.post("/forgot-password")
 def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(database.get_db)):

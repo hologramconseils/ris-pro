@@ -44,6 +44,7 @@ class ScanResultDetailedResponse(ScanResultResponse):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    user: Optional[UserResponse] = None
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
