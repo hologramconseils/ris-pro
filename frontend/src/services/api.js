@@ -26,10 +26,10 @@ api.interceptors.response.use(
   error => {
     if (error.response && error.response.status === 401) {
       console.warn("Auth Error (401): Session expired or invalid.");
-      // localStorage.removeItem('access_token')
-      // if (window.location.pathname !== '/') {
-      //   window.location.href = '/'
-      // }
+      localStorage.removeItem('access_token')
+      if (window.location.pathname !== '/') {
+        window.location.href = '/'
+      }
     }
     return Promise.reject(error)
   }
