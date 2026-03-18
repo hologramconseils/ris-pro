@@ -14,8 +14,6 @@ class UserResponse(UserBase):
     id: int
     is_admin: bool
     has_paid_access: bool
-    last_login: Optional[datetime] = None
-    login_count: int = 0
     created_at: datetime
 
     class Config:
