@@ -34,8 +34,17 @@ async def add_security_and_cors_headers(request: Request, call_next):
             }
         )
 
-    response: Response = await call_next(request)
-    
+    try:
+        response: Response = await call_next(request)
+    except Exception as e:
+        print(f"CORS MIDDLEWARE caught crash: {e}")
+        # Build an error response but still add CORS headers
+        from fastapi.responses import JSONResponse
+        response = JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error during CORS request", "error": str(e)}
+        )
+
     # Standard Security Headers
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["X-Content-Type-Options"] = "nosniff"
