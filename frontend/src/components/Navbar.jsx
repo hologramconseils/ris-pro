@@ -33,6 +33,7 @@ export default function Navbar() {
                 {user.has_paid_access && !user.is_admin && <span style={{ color: 'var(--success)' }}>✦ Accès Pro</span>}
                 <span className="user-name-mobile">{user.first_name}</span>
               </span>
+              {user.is_admin && <Link to="/admin" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none', borderColor: 'var(--primary)' }}>Admin</Link>}
               <Link to="/history" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none' }}>Historique</Link>
               <button className="btn btn-secondary btn-nav" onClick={logout}>Déconnexion</button>
             </>

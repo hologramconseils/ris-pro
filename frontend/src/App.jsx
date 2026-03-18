@@ -8,6 +8,7 @@ import ResetPassword from './pages/ResetPassword'
 import DetailedResultPage from './pages/DetailedResultPage'
 import Legal from './pages/Legal'
 import Privacy from './pages/Privacy'
+import AdminDashboard from './pages/AdminDashboard'
 import Footer from './components/Footer'
 
 function AppContent() {
@@ -25,6 +26,7 @@ function AppContent() {
           <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>
       <Footer />
