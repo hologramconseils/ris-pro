@@ -24,12 +24,15 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 async def add_security_and_cors_headers(request: Request, call_next):
     # Handle OPTIONS preflight manually for maximum reliability
     if request.method == "OPTIONS":
-        response = Response()
-        response.headers["Access-Control-Allow-Origin"] = "https://ris.hologramconseils.com"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        return response
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "https://ris.hologramconseils.com",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "true",
+            }
+        )
 
     response: Response = await call_next(request)
     
