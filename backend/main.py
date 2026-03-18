@@ -21,44 +21,31 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.middleware("http")
-async def add_security_headers(request: Request, call_next):
+async def add_security_and_cors_headers(request: Request, call_next):
+    # Handle OPTIONS preflight manually for maximum reliability
+    if request.method == "OPTIONS":
+        response = Response()
+        response.headers["Access-Control-Allow-Origin"] = "https://ris.hologramconseils.com"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+
     response: Response = await call_next(request)
+    
+    # Standard Security Headers
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://js.stripe.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        "font-src 'self' https://fonts.gstatic.com; "
-        "img-src 'self' data: https://*.stripe.com; "
-        "frame-src https://js.stripe.com;"
-    )
     response.headers["X-XSS-Protection"] = "1; mode=block"
+    
+    # Brute-force CORS Headers
+    response.headers["Access-Control-Allow-Origin"] = "https://ris.hologramconseils.com"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    
     return response
-
-# CORS Settings - Use ALLOWED_ORIGINS env var for production
-default_origins = "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173,https://ris.hologramconseils.com"
-allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", default_origins).split(",")]
-
-# CORS Settings
-# IMPORTANT: When allow_credentials=True, allow_origins CANNOT be ["*"]
-allowed_origins = [
-    "https://ris.hologramconseils.com",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.include_router(auth.router)
 app.include_router(upload.router)
