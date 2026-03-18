@@ -47,7 +47,6 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(d
     return new_user
 
 @router.post("/token", response_model=schemas.Token)
-@limiter.limit("10/minute")
 def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     user = auth_service.get_user(db, email=form_data.username)
     
