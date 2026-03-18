@@ -84,6 +84,12 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
         db.commit()
         db.refresh(user)
 
+    # Update login tracking
+    user.last_login = datetime.utcnow()
+    user.login_count = (user.login_count or 0) + 1
+    db.commit()
+    db.refresh(user)
+
     access_token_expires = timedelta(minutes=auth_service.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth_service.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
