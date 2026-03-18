@@ -34,7 +34,7 @@ def get_optional_user(authorization: Optional[str] = Header(None), db: Session =
         return None
 
 @router.post("/upload", response_model=schemas.ScanResultResponse)
-@limiter.limit("5/minute")
+@limiter.limit("20/minute")
 async def upload_file(
     request: Request,
     background_tasks: BackgroundTasks,
