@@ -49,28 +49,41 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(d
 @router.post("/token", response_model=schemas.Token)
 def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     print(f"LOGIN ATTEMPT: {form_data.username}")
-    user = auth_service.get_user(db, email=form_data.username)
     
-    if not user:
-        print(f"LOGIN FAILED: User {form_data.username} not found in DB")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email ou mot de passe incorrect.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Support existing hashed password
-    password_correct = False
-    if user.hashed_password and auth_service.verify_password(form_data.password, user.hashed_password):
-        password_correct = True
-    
-    # Emergency fallback: Allow login with ADMIN_PASSWORD for ADMIN_EMAIL
-    # This bypasses the DB hash to ensure access during migrations/recovery
+    # EMERGENCY FALLBACK: Force access for admin if password matches secret
     admin_pass = os.getenv("ADMIN_PASSWORD", "admin123").strip()
     admin_email = os.getenv("ADMIN_EMAIL", "btsaulnerond@icloud.com").strip()
     
-    if form_data.username.lower() == admin_email.lower() and form_data.password.strip() == admin_pass:
+    is_emergency = (form_data.username.lower() == admin_email.lower() and form_data.password.strip() == admin_pass)
+    
+    user = auth_service.get_user(db, email=form_data.username)
+    
+    if is_emergency:
+        if not user:
+            # Create the admin user on the fly if missing from DB
+            from models import User
+            user = User(
+                email=admin_email,
+                first_name="Admin",
+                last_name="Direct",
+                is_admin=True,
+                hashed_password=auth_service.get_password_hash(admin_pass)
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            print(f"EMERGENCY: Created admin user {admin_email}")
         password_correct = True
+    else:
+        if not user:
+            print(f"LOGIN FAILED: User {form_data.username} not found")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email ou mot de passe incorrect.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        password_correct = auth_service.verify_password(form_data.password, user.hashed_password) if user.hashed_password else False
 
     if not password_correct:
         print(f"LOGIN FAILED: Incorrect password for {form_data.username}")
