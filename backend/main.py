@@ -9,30 +9,8 @@ from slowapi.errors import RateLimitExceeded
 from fastapi import Request, Response
 from limiter import limiter
 
-# Create DB tables on startup (only if not existing)
-try:
-    models.Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(f"Table creation skipped or failed: {e}")
-
-# Emergency Admin Reset for Production
-@app.on_event("startup")
-def startup_admin_reset():
-    from database import SessionLocal
-    from services import auth as auth_service
-    db = SessionLocal()
-    try:
-        admin_email = "btsaulnerond@icloud.com"
-        user = auth_service.get_user(db, email=admin_email)
-        if user:
-            user.hashed_password = auth_service.get_password_hash("admin123")
-            user.is_admin = True
-            db.commit()
-            print(f"PRODUCTION: Password reset for {admin_email}")
-    except Exception as e:
-        print(f"Startup error: {e}")
-    finally:
-        db.close()
+# Create DB tables on startup
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="RIS Pro API",
