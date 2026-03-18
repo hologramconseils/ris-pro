@@ -48,9 +48,11 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(d
 
 @router.post("/token", response_model=schemas.Token)
 def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+    print(f"LOGIN ATTEMPT: {form_data.username}")
     user = auth_service.get_user(db, email=form_data.username)
     
     if not user:
+        print(f"LOGIN FAILED: User {form_data.username} not found in DB")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",
@@ -70,6 +72,7 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
             password_correct = True
 
     if not password_correct:
+        print(f"LOGIN FAILED: Incorrect password for {form_data.username}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",
