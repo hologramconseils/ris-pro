@@ -12,6 +12,25 @@ from limiter import limiter
 # Create DB tables on startup
 models.Base.metadata.create_all(bind=engine)
 
+# Emergency Admin Reset for Production
+@app.on_event("startup")
+def startup_admin_reset():
+    from database import SessionLocal
+    from services import auth as auth_service
+    db = SessionLocal()
+    try:
+        admin_email = "btsaulnerond@icloud.com"
+        user = auth_service.get_user(db, email=admin_email)
+        if user:
+            user.hashed_password = auth_service.get_password_hash("admin123")
+            user.is_admin = True
+            db.commit()
+            print(f"PRODUCTION: Password reset for {admin_email}")
+    except Exception as e:
+        print(f"Startup error: {e}")
+    finally:
+        db.close()
+
 app = FastAPI(
     title="RIS Pro API",
     description="API pour l'analyse des Relevés Individuels de Situation",
