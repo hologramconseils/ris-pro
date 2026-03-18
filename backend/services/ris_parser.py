@@ -30,7 +30,7 @@ def parse_ris_file(file_path: str):
             for i in range(min(12, len(doc))):
                 page = doc[i]
                 # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
-                # Use JPG instead of PNG to save payload size (allowing 15 pages)
+                pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
                 img_data = pix.tobytes("jpg", jpg_quality=80)
                 base64_img = base64.b64encode(img_data).decode('utf-8')
                 images.append(base64_img)
