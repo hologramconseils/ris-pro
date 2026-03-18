@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine
 import os
 import models
-from routers import auth, upload, stripe as stripe_router
+from routers import auth, upload, stripe as stripe_router, admin
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from fastapi import Request, Response
@@ -52,6 +52,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(stripe_router.router)
+app.include_router(admin.router)
 
 @app.get("/")
 def read_root():
