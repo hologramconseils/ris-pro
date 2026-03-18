@@ -16,3 +16,4 @@ email-validator>=2.1.0
 resend>=0.8.4
 slowapi
 limits
+bcrypt
