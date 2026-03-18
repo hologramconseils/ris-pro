@@ -9,8 +9,11 @@ from slowapi.errors import RateLimitExceeded
 from fastapi import Request, Response
 from limiter import limiter
 
-# Create DB tables on startup
-models.Base.metadata.create_all(bind=engine)
+# Create DB tables on startup (only if not existing)
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Table creation skipped or failed: {e}")
 
 # Emergency Admin Reset for Production
 @app.on_event("startup")
