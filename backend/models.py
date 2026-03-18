@@ -15,8 +15,6 @@ class User(Base):
     has_paid_access = Column(Boolean, default=False)
     reset_token = Column(String, nullable=True)
     reset_token_expires = Column(DateTime, nullable=True)
-    last_login = Column(DateTime, nullable=True)
-    login_count = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     scans = relationship("ScanResult", back_populates="user")

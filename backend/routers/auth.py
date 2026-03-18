@@ -100,9 +100,6 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
         db.commit()
         db.refresh(user)
 
-    # Update login tracking
-    user.last_login = datetime.utcnow()
-    user.login_count = (user.login_count or 0) + 1
     db.commit()
     db.refresh(user)
 
