@@ -15,7 +15,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('access_token')
         const headers = { Authorization: `Bearer ${token}` }
         
         const [usersRes, statsRes] = await Promise.all([
