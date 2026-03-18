@@ -26,9 +26,8 @@ def parse_ris_file(file_path: str):
         # Increased threshold to 2000 to catch documents with sparse text or empty headers
         if len(doc_text.strip()) < 2000:
             is_scanned = True
-            # Convert first 15 pages to images for Gemini Vision
-            # This allows the AI to "see" the document even if no text is extractable
-            for i in range(min(15, len(doc))):
+            # Convert first 12 pages to images for Gemini Vision (Safety limit)
+            for i in range(min(12, len(doc))):
                 page = doc[i]
                 # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
                 # Use JPG instead of PNG to save payload size (allowing 15 pages)

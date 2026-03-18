@@ -65,12 +65,12 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 - **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
-- **INTRODUCTION PERSONNALISÉE :** Détecte le nom et prénom de l'assuré dans le document. Commence impérativement ton `resume_global` par une phrase d'accueil citant son identité (ex: "Bonjour [Prénom] [Nom], j'ai analysé votre situation...").
+- **INTRODUCTION PERSONNALISÉE :** Détecte le nom et prénom de l'assuré. Commence impérativement ton `resume_global` par une phrase d'accueil DIRECTE citant son identité (ex: "Bonjour [Prénom] [Nom], j'ai analysé votre situation..."). **INTERDICTION DE METTRE UNE PUCE (•) DEVANT CETTE PREMIÈRE PHRASE.**
 - Ne mentionne JAMAIS ton mode de fonctionnement technique. Parle exclusivement en tant qu'expert retraite de Hologram Conseils.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
 - **INTERDICTION FORMELLE DE FORMATAGE MARKDOWN** : N'utilise JAMAIS d'astérisques (**) pour mettre en gras, de dièses (#) pour les titres, ou de tout autre symbole de formatage technique. Le texte doit être du texte brut pur et professionnel.
-- **STRUCTURE DES LISTES :** Pour `resume_global`, `compte_rendu` et `justificatif_suggere`, tu DOIS utiliser des listes à puces (•). Chaque point DOIT être sur sa propre ligne (retour à la ligne obligatoire après chaque point).
+- **STRUCTURE DES LISTES :** Après l'introduction, pour `resume_global`, `compte_rendu` et `justificatif_suggere`, tu DOIS utiliser des listes à puces (•). Chaque point DOIT être sur sa propre ligne.
 
 **RÈGLES D'ANALYSE DE L'EXPERT (LOGIQUE DE DÉTECTION SUR SCAN) :**
 1. **IDENTIFICATION DES EMPLOYÉURS** : Le nom de l'EMPLOYEUR ou de l'activité est toujours sur la ligne du DESSUS par rapport aux informations de dates et revenus.

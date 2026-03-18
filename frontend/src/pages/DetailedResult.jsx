@@ -48,16 +48,16 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
           const style = doc.createElement('style')
           style.innerHTML = `
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-            * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; }
+            * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; color: #1e1b4b !important; }
             .page { padding: 0 !important; background: #fff !important; }
             .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .card { border: none !important; box-shadow: none !important; background: #fff !important; padding: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; background: #fff !important; padding: 0 !important; color: #1e1b4b !important; }
             .bg-dots, .navbar, .btn, .delete-scan-btn, .badge-success { display: none !important; }
             h1 { font-size: 28pt !important; color: #1e1b4b !important; margin-bottom: 8pt !important; text-align: center !important; }
             h3 { font-size: 16pt !important; color: #1e1b4b !important; border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8pt !important; margin-top: 24pt !important; }
             h4 { font-size: 12pt !important; color: #4338ca !important; margin-bottom: 8pt !important; }
-            .justificatif-box { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6pt !important; padding: 12pt !important; margin-bottom: 15pt !important; }
-            .anomaly-card { page-break-inside: avoid !important; margin-bottom: 20pt !important; border: 1px solid #f1f5f9 !important; border-radius: 8pt !important; padding: 15pt !important; background: #fff !important; }
+            .justificatif-box { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6pt !important; padding: 12pt !important; margin-bottom: 15pt !important; color: #1e1b4b !important; }
+            .anomaly-card { page-break-inside: avoid !important; margin-bottom: 20pt !important; border: 1px solid #f1f5f9 !important; border-radius: 8pt !important; padding: 15pt !important; background: #fff !important; color: #1e1b4b !important; }
             .pdf-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 3px solid #4338ca; padding-bottom: 15pt; margin-bottom: 30pt; }
             .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 9pt; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10pt; }
           `
@@ -110,11 +110,11 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
           aiData.full_timeline.forEach(item => {
             if (!item) return
             const isAnom = String(item.statut || '').toLowerCase() !== 'complet'
-            children.push(new Paragraph({ children: [new TextRun({ text: `ANNÉE ${item.annee}`, bold: true }), new TextRun({ text: ` - ${String(item.statut || '').toUpperCase()}` }), new TextRun({ text: ` (${item.trimestres_valides}/4 trim. | ${item.activite || 'N/A'})`, italics: true })], spacing: { before: 200, after: 100 } }))
+            children.push(new Paragraph({ children: [new TextRun({ text: `ANNÉE ${item.annee}`, bold: true }), new TextRun({ text: ` - ${String(item.statut || '').toUpperCase()}` }), new TextRun({ text: ` (${item.trimestres_valides}/4 trim. | ${item.activite || 'N/A'})`, italics: true }), item.points_complementaires ? new TextRun({ text: ` | Points: ${item.points_complementaires}`, bold: true, color: "4F46E5" }) : new TextRun({ text: "" })], spacing: { before: 200, after: 100 } }))
             if (isAnom) {
-              children.push(new Paragraph({ children: [new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }), new TextRun({ text: cleanText(item.anomalie_specifique || "Trimestres manquants") })], spacing: { after: 80 } }))
+              children.push(new Paragraph({ children: [new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }), new TextRun({ text: cleanText(item.anomalie_specifique || "Régularisation requise") })], spacing: { after: 80 } }))
               if (item.justificatif_suggere) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }), new TextRun({ text: cleanText(item.justificatif_suggere), bold: true })], spacing: { after: 200 } }))
+                children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }), new TextRun({ text: cleanText(item.justificatif_suggere) })], spacing: { after: 200 } }))
               }
             }
           })
