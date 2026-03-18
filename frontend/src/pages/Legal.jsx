@@ -57,7 +57,7 @@ export default function Legal() {
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>5. Responsabilité</h2>
           <p>
-            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé et sont données à titre indicatif. Elles ne remplacent en aucun cas les conclusion d'un conseiller retraite ou un conseil juridique ou une attestation officielle des caisses de retraite.
+            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé. Elles sont fournies à titre indicatif et ne peuvent en aucun cas se substituer à l’avis d’un conseiller retraite ou d’un conseiller juridique.
           </p>
         </section>
       </motion.div>
