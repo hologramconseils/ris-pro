@@ -10,9 +10,16 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total_users: 0, paid_users: 0, total_scans: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isVerified, setIsVerified] = useState(() => sessionStorage.getItem('admin_verified') === 'true')
+  const [accessCode, setAccessCode] = useState('')
+  const [accessError, setAccessError] = useState('')
   const { user: currentUser } = useAuth()
 
+  const ADMIN_CODE = import.meta.env.VITE_ADMIN_CODE || '2024'
+
   useEffect(() => {
+    if (!isVerified) return
+
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('access_token')
@@ -39,9 +46,79 @@ export default function AdminDashboard() {
       setError("Accès non autorisé.")
       setLoading(false)
     }
-  }, [currentUser])
+  }, [currentUser, isVerified])
 
-  if (loading) return <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>Chargement...</div>
+  const handleVerify = (e) => {
+    e.preventDefault()
+    if (accessCode === ADMIN_CODE) {
+      setIsVerified(true)
+      sessionStorage.setItem('admin_verified', 'true')
+      setAccessError('')
+    } else {
+      setAccessError("Code incorrect.")
+    }
+  }
+
+  if (!isVerified) {
+    return (
+      <div className="container" style={{ 
+        height: '80vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ 
+            background: 'var(--card-bg)', 
+            padding: 40, 
+            borderRadius: 24, 
+            border: '1px solid var(--border-color)',
+            maxWidth: 400,
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 20 }}>🔐</div>
+          <h2 style={{ marginBottom: 10 }}>Accès Sécurisé</h2>
+          <p style={{ color: 'var(--text-subtle)', marginBottom: 30, fontSize: 14 }}>
+            Veuillez entrer le code secret administrateur pour accéder à la base de données.
+          </p>
+          
+          <form onSubmit={handleVerify}>
+            <input 
+              type="password"
+              placeholder="Code Secret"
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value)}
+              autoFocus
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                borderRadius: 12, 
+                border: '1px solid var(--border-color)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'white',
+                fontSize: 18,
+                textAlign: 'center',
+                letterSpacing: 4,
+                marginBottom: 20
+              }}
+            />
+            {accessError && <div style={{ color: '#EF4444', marginBottom: 20, fontSize: 13 }}>{accessError}</div>}
+            
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+              Déverrouiller
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    )
+  }
+
+  if (loading) return <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>Chargement des données confidentielles...</div>
 
   return (
     <motion.div 
@@ -50,9 +127,17 @@ export default function AdminDashboard() {
       animate={{ opacity: 1, y: 0 }}
       style={{ padding: '40px 20px' }}
     >
-      <header style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: 10 }}>Tableau de Bord Admin</h1>
-        <p style={{ color: 'var(--text-subtle)' }}>Suivi de l'activité et des utilisateurs de RIS Pro.</p>
+      <header style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: 10 }}>Contrôle Admin</h1>
+          <p style={{ color: 'var(--text-subtle)' }}>Gestion sécurisée des utilisateurs et statistiques.</p>
+        </div>
+        <button 
+          onClick={() => { sessionStorage.removeItem('admin_verified'); setIsVerified(false); }}
+          style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', color: 'var(--text-subtle)', border: 'none', cursor: 'pointer', fontSize: 12 }}
+        >
+          Déconnexion Admin
+        </button>
       </header>
 
       {error ? (
@@ -71,24 +156,23 @@ export default function AdminDashboard() {
           </div>
 
           <div style={{ 
-            background: 'rgba(255,255,255,0.05)', 
+            background: 'var(--card-bg)', 
             borderRadius: 16, 
             overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.1)'
+            border: '1px solid var(--border-color)'
           }}>
-            <div style={{ padding: 24, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0 }}>Derniers Utilisateurs</h3>
-              <span style={{ fontSize: 13, color: 'var(--text-subtle)' }}>{users.length} utilisateurs au total</span>
+            <div style={{ padding: 24, borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>Base de données Utilisateurs</h3>
+              <span style={{ fontSize: 13, color: 'var(--text-subtle)' }}>{users.length} comptes actifs</span>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ background: 'rgba(255,255,255,0.02)', fontSize: 13, color: 'var(--text-subtle)' }}>
-                    <th style={{ padding: '16px 24px' }}>Utilisateur</th>
-                    <th style={{ padding: '16px 24px' }}>Statut</th>
-                    <th style={{ padding: '16px 24px' }}>Dernière Connexion</th>
-                    <th style={{ padding: '16px 24px' }}>Connexions</th>
-                    <th style={{ padding: '16px 24px' }}>Inscription</th>
+                    <th style={{ padding: '16px 24px' }}>Client</th>
+                    <th style={{ padding: '16px 24px' }}>Niveau d'accès</th>
+                    <th style={{ padding: '16px 24px' }}>Date d'inscription</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'right' }}>ID</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,19 +184,17 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '16px 24px' }}>
                         {u.has_paid_access ? (
-                          <span style={{ padding: '4px 8px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', color: '#10B981', fontSize: 11, fontWeight: 600 }}>PAYÉ</span>
+                          <span style={{ padding: '4px 10px', borderRadius: 20, background: 'rgba(16,185,129,0.1)', color: '#10B981', fontSize: 11, fontWeight: 700 }}>PREMIUM</span>
                         ) : (
-                          <span style={{ padding: '4px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.05)', color: 'var(--text-subtle)', fontSize: 11 }}>GRATUIT</span>
+                          <span style={{ padding: '4px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.05)', color: 'var(--text-subtle)', fontSize: 11, fontWeight: 500 }}>FREE</span>
                         )}
+                        {u.is_admin && <span style={{ marginLeft: 8, color: '#4F46E5', fontSize: 10, fontWeight: 800 }}>ADMIN</span>}
                       </td>
                       <td style={{ padding: '16px 24px', color: 'var(--text-subtle)' }}>
-                        {u.last_login ? new Date(u.last_login).toLocaleString('fr-FR') : 'Jamais'}
+                        {new Date(u.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </td>
-                      <td style={{ padding: '16px 24px', textAlign: 'center' }}>
-                        {u.login_count || 0}
-                      </td>
-                      <td style={{ padding: '16px 24px', color: 'var(--text-subtle)' }}>
-                        {new Date(u.created_at).toLocaleDateString('fr-FR')}
+                      <td style={{ padding: '16px 24px', textAlign: 'right', color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>
+                        #{u.id}
                       </td>
                     </tr>
                   ))}
