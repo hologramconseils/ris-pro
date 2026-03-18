@@ -57,7 +57,7 @@ export default function Legal() {
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>5. Responsabilité</h2>
           <p>
-            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé et sont données à titre indicatif. Elles ne remplacent en aucun cas un conseil juridique ou une attestation officielle des caisses de retraite. Hologram Conseils ne peut être tenu responsable des décisions prises sur la base de ces analyses.
+            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé et sont données à titre indicatif. Elles ne remplacent en aucun cas les conclusion d'un conseiller retraite ou un conseil juridique ou une attestation officielle des caisses de retraite.
           </p>
         </section>
       </motion.div>
