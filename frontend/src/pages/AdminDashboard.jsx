@@ -10,7 +10,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total_users: 0, paid_users: 0, total_scans: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [isVerified, setIsVerified] = useState(() => sessionStorage.getItem('admin_verified') === 'true')
+  const [isVerified, setIsVerified] = useState(() => sessionStorage.getItem('ris_admin_auth_v1') === 'true')
   const [accessCode, setAccessCode] = useState('')
   const [accessError, setAccessError] = useState('')
   const { user: currentUser } = useAuth()
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
           <p style={{ color: 'var(--text-subtle)' }}>Gestion sécurisée des utilisateurs et statistiques.</p>
         </div>
         <button 
-          onClick={() => { sessionStorage.removeItem('admin_verified'); setIsVerified(false); }}
+          onClick={() => { sessionStorage.removeItem('ris_admin_auth_v1'); setIsVerified(false); }}
           style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', color: 'var(--text-subtle)', border: 'none', cursor: 'pointer', fontSize: 12 }}
         >
           Déconnexion Admin
