@@ -24,6 +24,11 @@ function AppContent() {
           <Route path="/history" element={<History />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
+          {/* Legacy Routes for compatibility */}
+          <Route path="/result/:id" element={<DetailedResultPage />} />
+          <Route path="/detailed/:id" element={<DetailedResultPage />} />
+          <Route path="/login" element={<LandingPage />} />
+          <Route path="/register" element={<LandingPage />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/admin" element={<AdminDashboard />} />

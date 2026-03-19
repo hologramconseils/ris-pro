@@ -12,9 +12,9 @@ const isProduction = typeof window !== 'undefined' &&
 
 const isLocalUrl = (url) => !url || url.includes('localhost') || url.includes('127.0.0.1')
 
-const API_URL = (isProduction && isLocalUrl(envUrl)) 
+const API_URL = ((isProduction && isLocalUrl(envUrl)) 
   ? RENDER_BACKEND 
-  : (envUrl || 'http://127.0.0.1:8000')
+  : (envUrl || 'http://127.0.0.1:8000')).replace(/\/api\/v1\/?$/, '')
 
 const api = axios.create({
   baseURL: API_URL,
