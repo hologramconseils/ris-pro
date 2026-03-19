@@ -10,7 +10,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ total_users: 0, paid_users: 0, total_scans: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [isVerified, setIsVerified] = useState(() => sessionStorage.getItem('ris_admin_auth_v1') === 'true')
+  const [isVerified, setIsVerified] = useState(false)
   const [accessCode, setAccessCode] = useState('')
   const [accessError, setAccessError] = useState('')
   const { user: currentUser } = useAuth()

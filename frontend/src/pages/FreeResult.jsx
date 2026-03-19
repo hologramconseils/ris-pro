@@ -113,13 +113,15 @@ export default function FreeResult({ result: initialResult, onReset }) {
           <div className="result-verdict">
             <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
             <div className="verdict-label">Rapport Standard RIS</div>
-            <div className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`}>
-              Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+            <div className={`verdict-title ${!isAiComplete ? 'muted' : (hasAnomalies ? 'danger' : 'success')}`}>
+              {!isAiComplete ? 'Analyse en cours...' : (hasAnomalies ? 'Anomalies détectées : OUI' : 'Anomalies détectées : NON')}
             </div>
             <p className="verdict-subtitle">
-              {hasAnomalies
-                ? 'Notre moteur d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
-                : 'Félicitations ! Aucune anomalie majeure n’a été détectée dans votre relevé actuel.'}
+              {!isAiComplete 
+                ? 'Notre moteur d’analyse traite actuellement votre document. Les résultats définitifs apparaîtront dans quelques instants.'
+                : (hasAnomalies
+                  ? 'Notre moteur d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                  : 'Félicitations ! Aucune anomalie majeure n’a été détectée dans votre relevé actuel.')}
             </p>
           </div>
           
