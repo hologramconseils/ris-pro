@@ -41,44 +41,36 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Standard CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://ris.hologramconseils.com",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
 @app.middleware("http")
-async def add_security_and_cors_headers(request: Request, call_next):
-    # Handle OPTIONS preflight manually for maximum reliability
-    if request.method == "OPTIONS":
-        return Response(
-            status_code=200,
-            headers={
-                "Access-Control-Allow-Origin": "https://ris.hologramconseils.com",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Credentials": "true",
-            }
-        )
-
+async def add_security_headers(request: Request, call_next):
     try:
-        response: Response = await call_next(request)
+        response = await call_next(request)
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        return response
     except Exception as e:
-        print(f"CORS MIDDLEWARE caught crash: {e}")
-        # Build an error response but still add CORS headers
+        print(f"CRITICAL ERROR: {e}")
         from fastapi.responses import JSONResponse
-        response = JSONResponse(
+        return JSONResponse(
             status_code=500,
-            content={"detail": "Internal Server Error during CORS request", "error": str(e)}
+            content={"detail": "Une erreur interne est survenue.", "error": str(e)}
         )
-
-    # Standard Security Headers
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    
-    # Brute-force CORS Headers
-    response.headers["Access-Control-Allow-Origin"] = "https://ris.hologramconseils.com"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    
-    return response
 
 app.include_router(auth.router)
 app.include_router(upload.router)
