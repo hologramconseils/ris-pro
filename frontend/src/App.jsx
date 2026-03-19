@@ -9,6 +9,7 @@ import DetailedResultPage from './pages/DetailedResultPage'
 import Legal from './pages/Legal'
 import Privacy from './pages/Privacy'
 import AdminDashboard from './pages/AdminDashboard'
+import Dashboard from './pages/Dashboard'
 import Footer from './components/Footer'
 
 function AppContent() {
@@ -20,7 +21,10 @@ function AppContent() {
       <Navbar />
       <div style={{ flex: 1 }}>
         <Routes>
-          <Route path="/" element={isPaymentSuccess ? <PaymentSuccess /> : <LandingPage />} />
+          <Route path="/" element={
+            user ? <Dashboard /> : (isPaymentSuccess ? <PaymentSuccess /> : <LandingPage />)
+          } />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/history" element={<History />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/detailed-result/:id" element={<DetailedResultPage />} />

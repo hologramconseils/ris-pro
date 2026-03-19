@@ -41,7 +41,7 @@ export default function Navbar() {
                 <span className="user-name-mobile">{user.first_name}</span>
               </span>
               {user.is_admin && <Link to="/admin" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none', borderColor: 'var(--primary)' }}>Admin</Link>}
-              <Link to="/history" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none' }}>Historique</Link>
+              <Link to="/dashboard" className="btn btn-secondary btn-nav" style={{ textDecoration: 'none' }}>Tableau de bord</Link>
               <button className="btn btn-secondary btn-nav" onClick={logout}>Déconnexion</button>
             </>
           ) : (
