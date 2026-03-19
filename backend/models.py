@@ -31,6 +31,7 @@ class ScanResult(Base):
     is_valid_ris = Column(Boolean, default=False)
     ocr_status = Column(String, default="none") # none, pending, processing, success, failed
     ocr_error = Column(Text, nullable=True)
+    raw_text = Column(Text, nullable=True)
     detailed_report = Column(Text, nullable=True) 
     ai_analysis = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)

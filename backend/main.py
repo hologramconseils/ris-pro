@@ -27,6 +27,10 @@ def check_and_update_schema():
             print("Migration: Adding ocr_error to scan_results")
             conn.execute(text("ALTER TABLE scan_results ADD COLUMN ocr_error TEXT"))
             conn.commit()
+        if "raw_text" not in columns:
+            print("Migration: Adding raw_text to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN raw_text TEXT"))
+            conn.commit()
 
 try:
     check_and_update_schema()

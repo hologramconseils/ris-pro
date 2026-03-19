@@ -43,6 +43,7 @@ class ScanResultResponse(ScanResultBase):
 class ScanResultDetailedResponse(ScanResultResponse):
     detailed_report: Optional[str] = None
     ai_analysis: Optional[str] = None
+    raw_text: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
