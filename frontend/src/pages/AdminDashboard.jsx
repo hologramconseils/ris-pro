@@ -52,7 +52,7 @@ export default function AdminDashboard() {
     e.preventDefault()
     if (accessCode === ADMIN_CODE) {
       setIsVerified(true)
-      sessionStorage.setItem('admin_verified', 'true')
+      sessionStorage.setItem('ris_admin_auth_v1', 'true')
       setAccessError('')
     } else {
       setAccessError("Code incorrect.")
