@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     >
       <header style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: 10 }}>Contrôle Admin</h1>
+          <h1 style={{ fontSize: '1.8rem', marginBottom: 10 }}>Contrôle Admin</h1>
           <p style={{ color: 'var(--text-subtle)' }}>Gestion sécurisée des utilisateurs et statistiques.</p>
         </div>
         <button 
