@@ -67,10 +67,15 @@ async def add_security_headers(request: Request, call_next):
     except Exception as e:
         print(f"CRITICAL ERROR: {e}")
         from fastapi.responses import JSONResponse
-        return JSONResponse(
+        # Manually add CORS headers to the error response so the frontend sees the message instead of 'Network Error'
+        error_response = JSONResponse(
             status_code=500,
             content={"detail": "Une erreur interne est survenue.", "error": str(e)}
         )
+        error_response.headers["Access-Control-Allow-Origin"] = "*" # Or the specific origin
+        error_response.headers["Access-Control-Allow-Methods"] = "*"
+        error_response.headers["Access-Control-Allow-Headers"] = "*"
+        return error_response
 
 app.include_router(auth.router)
 app.include_router(upload.router)

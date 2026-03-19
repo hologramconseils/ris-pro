@@ -9,6 +9,8 @@ from jose import jwt, JWTError
 import json
 import uuid
 import os
+import shutil
+from datetime import datetime
 from services import ai_service
 import asyncio
 from limiter import limiter
@@ -74,8 +76,7 @@ async def upload_file(
         background_tasks.add_task(
             run_full_analysis_worker,
             new_scan.id,
-            file_path,
-            db
+            file_path
         )
                 
         return new_scan
@@ -85,11 +86,12 @@ async def upload_file(
 
 async def run_full_analysis_worker(
     scan_id: int, 
-    file_path: str,
-    db_session: Session
+    file_path: str
 ):
     """Worker function to handle parsing + AI audit in background."""
-    print(f"DEBUG: Starting background worker for scan {scan_id}") # Added logging
+    print(f"DEBUG: Starting background worker for scan {scan_id}")
+    from database import SessionLocal # Import here to avoid circular imports if any
+    db_session = SessionLocal()
     db_scan = None
     try:
         db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
