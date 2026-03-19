@@ -45,36 +45,43 @@ async def upload_file(
     if file.content_type not in ["application/pdf"]:
         raise HTTPException(status_code=400, detail="Seuls les fichiers PDF sont acceptés.")
 
-    # 1. Save file temporarily
-    safe_filename = f"{uuid.uuid4()}_{file.filename}"
-    file_path = os.path.join(UPLOAD_DIR, safe_filename)
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+    try:
+        # 1. Save file temporarily
+        safe_filename = f"{uuid.uuid4()}_{file.filename}"
+        file_path = os.path.join(UPLOAD_DIR, safe_filename)
+        print(f"DEBUG: Saving upload to {file_path}") # Added logging
+        with open(file_path, "wb") as buffer: # Changed to shutil.copyfileobj for potentially better performance with large files
+            shutil.copyfileobj(file.file, buffer)
 
-    # 2. Create entry in DB with 'pending' status immediately
-    new_scan = models.ScanResult(
-        user_id=user.id if user else None,
-        filename=file.filename,
-        has_anomalies=False,
-        is_scanned=False,
-        is_valid_ris=False,
-        ocr_status="pending",
-        detailed_report="[]",
-        raw_text=""
-    )
-    db.add(new_scan)
-    db.commit()
-    db.refresh(new_scan)
+        # 2. Create entry in DB with 'pending' status immediately
+        new_scan = models.ScanResult(
+            user_id=user.id if user else None,
+            filename=file.filename,
+            has_anomalies=False,
+            is_scanned=False,
+            is_valid_ris=False,
+            ocr_status="pending",
+            detailed_report="[]",
+            raw_text="",
+            created_at=datetime.utcnow() # Added created_at
+        )
+        db.add(new_scan)
+        db.commit()
+        db.refresh(new_scan)
+        print(f"DEBUG: Created scan {new_scan.id} for user {user.id if user else 'anonymous'}") # Added logging
 
-    # 3. Background the ENTIRE analysis pipeline
-    background_tasks.add_task(
-        run_full_analysis_worker,
-        new_scan.id,
-        file_path,
-        db
-    )
-            
-    return new_scan
+        # 3. Background the ENTIRE analysis pipeline
+        background_tasks.add_task(
+            run_full_analysis_worker,
+            new_scan.id,
+            file_path,
+            db
+        )
+                
+        return new_scan
+    except Exception as e:
+        print(f"CRITICAL UPLOAD ERROR: {str(e)}") # Added error logging
+        raise HTTPException(status_code=500, detail=f"Échec de l'upload: {str(e)}")
 
 async def run_full_analysis_worker(
     scan_id: int, 
@@ -82,13 +89,17 @@ async def run_full_analysis_worker(
     db_session: Session
 ):
     """Worker function to handle parsing + AI audit in background."""
+    print(f"DEBUG: Starting background worker for scan {scan_id}") # Added logging
     db_scan = None
     try:
         db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
-        if not db_scan: return
+        if not db_scan:
+            print(f"ERROR: Scan {scan_id} not found in worker") # Added error logging for None scan
+            return
 
         db_scan.ocr_status = "processing"
         db_session.commit()
+        print(f"DEBUG: Scan {scan_id} status -> processing") # Added logging
 
         # Step 1: Initial Parsing (Fast)
         result = ris_parser.parse_ris_file(file_path)
@@ -156,9 +167,10 @@ async def run_full_analysis_worker(
         # Final update
         db_scan.ocr_status = "success"
         db_session.commit()
+        print(f"DEBUG: Worker success for scan {scan_id}") # Added logging
 
     except Exception as e:
-        print(f"Worker Error: {e}")
+        print(f"CRITICAL WORKER ERROR for scan {scan_id}: {str(e)}") # Added error logging
         if db_scan:
             db_scan.ocr_status = "failed"
             db_scan.ocr_error = str(e)
@@ -168,6 +180,7 @@ async def run_full_analysis_worker(
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
+                print(f"DEBUG: Cleaned up {file_path}") # Added logging
             except:
                 pass
         db_session.close()

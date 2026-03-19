@@ -62,7 +62,8 @@ export default function Dashboard() {
       setUploadFile(null)
       loadData()
     } catch (err) {
-      alert("Erreur lors de l'envoi du fichier.")
+      const errorMsg = err.response?.data?.detail || err.message || "Erreur inconnue"
+      alert(`Erreur lors de l'envoi du fichier : ${errorMsg}`)
     } finally {
       setIsUploading(false)
     }
