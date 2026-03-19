@@ -72,7 +72,10 @@ const retryRequest = async (error, retryCount = 0) => {
 };
 
 api.interceptors.response.use(
-  response => response,
+  response => {
+    coldStartTracker.complete();
+    return response;
+  },
   error => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('access_token');

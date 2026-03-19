@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -14,7 +14,6 @@ export default function AdminDashboard() {
   const [accessCode, setAccessCode] = useState('')
   const [accessError, setAccessError] = useState('')
   const { user: currentUser } = useAuth()
-
   const ADMIN_CODE = import.meta.env.VITE_ADMIN_CODE || '2024'
 
   useEffect(() => {
@@ -22,12 +21,9 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('access_token')
-        const headers = { Authorization: `Bearer ${token}` }
-        
         const [usersRes, statsRes] = await Promise.all([
-          axios.get(`${API_URL}/admin/users`, { headers }),
-          axios.get(`${API_URL}/admin/stats`, { headers })
+          api.get(`/admin/users`),
+          api.get(`/admin/stats`)
         ])
         
         setUsers(usersRes.data)

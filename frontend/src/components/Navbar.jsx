@@ -28,7 +28,6 @@ export default function Navbar() {
       <nav className="navbar">
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
           <Link className="navbar-brand" to="/" onClick={handleHomeClick}>🔍 RIS Pro</Link>
-          <Link to="/" className="btn btn-secondary btn-nav-home" onClick={handleHomeClick}>Accueil</Link>
         </div>
 
         <div id="navbar-portal-root" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}></div>
