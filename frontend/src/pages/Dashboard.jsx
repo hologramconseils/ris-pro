@@ -130,7 +130,7 @@ export default function Dashboard() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ fontSize: 24 }}>
+                      <div style={{ fontSize: 24 }} title={scan.ocr_status === 'failed' ? scan.ocr_error : ''}>
                         {scan.ocr_status === 'success' ? (scan.has_anomalies ? '⚠️' : '✅') : 
                          scan.ocr_status === 'failed' ? '❌' : '⏳'}
                       </div>
