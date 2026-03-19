@@ -147,7 +147,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                   <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[0].title}</h4>
                   <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[0].description}</p>
                   
-                  {result.preview_anomalies[0].justificatif && (
+                  {result.preview_anomalies[0].justificatif ? (
                     <div className="justificatif-box" style={{ borderColor: 'var(--primary-light)', padding: '16px', borderLeft: '5px solid var(--primary-light)' }}>
                       <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.5px' }}>
                         📄 Justificatifs
@@ -156,8 +156,9 @@ export default function FreeResult({ result: initialResult, onReset }) {
                         {result.preview_anomalies[0].justificatif}
                       </div>
                     </div>
+                  ) : (
+                    result.preview_anomalies[0].needs_justificatifs && <JustificatifsBlock />
                   )}
-                  {result.preview_anomalies[0].needs_justificatifs && <JustificatifsBlock />}
                 </motion.div>
                 
                 {result.preview_anomalies.length > 1 && (
@@ -173,7 +174,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                     <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[1].title}</h4>
                     <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[1].description}</p>
                     
-                    {result.preview_anomalies[1].justificatif && (
+                    {result.preview_anomalies[1].justificatif ? (
                       <div className="justificatif-box" style={{ borderColor: 'var(--accent-light)', padding: '16px', borderLeft: '5px solid var(--accent-light)' }}>
                         <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-light)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.5px' }}>
                           📄 Justificatifs
@@ -182,8 +183,9 @@ export default function FreeResult({ result: initialResult, onReset }) {
                           {result.preview_anomalies[1].justificatif}
                         </div>
                       </div>
+                    ) : (
+                      result.preview_anomalies[1].needs_justificatifs && <JustificatifsBlock />
                     )}
-                    {result.preview_anomalies[1].needs_justificatifs && <JustificatifsBlock />}
                   </motion.div>
                 )}
               </div>

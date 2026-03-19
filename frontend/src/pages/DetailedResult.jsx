@@ -198,13 +198,14 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     {isErr && (
                       <div style={{ marginTop: 16 }}>
                         <div style={{ padding: '12px', borderRadius: 8, background: 'rgba(234,179,8,0.05)', color: 'var(--warning)', fontWeight: 600, marginBottom: 12 }}>⚠️ {cleanText(item.anomalie_specifique || "Régularisation requise")}</div>
-                        {item.justificatif_suggere && (
+                        {item.justificatif_suggere ? (
                           <div className="justificatif-box" style={{ borderColor: 'var(--primary-light)', padding: '16px' }}>
                             <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 6 }}>📄 Justificatif(s) :</div>
                             <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap' }}>{cleanText(item.justificatif_suggere)}</div>
                           </div>
+                        ) : (
+                          item.needs_justificatifs && <JustificatifsBlock />
                         )}
-                        {item.needs_justificatifs && <JustificatifsBlock />}
                       </div>
                     )}
                   </div>
