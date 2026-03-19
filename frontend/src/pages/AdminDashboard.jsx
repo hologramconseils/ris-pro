@@ -127,7 +127,7 @@ export default function AdminDashboard() {
       animate={{ opacity: 1, y: 0 }}
       style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}
     >
-      <header style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <header style={{ marginTop: 120, marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', marginBottom: 10 }}>Contrôle Admin</h1>
           <p style={{ color: 'var(--text-subtle)' }}>Gestion sécurisée des utilisateurs et statistiques.</p>
