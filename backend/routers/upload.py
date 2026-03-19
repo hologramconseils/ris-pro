@@ -55,97 +55,96 @@ async def upload_file(
     result = ris_parser.parse_ris_file(file_path)
 
     # Save to DB
-    db_scan = models.ScanResult(
+    new_scan = models.ScanResult(
         user_id=user.id if user else None,
         filename=file.filename,
-        has_anomalies=result["has_anomalies"],
-        is_scanned=result["is_scanned"],
-        is_valid_ris=result["is_valid_ris"],
-        detailed_report=json.dumps(result["detailed_report"]) if result["detailed_report"] else None
+        has_anomalies=result.get("has_anomalies", False),
+        is_scanned=result.get("is_scanned", False),
+        is_valid_ris=result.get("is_valid_ris", False),
+        ocr_status="pending" if result.get("is_scanned") else "none",
+        detailed_report=json.dumps(result.get("detailed_report", [])),
+        raw_text=result.get("raw_text", "")
     )
-    db.add(db_scan)
+    db.add(new_scan)
     db.commit()
-    db.refresh(db_scan)
+    db.refresh(new_scan)
 
-    # Background the AI Audit for all valid RIS or Scans (including guests for preview)
+    # Background the AI Audit for all valid RIS or Scans
     if result["is_valid_ris"] or result["is_scanned"]:
         background_tasks.add_task(
             run_ai_audit_background,
-            db_scan.id,
-            file.filename,
-            result["detailed_report"],
+            new_scan.id,
             result.get("raw_text", ""),
-            result.get("images", [])
+            result.get("detailed_report", []),
+            result.get("images", []),
+            db
         )
 
     # Add preview anomalies for free results
-    if db_scan.detailed_report:
-        report = json.loads(db_scan.detailed_report)
-        db_scan.total_anomalies = len(report)
-        if len(report) >= 2:
-            oldest = report[0]
-            most_recent = report[-1]
-            if len(report) > 2:
-                most_recent = report[-2]
-            db_scan.preview_anomalies = [oldest, most_recent]
-        elif len(report) == 1:
-            db_scan.preview_anomalies = [report[0]]
+    if new_scan.detailed_report:
+        try:
+            report = json.loads(new_scan.detailed_report)
+            new_scan.total_anomalies = len(report)
+            if len(report) >= 2:
+                oldest = report[0]
+                most_recent = report[-1]
+                if len(report) > 2:
+                    most_recent = report[-2]
+                new_scan.preview_anomalies = [oldest, most_recent]
+            elif len(report) == 1:
+                new_scan.preview_anomalies = [report[0]]
+        except:
+            pass
             
-    return db_scan
+    return new_scan
 
 async def run_ai_audit_background(
     scan_id: int, 
-    filename: str, 
-    initial_report: list, 
     raw_text: str, 
-    images: list
+    initial_report: list, 
+    images: list,
+    db_session: Session
 ):
     """Worker function to run expensive AI analysis in the background."""
-    from database import SessionLocal
-    db = SessionLocal()
+    db_scan = None
     try:
-        db_scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+        db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
         if not db_scan:
             return
 
-        # Simple Retry Mechanism: 1 retry if AI fails or returns invalid JSON
+        if db_scan.is_scanned:
+            db_scan.ocr_status = "processing"
+            db_session.commit()
+
         ai_commentary = None
         max_retries = 2
         for attempt in range(max_retries):
             try:
                 ai_commentary = await ai_service.generate_ai_audit(
                     initial_report, 
-                    filename,
+                    db_scan.filename,
                     raw_text=raw_text,
                     images=images
                 )
                 if ai_service.is_valid_json(ai_commentary):
                     break
-                print(f"Attempt {attempt + 1}: AI returned invalid JSON. Retrying...")
             except Exception as e:
-                print(f"Attempt {attempt + 1}: AI service error: {e}")
+                print(f"AI attempt {attempt+1} failed: {e}")
             
             if attempt < max_retries - 1:
                 await asyncio.sleep(2)
 
         if not ai_commentary or not ai_service.is_valid_json(ai_commentary):
-            print(f"AI Audit consistently failed for scan {scan_id}")
-            # Mark as complete but with error to stop spinner
-            db_scan.ai_analysis = json.dumps({
-                "anomalie_detectee": "non",
-                "niveau_risque": "moyen",
-                "resume_global": "L'expertise automatique a rencontré un délai d'attente. Veuillez rafraîchir la page dans quelques instants.",
-                "premiere_annee": "N/A",
-                "derniere_annee": "N/A",
-                "full_timeline": [],
-                "compte_rendu": "Le service d'expertise est temporairement surchargé. Nos experts techniques ont été prévenus."
-            })
-            db.commit()
+            if db_scan.is_scanned:
+                db_scan.ocr_status = "failed"
+                db_scan.ocr_error = "L'expertise IA a échoué après plusieurs tentatives."
+            db_session.commit()
             return
 
         db_scan.ai_analysis = ai_commentary
+        if db_scan.is_scanned:
+            db_scan.ocr_status = "success"
         
-        # Logique Expertise
         try:
             ai_data = json.loads(ai_commentary)
             if ai_data.get("anomalie_detectee") == "oui":
@@ -159,7 +158,6 @@ async def run_ai_audit_background(
                         activite_str = str(item.get("activite", "")).lower()
                         q_count = int(item.get("trimestres_valides", 0))
                         
-                        # Rule: incomplete/missing quarters AND no activity or uncertain activity
                         is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou", "non détecté"])
                         needs_justificatifs = (q_count < 4) and is_missing_act
                         
@@ -174,66 +172,69 @@ async def run_ai_audit_background(
                     if ai_anomalies:
                         db_scan.detailed_report = json.dumps(ai_anomalies)
         except Exception as json_err:
-            print(f"Failed to parse AI JSON for scan {scan_id}: {json_err}")
+            if db_scan.is_scanned:
+                db_scan.ocr_status = "failed"
+                db_scan.ocr_error = f"Erreur de formatage AI: {str(json_err)}"
             
-        db.commit()
+        db_session.commit()
     except Exception as e:
-        print(f"Background AI Audit Failed for scan {scan_id}: {e}")
-        # Mark as failed to stop spinner in frontend
-        try:
-            db_scan.ai_analysis = json.dumps({
-                "anomalie_detectee": "non",
-                "niveau_risque": "moyen",
-                "resume_global": "Une erreur technique est survenue lors de l'analyse.",
-                "premiere_annee": "N/A",
-                "derniere_annee": "N/A",
-                "full_timeline": [],
-                "compte_rendu": f"Erreur système : {str(e)}"
-            })
-            db.commit()
-        except:
-            pass
+        print(f"Background AI Audit Failed: {e}")
+        if not db_scan:
+            db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+        if db_scan and db_scan.is_scanned:
+            db_scan.ocr_status = "failed"
+            db_scan.ocr_error = str(e)
+            db_session.commit()
     finally:
-        db.close()
-        # Cleanup: ALWAYS delete the uploaded file to save space
-        try:
-            file_path = os.path.join(UPLOAD_DIR, filename) 
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Successfully cleaned up: {filename}")
-        except Exception as cleanup_err:
-            print(f"Cleanup failed for {filename}: {cleanup_err}")
+        db_session.close()
 
-    # Add preview anomalies for free results
-    if db_scan.detailed_report:
-        report = json.loads(db_scan.detailed_report)
-        db_scan.total_anomalies = len(report)
-        if len(report) >= 2:
-            oldest = report[0]
-            most_recent = report[-1]
-            if len(report) > 2:
-                most_recent = report[-2]
-            db_scan.preview_anomalies = [oldest, most_recent]
-        elif len(report) == 1:
-            db_scan.preview_anomalies = [report[0]]
-            
-    return db_scan
+@router.post("/{scan_id}/retry")
+async def retry_scan_analysis(
+    scan_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(database.get_db),
+    user: models.User = Depends(get_current_user)
+):
+    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Analyse non trouvée.")
+    
+    if scan.user_id != user.id and not user.is_admin:
+        raise HTTPException(status_code=403, detail="Non autorisé.")
+
+    scan.ocr_status = "pending"
+    scan.ocr_error = None
+    scan.ai_analysis = None
+    db.commit()
+
+    background_tasks.add_task(
+        run_ai_audit_background,
+        scan.id,
+        scan.raw_text or "",
+        json.loads(scan.detailed_report or "[]"),
+        [],
+        db
+    )
+    return {"message": "Analyse relancée."}
 
 @router.get("/history", response_model=List[schemas.ScanResultResponse])
 def get_history(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scans = db.query(models.ScanResult).filter(models.ScanResult.user_id == current_user.id).order_by(models.ScanResult.created_at.desc()).all()
     for s in scans:
         if s.detailed_report:
-            report = json.loads(s.detailed_report)
-            s.total_anomalies = len(report)
-            if len(report) >= 2:
-                oldest = report[0]
-                most_recent = report[-1]
-                if len(report) > 2:
-                    most_recent = report[-2]
-                s.preview_anomalies = [oldest, most_recent]
-            elif len(report) == 1:
-                s.preview_anomalies = [report[0]]
+            try:
+                report = json.loads(s.detailed_report)
+                s.total_anomalies = len(report)
+                if len(report) >= 2:
+                    oldest = report[0]
+                    most_recent = report[-1]
+                    if len(report) > 2:
+                        most_recent = report[-2]
+                    s.preview_anomalies = [oldest, most_recent]
+                elif len(report) == 1:
+                    s.preview_anomalies = [report[0]]
+            except:
+                pass
     return scans
 
 @router.get("/preview/{scan_id}", response_model=schemas.ScanResultResponse)
@@ -242,10 +243,8 @@ def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     
-    # Compute is_ai_complete for the response
     scan.is_ai_complete = scan.ai_analysis is not None
     
-    # Refresh preview anomalies if they were updated by AI
     if scan.detailed_report:
         try:
             report = json.loads(scan.detailed_report)
@@ -270,7 +269,7 @@ def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     enable_admin = os.getenv("ENABLE_ADMIN_BYPASS", "true").lower() == "true"
     if not (current_user.has_paid_access or (current_user.is_admin and enable_admin)):
-        raise HTTPException(status_code=403, detail="Vous devez payer 19€ pour accéder au rapport détaillé.")
+        raise HTTPException(status_code=403, detail="Vous devez payer pour accéder au rapport détaillé.")
     return scan
 
 @router.delete("/{scan_id}")

@@ -9,7 +9,7 @@ const STEPS = [
   { label: 'Génération du diagnostic avancé…', icon: '⚡' },
 ]
 
-export default function AnalysisLoader() {
+export default function AnalysisLoader({ message }) {
   const [currentStep, setCurrentStep] = useState(0)
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function AnalysisLoader() {
     >
       <div className="spinner" />
       <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, letterSpacing: '-0.5px' }}>
-        Analyse de votre carrière...
+        {message || "Analyse de votre carrière..."}
       </h3>
       <p style={{ color: 'var(--text-muted)', fontSize: 15, marginBottom: 32 }}>
         Veuillez patienter, nous scrutons votre RIS ligne par ligne.

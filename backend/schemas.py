@@ -33,6 +33,8 @@ class ScanResultResponse(ScanResultBase):
     preview_anomalies: Optional[List[dict]] = None
     total_anomalies: int = 0
     is_ai_complete: bool = False
+    ocr_status: str = "none"
+    ocr_error: Optional[str] = None
     created_at: datetime
 
     class Config:

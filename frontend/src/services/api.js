@@ -107,6 +107,7 @@ export const scanAPI = {
   },
   getResult: (scanId) => api.get(`/scans/${scanId}`),
   getPreview: (scanId) => api.get(`/scans/preview/${scanId}`),
+  retryOCR: (scanId) => api.post(`/scans/${scanId}/retry`),
   listHistory: () => api.get('/scans/history'),
   deleteScan: (scanId) => api.delete(`/scans/${scanId}`),
 }

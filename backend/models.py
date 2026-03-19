@@ -29,7 +29,9 @@ class ScanResult(Base):
     has_anomalies = Column(Boolean, default=False)
     is_scanned = Column(Boolean, default=False)
     is_valid_ris = Column(Boolean, default=False)
-    detailed_report = Column(Text, nullable=True) # JSON stored as string for simplicity
+    ocr_status = Column(String, default="none") # none, pending, processing, success, failed
+    ocr_error = Column(Text, nullable=True)
+    detailed_report = Column(Text, nullable=True) 
     ai_analysis = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
 

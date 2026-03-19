@@ -32,16 +32,18 @@ export default function FreeResult({ result: initialResult, onReset }) {
     }
   }, [result.id])
 
-  // Polling for scanned documents
+  // Polling for scanned documents or ongoing audits
   useEffect(() => {
     let interval;
-    if (result.is_scanned && !isAiComplete && !hasAnomalies) {
+    const needsPolling = (result.is_scanned && (!isAiComplete || result.ocr_status === 'processing' || result.ocr_status === 'pending')) || (!isAiComplete && !hasAnomalies);
+    
+    if (needsPolling) {
       interval = setInterval(() => {
         refreshResult(true)
-      }, 8000) // Poll every 8 seconds
+      }, 7000) // Poll slightly faster for OCR feedback
     }
     return () => clearInterval(interval)
-  }, [result.is_scanned, isAiComplete, hasAnomalies, refreshResult])
+  }, [result.is_scanned, result.ocr_status, isAiComplete, hasAnomalies, refreshResult])
 
   const handleGetDetailed = async () => {
     if (!user) {
@@ -63,6 +65,20 @@ export default function FreeResult({ result: initialResult, onReset }) {
         setError(errorMsg);
         setLoading(false);
       }
+    }
+  }
+
+  const handleRetryOCR = async () => {
+    setIsRefreshing(true)
+    setError('')
+    try {
+      await scanAPI.retryOCR(result.id)
+      // Wait a bit then poll
+      setTimeout(() => refreshResult(true), 1000)
+    } catch (err) {
+      setError("Impossible de relancer l'OCR. Veuillez réessayer.")
+    } finally {
+      setIsRefreshing(false)
     }
   }
 
@@ -182,28 +198,69 @@ export default function FreeResult({ result: initialResult, onReset }) {
           {!hasAnomalies && result.is_scanned && !isAiComplete && (
             <motion.div 
               style={{ 
-                margin: '24px 0', padding: '20px', borderRadius: 16, 
-                background: 'rgba(79,70,229,0.05)', border: '1px dashed var(--primary-light)',
-                textAlign: 'center'
+                margin: '24px 0', padding: '24px', borderRadius: 20, 
+                background: 'rgba(79,70,229,0.08)', border: '1px solid rgba(79,70,229,0.2)',
+                textAlign: 'center', position: 'relative', overflow: 'hidden'
               }}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <div style={{ fontSize: 24, marginBottom: 12 }}>🔍</div>
-              <h4 style={{ marginBottom: 8 }}>Analyse visuelle approfondie en cours</h4>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
-                Votre document étant un scan, notre expert retraite réalise une analyse ligne par ligne. 
-                Cela peut prendre jusqu'à 60 secondes.
-              </p>
-              <button 
-                className="btn btn-secondary btn-sm" 
-                onClick={() => refreshResult()}
-                disabled={isRefreshing}
-                style={{ fontSize: 12 }}
-              >
-                {isRefreshing ? '⌛ Vérification...' : '🔄 Actualiser le résultat'}
-              </button>
+              {(result.ocr_status === 'processing' || result.ocr_status === 'pending') ? (
+                <>
+                  <div className="spinner-small" style={{ margin: '0 auto 16px' }} />
+                  <h4 style={{ color: 'var(--primary-light)', marginBottom: 8 }}>Traitement OCR en cours…</h4>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                    Nous convertissons votre scan en données structurées. Patientez encore quelques secondes.
+                  </p>
+                </>
+              ) : result.ocr_status === 'failed' ? (
+                <>
+                  <div style={{ fontSize: 32, marginBottom: 16 }}>⚠️</div>
+                  <h4 style={{ color: 'var(--danger)', marginBottom: 8 }}>Échec du traitement OCR du PDF</h4>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+                    {result.ocr_error || "Une erreur est survenue lors de l'extraction des données."}
+                  </p>
+                  <button 
+                    className="btn btn-primary btn-sm" 
+                    onClick={handleRetryOCR}
+                    disabled={isRefreshing}
+                  >
+                    {isRefreshing ? '⌛ Relance...' : '🔄 Re-tenter l’OCR'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 32, marginBottom: 16 }}>🔍</div>
+                  <h4 style={{ marginBottom: 8 }}>Analyse visuelle approfondie en cours</h4>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+                    Votre document étant un scan, notre expert retraite réalise une analyse ligne par ligne.
+                  </p>
+                  <button 
+                    className="btn btn-secondary btn-sm" 
+                    onClick={() => refreshResult()}
+                    disabled={isRefreshing}
+                    style={{ fontSize: 12 }}
+                  >
+                    {isRefreshing ? '⌛ Vérification...' : '🔄 Actualiser le résultat'}
+                  </button>
+                </>
+              )}
             </motion.div>
+          )}
+
+          {result.ocr_status === 'success' && !isAiComplete && (
+             <motion.div 
+               style={{ 
+                 margin: '20px 0', padding: '12px', borderRadius: 12, 
+                 background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+                 textAlign: 'center', color: 'var(--success)'
+               }}
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+             >
+               ✅ PDF traité avec succès par OCR. Finalisation de l'audit...
+             </motion.div>
           )}
 
           {hasAnomalies && (

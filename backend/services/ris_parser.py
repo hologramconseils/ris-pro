@@ -24,10 +24,10 @@ def parse_ris_file(file_path: str):
         
         # Detection of scanned PDF (OCR fallback needed)
         # Increased threshold to 2000 to catch documents with sparse text or empty headers
-        if len(doc_text.strip()) < 2000:
+        if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
-            # Convert first 12 pages to images for Gemini Vision (Safety limit)
-            for i in range(min(12, len(doc))):
+            # Convert first 15 pages to images for Gemini Vision
+            for i in range(min(15, len(doc))):
                 page = doc[i]
                 # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
                 pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
