@@ -152,15 +152,25 @@ async def run_ai_audit_background(
                 db_scan.has_anomalies = True
                 
                 if ai_data.get("full_timeline"):
-                    ai_anomalies = [
-                        {
+                    ai_anomalies = []
+                    for item in ai_data["full_timeline"]:
+                        if item.get("statut") == "complet": continue
+                        
+                        activite_str = str(item.get("activite", "")).lower()
+                        q_count = int(item.get("trimestres_valides", 0))
+                        
+                        # Rule: incomplete/missing quarters AND no activity or uncertain activity
+                        is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou", "non détecté"])
+                        needs_justificatifs = (q_count < 4) and is_missing_act
+                        
+                        ai_anomalies.append({
                             "year": item["annee"], 
                             "title": f"Année {item['annee']} : {item['statut']}", 
                             "description": item["anomalie_specifique"],
-                            "justificatif": item.get("justificatif_suggere")
-                        }
-                        for item in ai_data["full_timeline"] if item.get("statut") != "complet"
-                    ]
+                            "justificatif": item.get("justificatif_suggere"),
+                            "needs_justificatifs": needs_justificatifs
+                        })
+                    
                     if ai_anomalies:
                         db_scan.detailed_report = json.dumps(ai_anomalies)
         except Exception as json_err:

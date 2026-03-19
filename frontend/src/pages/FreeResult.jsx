@@ -4,6 +4,7 @@ import DetailedResult from './DetailedResult'
 import { billingAPI, scanAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { motion } from 'framer-motion'
+import JustificatifsBlock from '../components/JustificatifsBlock'
 
 export default function FreeResult({ result: initialResult, onReset }) {
   const { user } = useAuth()
@@ -131,6 +132,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                       </div>
                     </div>
                   )}
+                  {result.preview_anomalies[0].needs_justificatifs && <JustificatifsBlock />}
                 </motion.div>
                 
                 {result.preview_anomalies.length > 1 && (
@@ -156,6 +158,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                         </div>
                       </div>
                     )}
+                    {result.preview_anomalies[1].needs_justificatifs && <JustificatifsBlock />}
                   </motion.div>
                 )}
               </div>

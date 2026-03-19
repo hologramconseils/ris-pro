@@ -181,21 +181,26 @@ def parse_ris_file(file_path: str):
                 s = found_salaries.get(y_str, 0)
                 title_suffix = "trimestre" if q <= 1 else "trimestres"
                 
+                needs_justificatifs = (q < 4) and (s <= 0 and p <= 0)
+                
                 if q == 0:
                     anomalies_list.append({
                         "year": y, "title": f"Année {y} : 0 trimestre",
-                        "description": f"Aucun trimestre validé au régime de base pour l'année {y}. Vérifiez vos droits."
+                        "description": f"Aucun trimestre validé au régime de base pour l'année {y}. Vérifiez vos droits.",
+                        "needs_justificatifs": needs_justificatifs
                     })
                 elif q < 4:
                     anomalies_list.append({
                         "year": y, "title": f"Année {y} : {q} {title_suffix}",
-                        "description": f"L'année {y} est incomplète au régime de base ({q}/4 trimestres)."
+                        "description": f"L'année {y} est incomplète au régime de base ({q}/4 trimestres).",
+                        "needs_justificatifs": needs_justificatifs
                     })
                 
                 if (q > 0 or s > 0) and p <= 0:
                     anomalies_list.append({
                         "year": y, "title": f"Absence de points {main_regime} ({y})",
-                        "description": f"Une activité est détectée ({q} trim, Sal: {s:.0f}€) mais aucun point n'apparaît au régime complémentaire."
+                        "description": f"Une activité est détectée ({q} trim, Sal: {s:.0f}€) mais aucun point n'apparaît au régime complémentaire.",
+                        "needs_justificatifs": False # Activity is present here
                     })
 
     has_anomalies = len(anomalies_list) > 0

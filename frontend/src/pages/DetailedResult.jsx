@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import html2pdf from 'html2pdf.js'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
+import JustificatifsBlock from '../components/JustificatifsBlock'
 
 export default function DetailedResult({ result, onReset, onRefresh }) {
   const { user } = useAuth()
@@ -115,6 +116,9 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
               children.push(new Paragraph({ children: [new TextRun({ text: "⚠️ Anomalie : ", bold: true, color: "EAB308" }), new TextRun({ text: cleanText(item.anomalie_specifique || "Régularisation requise") })], spacing: { after: 80 } }))
               if (item.justificatif_suggere) {
                 children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatif(s) à fournir : ", bold: true, color: "4F46E5" }), new TextRun({ text: cleanText(item.justificatif_suggere) })], spacing: { after: 200 } }))
+              }
+              if (item.needs_justificatifs) {
+                children.push(new Paragraph({ children: [new TextRun({ text: "📄 Justificatifs : ", bold: true, color: "4F46E5" }), new TextRun({ text: "Veuillez fournir une attestation sur l’honneur d’activité ou de non-activité, ainsi que les justificatifs cohérents avec le contenu de cette attestation lorsque l’analyse détecte des éléments manquants dans votre carrière." })], spacing: { after: 200 } }))
               }
             }
           })
@@ -243,6 +247,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                             <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap' }}>{cleanText(item.justificatif_suggere)}</div>
                           </div>
                         )}
+                        {item.needs_justificatifs && <JustificatifsBlock />}
                       </div>
                     )}
                   </div>
