@@ -62,6 +62,8 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 
 **MISSION ET PÉRIODE D'ANALYSE :**
 - Analyse la carrière de la toute première activité détectée jusqu'à l'année **{target_year}** (N-1 par rapport à aujourd'hui).
+- **RÉGIMES COMPLÉMENTAIRES EST ESSENTIEL :** Ne te limite pas au régime de base (trimestres). Analyse impérativement les régimes complémentaires (Agirc-Arrco, Ircantec, RAFP, RCI, etc.) et les POINTS acquis.
+- **DÉTECTION HORS TRIMESTRES :** Signale systématiquement si des points apparaissent sur une année sans trimestres, ou si une activité salariée connue n'affiche pas de points complémentaires.
 - **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
@@ -89,6 +91,7 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 - Contractuel public ➔ **IRCANTEC** (inclut : Universités, CROUS, Mairies)
 
 Lors de l'analyse, impute systématiquement les points au bon régime selon le statut.
+9. **EXPLOITATION DES POINTS** : Si le RIS affiche des points Agirc-Arrco, Ircantec ou autres, ils doivent être cités et analysés comme preuve d'activité, même en l'absence de trimestres validés.
 
 --- 📄 CHECKLIST DES PIÈCES À FOURNIR (Source Experte) ---
 Selon l'anomalie détectée, tu DOIS suggérer les documents suivants :

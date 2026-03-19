@@ -32,60 +32,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     return () => clearInterval(interval);
   }, [result?.ai_analysis, onRefresh]);
 
-  const handleDownloadPDF = async () => {
-    if (!contentRef.current) return
-    setIsExporting(true)
-    const element = contentRef.current
-    const opt = {
-      margin: [15, 12, 15, 12],
-      filename: `Rapport_expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true, 
-        letterRendering: true,
-        logging: false,
-        onclone: (doc) => {
-          const style = doc.createElement('style')
-          style.innerHTML = `
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-            * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; color: #1e1b4b !important; }
-            .page { padding: 0 !important; background: #fff !important; }
-            .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .card { border: none !important; box-shadow: none !important; background: #fff !important; padding: 0 !important; color: #1e1b4b !important; }
-            .bg-dots, .navbar, .btn, .delete-scan-btn, .badge-success { display: none !important; }
-            h1 { font-size: 28pt !important; color: #1e1b4b !important; margin-bottom: 8pt !important; text-align: center !important; }
-            h3 { font-size: 16pt !important; color: #1e1b4b !important; border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8pt !important; margin-top: 24pt !important; }
-            h4 { font-size: 12pt !important; color: #4338ca !important; margin-bottom: 8pt !important; }
-            .justificatif-box { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6pt !important; padding: 12pt !important; margin-bottom: 15pt !important; color: #1e1b4b !important; }
-            .anomaly-card { page-break-inside: avoid !important; margin-bottom: 20pt !important; border: 1px solid #f1f5f9 !important; border-radius: 8pt !important; padding: 15pt !important; background: #fff !important; color: #1e1b4b !important; }
-            .pdf-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 3px solid #4338ca; padding-bottom: 15pt; margin-bottom: 30pt; }
-            .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 9pt; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10pt; }
-          `
-          doc.head.appendChild(style)
-          const content = doc.querySelector('.card')
-          if (content) {
-            const header = doc.createElement('div')
-            header.className = 'pdf-header'
-            header.innerHTML = `<div style="font-weight: 800; font-size: 14pt; color: #4338ca;">HOLOGRAM CONSEILS</div><div style="text-align: right; font-size: 10pt; color: #64748b;"><strong>Rapport d'expertise Retraite</strong><br/>Émis le ${new Date().toLocaleDateString('fr-FR')}</div>`
-            content.prepend(header)
-            const footer = doc.createElement('div')
-            footer.className = 'pdf-footer'
-            footer.innerHTML = `Hologram Conseils - expertise RIS - Document confidentiel`
-            content.appendChild(footer)
-          }
-        }
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }
-    try {
-      await html2pdf().set(opt).from(element).save()
-    } catch (err) {
-      console.error("PDF generation failed", err)
-    } finally {
-      setIsExporting(false)
-    }
-  }
 
   const handleDownloadWord = async () => {
     setIsExporting(true)
@@ -159,10 +105,11 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
         {document.getElementById('navbar-portal-root') && createPortal(
-          <>
-            <button className="btn btn-secondary btn-nav" onClick={handleDownloadWord} disabled={isExporting}>{isExporting ? '⌛' : '📄'} Word</button>
-            <button className="btn btn-secondary btn-nav" onClick={handleDownloadPDF} disabled={isExporting}>{isExporting ? '⌛' : '📥'} PDF</button>
-          </>,
+          <div className="portal-center-actions">
+            <button className="btn btn-primary btn-nav-large shadow-expert" onClick={handleDownloadWord} disabled={isExporting} style={{ fontWeight: 800 }}>
+              {isExporting ? '⌛' : '📄'} Extraction Word (DOCX)
+            </button>
+          </div>,
           document.getElementById('navbar-portal-root')
         )}
         

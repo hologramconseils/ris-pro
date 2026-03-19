@@ -60,7 +60,7 @@ def parse_ris_file(file_path: str):
         # Typical RIS line: "2015  Assurance Vieillesse  4 trimestres  15000 €"
         
         found_years = {}
-        found_points = {}  # {year: (pts_val, regime_name)}
+        found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
         all_potential_years = []
 
@@ -111,7 +111,7 @@ def parse_ris_file(file_path: str):
                     if current_year not in found_years or quarters > found_years[current_year]:
                         found_years[current_year] = quarters
                 
-                p_match = re.search(r"(\d+(?:[\s.,]\d+)?)\s*(?:pts|points)\b", line_clean, re.IGNORECASE)
+                p_match = re.search(r"(\d{1,4}(?:[\s.,]\d{1,3})?)\s*(?:pts|points|pt)\b", line_clean, re.IGNORECASE)
                 if p_match:
                     raw_pts = p_match.group(1).replace(' ', '').replace(',', '.')
                     try:
@@ -126,8 +126,11 @@ def parse_ris_file(file_path: str):
                                 regime_name = name
                                 break
                         
-                        if current_year not in found_points or pts_val > found_points[current_year][0]:
-                            found_points[current_year] = (pts_val, regime_name)
+                        # Store all points, not just the highest if different regimes?
+                        # For now, keep highest per year or aggregate.
+                        if current_year not in found_points:
+                            found_points[current_year] = []
+                        found_points[current_year].append((pts_val, regime_name))
                     except:
                         pass
 
@@ -179,23 +182,30 @@ def parse_ris_file(file_path: str):
             for y in range(start_year, FINAL_YEAR + 1):
                 y_str = str(y)
                 q = found_years.get(y_str, 0)
-                p_data = found_points.get(y_str, (0, "N/A"))
-                p = p_data[0]
+                p_list = found_points.get(y_str, [])
+                p = sum(item[0] for item in p_list)
+                p_desc = " | ".join([f"{item[0]} pts ({item[1]})" for item in p_list])
                 s = found_salaries.get(y_str, 0)
                 title_suffix = "trimestre" if q <= 1 else "trimestres"
                 
                 needs_justificatifs = (q < 4) and (s <= 0 and p <= 0)
                 
                 if q == 0:
+                    description = f"Aucun trimestre validé au régime de base pour l'année {y}."
+                    if p > 0:
+                        description += f" Cependant, {p_desc} ont été détectés."
                     anomalies_list.append({
                         "year": y, "title": f"Année {y} : 0 trimestre",
-                        "description": f"Aucun trimestre validé au régime de base pour l'année {y}. Vérifiez vos droits.",
-                        "needs_justificatifs": needs_justificatifs
+                        "description": description,
+                        "needs_justificatifs": needs_justificatifs and p <= 0
                     })
                 elif q < 4:
+                    description = f"L'année {y} est incomplète au régime de base ({q}/4 trimestres)."
+                    if p > 0:
+                        description += f" (Points détectés : {p_desc})"
                     anomalies_list.append({
                         "year": y, "title": f"Année {y} : {q} {title_suffix}",
-                        "description": f"L'année {y} est incomplète au régime de base ({q}/4 trimestres).",
+                        "description": description,
                         "needs_justificatifs": needs_justificatifs
                     })
                 
