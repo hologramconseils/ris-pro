@@ -24,7 +24,6 @@ export default function Footer() {
           marginBottom: 20,
           flexWrap: 'wrap'
         }}>
-          <Link to="/" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 14 }}>Accueil</Link>
           <Link to="/legal" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 14 }}>Mentions Légales & CGV</Link>
           <Link to="/privacy" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 14 }}>Protection des données (RGPD)</Link>
         </div>
