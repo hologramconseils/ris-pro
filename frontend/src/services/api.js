@@ -1,10 +1,16 @@
 import axios from 'axios'
 import { coldStartTracker } from './coldStartTracker'
 
-const API_URL = import.meta.env.VITE_API_URL || 
-  (typeof window !== 'undefined' && window.location.hostname === 'ris.hologramconseils.com' 
-    ? 'https://ris-scan-pro-backend.onrender.com' 
-    : 'http://127.0.0.1:8000')
+const PROD_DOMAIN = 'ris.hologramconseils.com'
+const RENDER_BACKEND = 'https://ris-scan-pro-backend.onrender.com'
+const envUrl = import.meta.env.VITE_API_URL
+
+const isLocalUrl = (url) => !url || url.includes('localhost') || url.includes('127.0.0.1')
+const isProduction = typeof window !== 'undefined' && window.location.hostname === PROD_DOMAIN
+
+const API_URL = (isProduction && isLocalUrl(envUrl)) 
+  ? RENDER_BACKEND 
+  : (envUrl || 'http://127.0.0.1:8000')
 
 const api = axios.create({
   baseURL: API_URL,
