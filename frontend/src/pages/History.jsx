@@ -34,18 +34,8 @@ export default function History() {
     }
   }
  
-  const handleViewScan = async (scan) => {
-    if (user.has_paid_access || user.is_admin) {
-      try {
-        const res = await scanAPI.getResult(scan.id)
-        setDetailedData(res.data)
-        setSelectedScan(scan)
-      } catch (err) {
-        setError('Impossible de charger le rapport détaillé.')
-      }
-    } else {
-      setSelectedScan(scan)
-    }
+  const handleViewScan = (scan) => {
+    navigate(`/detailed-result/${scan.id}`)
   }
  
   const handleDeleteClick = (e, scan) => {
@@ -62,21 +52,10 @@ export default function History() {
       setScans(scans.filter(s => s.id !== scanId))
       setConfirmingDelete(null)
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Erreur lors de la suppression.'
+      const msg = err.response?.data?.detail || 'Erreur lors de l\'suppression.'
       alert(`Erreur: ${msg}`)
       setConfirmingDelete(null)
     }
-  }
-
-  if (selectedScan) {
-    if ((user.has_paid_access || user.is_admin) && detailedData) {
-      return <DetailedResult 
-        result={detailedData} 
-        onReset={() => { setSelectedScan(null); setDetailedData(null); }} 
-        onRefresh={() => handleViewScan(selectedScan)}
-      />
-    }
-    return <FreeResult result={selectedScan} onReset={() => setSelectedScan(null)} />
   }
 
   return (
