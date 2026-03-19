@@ -16,6 +16,8 @@ const API_URL = ((isProduction && isLocalUrl(envUrl))
   ? RENDER_BACKEND 
   : (envUrl || 'http://127.0.0.1:8000')).replace(/\/api\/v1\/?$/, '')
 
+console.log(`[API] Mode: ${isProduction ? 'PROD' : 'DEV'}, URL: ${API_URL}`)
+
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
