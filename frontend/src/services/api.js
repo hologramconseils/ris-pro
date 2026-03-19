@@ -10,6 +10,8 @@ const isLocalHost = typeof window !== 'undefined' &&
 const isProduction = typeof window !== 'undefined' && 
   (window.location.hostname === PROD_DOMAIN || !isLocalHost)
 
+const isLocalUrl = (url) => !url || url.includes('localhost') || url.includes('127.0.0.1')
+
 const API_URL = (isProduction && isLocalUrl(envUrl)) 
   ? RENDER_BACKEND 
   : (envUrl || 'http://127.0.0.1:8000')
