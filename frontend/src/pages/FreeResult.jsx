@@ -18,7 +18,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const hasAnomalies = result.has_anomalies
-  const isAiComplete = result.is_ai_complete
+  const isFinished = result.is_ai_complete
 
   const refreshResult = useCallback(async (silent = false) => {
     if (!silent) setIsRefreshing(true)
@@ -35,7 +35,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
   // Polling for scanned documents or ongoing audits
   useEffect(() => {
     let interval;
-    const needsPolling = (result.is_scanned && (!isAiComplete || result.ocr_status === 'processing' || result.ocr_status === 'pending')) || (!isAiComplete && !hasAnomalies);
+    const needsPolling = (result.is_scanned && (!isFinished || result.ocr_status === 'processing' || result.ocr_status === 'pending')) || (!isFinished && !hasAnomalies);
     
     if (needsPolling) {
       interval = setInterval(() => {
@@ -112,16 +112,23 @@ export default function FreeResult({ result: initialResult, onReset }) {
         <div className="card shadow-expert">
           <div className="result-verdict">
             <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
-            <div className="verdict-label">Rapport Standard RIS</div>
-            <div className={`verdict-title ${!isAiComplete ? 'muted' : (hasAnomalies ? 'danger' : 'success')}`}>
-              {!isAiComplete ? 'Analyse en cours...' : (hasAnomalies ? 'Anomalies détectées : OUI' : 'Anomalies détectées : NON')}
+            <div className="verdict-label">{isFinished ? 'Audit algorithmique terminé' : 'Analyse du relevé en cours'}</div>
+            <div className={`verdict-title ${!isFinished ? 'muted' : 'success'}`}>
+              {!isFinished ? 'Analyse en cours...' : 'Analyse terminée'}
             </div>
+            
+            {isFinished && (
+              <div className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8, fontSize: 20 }}>
+                Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+              </div>
+            )}
+
             <p className="verdict-subtitle">
-              {!isAiComplete 
-                ? 'Notre moteur d’analyse traite actuellement votre document. Les résultats définitifs apparaîtront dans quelques instants.'
+              {!isFinished 
+                ? 'Notre algorithme d’analyse traite actuellement votre document. Les résultats définitifs apparaîtront dans quelques instants.'
                 : (hasAnomalies
-                  ? 'Notre moteur d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
-                  : 'Félicitations ! Aucune anomalie majeure n’a été détectée dans votre relevé actuel.')}
+                  ? 'L’algorithme d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                  : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre algorithme.')}
             </p>
           </div>
           
@@ -197,7 +204,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
             </div>
           )}
 
-          {!hasAnomalies && result.is_scanned && !isAiComplete && (
+          {!hasAnomalies && result.is_scanned && !isFinished && (
             <motion.div 
               style={{ 
                 margin: '24px 0', padding: '24px', borderRadius: 20, 
@@ -233,9 +240,9 @@ export default function FreeResult({ result: initialResult, onReset }) {
               ) : (
                 <>
                   <div style={{ fontSize: 32, marginBottom: 16 }}>🔍</div>
-                  <h4 style={{ marginBottom: 8 }}>Analyse visuelle approfondie en cours</h4>
+                  <h4 style={{ marginBottom: 8 }}>Analyse algorithmique approfondie en cours</h4>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-                    Votre document étant un scan, notre expert retraite réalise une analyse ligne par ligne.
+                    Votre document étant un scan, notre algorithme expert retraite réalise une analyse ligne par ligne.
                   </p>
                   <button 
                     className="btn btn-secondary btn-sm" 
@@ -250,7 +257,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
             </motion.div>
           )}
 
-          {result.ocr_status === 'success' && !isAiComplete && (
+          {result.ocr_status === 'success' && !isFinished && (
              <motion.div 
                style={{ 
                  margin: '20px 0', padding: '12px', borderRadius: 12, 

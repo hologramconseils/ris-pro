@@ -6,7 +6,7 @@ const STEPS = [
   { label: 'Extraction du texte (OCR si nécessaire)…', icon: '🔍' },
   { label: 'Analyse des données de carrière…', icon: '📊' },
   { label: 'Détection des anomalies…', icon: '⚠️' },
-  { label: 'Génération du diagnostic avancé…', icon: '⚡' },
+  { label: 'Calcul algorithmique du diagnostic…', icon: '⚡' },
 ]
 
 export default function AnalysisLoader({ message }) {

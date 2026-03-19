@@ -185,7 +185,7 @@ export default function Dashboard() {
               </button>
               
               <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginTop: 12, textAlign: 'center' }}>
-                Le traitement IA peut prendre jusqu'à 1 minute pour les documents scannés.
+                Le traitement algorithmique peut prendre jusqu'à 1 minute pour les documents scannés.
               </p>
             </div>
           </div>

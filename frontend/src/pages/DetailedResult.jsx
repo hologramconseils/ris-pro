@@ -169,8 +169,8 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
         <div ref={contentRef} className="card shadow-expert" style={{ background: 'var(--bg-card)', padding: '40px' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,70,229,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>📊</div>
-            <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Rapport d'expertise RIS</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Analyse exhaustive de votre situation de retraite</p>
+            <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Expertise Algorithmique RIS</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Analyse certifiée de votre situation de retraite</p>
             <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', gap: 12 }}>
               <span className="badge badge-success">✦ Accès Expert Illimité</span>
               {result.is_scanned && <span className="badge badge-warning">📄 Document Scanné</span>}
