@@ -122,10 +122,10 @@ export default function AdminDashboard() {
 
   return (
     <motion.div 
-      className="container"
+      className="container page"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      style={{ padding: '80px 20px 40px' }}
+      style={{ padding: '0 20px' }}
     >
       <header style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
