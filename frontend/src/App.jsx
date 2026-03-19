@@ -1,5 +1,5 @@
 import { Routes, Route, useSearchParams } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import PaymentSuccess from './pages/PaymentSuccess'
@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard'
 import Footer from './components/Footer'
 
 function AppContent() {
+  const { user } = useAuth()
   const [searchParams] = useSearchParams()
   const isPaymentSuccess = searchParams.get('payment_success') === '1'
 
