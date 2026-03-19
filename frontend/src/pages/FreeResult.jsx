@@ -35,7 +35,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
   // Polling for scanned documents or ongoing audits
   useEffect(() => {
     let interval;
-    const needsPolling = (result.is_scanned && (!isFinished || result.ocr_status === 'processing' || result.ocr_status === 'pending')) || (!isFinished && !hasAnomalies);
+    const needsPolling = !isFinished && result.ocr_status !== 'failed';
     
     if (needsPolling) {
       interval = setInterval(() => {
