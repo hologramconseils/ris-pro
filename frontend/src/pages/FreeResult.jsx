@@ -108,16 +108,6 @@ export default function FreeResult({ result: initialResult, onReset }) {
           
           {hasAnomalies && result.preview_anomalies && result.preview_anomalies.length > 0 && (
             <div style={{ marginBottom: 32 }}>
-              <div style={{ 
-                display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20,
-                borderBottom: '1px solid var(--border)', paddingBottom: 12
-              }}>
-                <span style={{ fontSize: 20 }}>🔍</span>
-                <h4 style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>
-                  Aperçu des justificatifs à préparer
-                </h4>
-              </div>
-
               <div className="anomaly-list">
                 <motion.div 
                   className="anomaly-card"
@@ -132,11 +122,11 @@ export default function FreeResult({ result: initialResult, onReset }) {
                   <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[0].description}</p>
                   
                   {result.preview_anomalies[0].justificatif && (
-                    <div className="justificatif-box">
-                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary-light)', marginBottom: 4 }}>
-                        📄 PIÈCE(S) À FOURNIR :
+                    <div className="justificatif-box" style={{ borderColor: 'var(--primary-light)', padding: '16px', borderLeft: '5px solid var(--primary-light)' }}>
+                      <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--primary-light)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.5px' }}>
+                        📄 Justificatifs
                       </div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap', color: 'var(--text)' }}>
                         {result.preview_anomalies[0].justificatif}
                       </div>
                     </div>
@@ -157,11 +147,11 @@ export default function FreeResult({ result: initialResult, onReset }) {
                     <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[1].description}</p>
                     
                     {result.preview_anomalies[1].justificatif && (
-                      <div className="justificatif-box">
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-light)', marginBottom: 4 }}>
-                          📄 PIÈCE(S) À FOURNIR :
+                      <div className="justificatif-box" style={{ borderColor: 'var(--accent-light)', padding: '16px', borderLeft: '5px solid var(--accent-light)' }}>
+                        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-light)', textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.5px' }}>
+                          📄 Justificatifs
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
+                        <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'pre-wrap', color: 'var(--text)' }}>
                           {result.preview_anomalies[1].justificatif}
                         </div>
                       </div>

@@ -37,7 +37,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     const element = contentRef.current
     const opt = {
       margin: [15, 12, 15, 12],
-      filename: `Rapport_Expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
+      filename: `Rapport_expertise_RIS_${new Date().toISOString().split('T')[0]}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
@@ -66,11 +66,11 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
           if (content) {
             const header = doc.createElement('div')
             header.className = 'pdf-header'
-            header.innerHTML = `<div style="font-weight: 800; font-size: 14pt; color: #4338ca;">HOLOGRAM CONSEILS</div><div style="text-align: right; font-size: 10pt; color: #64748b;"><strong>Rapport d'Expertise Retraite</strong><br/>Émis le ${new Date().toLocaleDateString('fr-FR')}</div>`
+            header.innerHTML = `<div style="font-weight: 800; font-size: 14pt; color: #4338ca;">HOLOGRAM CONSEILS</div><div style="text-align: right; font-size: 10pt; color: #64748b;"><strong>Rapport d'expertise Retraite</strong><br/>Émis le ${new Date().toLocaleDateString('fr-FR')}</div>`
             content.prepend(header)
             const footer = doc.createElement('div')
             footer.className = 'pdf-footer'
-            footer.innerHTML = `Hologram Conseils - Expertise RIS - Document confidentiel`
+            footer.innerHTML = `Hologram Conseils - expertise RIS - Document confidentiel`
             content.appendChild(footer)
           }
         }
@@ -124,7 +124,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
       const doc = new Document({ sections: [{ properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } }, children }] })
       const blob = await Packer.toBlob(doc)
       const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a"); a.href = url; a.download = `Rapport_Expert_RIS_${new Date().toISOString().split('T')[0]}.docx`; a.click()
+      const a = document.createElement("a"); a.href = url; a.download = `Rapport_expert_RIS_${new Date().toISOString().split('T')[0]}.docx`; a.click()
       window.URL.revokeObjectURL(url)
     } catch (err) {
       console.error("Word generation failed", err)
@@ -165,7 +165,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
         <div ref={contentRef} className="card shadow-expert" style={{ background: 'var(--bg-card)', padding: '40px' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,70,229,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>📊</div>
-            <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Rapport d'Expertise RIS</h1>
+            <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Rapport d'expertise RIS</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Analyse exhaustive de votre situation de retraite</p>
             <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', gap: 12 }}>
               <span className="badge badge-success">✦ Accès Expert Illimité</span>

@@ -35,13 +35,17 @@ function AppContent() {
 }
 
 import ErrorBoundary from './components/ErrorBoundary'
+import { ColdStartProvider, ColdStartLoader } from './context/ColdStartContext'
 
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <ColdStartProvider>
+        <ColdStartLoader />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ColdStartProvider>
     </ErrorBoundary>
   )
 }
