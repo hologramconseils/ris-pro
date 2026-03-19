@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     if (currentUser?.is_admin) {
       fetchData()
     } else {
-      setError("Accès non autorisé.")
+      setError(currentUser ? "Accès non autorisé." : "Veuillez vous connecter avec votre compte administrateur.")
       setLoading(false)
     }
   }, [currentUser, isVerified])
