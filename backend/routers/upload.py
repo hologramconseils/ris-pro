@@ -55,19 +55,27 @@ async def upload_file(
     result = ris_parser.parse_ris_file(file_path)
 
     # Save to DB
-    new_scan = models.ScanResult(
-        user_id=user.id if user else None,
-        filename=file.filename,
-        has_anomalies=result.get("has_anomalies", False),
-        is_scanned=result.get("is_scanned", False),
-        is_valid_ris=result.get("is_valid_ris", False),
-        ocr_status="pending" if result.get("is_scanned") else "none",
-        detailed_report=json.dumps(result.get("detailed_report", [])),
-        raw_text=result.get("raw_text", "")
-    )
-    db.add(new_scan)
-    db.commit()
-    db.refresh(new_scan)
+    try:
+        new_scan = models.ScanResult(
+            user_id=user.id if user else None,
+            filename=file.filename,
+            has_anomalies=result.get("has_anomalies", False),
+            is_scanned=result.get("is_scanned", False),
+            is_valid_ris=result.get("is_valid_ris", False),
+            ocr_status="pending" if result.get("is_scanned") else "none",
+            detailed_report=json.dumps(result.get("detailed_report", [])),
+            raw_text=result.get("raw_text", "")
+        )
+        db.add(new_scan)
+        db.commit()
+        db.refresh(new_scan)
+    finally:
+        # Crucial: Delete the file as soon as parsing is done to save RAM on Render
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception as cleanup_err:
+                print(f"Cleanup error: {cleanup_err}")
 
     # Background the AI Audit for all valid RIS or Scans
     if result["is_valid_ris"] or result["is_scanned"]:

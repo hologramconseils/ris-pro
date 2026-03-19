@@ -23,20 +23,23 @@ def parse_ris_file(file_path: str):
             doc_text += page.get_text()
         
         # Detection of scanned PDF (OCR fallback needed)
-        # Increased threshold to 2000 to catch documents with sparse text or empty headers
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
-            # Convert first 15 pages to images for Gemini Vision
-            for i in range(min(15, len(doc))):
+            # Convert first 10 pages only to save memoey (formerly 15)
+            for i in range(min(10, len(doc))):
                 page = doc[i]
-                # Matrix 3x3 approx 216 DPI for better detail on low quality scans/photos
-                pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
-                img_data = pix.tobytes("jpg", jpg_quality=80)
+                # Reduced resolution (2x2 instead of 3x3) and quality (60 instead of 80)
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+                img_data = pix.tobytes("jpg", jpg_quality=60)
                 base64_img = base64.b64encode(img_data).decode('utf-8')
                 images.append(base64_img)
+                # Force release of C-level memory
+                pix = None
         
         doc.close()
     except Exception as e:
+        if 'doc' in locals() and doc:
+            doc.close()
         return {
             "has_anomalies": False,
             "error": f"Impossible de lire le fichier PDF : {str(e)}",
