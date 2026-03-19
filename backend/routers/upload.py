@@ -1,18 +1,21 @@
+import httpx
+import json
+import os
+import uuid
+import shutil
+import asyncio
+from datetime import datetime
+from typing import Optional, List
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import Optional, List
-import database, schemas, models
-from services import ris_parser
+
+import database
+import schemas
+import models
+from services import ris_parser, ai_service
 from routers.auth import get_current_user
 from services.auth import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
-import json
-import uuid
-import os
-import shutil
-from datetime import datetime
-from services import ai_service
-import asyncio
 from limiter import limiter
 
 router = APIRouter(prefix="/scans", tags=["scans"])
@@ -51,8 +54,7 @@ async def upload_file(
         # 1. Save file temporarily
         safe_filename = f"{uuid.uuid4()}_{file.filename}"
         file_path = os.path.join(UPLOAD_DIR, safe_filename)
-        print(f"DEBUG: Saving upload to {file_path}") # Added logging
-        with open(file_path, "wb") as buffer: # Changed to shutil.copyfileobj for potentially better performance with large files
+        with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         # 2. Create entry in DB with 'pending' status immediately
@@ -65,12 +67,11 @@ async def upload_file(
             ocr_status="pending",
             detailed_report="[]",
             raw_text="",
-            created_at=datetime.utcnow() # Added created_at
+            created_at=datetime.utcnow()
         )
         db.add(new_scan)
         db.commit()
         db.refresh(new_scan)
-        print(f"DEBUG: Created scan {new_scan.id} for user {user.id if user else 'anonymous'}") # Added logging
 
         # 3. Background the ENTIRE analysis pipeline
         background_tasks.add_task(
@@ -81,7 +82,7 @@ async def upload_file(
                 
         return new_scan
     except Exception as e:
-        print(f"CRITICAL UPLOAD ERROR: {str(e)}") # Added error logging
+        print(f"CRITICAL UPLOAD ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Échec de l'upload: {str(e)}")
 
 async def run_full_analysis_worker(
@@ -89,19 +90,16 @@ async def run_full_analysis_worker(
     file_path: str
 ):
     """Worker function to handle parsing + AI audit in background."""
-    print(f"DEBUG: Starting background worker for scan {scan_id}")
-    from database import SessionLocal # Import here to avoid circular imports if any
+    from database import SessionLocal
     db_session = SessionLocal()
     db_scan = None
     try:
         db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
         if not db_scan:
-            print(f"ERROR: Scan {scan_id} not found in worker") # Added error logging for None scan
             return
 
         db_scan.ocr_status = "processing"
         db_session.commit()
-        print(f"DEBUG: Scan {scan_id} status -> processing") # Added logging
 
         # Step 1: Initial Parsing (Fast)
         result = ris_parser.parse_ris_file(file_path)
@@ -115,7 +113,6 @@ async def run_full_analysis_worker(
         db_session.commit()
 
         # Step 3: Expensive AI Audit (Slow)
-        # We only do this if it's a valid RIS or a suspected scan
         if db_scan.is_valid_ris or db_scan.is_scanned:
             ai_commentary = None
             max_retries = 2
@@ -139,52 +136,60 @@ async def run_full_analysis_worker(
                 db_scan.ai_analysis = ai_commentary
                 try:
                     ai_data = json.loads(ai_commentary)
-                    if ai_data.get("anomalie_detectee") == "oui":
-                        db_scan.has_anomalies = True
-                        
-                        if ai_data.get("full_timeline"):
-                            ai_anomalies = []
-                            for item in ai_data["full_timeline"]:
-                                if item.get("statut") == "complet": continue
-                                
-                                activite_str = str(item.get("activite", "")).lower()
-                                q_count = int(item.get("trimestres_valides", 0))
-                                
-                                is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou", "non détecté"])
-                                needs_justificatifs = (q_count < 4) and is_missing_act
-                                
-                                ai_anomalies.append({
-                                    "year": item["annee"], 
-                                    "title": f"Année {item['annee']} : {item['statut']}", 
-                                    "description": item["anomalie_specifique"],
-                                    "justificatif": item.get("justificatif_suggere"),
-                                    "needs_justificatifs": needs_justificatifs
-                                })
+                    # Use a more robust check for timeline anomalies
+                    full_timeline = ai_data.get("full_timeline", [])
+                    ai_anomalies = []
+                    
+                    for item in full_timeline:
+                        # Skip 'complet' years only if they truly have no issues
+                        # But prioritize the AI's flagging of anomalies
+                        statut = str(item.get("statut", "")).lower()
+                        if statut == "complet":
+                            continue
                             
-                            if ai_anomalies:
-                                db_scan.detailed_report = json.dumps(ai_anomalies)
+                        # Extract data safely with default values
+                        year = item.get("annee", "N/A")
+                        activite_str = str(item.get("activite", "")).lower()
+                        q_count = 0
+                        try:
+                            q_count = int(item.get("trimestres_valides", 0))
+                        except (TypeError, ValueError):
+                            pass
+                        
+                        is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou", "non détecté"])
+                        needs_justificatifs = (q_count < 4) or is_missing_act
+                        
+                        ai_anomalies.append({
+                            "year": year, 
+                            "title": f"Année {year} : {item.get('statut', 'Anomalie')}", 
+                            "description": item.get("anomalie_specifique", "Incohérence détectée"),
+                            "justificatif": item.get("justificatif_suggere"),
+                            "needs_justificatifs": needs_justificatifs,
+                            "points_complementaires": item.get("points_complementaires")
+                        })
+                    
+                    if ai_anomalies:
+                        db_scan.detailed_report = json.dumps(ai_anomalies)
+                        db_scan.has_anomalies = True
+                    # If AI found nothing but algo did, we keep algo's has_anomalies=True
+                             
                 except Exception as json_err:
                     print(f"JSON Parse AI error: {json_err}")
 
         # Final update
         db_scan.ocr_status = "success"
         db_session.commit()
-        print(f"DEBUG: Worker success for scan {scan_id}") # Added logging
 
     except Exception as e:
-        print(f"CRITICAL WORKER ERROR for scan {scan_id}: {str(e)}") # Added error logging
+        print(f"CRITICAL WORKER ERROR for scan {scan_id}: {str(e)}")
         if db_scan:
             db_scan.ocr_status = "failed"
             db_scan.ocr_error = str(e)
             db_session.commit()
     finally:
-        # Crucial Memory Cleanup
         if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-                print(f"DEBUG: Cleaned up {file_path}") # Added logging
-            except:
-                pass
+            try: os.remove(file_path)
+            except: pass
         db_session.close()
 
 @router.post("/{scan_id}/retry")
@@ -226,8 +231,6 @@ async def run_full_analysis_worker_from_existing_text(
         db_scan.ocr_status = "processing"
         db_session.commit()
         
-        # We assume raw_text is already there, just re-run AI audit
-        # (This is a simplified retry for now since file is deleted)
         ai_commentary = await ai_service.generate_ai_audit(
             json.loads(db_scan.detailed_report or "[]"),
             db_scan.filename,
@@ -260,15 +263,13 @@ def get_history(db: Session = Depends(database.get_db), current_user: models.Use
                 report = json.loads(s.detailed_report)
                 s.total_anomalies = len(report)
                 if len(report) >= 2:
-                    oldest = report[0]
-                    most_recent = report[-1]
-                    if len(report) > 2:
-                        most_recent = report[-2]
-                    s.preview_anomalies = [oldest, most_recent]
+                    s.preview_anomalies = [report[0], report[-1]]
                 elif len(report) == 1:
                     s.preview_anomalies = [report[0]]
+                else:
+                    s.preview_anomalies = []
             except:
-                pass
+                s.preview_anomalies = []
     return scans
 
 @router.get("/preview/{scan_id}", response_model=schemas.ScanResultResponse)
@@ -284,15 +285,13 @@ def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
             report = json.loads(scan.detailed_report)
             scan.total_anomalies = len(report)
             if len(report) >= 2:
-                oldest = report[0]
-                most_recent = report[-1]
-                if len(report) > 2:
-                    most_recent = report[-2]
-                scan.preview_anomalies = [oldest, most_recent]
+                scan.preview_anomalies = [report[0], report[-1]]
             elif len(report) == 1:
                 scan.preview_anomalies = [report[0]]
+            else:
+                scan.preview_anomalies = []
         except:
-            pass
+            scan.preview_anomalies = []
             
     return scan
 

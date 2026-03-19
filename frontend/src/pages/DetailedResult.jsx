@@ -107,7 +107,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
         {document.getElementById('navbar-portal-root') && createPortal(
           <div className="portal-center-actions">
             <button className="btn btn-primary btn-nav-large shadow-expert" onClick={handleDownloadWord} disabled={isExporting} style={{ fontWeight: 800 }}>
-              {isExporting ? '⌛' : '📄'} Extraction Word (DOCX)
+              {isExporting ? '⌛' : '📄'} Extraction DOC / Word
             </button>
           </div>,
           document.getElementById('navbar-portal-root')
@@ -118,9 +118,19 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,70,229,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>📊</div>
             <h1 style={{ fontSize: 36, fontWeight: 900, marginBottom: 12, letterSpacing: -1 }}>Expertise Algorithmique RIS</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Analyse certifiée de votre situation de retraite</p>
-            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center', gap: 12 }}>
-              <span className="badge badge-success">✦ Accès Expert Illimité</span>
-              {result.is_scanned && <span className="badge badge-warning">📄 Document Scanné</span>}
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+                <span className="badge badge-success">✦ Accès Expert Illimité</span>
+                {result.is_scanned && <span className="badge badge-warning">📄 Document Scanné</span>}
+              </div>
+              <button 
+                className="btn btn-primary shadow-glow" 
+                onClick={handleDownloadWord} 
+                disabled={isExporting}
+                style={{ width: 'fit-content', padding: '12px 32px', borderRadius: '50px' }}
+              >
+                {isExporting ? 'Génération...' : '📥 Télécharger l\'Extraction DOC / Word'}
+              </button>
             </div>
           </div>
 

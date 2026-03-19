@@ -60,14 +60,14 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
 
-**MISSION ET PÉRIODE D'ANALYSE :**
+**MISSION ET PÉRIODE D’ANALYSE :**
 - Analyse la carrière de la toute première activité détectée jusqu'à l'année **{target_year}** (N-1 par rapport à aujourd'hui).
 - **RÉGIMES COMPLÉMENTAIRES EST ESSENTIEL :** Ne te limite pas au régime de base (trimestres). Analyse impérativement les régimes complémentaires (Agirc-Arrco, Ircantec, RAFP, RCI, etc.) et les POINTS acquis.
 - **DÉTECTION HORS TRIMESTRES :** Signale systématiquement si des points apparaissent sur une année sans trimestres, ou si une activité salariée connue n'affiche pas de points complémentaires.
 - **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.
 
 **RÈGLES DE RÉDACTION (STRICTES ET CRITIQUES) :**
-- **INTRODUCTION PERSONNALISÉE :** Détecte le nom et prénom de l'assuré. Commence impérativement ton `resume_global` par une phrase d'accueil DIRECTE citant son identité (ex: "Bonjour [Prénom] [Nom], j'ai analysé votre situation..."). **INTERDICTION DE METTRE UNE PUCE (•) DEVANT CETTE PREMIÈRE PHRASE.**
+- **INTRODUCTION PERSONNALISÉE :** Détecte le nom et prénom de l'assuré. Commencez impérativement ton `resume_global` par une phrase d'accueil DIRECTE citant son identité (ex: "Bonjour [Prénom] [Nom], j'ai analysé votre situation..."). **INTERDICTION DE METTRE UNE PUCE (•) DEVANT CETTE PREMIÈRE PHRASE.**
 - Ne mentionne JAMAIS ton mode de fonctionnement technique. Parle exclusivement en tant qu'expert retraite de Hologram Conseils.
 - Utilise une langue française impeccable, sans aucune faute d'orthographe, de syntaxe ou de grammaire.
 - Respecte scrupuleusement l'usage des apostrophes françaises (ex: l'obtention, d'une, n'est, l'année, d'apprentissage).
@@ -130,6 +130,7 @@ Format de sortie attendu (JSON valide) :
       "annee": "XXXX",
       "statut": "manquant/incomplet",
       "trimestres_valides": N,
+      "points_complementaires": N,
       "activite": "Employeur / Statut",
       "anomalie_specifique": "Explication rapide",
       "justificatif_suggere": "• Premier justificatif\\n• Deuxième justificatif"
@@ -140,7 +141,10 @@ Format de sortie attendu (JSON valide) :
 
 **CONSIGNE DE RAPIDITÉ :** Ne génère un élément dans `full_timeline` QUE si c'est une anomalie (incomplet/manquant) ou un point critique. Ignore les années "complet" sans problème.
 
-Données à analyser :
+Données pré-analysées par l’algorithme :
+{json.dumps(anomalies, ensure_ascii=False, indent=2)}
+
+Texte brut extrait du document :
 {raw_text}
 """
 
@@ -171,6 +175,13 @@ async def _finalize_response(res: str):
     try:
         data = json.loads(res)
         cleaned_data = strip_markdown(data)
+        
+        # Post-processing: Remove prohibited bullet from first line of resume_global
+        if "resume_global" in cleaned_data and isinstance(cleaned_data["resume_global"], str):
+            rg = cleaned_data["resume_global"].strip()
+            if rg.startswith("•") or rg.startswith("*") or rg.startswith("-"):
+                cleaned_data["resume_global"] = rg[1:].strip()
+                
         return json.dumps(cleaned_data, ensure_ascii=False)
     except:
         return res

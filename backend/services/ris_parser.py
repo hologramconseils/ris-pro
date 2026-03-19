@@ -25,15 +25,12 @@ def parse_ris_file(file_path: str):
         # Detection of scanned PDF (OCR fallback needed)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
-            # Convert first 10 pages only to save memoey (formerly 15)
             for i in range(min(10, len(doc))):
                 page = doc[i]
-                # Reduced resolution (2x2 instead of 3x3) and quality (60 instead of 80)
                 pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
                 img_data = pix.tobytes("jpg", jpg_quality=60)
                 base64_img = base64.b64encode(img_data).decode('utf-8')
                 images.append(base64_img)
-                # Force release of C-level memory
                 pix = None
         
         doc.close()
@@ -46,23 +43,20 @@ def parse_ris_file(file_path: str):
             "detailed_report": []
         }
 
-    # Basic validation and Scan labeling
+    # Basic validation
     if is_scanned:
         doc_text = f"[MODE SCAN DETECTÉ - ANALYSE VISUELLE PRIORITAIRE]\n{doc_text}"
 
-    # Check for document type (fallback to true for scans to allow AI analysis)
     is_ris = is_scanned or any(keyword in doc_text.lower() for keyword in ["relevé individuel", "ris", "retraites", "assurance vieillesse", "carrière"])
     
     anomalies_list = []
     
     if is_ris and not is_scanned:
-        # Real-ish parsing logic: Extract years and their associated quarters
-        # Typical RIS line: "2015  Assurance Vieillesse  4 trimestres  15000 €"
-        
         found_years = {}
         found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
-        all_potential_years = []
+        all_detected = []
+        birth_year = None
 
         REGIMES_MAP = {
             "Agirc-Arrco": ["agirc", "arrco"],
@@ -76,7 +70,7 @@ def parse_ris_file(file_path: str):
 
         # Stateful Parsing Machine
         current_year = None
-        current_context = "GENERAL" # GENERAL, SYNTHESE (Détail par année), DETAIL (Détail de votre carrière)
+        current_context = "GENERAL"
         
         lines = doc_text.split('\n')
         for i, line in enumerate(lines):
@@ -88,21 +82,22 @@ def parse_ris_file(file_path: str):
                 current_context = "SYNTHESE"
             elif "détail de votre carrière" in line_clean.lower():
                 current_context = "DETAIL"
-            elif "en savoir plus" in line_clean.lower():
-                current_context = "GENERAL"
+            
+            # Birth year detection
+            if "né(e) le" in line_clean.lower() or "né le" in line_clean.lower():
+                b_match = re.search(r"\d{2}/\d{2}/(19[4-9]\d)", line_clean)
+                if b_match:
+                    birth_year = b_match.group(1)
 
-            # 1. Year Tracking (Global + Contextual)
-            year_match = re.search(r"\b(19[5-8]\d|199\d|20[0-2]\d)\b", line_clean)
+            # 1. Year Tracking
+            year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", line_clean)
             if year_match:
                 detected_year = year_match.group(1)
+                all_detected.append(int(detected_year))
                 if current_context == "SYNTHESE":
                     current_year = detected_year
-                
-                year_int = int(detected_year)
-                if year_int not in all_potential_years:
-                    all_potential_years.append(year_int)
 
-            # 2. Quarters and Points (SYNTHESE Context)
+            # 2. Quarters and Points (SYNTHESE)
             if current_context == "SYNTHESE" and current_year:
                 q_match = re.search(r"(\d+)\s*(?:trimestr|trim\.|T)\b", line_clean, re.IGNORECASE)
                 if q_match:
@@ -126,106 +121,88 @@ def parse_ris_file(file_path: str):
                                 regime_name = name
                                 break
                         
-                        # Store all points, not just the highest if different regimes?
-                        # For now, keep highest per year or aggregate.
                         if current_year not in found_points:
                             found_points[current_year] = []
                         found_points[current_year].append((pts_val, regime_name))
-                    except:
-                        pass
+                    except: pass
 
-            # 3. Salaries (DETAIL Context)
+            # 3. Salaries (DETAIL)
             if current_context == "DETAIL":
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d))", line_clean)
-                if date_match:
-                    item_year = date_match.group(2)
-                    search_scope = ""
-                    for j in range(i, min(len(lines), i+3)):
-                        search_scope += lines[j] + " "
-                    
-                    s_match = re.search(r"(\d{1,3}(?:[\s]\d{3})*(?:[.,]\d+)?)\s*(?:€|EUR|FRF)\b", search_scope)
-                    if s_match:
-                        raw_sal = s_match.group(1).replace(' ', '').replace(',', '.')
+                if date_match and current_year:
+                    sal_match = re.search(r"(\d{1,6}(?:[\s,]\d{3})*(?:[.,]\d{2})?)\s*€", line_clean)
+                    if sal_match:
+                        raw_sal = sal_match.group(1).replace(' ', '').replace(',', '.')
                         try:
-                            sal_val = float(raw_sal)
-                            if "FRF" in s_match.group(0):
-                                sal_val = sal_val / 6.55957
-                                
-                            if item_year not in found_salaries or sal_val > found_salaries[item_year]:
-                                found_salaries[item_year] = sal_val
-                        except:
-                            pass
+                            found_salaries[current_year] = float(raw_sal)
+                        except: pass
 
-        # Timeline establishment for native PDFs
-        birth_year = None
-        birth_match = re.search(r"(?:Né[e]? le|naissance\s*:?|né en)\s*.*?(\d{4})", doc_text, re.IGNORECASE)
-        if birth_match:
-            birth_year = int(birth_match.group(1))
-            if birth_year < 1920 or birth_year > 2010: birth_year = None
-
-        detected_years_raw = list(found_years.keys()) + list(found_points.keys()) + list(found_salaries.keys())
-        all_detected = [int(y) for y in detected_years_raw if y] + all_potential_years
-        
+        # 4. Anomaly Synthesis
         if all_detected:
             years_list = sorted(list(set(all_detected)))
+            if not years_list:
+                return {
+                    "has_anomalies": False,
+                    "is_scanned": is_scanned,
+                    "is_valid_ris": is_ris,
+                    "detailed_report": [],
+                    "raw_text": doc_text,
+                    "images": images,
+                    "warning": "Aucune année de carrière détectée dans le document."
+                }
             start_year = min(years_list)
             if birth_year is not None:
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
-            FINAL_YEAR = datetime.date.today().year
+            target_year = datetime.date.today().year - 1
             main_regime = "Agirc-Arrco"
-            for _, r_name in found_points.values():
-                if r_name != "Complémentaire":
-                    main_regime = r_name
-                    break
+            for p_list in found_points.values():
+                for _, r_name in p_list:
+                    if r_name != "Complémentaire":
+                        main_regime = r_name
+                        break
 
-            for y in range(start_year, FINAL_YEAR + 1):
+            for y in range(start_year, target_year + 1):
                 y_str = str(y)
                 q = found_years.get(y_str, 0)
                 p_list = found_points.get(y_str, [])
                 p = sum(item[0] for item in p_list)
                 p_desc = " | ".join([f"{item[0]} pts ({item[1]})" for item in p_list])
                 s = found_salaries.get(y_str, 0)
-                title_suffix = "trimestre" if q <= 1 else "trimestres"
                 
-                needs_justificatifs = (q < 4) and (s <= 0 and p <= 0)
-                
-                if q == 0:
-                    description = f"Aucun trimestre validé au régime de base pour l'année {y}."
+                # USER RULE: 0, 1, 2, 3 trimestres = Anomalie
+                if q < 4:
+                    title_suffix = "trimestre" if q <= 1 else "trimestres"
+                    description = f"L'année {y} est incomplète au régime de base ({q}/4 trimestres)."
+                    if q == 0:
+                        description = f"Aucun trimestre validé au régime de base pour l'année {y}."
+                    
                     if p > 0:
                         description += f" Cependant, {p_desc} ont été détectés."
+                    
                     anomalies_list.append({
-                        "year": y, "title": f"Année {y} : 0 trimestre",
+                        "year": y, 
+                        "title": f"Année {y} : {q} {title_suffix}",
                         "description": description,
-                        "needs_justificatifs": needs_justificatifs and p <= 0
-                    })
-                elif q < 4:
-                    description = f"L'année {y} est incomplète au régime de base ({q}/4 trimestres)."
-                    if p > 0:
-                        description += f" (Points détectés : {p_desc})"
-                    anomalies_list.append({
-                        "year": y, "title": f"Année {y} : {q} {title_suffix}",
-                        "description": description,
-                        "needs_justificatifs": needs_justificatifs
+                        "needs_justificatifs": True,
+                        "points_complementaires": p if p > 0 else None
                     })
                 
-                if (q > 0 or s > 0) and p <= 0:
+                # Check for absence of points if activity exists
+                elif (q > 0 or s > 0) and p <= 0:
                     anomalies_list.append({
                         "year": y, "title": f"Absence de points {main_regime} ({y})",
-                        "description": f"Une activité est détectée ({q} trim, Sal: {s:.0f}€) mais aucun point n'apparaît au régime complémentaire.",
-                        "needs_justificatifs": False # Activity is present here
+                        "description": f"Une activité est détectée ({q} trim) mais aucun point n'apparaît au régime complémentaire.",
+                        "needs_justificatifs": False
                     })
 
     has_anomalies = len(anomalies_list) > 0
-    
-    result = {
+    return {
         "has_anomalies": has_anomalies,
         "is_scanned": is_scanned,
         "is_valid_ris": is_ris,
         "detailed_report": sorted(anomalies_list, key=lambda x: x.get("year", 0)),
         "raw_text": doc_text,
-        "images": images, # Base64 images for Gemini Vision
+        "images": images,
         "warning": None if (is_ris or is_scanned) else "Le document ne semble pas être un RIS standard."
     }
-    
-    return result
