@@ -43,7 +43,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
       }, 7000) // Poll slightly faster for OCR feedback
     }
     return () => clearInterval(interval)
-  }, [result.is_scanned, result.ocr_status, isAiComplete, hasAnomalies, refreshResult])
+  }, [result.is_scanned, result.ocr_status, isFinished, hasAnomalies, refreshResult])
 
   const handleGetDetailed = async () => {
     if (!user) {
