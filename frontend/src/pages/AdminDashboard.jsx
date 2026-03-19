@@ -125,7 +125,7 @@ export default function AdminDashboard() {
       className="container page"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      style={{ padding: '0 20px' }}
+      style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}
     >
       <header style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
