@@ -15,9 +15,9 @@ from limiter import limiter
 
 router = APIRouter(prefix="/scans", tags=["scans"])
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/tmp/ris_uploads"
 if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def get_optional_user(authorization: Optional[str] = Header(None), db: Session = Depends(database.get_db)) -> Optional[models.User]:
     if not authorization or not authorization.startswith("Bearer "):

@@ -5,8 +5,10 @@ const PROD_DOMAIN = 'ris.hologramconseils.com'
 const RENDER_BACKEND = 'https://ris-scan-pro-backend.onrender.com'
 const envUrl = import.meta.env.VITE_API_URL
 
-const isLocalUrl = (url) => !url || url.includes('localhost') || url.includes('127.0.0.1')
-const isProduction = typeof window !== 'undefined' && window.location.hostname === PROD_DOMAIN
+const isLocalHost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const isProduction = typeof window !== 'undefined' && 
+  (window.location.hostname === PROD_DOMAIN || !isLocalHost)
 
 const API_URL = (isProduction && isLocalUrl(envUrl)) 
   ? RENDER_BACKEND 
@@ -15,7 +17,7 @@ const API_URL = (isProduction && isLocalUrl(envUrl))
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000 // Increased to 30 seconds to handle cold-starts
+  timeout: 60000 // Increased to 60 seconds for large PDF uploads and OCR
 })
 
 // Attach JWT token automatically if available
@@ -46,7 +48,8 @@ const retryRequest = async (error, retryCount = 0) => {
   console.log(`[API] Retrying request ${config.url} (Attempt ${retryCount + 1}/${MAX_RETRIES})`);
   
   if (!config || retryCount >= MAX_RETRIES) {
-    coldStartTracker.fail("Le service ne peut pas démarrer. Veuillez réessayer plus tard ou contacter le support.");
+    const errorMsg = error.response?.data?.detail || error.message || "Le service ne répond pas."
+    coldStartTracker.fail(`Erreur de démarrage : ${errorMsg}. Veuillez rafraîchir la page.`);
     return Promise.reject(error);
   }
 

@@ -12,6 +12,27 @@ from limiter import limiter
 # Create DB tables on startup
 models.Base.metadata.create_all(bind=engine)
 
+# Manual Migration Helper for existing databases
+def check_and_update_schema():
+    from sqlalchemy import inspect, text
+    inspector = inspect(engine)
+    columns = [c['name'] for c in inspector.get_columns("scan_results")]
+    
+    with engine.connect() as conn:
+        if "ocr_status" not in columns:
+            print("Migration: Adding ocr_status to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN ocr_status VARCHAR DEFAULT 'none'"))
+            conn.commit()
+        if "ocr_error" not in columns:
+            print("Migration: Adding ocr_error to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN ocr_error TEXT"))
+            conn.commit()
+
+try:
+    check_and_update_schema()
+except Exception as e:
+    print(f"Migration failed (might be already up to date): {e}")
+
 app = FastAPI(
     title="RIS Pro API",
     description="API pour l'analyse des Relevés Individuels de Situation",
