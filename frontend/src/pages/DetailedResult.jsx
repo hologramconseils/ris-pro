@@ -104,15 +104,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
     <div className="page" style={{ paddingBottom: 100 }}>
       <div className="bg-dots" />
       <div className="container" style={{ maxWidth: 740, position: 'relative' }}>
-        {document.getElementById('navbar-portal-root') && createPortal(
-          <div className="portal-center-actions">
-            <button className="btn btn-primary btn-nav-large shadow-expert" onClick={handleDownloadWord} disabled={isExporting} style={{ fontWeight: 800 }}>
-              {isExporting ? '⌛' : '📄'} Extraction DOC / Word
-            </button>
-          </div>,
-          document.getElementById('navbar-portal-root')
-        )}
-        
         <div ref={contentRef} className="card shadow-expert" style={{ background: 'var(--bg-card)', padding: '40px' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,70,229,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>📊</div>
@@ -129,7 +120,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                 disabled={isExporting}
                 style={{ width: 'fit-content', padding: '12px 32px', borderRadius: '50px' }}
               >
-                {isExporting ? 'Génération...' : '📥 Télécharger l\'Extraction DOC / Word'}
+                {isExporting ? 'Génération...' : 'Télécharger l’extraction DOC / Word'}
               </button>
             </div>
           </div>
