@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const FEATURES = [
   { icon: '🔍', title: 'Détection automatique', desc: 'Notre algorithme analyse chaque ligne de votre RIS à la recherche d\'anomalies potentielles.' },
-  { icon: '⚡', title: 'Résultat en < 1 min', desc: 'L\'analyse est ultra-rapide. Vous obtenez un diagnostic clair en moins de 1 minute.' },
+  { icon: '⚡', title: 'Résultat en < 5 min', desc: 'L\'analyse est ultra-rapide. Vous obtenez un diagnostic clair en moins de 5 minutes.' },
   { icon: '🔒', title: 'Données sécurisées', desc: 'Vos fichiers sont traités de façon confidentielle. Nous ne les partageons jamais.' },
   { icon: '📋', title: 'Rapport détaillé', desc: 'Accédez à une liste complète des anomalies avec des explications claires pour 19€ à vie.' },
 ]
@@ -124,7 +124,7 @@ export default function LandingPage() {
         >
           <div className="trust-item"><span>🇫🇷</span> 100% conforme RGPD</div>
           <div className="trust-item"><span>🔒</span> Données chiffrées</div>
-          <div className="trust-item"><span>⚡</span> Résultat en &lt; 1 min</div>
+          <div className="trust-item"><span>⚡</span> Résultat en &lt; 5 min</div>
           <div className="trust-item"><span>📄</span> PDF natif + OCR</div>
         </motion.div>
 
