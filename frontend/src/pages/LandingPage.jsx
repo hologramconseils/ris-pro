@@ -64,9 +64,14 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="hero-eyebrow">
-            <span>✦</span> Par Hologram Conseils
-          </div>
+          <a 
+            href="https://hologramconseils.com" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="hero-eyebrow"
+          >
+            Visiter Hologram Conseils
+          </a>
           <h1>
             Analysez votre RIS,<br />
             <span>détectez les anomalies</span><br />

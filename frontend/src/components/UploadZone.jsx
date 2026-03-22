@@ -48,6 +48,7 @@ export default function UploadZone({ onFileSelect, file }) {
         type="file"
         accept="application/pdf"
         onChange={handleChange}
+        aria-label="Charger votre relevé de situation (RIS) au format PDF"
       />
       <div className="upload-icon">
         {file ? '📄' : '☁️'}
