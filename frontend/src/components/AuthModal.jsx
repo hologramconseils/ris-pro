@@ -68,17 +68,17 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
             <>
               <div className="input-group">
                 <label>Prénom *</label>
-                <input className="input" name="first_name" placeholder="Jean" value={form.first_name} onChange={handle} required />
+                <input className="input" name="first_name" placeholder="Jean" value={form.first_name} onChange={handle} required autocomplete="given-name" />
               </div>
               <div className="input-group">
                 <label>Nom de famille *</label>
-                <input className="input" name="last_name" placeholder="Dupont" value={form.last_name} onChange={handle} required />
+                <input className="input" name="last_name" placeholder="Dupont" value={form.last_name} onChange={handle} required autocomplete="family-name" />
               </div>
             </>
           )}
           <div className="input-group">
             <label>Email *</label>
-            <input className="input" type="email" name="email" placeholder="jean.dupont@example.com" value={form.email} onChange={handle} required />
+            <input className="input" type="email" name="email" placeholder="jean.dupont@example.com" value={form.email} onChange={handle} required autocomplete="email" />
           </div>
           
           {mode !== 'forgot' && (
@@ -102,6 +102,7 @@ export default function AuthModal({ onClose, onSuccess, mode: initialMode = 'log
                   required 
                   minLength={6} 
                   style={{ paddingRight: 40 }}
+                  autocomplete={mode === 'register' ? 'new-password' : 'current-password'}
                 />
                 <button 
                   type="button"

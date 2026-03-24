@@ -10,6 +10,7 @@ import Legal from './pages/Legal'
 import Privacy from './pages/Privacy'
 import AdminDashboard from './pages/AdminDashboard'
 import Dashboard from './pages/Dashboard'
+import PreviewPage from './pages/PreviewPage'
 import Footer from './components/Footer'
 
 function AppContent() {
@@ -29,6 +30,7 @@ function AppContent() {
           <Route path="/history" element={<History />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
+          <Route path="/preview/:id" element={<PreviewPage />} />
           {/* Legacy Routes for compatibility */}
           <Route path="/result/:id" element={<DetailedResultPage />} />
           <Route path="/detailed/:id" element={<DetailedResultPage />} />

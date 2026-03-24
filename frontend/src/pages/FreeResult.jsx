@@ -111,25 +111,46 @@ export default function FreeResult({ result: initialResult, onReset }) {
 
         <div className="card shadow-expert">
           <div className="result-verdict">
-            <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
-            <div className="verdict-label">{isFinished ? 'Audit algorithmique terminé' : 'Analyse du relevé en cours'}</div>
-            <div className={`verdict-title ${!isFinished ? 'muted' : 'success'}`}>
-              {!isFinished ? 'Analyse en cours...' : 'Analyse terminée'}
-            </div>
-            
-            {isFinished && (
-              <div className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8, fontSize: 20 }}>
-                Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+
+            {/* ─── État intermédiaire : analyse IA en cours ─── */}
+            {!isFinished && (
+              <div style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+                padding: '40px 20px', textAlign: 'center'
+              }}>
+                <div className="spinner" style={{ marginBottom: 8 }} />
+                <div className="verdict-label" style={{ color: 'var(--primary-light)' }}>Analyse IA en cours…</div>
+                <div className="verdict-title muted" style={{ fontSize: 22 }}>Document reçu — Audit en traitement</div>
+                <p className="verdict-subtitle" style={{ maxWidth: 440 }}>
+                  Notre expert algorithmique analyse votre relevé ligne par ligne.
+                  Ce traitement peut prendre <strong>jusqu'à 90 secondes</strong> pour les documents scannés.
+                </p>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => refreshResult()}
+                  disabled={isRefreshing}
+                  style={{ fontSize: 13, marginTop: 4 }}
+                >
+                  {isRefreshing ? '⌛ Vérification...' : '🔄 Vérifier l\'avancement'}
+                </button>
               </div>
             )}
 
-            <p className="verdict-subtitle">
-              {!isFinished 
-                ? 'Notre algorithme d’analyse traite actuellement votre document. Les résultats définitifs apparaîtront dans quelques instants.'
-                : (hasAnomalies
-                  ? 'L’algorithme d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
-                  : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre algorithme.')}
-            </p>
+            {/* ─── Résultat final : analyse terminée ─── */}
+            {isFinished && (
+              <>
+                <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
+                <div className="verdict-label">Audit algorithmique terminé</div>
+                <div className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8, fontSize: 20 }}>
+                  Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+                </div>
+                <p className="verdict-subtitle">
+                  {hasAnomalies
+                    ? 'L’algorithme d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                    : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre algorithme.'}
+                </p>
+              </>
+            )}
           </div>
           
           {hasAnomalies && result.preview_anomalies && result.preview_anomalies.length > 0 && (
@@ -274,7 +295,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
              </motion.div>
           )}
 
-          {hasAnomalies && (
+          {hasAnomalies && isFinished && (
             <div className="cta-box shadow-glow">
               <div style={{ display: 'inline-block', padding: '12px', borderRadius: '50%', background: 'rgba(79,70,229,0.1)', marginBottom: 16 }}>
                 <span style={{ fontSize: 32 }}>📑</span>
@@ -288,7 +309,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                  <span className="cta-price" style={{ fontSize: 56 }}>19€</span>
               </div>
               
-              <div className="cta-price-label">Accès illimité à vie · Support expert inclus</div>
+              <div className="cta-price-label">Accès illimité à vie · Rapport exportable Word</div>
 
               {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>⚠️ {error}</div>}
 
