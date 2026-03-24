@@ -2,7 +2,6 @@ import axios from 'axios'
 import { coldStartTracker } from './coldStartTracker'
 
 const PROD_DOMAIN = 'ris.hologramconseils.com'
-const RENDER_BACKEND = 'https://ris-scan-pro-backend.onrender.com'
 const envUrl = import.meta.env.VITE_API_URL
 
 const isLocalHost = typeof window !== 'undefined' && 
@@ -10,10 +9,9 @@ const isLocalHost = typeof window !== 'undefined' &&
 const isProduction = typeof window !== 'undefined' && 
   (window.location.hostname === PROD_DOMAIN || !isLocalHost)
 
-const isLocalUrl = (url) => !url || url.includes('localhost') || url.includes('127.0.0.1')
-
-const API_URL = ((isProduction && isLocalUrl(envUrl)) 
-  ? RENDER_BACKEND 
+// Si on est en prod et qu'on a une URL env, on l'utilise. Sinon fallback sur localhost (dev)
+const API_URL = (isProduction && envUrl && !envUrl.includes('localhost') 
+  ? envUrl 
   : (envUrl || 'http://127.0.0.1:8000')).replace(/\/api\/v1\/?$/, '')
 
 console.log(`[API] Mode: ${isProduction ? 'PROD' : 'DEV'}, URL: ${API_URL}`)
