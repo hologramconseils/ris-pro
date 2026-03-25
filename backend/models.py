@@ -1,6 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 import datetime
+import hashlib
 from database import Base
 
 class User(Base):
@@ -34,15 +35,27 @@ class ScanResult(Base):
     raw_text = Column(Text, nullable=True)
     detailed_report = Column(Text, nullable=True) 
     ai_analysis = Column(Text, nullable=True)
+    identity_hash = Column(String, index=True, nullable=True) # Hash of Name + BirthDate
+    identity_name = Column(String, nullable=True)
+    identity_birth_date = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
 
     user = relationship("User", back_populates="scans")
+
+class IdentityAccess(Base):
+    __tablename__ = "identity_access"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    identity_hash = Column(String, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Transaction(Base):
     __tablename__ = "transactions"
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    scan_id = Column(Integer, ForeignKey("scan_results.id"), nullable=True)
     stripe_session_id = Column(String, unique=True, index=True)
     status = Column(String) # "pending", "completed"
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

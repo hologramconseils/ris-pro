@@ -11,7 +11,7 @@ const FEATURES = [
   { icon: '🔍', title: 'Détection automatique', desc: 'Notre système d\'expertise analyse chaque ligne de votre RIS à la recherche d\'anomalies potentielles.' },
   { icon: '⚡', title: 'Résultat en < 5 min', desc: 'L\'analyse est ultra-rapide. Vous obtenez un diagnostic clair en moins de 5 minutes.' },
   { icon: '🔒', title: 'Données sécurisées', desc: 'Vos fichiers sont traités de façon confidentielle. Nous ne les partageons jamais.' },
-  { icon: '📋', title: 'Rapport détaillé', desc: 'Accédez à une liste complète des anomalies avec des explications claires pour 19€ à vie.' },
+  { icon: '🏢', title: 'Particuliers & Pros', desc: '19€ par dossier pour les particuliers. Professionnels ? Contactez Hologram Conseils.' },
 ]
 
 export default function LandingPage() {
@@ -115,7 +115,7 @@ export default function LandingPage() {
           </div>
 
           <p style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--text-subtle)' }}>
-            Analyse de base gratuite · Rapport détaillé disponible pour 19€
+            19€ par dossier (particuliers uniquement) · Accès à vie · Pros : contactez Hologram Conseils
           </p>
         </motion.div>
 

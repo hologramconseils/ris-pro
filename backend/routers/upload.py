@@ -110,6 +110,12 @@ async def run_full_analysis_worker(
         db_scan.raw_text = result.get("raw_text", "")
         db_scan.has_anomalies = result.get("has_anomalies", False)
         db_scan.detailed_report = json.dumps(result.get("detailed_report", []))
+        
+        # Identity logic
+        db_scan.identity_hash = result.get("identity_hash")
+        db_scan.identity_name = result.get("identity_name")
+        db_scan.identity_birth_date = result.get("identity_birth_date")
+        
         db_session.commit()
 
         # Step 3: Expensive AI Audit (Slow)
@@ -300,9 +306,27 @@ def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user:
     scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
-    enable_admin = os.getenv("ENABLE_ADMIN_BYPASS", "true").lower() == "true"
-    if not (current_user.has_paid_access or (current_user.is_admin and enable_admin)):
-        raise HTTPException(status_code=403, detail="Vous devez payer pour accéder au rapport détaillé.")
+    # Admin bypass
+    if current_user.is_admin and os.getenv("ENABLE_ADMIN_BYPASS", "true").lower() == "true":
+        return scan
+        
+    # Folder-based access: check if user has paid for this identity_hash
+    if not scan.identity_hash:
+        # If no identity extracted, we fallback to old global access (or deny)
+        if current_user.has_paid_access: return scan
+        raise HTTPException(status_code=403, detail="Analyse en cours ou identité non détectée.")
+
+    access_entry = db.query(models.IdentityAccess).filter(
+        models.IdentityAccess.user_id == current_user.id,
+        models.IdentityAccess.identity_hash == scan.identity_hash
+    ).first()
+    
+    if not access_entry:
+        # Check if user has global access (old model) - migration support
+        if current_user.has_paid_access:
+            return scan
+        raise HTTPException(status_code=403, detail="Vous devez payer pour accéder au rapport détaillé de ce dossier.")
+        
     return scan
 
 @router.delete("/{scan_id}")

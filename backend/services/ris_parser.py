@@ -197,6 +197,8 @@ def parse_ris_file(file_path: str):
                     })
 
     has_anomalies = len(anomalies_list) > 0
+    identity_data = extract_identity(doc_text)
+    
     return {
         "has_anomalies": has_anomalies,
         "is_scanned": is_scanned,
@@ -204,5 +206,45 @@ def parse_ris_file(file_path: str):
         "detailed_report": sorted(anomalies_list, key=lambda x: x.get("year", 0)),
         "raw_text": doc_text,
         "images": images,
+        "identity_name": identity_data[0],
+        "identity_birth_date": identity_data[1],
+        "identity_hash": identity_data[2],
         "warning": None if (is_ris or is_scanned) else "Le document ne semble pas être un RIS standard."
     }
+
+def extract_identity(text: str):
+    """
+    Extracts name and birth date to create a unique identity hash.
+    """
+    import hashlib
+    name = "Inconnu"
+    
+    # Pattern 1: "M. NOM Prénom" or "Mme NOM Prénom" (usually at top)
+    name_match = re.search(r"(?:M\.|Mme)\s+([A-Z\s\-]{2,})\s+([A-Z][a-z]+(?:[\s\-][A-Z][a-z]+)*)", text)
+    if name_match:
+        name = f"{name_match.group(1).strip()} {name_match.group(2).strip()}"
+    else:
+        # Pattern 2: "Nom d'usage : NOM" + "Prénom : Prénom"
+        usage_match = re.search(r"Nom\s+d'usage\s*:\s*([A-Z\s\-]{2,})", text, re.IGNORECASE)
+        prename_match = re.search(r"Prénom\s*:\s*([A-Z][a-z]+(?:[\s\-][A-Z][a-z]+)*)", text, re.IGNORECASE)
+        if usage_match and prename_match:
+            name = f"{usage_match.group(1).strip()} {prename_match.group(1).strip()}"
+        else:
+            # Pattern 3: Just look for a name-like structure after "RELEVÉ INDIVIDUEL DE SITUATION"
+            lines = text.split('\n')
+            for i in range(min(40, len(lines))):
+                if any(k in lines[i].lower() for k in ["monsieur", "madame"]):
+                    name = lines[i].strip()
+                    break
+
+    # Birth date
+    birth_date = "00/00/0000"
+    # Looking for "Date de naissance : DD/MM/YYYY" or "né(e) le DD/MM/YYYY"
+    b_match = re.search(r"(?:né\(e\)\s+le|naissance\s*:)\s*(\d{2}/\d{2}/\d{4})", text, re.IGNORECASE)
+    if b_match:
+        birth_date = b_match.group(1)
+        
+    identity_str = f"{name.upper()}_{birth_date}"
+    identity_hash = hashlib.sha256(identity_str.encode()).hexdigest()
+    
+    return name, birth_date, identity_hash

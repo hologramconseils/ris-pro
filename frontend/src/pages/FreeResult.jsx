@@ -51,20 +51,31 @@ export default function FreeResult({ result: initialResult, onReset }) {
       setShowAuth(true)
       return
     }
-    if (user.has_paid_access || user.is_admin) {
-      await loadDetailed()
-    } else {
-      setLoading(true)
-      try {
-        const successUrl = `${window.location.origin}/?payment_success=1`
-        const cancelUrl = window.location.href
-        const res = await billingAPI.createCheckout(successUrl, cancelUrl)
-        window.location.href = res.data.url
-      } catch (err) {
-        const errorMsg = err.response?.data?.detail || 'Impossible de créer la session de paiement. Vérifiez votre connexion.';
-        setError(errorMsg);
-        setLoading(false);
+    
+    setLoading(true)
+    setError('')
+    try {
+      // Try to load detailed directly first (in case they already paid for this folder)
+      const res = await scanAPI.getResult(result.id)
+      setDetailedData(res.data)
+      setShowDetailed(true)
+    } catch (err) {
+      if (err.response?.status === 403) {
+        // Not paid for this identity or global access expired
+        try {
+          const successUrl = `${window.location.origin}/?payment_success=1`
+          const cancelUrl = window.location.href
+          const res = await billingAPI.createCheckout(successUrl, cancelUrl, result.id)
+          window.location.href = res.data.url
+          return; // Redirecting
+        } catch (payErr) {
+          setError(payErr.response?.data?.detail || 'Impossible de créer la session de paiement.');
+        }
+      } else {
+        setError('Impossible de charger le rapport. Veuillez réessayer.');
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -144,6 +155,11 @@ export default function FreeResult({ result: initialResult, onReset }) {
               <div style={{ padding: '32px 0' }}>
                 <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
                 <div className="verdict-label">Expertise de carrière terminée</div>
+                {result.identity_name && result.identity_name !== 'Inconnu' && (
+                  <div style={{ marginTop: 8, fontSize: 14, fontWeight: 600, color: 'var(--text-subtle)' }}>
+                     📁 Dossier : {result.identity_name} {result.identity_birth_date !== '00/00/0000' ? `(né le ${result.identity_birth_date})` : ''}
+                  </div>
+                )}
                 <h2 className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8 }}>
                   Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
                 </h2>
@@ -313,6 +329,9 @@ export default function FreeResult({ result: initialResult, onReset }) {
               </div>
               
               <div className="cta-price-label">Accès illimité à vie · Rapport exportable Word</div>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, maxWidth: 400, margin: '8px auto 24px' }}>
+                Tarif réservé exclusivement aux particuliers. <strong>Professionnels :</strong> ce service ne s'applique pas à votre situation, merci de contacter Hologram Conseils.
+              </p>
 
               {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>⚠️ {error}</div>}
 
@@ -322,7 +341,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                 </button>
               ) : (
                 <button className="btn btn-primary btn-large btn-glow" onClick={handleGetDetailed} disabled={loading}>
-                  {loading ? 'Redirection sécurisée…' : '💳 Débloquer mon expertise complète'}
+                  {loading ? 'Redirection sécurisée…' : '💳 Débloquer mon expertise pour ce dossier'}
                 </button>
               )}
 

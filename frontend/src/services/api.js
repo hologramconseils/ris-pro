@@ -149,9 +149,9 @@ export const scanAPI = {
 }
 
 export const billingAPI = {
-  createCheckout: (successUrl, cancelUrl) =>
+  createCheckout: (successUrl, cancelUrl, scanId) =>
     api.post('/billing/create-checkout-session', null, {
-      params: { success_url: successUrl, cancel_url: cancelUrl }
+      params: { success_url: successUrl, cancel_url: cancelUrl, scan_id: scanId }
     }),
 }
 

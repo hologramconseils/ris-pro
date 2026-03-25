@@ -35,6 +35,9 @@ class ScanResultResponse(ScanResultBase):
     is_analysis_complete: bool = Field(default=False, serialization_alias="is_analysis_complete")
     ocr_status: str = "none"
     ocr_error: Optional[str] = None
+    identity_hash: Optional[str] = None
+    identity_name: Optional[str] = None
+    identity_birth_date: Optional[str] = None
     created_at: datetime
 
     class Config:

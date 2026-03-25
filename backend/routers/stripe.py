@@ -11,10 +11,11 @@ router = APIRouter(prefix="/billing", tags=["billing"])
 def create_checkout_session(
     success_url: str,
     cancel_url: str,
+    scan_id: int = None,
     current_user: models.User = Depends(get_current_user), 
 ):
     try:
-        session = stripe_service.create_checkout_session(current_user, success_url, cancel_url)
+        session = stripe_service.create_checkout_session(current_user, success_url, cancel_url, scan_id)
         return {"url": session.url}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

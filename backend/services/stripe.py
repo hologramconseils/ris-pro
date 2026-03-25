@@ -11,9 +11,9 @@ load_dotenv(dotenv_path=_env_path, override=True)
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "").strip() or None
 
-def create_checkout_session(user: models.User, success_url: str, cancel_url: str):
+def create_checkout_session(user: models.User, success_url: str, cancel_url: str, scan_id: int):
     """
-    Create a Stripe checkout session for the user.
+    Create a Stripe checkout session for the user, tied to a specific scan/folder.
     """
     # Always ensure the API key is fresh from environment
     stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "").strip() or stripe.api_key
@@ -25,8 +25,8 @@ def create_checkout_session(user: models.User, success_url: str, cancel_url: str
             'price_data': {
                 'currency': 'eur',
                 'product_data': {
-                    'name': 'Analyse Détaillée RIS',
-                    'description': 'Accès à vie à l\'analyse détaillée de votre relevé de carrière',
+                    'name': 'Audit Expert RIS - Dossier Individuel',
+                    'description': 'Accès à vie au rapport détaillé pour ce dossier (Particuliers uniquement)',
                 },
                 'unit_amount': 1900, # 19.00 EUR
             },
@@ -37,7 +37,8 @@ def create_checkout_session(user: models.User, success_url: str, cancel_url: str
         cancel_url=cancel_url,
         customer_email=user.email,
         metadata={
-            "user_id": user.id
+            "user_id": user.id,
+            "scan_id": scan_id
         }
     )
     return session
@@ -63,15 +64,37 @@ def process_webhook(payload, sig_header, endpoint_secret, db: Session):
 
 def handle_checkout_session(session, db: Session):
     user_id = session.get("metadata", {}).get("user_id")
+    scan_id = session.get("metadata", {}).get("scan_id")
+    
     if user_id:
         user = db.query(models.User).filter(models.User.id == int(user_id)).first()
         if user:
+            # Grant global access just in case (legacy support)
             user.has_paid_access = True
+            
+            # Grant specific identity access
+            if scan_id:
+                scan = db.query(models.ScanResult).filter(models.ScanResult.id == int(scan_id)).first()
+                if scan and scan.identity_hash:
+                    # Check if access already exists
+                    existing_access = db.query(models.IdentityAccess).filter(
+                        models.IdentityAccess.user_id == user.id,
+                        models.IdentityAccess.identity_hash == scan.identity_hash
+                    ).first()
+                    
+                    if not existing_access:
+                        new_access = models.IdentityAccess(
+                            user_id=user.id,
+                            identity_hash=scan.identity_hash
+                        )
+                        db.add(new_access)
+
             # Check for existing transaction to ensure idempotency
             existing = db.query(models.Transaction).filter(models.Transaction.stripe_session_id == session.get('id')).first()
             if not existing:
                 transaction = models.Transaction(
                     user_id=user.id,
+                    scan_id=int(scan_id) if scan_id else None,
                     stripe_session_id=session.get('id'),
                     status="completed"
                 )
