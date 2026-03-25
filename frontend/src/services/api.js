@@ -2,19 +2,40 @@ import axios from 'axios'
 import { coldStartTracker } from './coldStartTracker'
 
 const PROD_DOMAIN = 'ris.hologramconseils.com'
-const envUrl = import.meta.env.VITE_API_URL
+const RAILWAY_BACKEND = 'https://ris-pro-api.up.railway.app'
+const RENDER_BACKEND = 'https://ris-scan-pro-backend.onrender.com'
 
 const isLocalHost = typeof window !== 'undefined' && 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname === '127.0.0.1' || 
+   window.location.hostname.includes('192.168.'))
+
 const isProduction = typeof window !== 'undefined' && 
-  (window.location.hostname === PROD_DOMAIN || !isLocalHost)
+  (window.location.hostname === PROD_DOMAIN || (!isLocalHost && !window.location.hostname.includes('vercel.app')))
 
-// Si on est en prod et qu'on a une URL env, on l'utilise. Sinon fallback sur localhost (dev)
-const API_URL = (isProduction && envUrl && !envUrl.includes('localhost') 
-  ? envUrl 
-  : (envUrl || 'http://127.0.0.1:8000')).replace(/\/api\/v1\/?$/, '')
+// Robust API URL selection with logging
+const getApiUrl = () => {
+  if (!isProduction) return envUrl || 'http://127.0.0.1:8000'
+  
+  // In production, prioritize VITE_API_URL if it's not a localhost address
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl
+  }
+  
+  // Fallback for production if env var is missing or incorrect
+  return RAILWAY_BACKEND
+}
 
-console.log(`[API] Mode: ${isProduction ? 'PROD' : 'DEV'}, URL: ${API_URL}`)
+const API_URL = getApiUrl().replace(/\/api\/v1\/?$/, '')
+
+if (typeof window !== 'undefined') {
+  console.log(`%c[RIS-PRO-API] %cMode: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`, 'color: #3b82f6; font-weight: bold', 'color: inherit')
+  console.log(`%c[RIS-PRO-API] %cBase URL: ${API_URL}`, 'color: #3b82f6; font-weight: bold', 'color: inherit')
+  
+  if (isProduction && API_URL.includes('onrender.com')) {
+    console.warn('[RIS-PRO-API] Attention : Le frontend utilise encore l\'URL Render. Veuillez configurer VITE_API_URL sur Vercel.')
+  }
+}
 
 const api = axios.create({
   baseURL: API_URL,
