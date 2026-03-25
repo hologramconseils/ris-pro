@@ -50,14 +50,14 @@ export default function Legal() {
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>4. Propriété Intellectuelle</h2>
           <p style={{ marginBottom: 15 }}>
-            L'intégralité du contenu de ce site (code, design, textes, algorithmes) est la propriété exclusive de Hologram Conseils. Toute reproduction ou exploitation sans autorisation préalable est interdite.
+            L'intégralité du contenu de ce site (code, design, textes, moteurs d'analyse) est la propriété exclusive de Hologram Conseils. Toute reproduction ou exploitation sans autorisation préalable est interdite.
           </p>
         </section>
 
         <section style={{ marginBottom: 40 }}>
           <h2 style={{ color: 'var(--primary)', marginBottom: 20 }}>5. Responsabilité</h2>
           <p>
-            Les analyses fournies par RIS Pro sont générées par un algorithme d'analyse avancé. Elles sont fournies à titre indicatif et ne peuvent en aucun cas se substituer à l’avis d’un conseiller retraite ou d’un conseiller juridique.
+            Les analyses fournies par RIS Pro sont générées par un système d'expertise avancé. Elles sont fournies à titre indicatif et ne peuvent en aucun cas se substituer à l’avis d’un conseiller retraite ou d’un conseiller juridique.
           </p>
         </section>
       </motion.div>

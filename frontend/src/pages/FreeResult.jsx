@@ -18,7 +18,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const hasAnomalies = result.has_anomalies
-  const isFinished = result.is_ai_complete
+  const isFinished = result.is_analysis_complete
 
   const refreshResult = useCallback(async (silent = false) => {
     if (!silent) setIsRefreshing(true)
@@ -120,10 +120,10 @@ export default function FreeResult({ result: initialResult, onReset }) {
               }}>
                 <div className="spinner" />
                 <div>
-                  <div className="verdict-label" style={{ color: 'var(--primary-light)', marginBottom: 8 }}>Analyse IA en cours…</div>
+                  <div className="verdict-label" style={{ color: 'var(--primary-light)', marginBottom: 8 }}>Analyse en cours…</div>
                   <h2 className="verdict-title" style={{ fontSize: 24, marginBottom: 12 }}>Document reçu — Audit en traitement</h2>
                   <p className="verdict-subtitle" style={{ maxWidth: 460, margin: '0 auto' }}>
-                    Notre expert algorithmique analyse votre relevé ligne par ligne. 
+                    Notre système d'expertise analyse votre relevé ligne par ligne. 
                     Ce diagnostic approfondi peut prendre <strong>jusqu'à 90 secondes</strong> pour les documents scannés.
                   </p>
                 </div>
@@ -143,14 +143,14 @@ export default function FreeResult({ result: initialResult, onReset }) {
               /* ─── Résultat final : analyse terminée ─── */
               <div style={{ padding: '32px 0' }}>
                 <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
-                <div className="verdict-label">Diagnostic algorithmique terminé</div>
+                <div className="verdict-label">Expertise de carrière terminée</div>
                 <h2 className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8 }}>
                   Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
                 </h2>
                 <p className="verdict-subtitle" style={{ marginBottom: 0 }}>
                   {hasAnomalies
-                    ? 'L’algorithme d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
-                    : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre algorithme.'}
+                    ? 'Le système d’audit a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
+                    : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre expertise.'}
                 </p>
               </div>
             )}
@@ -266,9 +266,9 @@ export default function FreeResult({ result: initialResult, onReset }) {
               ) : (
                 <>
                   <div style={{ fontSize: 32, marginBottom: 16 }}>🔍</div>
-                  <h4 style={{ marginBottom: 8 }}>Analyse algorithmique approfondie en cours</h4>
+                  <h4 style={{ marginBottom: 8 }}>Audit approfondi de carrière en cours</h4>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-                    Votre document étant un scan, notre algorithme expert retraite réalise une analyse ligne par ligne.
+                    Votre document étant un scan, notre système d'expertise traite chaque ligne individuellement.
                   </p>
                   <button 
                     className="btn btn-secondary btn-sm" 

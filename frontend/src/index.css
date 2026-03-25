@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
+  /* Shared / Brand */
   --primary: #4F46E5;
   --primary-light: #818CF8;
   --primary-dark: #3730A3;
@@ -9,6 +10,12 @@
   --success: #10B981;
   --danger: #EF4444;
   --warning: #F59E0B;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* Default Theme (Dark) */
+:root, [data-theme='dark'] {
   --bg: #0B0D14;
   --bg-card: #111827;
   --bg-card-2: #1F2937;
@@ -16,10 +23,23 @@
   --text: #F9FAFB;
   --text-muted: #9CA3AF;
   --text-subtle: #6B7280;
-  --radius: 16px;
-  --radius-sm: 10px;
   --shadow: 0 20px 60px rgba(0,0,0,0.5);
   --glow: 0 0 40px rgba(79, 70, 229, 0.25);
+  --nav-bg: rgba(11,13,20,0.85);
+}
+
+/* Light Theme */
+[data-theme='light'] {
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-card-2: #F1F5F9;
+  --border: rgba(0,0,0,0.08);
+  --text: #0F172A;
+  --text-muted: #475569;
+  --text-subtle: #64748B;
+  --shadow: 0 10px 30px rgba(0,0,0,0.05);
+  --glow: 0 0 40px rgba(79, 70, 229, 0.1);
+  --nav-bg: rgba(255,255,255,0.85);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -113,7 +133,7 @@ input, textarea { font-family: inherit; }
 /* ---- Navbar ---- */
 .navbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(11,13,20,0.85);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;

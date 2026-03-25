@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthModal from './AuthModal'
+import ThemeSwitcher from './ThemeSwitcher'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -42,7 +43,10 @@ export default function Navbar() {
 
         <div id="navbar-portal-root" className="navbar-portal-root" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}></div>
 
-        <div className="navbar-actions" style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <div className="navbar-actions" style={{ flex: 1, justifyContent: 'flex-end', display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div className="desktop-theme-switcher">
+            <ThemeSwitcher />
+          </div>
           {user ? (
             <div className="desktop-nav-auth" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span className="user-badge-desktop" style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -69,7 +73,10 @@ export default function Navbar() {
           <div className="mobile-menu" onClick={e => e.stopPropagation()}>
             <div className="mobile-menu-header">
               <span className="navbar-brand">🔍 RIS Pro</span>
-              <button className="close-menu" onClick={() => setMobileMenuOpen(false)}>✕</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <ThemeSwitcher />
+                <button className="close-menu" onClick={() => setMobileMenuOpen(false)}>✕</button>
+              </div>
             </div>
             
             <div className="mobile-menu-content">

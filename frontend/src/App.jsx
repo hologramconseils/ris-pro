@@ -1,5 +1,6 @@
 import { Routes, Route, useSearchParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import PaymentSuccess from './pages/PaymentSuccess'
@@ -52,12 +53,14 @@ import { ColdStartProvider, ColdStartLoader } from './context/ColdStartContext'
 export default function App() {
   return (
     <ErrorBoundary>
-      <ColdStartProvider>
-        <ColdStartLoader />
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </ColdStartProvider>
+      <ThemeProvider>
+        <ColdStartProvider>
+          <ColdStartLoader />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </ColdStartProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   )
 }

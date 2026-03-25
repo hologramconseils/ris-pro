@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -32,17 +32,18 @@ class ScanResultResponse(ScanResultBase):
     is_valid_ris: bool
     preview_anomalies: Optional[List[dict]] = None
     total_anomalies: int = 0
-    is_ai_complete: bool = False
+    is_analysis_complete: bool = Field(default=False, serialization_alias="is_analysis_complete")
     ocr_status: str = "none"
     ocr_error: Optional[str] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+        populate_by_name = True
 
 class ScanResultDetailedResponse(ScanResultResponse):
     detailed_report: Optional[str] = None
-    ai_analysis: Optional[str] = None
+    expert_analysis: Optional[str] = Field(None, alias="ai_analysis")
     raw_text: Optional[str] = None
 
 class Token(BaseModel):

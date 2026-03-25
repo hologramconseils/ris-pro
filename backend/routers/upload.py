@@ -257,7 +257,7 @@ async def run_full_analysis_worker_from_existing_text(
 def get_history(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scans = db.query(models.ScanResult).filter(models.ScanResult.user_id == current_user.id).order_by(models.ScanResult.created_at.desc()).all()
     for s in scans:
-        s.is_ai_complete = s.ocr_status in ["success", "failed"]
+        s.is_analysis_complete = s.ocr_status in ["success", "failed"]
         if s.detailed_report:
             try:
                 report = json.loads(s.detailed_report)
@@ -278,7 +278,7 @@ def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     
-    scan.is_ai_complete = scan.ocr_status in ["success", "failed"]
+    scan.is_analysis_complete = scan.ocr_status in ["success", "failed"]
     
     if scan.detailed_report:
         try:
