@@ -2,6 +2,7 @@ import axios from 'axios'
 import { coldStartTracker } from './coldStartTracker'
 
 const PROD_DOMAIN = 'ris.hologramconseils.com'
+const envUrl = import.meta.env.VITE_API_URL
 const RAILWAY_BACKEND = 'https://ris-pro-api.up.railway.app'
 const RENDER_BACKEND = 'https://ris-scan-pro-backend.onrender.com'
 
