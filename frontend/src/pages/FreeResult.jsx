@@ -330,7 +330,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
               
               <div className="cta-price-label">Accès illimité à vie · Rapport exportable Word</div>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, maxWidth: 400, margin: '8px auto 24px' }}>
-                Tarif réservé exclusivement aux particuliers. <strong>Professionnels :</strong> ce service ne s'applique pas à votre situation, merci de contacter Hologram Conseils.
+                Tarif réservé exclusivement aux particuliers. <strong>Professionnels :</strong> ce tarif ne s'applique pas à votre situation, merci de contacter Hologram Conseils.
               </p>
 
               {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>⚠️ {error}</div>}
