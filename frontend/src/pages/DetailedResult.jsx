@@ -206,8 +206,13 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
           )}
         </div>
 
-        <div style={{ marginTop: 40, textAlign: 'center' }}>
-          <button className="btn btn-secondary" onClick={onReset}>← Analyser un autre RIS</button>
+        {/* Sticky Footer for "Analyze another RIS" (AUD-009) */}
+        <div className="sticky-footer shadow-expert">
+          <div className="container" style={{ maxWidth: 740, display: 'flex', justifyContent: 'center' }}>
+            <button className="btn btn-secondary btn-large" onClick={onReset} style={{ width: '100%', maxWidth: 400 }}>
+              ← Analyser un autre document RIS
+            </button>
+          </div>
         </div>
       </div>
     </div>

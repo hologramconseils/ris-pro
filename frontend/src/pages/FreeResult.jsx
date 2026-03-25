@@ -112,48 +112,51 @@ export default function FreeResult({ result: initialResult, onReset }) {
         <div className="card shadow-expert">
           <div className="result-verdict">
 
-            {/* ─── État intermédiaire : analyse IA en cours ─── */}
-            {!isFinished && (
+            {/* ─── État dynamique d'avancement ─── */}
+            {!isFinished ? (
               <div style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
-                padding: '40px 20px', textAlign: 'center'
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+                padding: '48px 24px', textAlign: 'center'
               }}>
-                <div className="spinner" style={{ marginBottom: 8 }} />
-                <div className="verdict-label" style={{ color: 'var(--primary-light)' }}>Analyse IA en cours…</div>
-                <div className="verdict-title muted" style={{ fontSize: 22 }}>Document reçu — Audit en traitement</div>
-                <p className="verdict-subtitle" style={{ maxWidth: 440 }}>
-                  Notre expert algorithmique analyse votre relevé ligne par ligne.
-                  Ce traitement peut prendre <strong>jusqu'à 90 secondes</strong> pour les documents scannés.
-                </p>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => refreshResult()}
-                  disabled={isRefreshing}
-                  style={{ fontSize: 13, marginTop: 4 }}
-                >
-                  {isRefreshing ? '⌛ Vérification...' : '🔄 Vérifier l\'avancement'}
-                </button>
-              </div>
-            )}
-
-            {/* ─── Résultat final : analyse terminée ─── */}
-            {isFinished && (
-              <>
-                <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
-                <div className="verdict-label">Audit algorithmique terminé</div>
-                <div className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8, fontSize: 20 }}>
-                  Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+                <div className="spinner" />
+                <div>
+                  <div className="verdict-label" style={{ color: 'var(--primary-light)', marginBottom: 8 }}>Analyse IA en cours…</div>
+                  <h2 className="verdict-title" style={{ fontSize: 24, marginBottom: 12 }}>Document reçu — Audit en traitement</h2>
+                  <p className="verdict-subtitle" style={{ maxWidth: 460, margin: '0 auto' }}>
+                    Notre expert algorithmique analyse votre relevé ligne par ligne. 
+                    Ce diagnostic approfondi peut prendre <strong>jusqu'à 90 secondes</strong> pour les documents scannés.
+                  </p>
                 </div>
-                <p className="verdict-subtitle">
+                
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => refreshResult()}
+                    disabled={isRefreshing}
+                    style={{ fontSize: 13 }}
+                  >
+                    {isRefreshing ? '⌛ Vérification...' : '🔄 Vérifier l\'avancement'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* ─── Résultat final : analyse terminée ─── */
+              <div style={{ padding: '32px 0' }}>
+                <span className="verdict-icon">{hasAnomalies ? '⚠️' : '✅'}</span>
+                <div className="verdict-label">Diagnostic algorithmique terminé</div>
+                <h2 className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8 }}>
+                  Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
+                </h2>
+                <p className="verdict-subtitle" style={{ marginBottom: 0 }}>
                   {hasAnomalies
                     ? 'L’algorithme d’analyse a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'
                     : 'Félicitations ! Aucune anomalie majeure n’a été détectée par notre algorithme.'}
                 </p>
-              </>
+              </div>
             )}
           </div>
           
-          {hasAnomalies && result.preview_anomalies && result.preview_anomalies.length > 0 && (
+          {hasAnomalies && isFinished && result.preview_anomalies && result.preview_anomalies.length > 0 && (
             <div style={{ marginBottom: 32 }}>
               <div className="anomaly-list">
                 <motion.div 
@@ -163,7 +166,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                   transition={{ delay: 0.1 }}
                 >
                   <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 6, letterSpacing: 0.5 }}>
-                    ANOMALIE ANCIENNE
+                    ANOMALIE {result.preview_anomalies[0].year || 'IDENTIFIÉE'}
                   </div>
                   <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[0].title}</h4>
                   <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[0].description}</p>
@@ -190,7 +193,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                     transition={{ delay: 0.3 }}
                   >
                     <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-light)', marginBottom: 6, letterSpacing: 0.5 }}>
-                      POINT DE VIGILANCE INTERMÉDIAIRE
+                      ANOMALIE {result.preview_anomalies[1].year || 'IDENTIFIÉE'}
                     </div>
                     <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[1].title}</h4>
                     <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[1].description}</p>
@@ -323,12 +326,14 @@ export default function FreeResult({ result: initialResult, onReset }) {
                 </button>
               )}
 
-              <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-subtle)' }}>
+              <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--success)', fontWeight: 600 }}>
+                  <span>🎧</span> Support expert (48h)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)' }}>
                   <span>🔒</span> Paiement Stripe
                 </div>
-                <div style={{ width: 1, height: 12, background: 'var(--border)' }}></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-subtle)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)' }}>
                   <span>🤝</span> Hologram Conseils
                 </div>
               </div>

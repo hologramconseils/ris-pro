@@ -35,7 +35,12 @@ export default function History() {
   }
  
   const handleViewScan = (scan) => {
-    navigate(`/detailed-result/${scan.id}`)
+    if (user?.has_paid_access || user?.is_admin) {
+      navigate(`/detailed-result/${scan.id}`)
+    } else {
+      // Redirect to preview for unpaid users to avoid 403 (AUD-002)
+      navigate(`/preview/${scan.id}`)
+    }
   }
  
   const handleDeleteClick = (e, scan) => {
