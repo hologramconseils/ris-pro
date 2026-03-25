@@ -31,6 +31,25 @@ def check_and_update_schema():
             print("Migration: Adding raw_text to scan_results")
             conn.execute(text("ALTER TABLE scan_results ADD COLUMN raw_text TEXT"))
             conn.commit()
+        if "identity_hash" not in columns:
+            print("Migration: Adding identity_hash to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN identity_hash VARCHAR"))
+            conn.commit()
+        if "identity_name" not in columns:
+            print("Migration: Adding identity_name to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN identity_name VARCHAR"))
+            conn.commit()
+        if "identity_birth_date" not in columns:
+            print("Migration: Adding identity_birth_date to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN identity_birth_date VARCHAR"))
+            conn.commit()
+        
+        # Check transactions table
+        columns_trans = [c['name'] for c in inspector.get_columns("transactions")]
+        if "scan_id" not in columns_trans:
+            print("Migration: Adding scan_id to transactions")
+            conn.execute(text("ALTER TABLE transactions ADD COLUMN scan_id INTEGER REFERENCES scan_results(id)"))
+            conn.commit()
 
 try:
     check_and_update_schema()
