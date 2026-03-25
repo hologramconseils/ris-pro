@@ -1,18 +1,12 @@
-# Railway Nixpacks configuration
-# Installs system packages needed by pytesseract and pdf2image
+providers = ["python"]
 
 [phases.setup]
 nixPkgs = [
-  "python3",
-  "python3Packages.pip",
   "tesseract",
   "poppler_utils",
   "postgresql",
   "gcc"
 ]
-
-[phases.install]
-cmds = ["python3 -m pip install -r requirements.txt"]
 
 [start]
 cmd = "python3 -m uvicorn main:app --host 0.0.0.0 --port $PORT"
