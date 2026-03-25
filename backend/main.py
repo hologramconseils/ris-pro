@@ -54,7 +54,9 @@ app.add_middleware(
         "http://localhost:5174",
         "http://127.0.0.1:5174",
         "https://ris.hologramconseils.com",
+        "https://ris-scan-pro.vercel.app",
     ],
+    allow_origin_regex="https://ris-scan-pro-.*\\.vercel\\.app", # Allow all Vercel previews
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,7 +80,10 @@ async def add_security_headers(request: Request, call_next):
             status_code=500,
             content={"detail": "Une erreur interne est survenue.", "error": str(e)}
         )
-        error_response.headers["Access-Control-Allow-Origin"] = "*" # Or the specific origin
+        origin = request.headers.get("origin")
+        if origin:
+            error_response.headers["Access-Control-Allow-Origin"] = origin
+            error_response.headers["Access-Control-Allow-Credentials"] = "true"
         error_response.headers["Access-Control-Allow-Methods"] = "*"
         error_response.headers["Access-Control-Allow-Headers"] = "*"
         return error_response
