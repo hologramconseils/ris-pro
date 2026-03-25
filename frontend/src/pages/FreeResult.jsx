@@ -324,7 +324,11 @@ export default function FreeResult({ result: initialResult, onReset }) {
                 Le rapport détaillé vous donne la <strong>liste exhaustive</strong> des pièces à fournir pour chaque année en anomalie selon votre situation (salarié, indépendant, étranger, etc).
               </p>
               
-              <div style={{ position: 'relative', display: 'inline-block', marginBottom: 32 }}>
+              <div style={{ position: 'relative', display: 'inline-block', textAlign: 'center', marginBottom: 32 }}>
+                 <div style={{ fontSize: 13, color: 'var(--success)', fontWeight: 600, marginBottom: 12 }}>
+                   ✓ Analyse standard : réalisée (gratuite)
+                 </div>
+                 <div style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 4 }}>Rapport détaillé :</div>
                  <span className="cta-price" style={{ fontSize: 56 }}>19€</span>
               </div>
               
