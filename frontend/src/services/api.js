@@ -18,8 +18,8 @@ const isProduction = typeof window !== 'undefined' &&
 const getApiUrl = () => {
   if (!isProduction) return envUrl || 'http://127.0.0.1:8000'
   
-  // In production, prioritize VITE_API_URL if it's not a localhost address
-  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+  // In production, prioritize VITE_API_URL if it's not a localhost address OR a Render address (which we know is failing)
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1') && !envUrl.includes('onrender.com')) {
     return envUrl
   }
   
