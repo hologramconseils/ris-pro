@@ -67,14 +67,14 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           style={{ 
-            background: 'var(--card-bg)', 
+            background: 'var(--bg-card)', 
             padding: 40, 
             borderRadius: 24, 
-            border: '1px solid var(--border-color)',
+            border: '1px solid var(--border)',
             maxWidth: 400,
             width: '100%',
             textAlign: 'center',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+            boxShadow: 'var(--shadow)'
           }}
         >
           <div style={{ fontSize: 40, marginBottom: 20 }}>🔐</div>
@@ -92,15 +92,17 @@ export default function AdminDashboard() {
               autoFocus
               style={{ 
                 width: '100%', 
-                padding: '12px 16px', 
+                padding: '14px 16px', 
                 borderRadius: 12, 
-                border: '1px solid var(--border-color)',
-                background: 'rgba(255,255,255,0.05)',
-                color: 'white',
+                border: '1.5px solid var(--border)',
+                background: 'var(--bg-input, var(--bg-card-2))',
+                color: 'var(--text)',
                 fontSize: 18,
                 textAlign: 'center',
                 letterSpacing: 4,
-                marginBottom: 20
+                marginBottom: 20,
+                outline: 'none',
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
               }}
             />
             {accessError && <div style={{ color: '#EF4444', marginBottom: 20, fontSize: 13 }}>{accessError}</div>}
