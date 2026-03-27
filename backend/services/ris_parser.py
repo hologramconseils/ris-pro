@@ -46,9 +46,11 @@ def parse_ris_file(file_path: str):
             images.append(base64_img)
             pix = None
             
+        ### FROZEN MODULE: NON-NATIVE ANALYSIS ###
         # Detection of scanned PDF (UI flag for OCR warning)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
+        ### END FROZEN MODULE ###
         
         doc.close()
     except Exception as e:

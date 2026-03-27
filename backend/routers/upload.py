@@ -179,6 +179,7 @@ async def run_full_analysis_worker(
                     "compte_rendu": "• Analyse technique effectuée sur la base de l'extraction standard."
                 }, ensure_ascii=False)
 
+            ### FROZEN MODULE: NON-NATIVE ANALYSIS - SCAN WARNING ###
             # 2. Add OCR uncertainty warning if scanned
             if db_scan.is_scanned:
                 try:
@@ -188,6 +189,7 @@ async def run_full_analysis_worker(
                         ai_data["resume_global"] = warning_prefix + ai_data["resume_global"]
                     ai_commentary = json.dumps(ai_data, ensure_ascii=False)
                 except: pass
+            ### END FROZEN MODULE ###
             
             db_scan.ai_analysis = ai_commentary
             
@@ -233,6 +235,7 @@ async def run_full_analysis_worker(
                 db_scan.detailed_report = json.dumps(merged_anomalies, ensure_ascii=False)
                 db_scan.has_anomalies = len(merged_anomalies) > 0
                 
+                ### FROZEN MODULE: NON-NATIVE ANALYSIS - TECHNICAL BACKFILL ###
                 # 4. Backfill technical career_data for scanned documents if empty
                 if db_scan.is_scanned and full_timeline and not career_raw:
                     ai_career_data = []
@@ -253,6 +256,7 @@ async def run_full_analysis_worker(
                         ai_career_data.sort(key=lambda x: x['year'])
                         db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
                         db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                ### END FROZEN MODULE ###
 
             except Exception as final_err:
                 print(f"Final Data Merging error: {final_err}")
