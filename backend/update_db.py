@@ -19,8 +19,18 @@ def update_db():
             cursor.execute("ALTER TABLE scan_results ADD COLUMN raw_text TEXT")
             conn.commit()
             print("Successfully added 'raw_text' column.")
+        
+        if 'reliability_score' not in columns:
+            print("Adding 'reliability_score' column...")
+            cursor.execute("ALTER TABLE scan_results ADD COLUMN reliability_score INTEGER DEFAULT 100")
+            conn.commit()
+            
+        if 'career_data' not in columns:
+            print("Adding 'career_data' column...")
+            cursor.execute("ALTER TABLE scan_results ADD COLUMN career_data TEXT")
+            conn.commit()
         else:
-            print("'raw_text' column already exists.")
+            print("Columns already up to date.")
             
     except Exception as e:
         print(f"Error updating database: {e}")

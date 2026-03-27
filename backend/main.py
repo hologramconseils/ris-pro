@@ -43,6 +43,14 @@ def check_and_update_schema():
             print("Migration: Adding identity_birth_date to scan_results")
             conn.execute(text("ALTER TABLE scan_results ADD COLUMN identity_birth_date VARCHAR"))
             conn.commit()
+        if "reliability_score" not in columns:
+            print("Migration: Adding reliability_score to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN reliability_score INTEGER DEFAULT 100"))
+            conn.commit()
+        if "career_data" not in columns:
+            print("Migration: Adding career_data to scan_results")
+            conn.execute(text("ALTER TABLE scan_results ADD COLUMN career_data TEXT"))
+            conn.commit()
         
         # Check transactions table
         columns_trans = [c['name'] for c in inspector.get_columns("transactions")]
