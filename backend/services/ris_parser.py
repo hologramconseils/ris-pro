@@ -35,16 +35,20 @@ def parse_ris_file(file_path: str):
                 # Fallback to normal text extraction if sort=True fails for some reason
                 doc_text += page.get_text("text") + "\n"
         
-        # Detection of scanned PDF (OCR fallback needed)
+        
+        # ALWAYS capture page images for AI context (Gemini Vision is superior for table analysis)
+        # Limit to first 12 pages for performance/cost balance
+        for i in range(min(12, len(doc))):
+            page = doc[i]
+            pix = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5)) # Standard quality
+            img_data = pix.tobytes("jpg", jpg_quality=65)
+            base64_img = base64.b64encode(img_data).decode('utf-8')
+            images.append(base64_img)
+            pix = None
+            
+        # Detection of scanned PDF (UI flag for OCR warning)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
-            for i in range(min(10, len(doc))):
-                page = doc[i]
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-                img_data = pix.tobytes("jpg", jpg_quality=60)
-                base64_img = base64.b64encode(img_data).decode('utf-8')
-                images.append(base64_img)
-                pix = None
         
         doc.close()
     except Exception as e:
