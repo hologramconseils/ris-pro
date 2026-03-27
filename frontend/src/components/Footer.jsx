@@ -24,8 +24,10 @@ export default function Footer() {
           marginBottom: 20,
           flexWrap: 'wrap'
         }}>
-          <Link to="/legal" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 14 }}>Mentions Légales & CGV</Link>
-          <Link to="/privacy" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 14 }}>Protection des données (RGPD)</Link>
+          <Link to="/mentions" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Mentions Légales</Link>
+          <Link to="/cgv" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>CGV</Link>
+          <Link to="/privacy" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Politique de Confidentialité</Link>
+          <Link to="/security" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Sécurité des données</Link>
         </div>
         
         <p style={{ color: 'var(--text-subtle)', fontSize: 12 }}>

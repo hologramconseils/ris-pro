@@ -7,8 +7,10 @@ import PaymentSuccess from './pages/PaymentSuccess'
 import History from './pages/History'
 import ResetPassword from './pages/ResetPassword'
 import DetailedResultPage from './pages/DetailedResultPage'
-import Legal from './pages/Legal'
+import Mentions from './pages/Mentions'
+import CGV from './pages/CGV'
 import Privacy from './pages/Privacy'
+import Security from './pages/Security'
 import AdminDashboard from './pages/AdminDashboard'
 import Dashboard from './pages/Dashboard'
 import PreviewPage from './pages/PreviewPage'
@@ -37,8 +39,11 @@ function AppContent() {
           <Route path="/detailed/:id" element={<DetailedResultPage />} />
           <Route path="/login" element={<LandingPage />} />
           <Route path="/register" element={<LandingPage />} />
-          <Route path="/legal" element={<Legal />} />
+          <Route path="/mentions" element={<Mentions />} />
+          <Route path="/cgv" element={<CGV />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/legal" element={<Mentions />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>

@@ -171,7 +171,8 @@ async def run_full_analysis_worker(
                             "description": item.get("anomalie_specifique", "Incohérence détectée"),
                             "justificatif": item.get("justificatif_suggere"),
                             "needs_justificatifs": needs_justificatifs,
-                            "points_complementaires": item.get("points_complementaires")
+                            "points_complementaires": item.get("points_complementaires"),
+                            "trimestres_valides": q_count
                         })
                     
                     if ai_anomalies:

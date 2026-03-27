@@ -185,6 +185,19 @@ export default function FreeResult({ result: initialResult, onReset }) {
                     ANOMALIE {result.preview_anomalies[0].year || 'IDENTIFIÉE'}
                   </div>
                   <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[0].title}</h4>
+                  
+                  {/* Quarters and Points Display */}
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
+                    <div style={{ fontSize: 12, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Trimestres validés :</span> <strong>{result.preview_anomalies[0].trimestres_valides ?? '—'}</strong>
+                    </div>
+                    {result.preview_anomalies[0].points_complementaires > 0 && (
+                      <div style={{ fontSize: 12, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Points retraite :</span> <strong>{result.preview_anomalies[0].points_complementaires}</strong>
+                      </div>
+                    )}
+                  </div>
+
                   <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[0].description}</p>
                   
                   {result.preview_anomalies[0].justificatif ? (
@@ -212,6 +225,19 @@ export default function FreeResult({ result: initialResult, onReset }) {
                       ANOMALIE {result.preview_anomalies[1].year || 'IDENTIFIÉE'}
                     </div>
                     <h4 style={{ fontSize: 15, marginBottom: 8 }}>{result.preview_anomalies[1].title}</h4>
+                    
+                    {/* Quarters and Points Display */}
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
+                      <div style={{ fontSize: 12, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Trimestres validés :</span> <strong>{result.preview_anomalies[1].trimestres_valides ?? '—'}</strong>
+                      </div>
+                      {result.preview_anomalies[1].points_complementaires > 0 && (
+                        <div style={{ fontSize: 12, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Points retraite :</span> <strong>{result.preview_anomalies[1].points_complementaires}</strong>
+                        </div>
+                      )}
+                    </div>
+
                     <p style={{ fontSize: 13, marginBottom: 12 }}>{result.preview_anomalies[1].description}</p>
                     
                     {result.preview_anomalies[1].justificatif ? (
