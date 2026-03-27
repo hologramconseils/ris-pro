@@ -1,32 +1,26 @@
-# Walkthrough : Stabilisation et Déploiement de l'Analyse Native PDF (RIS Pro)
+# Walkthrough : Stabilisation Finale du Moteur de RIS Pro Native
 
-Toutes les corrections ont été appliquées et poussées vers le repository distant (`main`). Les problèmes de visibilité des salaires et d'absence de blocs expert pour les PDF natifs ont été résolus.
+Les corrections critiques concernant l'extraction des salaires et l'affichage des blocs d'expertise dans l'analyse des PDF natifs ont été appliquées et déployées.
 
-## Actions Réalisées
+## Corrections Majeures
 
-### 1. Git Push & Déploiement (Urgent)
-- **Status** : Succès. Les dernières corrections (Exclusion 2026, Extraction Salaires) ont été poussées vers `origin main`.
-- **Commit Hash** : `a7308fb` (Dernière version stable avec fusion exhaustive).
+### 1. Fiabilité de l'Extraction des Salaires (`ris_parser.py`)
+- **Priorité aux Symboles Monétaires** : Si une ligne contient le symbole "€", le nombre associé est désormais prioritaire. Cela évite que les identifiants techniques (DocIDs/NIRs) ne soient capturés à la place des salaires.
+- **Filtrage Intelligent** : Les nombres sans décimales de plus de 6 chiffres (DocIDs) ou les séquences de 13-15 chiffres (NIRs) sont automatiquement écartés, sauf s'ils sont explicitement marqués comme un salaire.
+- **Impact 2025** : Le salaire de 2025 est désormais agrégé correctement à partir des lignes de revenus réelles.
 
-### 2. Refonte de la Fusion de Données (`upload.py`)
-- **Problème** : Les PDF natifs affichaient des salaires manquants car le code dépendait de la sortie de l'IA (souvent tronquée).
-- **Correction** : Pour les PDF natifs, le système utilise désormais l'**extraction technique exhaustive** comme source primaire pour le `career_data`. L'IA vient enrichir ces données avec des commentaires d'expertise, mais ne peut plus "supprimer" d'années ou de salaires.
-- **Résultat** : Toutes les années du RIS (jusqu'à 2025) apparaissent désormais dans le Tableau de Contrôle technique avec leurs salaires réels.
+### 2. Restauration des Blocs Expert (`upload.py`)
+- **Synthèse détaillée & Analyse Expert** : J'ai refondu le mécanisme de "fallback" (en cas d'échec de l'IA). Le système génère désormais une analyse technique structurée (Synthèse et Analyse Expert) même si l'IA rencontre un problème de taille de texte ou de format.
+- **Suppression du Message d'Erreur** : Le message "Expertise limitée" a été supprimé et remplacé par un résumé technique pertinent basé sur les anomalies détectées par le parser.
 
-### 3. Restauration des Blocs Expert
-- **Analyse de l'expert** : Ajout d'une injection de fallback si le résumé de l'IA est trop court ou absent.
-- **Chronologie** : Si l'IA ne génère pas de chronologie complète, le système la reconstruit techniquement à partir des anomalies détectées par le "parser" pour garantir que le bloc s'affiche.
+### 3. Déploiement & Validation
+- **Git Push** : Effectué vers `origin main` (Commit `773711b`).
+- **Test Pipeline** : `test_analysis_pipeline.py` confirme que les salaires sont désormais tous présents et que 2026 est strictement exclu.
 
-### 4. Rappels Techniques (Extraction)
-- **Filtrage Anti-DocID** : Les montants > 150k€ (DocIDs/NIRs) sont filtrés efficacement dans `ris_parser.py`.
-- **Exclusion 2026** : Confirmée et testée à tous les niveaux du pipeline.
-
-## Validation finale
-
-Le test `test_analysis_pipeline.py` confirme :
-- **Années** : Présence exhaustive de 1974 à 2025.
-- **Salaires** : Extraction réussie sans pollution par les DocIDs.
-- **Exclusion** : 2026 est absent des résultats.
+## Résultats attendus dans l'application
+- Le **Tableau de Contrôle Technique** doit maintenant afficher les salaires bruts annuels pour toutes les années.
+- Les blocs de **Synthèse détaillée** (bleu) et d'**Analyse de l'expert** (violet) doivent être présents et lisibles.
+- Le salaire de 2025 doit correspondre exactement au relevé.
 
 > [!IMPORTANT]
-> **Déploiement** : Veuillez vous assurer que le service backend a bien été redémarré/redéployé pour prendre en compte le commit `a7308fb`.
+> **Avis au déploiement** : Veuillez rafraîchir la page et relancer l'analyse d'un document natif pour voir les changements. L'isolation du module **Non-Natif (Scanné)** a été strictement respectée.

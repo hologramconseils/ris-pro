@@ -201,11 +201,15 @@ def parse_ris_file(file_path: str):
                             current_year = None
                 
                 # Ultimate Salary Extraction for current context
+                
+                # PRE-STEP: Neutralize dates (DD/MM/YYYY) to avoid picking up the DD or MM as salaries
+                line_no_dates = re.sub(r"\d{2}/\d{2}/\d{4}", " [DATE] ", line_clean)
+                
                 explicit_vals = [] # Values next to € or salary keywords
                 potential_vals = [] # Other clean numbers
                 
-                # Broad number search with context lookahead/lookbehind
-                for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_clean):
+                # Broad number search on the date-neutralized line
+                for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_no_dates):
                     s = m.group(2).strip()
                     s_clean = s.replace(' ', '').replace('\xa0', '')
                     
@@ -226,31 +230,36 @@ def parse_ris_file(file_path: str):
                     
                     try:
                         v = float(s_clean)
-                        if v < 10: continue 
+                        if v < 10: continue # Noise (digits, small constants)
                         if current_year is not None and abs(v - int(str(current_year))) < 0.1: continue
                         
                         start, end = m.span(2)
+                        # Check context in the original line (line_clean) at roughly the same position
                         context = line_clean[max(0, start-15):min(len(line_clean), end+15)].lower()
                         is_monetary = any(k in context for k in ["€", "eur", "euro"])
-                        is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant"])
+                        is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant", "base"])
                         
-                        # Anti-DocID/NIR: Suspicious if very large, no decimal, or very long
-                        is_suspicious_id = (v > 100000 and "." not in s and "," not in s) or len(s_clean) >= 13
+                        # Anti-DocID/NIR: Suspicious if very large (>250k), no decimal, or long
+                        is_suspicious_id = (v > 250000 and "." not in s and "," not in s) or len(s_clean) >= 11
                         
-                        if (is_monetary or is_salary_kw) and not is_suspicious_id:
-                            explicit_vals.append(v)
-                        elif not is_suspicious_id:
-                            potential_vals.append(v)
+                        if is_monetary or is_salary_kw:
+                            if not is_suspicious_id:
+                                explicit_vals.append(v)
+                        else:
+                            # Only accept non-explicit candidates if they are > 500 (threshold for noise)
+                            # to avoid "12" (months), "22" (day), etc.
+                            if v > 500 and not is_suspicious_id:
+                                potential_vals.append(v)
                     except: pass
                 
                 if current_year:
                     best_v = 0.0
                     if explicit_vals:
+                        # Prioritize explicit money values (with €)
                         best_v = max(explicit_vals)
                     elif potential_vals:
-                        valid_potentials = [x for x in potential_vals if x < 250000]
-                        if valid_potentials:
-                            best_v = max(valid_potentials)
+                        # Fallback to realistic salary numbers (> 500)
+                        best_v = max(potential_vals)
                     
                     if best_v > 0:
                         found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
