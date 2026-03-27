@@ -13,6 +13,7 @@ import database
 import schemas
 import models
 from services import ris_parser, ai_service
+from services.rules_engine import RetirementRulesEngine
 from routers.auth import get_current_user
 from services.auth import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
@@ -141,11 +142,11 @@ async def run_full_analysis_worker(
                         except: pass
 
                     ai_commentary = await ai_service.generate_ai_audit(
-                        result.get("detailed_report", []), 
+                        parser_res.get("detailed_report", []), 
                         db_scan.filename,
                         raw_text=db_scan.raw_text,
-                        images=result.get("images", []),
-                        career_data=career_data,
+                        images=parser_res.get("images", []),
+                        career_data=technical_audit,
                         birth_year=birth_year
                     )
                     if ai_service.is_valid_json(ai_commentary):
@@ -197,19 +198,6 @@ async def run_full_analysis_worker(
                         db_scan.detailed_report = json.dumps(ai_anomalies)
                         db_scan.has_anomalies = True
                     
-                    # Extract reliability score from AI analysis if provided, 
-                    # else fallback to our calculated one (already in memory or computed)
-                    from services.rules_engine import RetirementRulesEngine
-                    verified_periods = []
-                    for entry in career_data:
-                        if entry.get("salary", 0) > 0:
-                            calc_res = RetirementRulesEngine.calculate_theoretical_points(entry["salary"], entry["year"])
-                            verified_periods.append({
-                                "ris_points": entry.get("ris_points", 0.0),
-                                "theo_points": calc_res.get("points", 0.0)
-                            })
-                    db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(verified_periods)
-                             
                 except Exception as json_err:
                     print(f"JSON Parse AI error: {json_err}")
 

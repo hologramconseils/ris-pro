@@ -93,7 +93,7 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
         # 2. Career Projection (Expert: uses birth year and total quarters)
         if career_data:
             last_entry = career_data[-1]
-            total_q = sum(e.get("quarters", 0) for e in career_data)
+            total_q = sum(e.get("ris_quarters", 0) for e in career_data)
             
             projection = RetirementRulesEngine.project_future_career(
                 total_points=sum(e.get("ris_points", 0.0) for e in career_data),
