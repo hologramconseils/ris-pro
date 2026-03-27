@@ -95,13 +95,39 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
             last_entry = career_data[-1]
             total_q = sum(e.get("ris_quarters", 0) for e in career_data)
             
+            total_pts = sum(e.get("ris_points", 0.0) for e in career_data)
             projection = RetirementRulesEngine.project_future_career(
-                total_points=sum(e.get("ris_points", 0.0) for e in career_data),
+                total_points=total_pts,
                 birth_year=birth_year,
                 current_salary=last_entry.get("salary", 40000.0),
                 current_quarters=total_q
             )
-            career_projection = projection
+            
+            # Technical Pension Estimate based on consolidated formulas
+            sam = RetirementRulesEngine.calculate_sam(career_data)
+            base_pension = RetirementRulesEngine.calculate_base_pension(
+                sam, 
+                projection.get("projected_quarters", total_q),
+                projection.get("required_quarters", 172)
+            )
+            
+            # Agirc-Arrco value from rules engine or default
+            service_val = 1.4386
+            resource_2025 = RetirementRulesEngine.RETIREMENT_RESOURCES.get(2025, {})
+            if isinstance(resource_2025, dict) and "unified" in resource_2025:
+                service_val = float(resource_2025["unified"].get("service", 1.4386))
+            
+            comp_pension = RetirementRulesEngine.calculate_complementary_pension(
+                projection.get("projected_points", total_pts),
+                float(service_val)
+            )
+            
+            total_monthly_pension = (base_pension + comp_pension) / 12.0
+            career_projection = {
+                **projection,
+                "technical_monthly_estimate": round(float(total_monthly_pension), 2),
+                "sam": round(float(sam), 2)
+            }
 
     expert_context = f"""
 **RÈGLES AGIRC-ARRCO (RÉFÉRENTIEL RÉGLEMENTAIRE) :**
@@ -117,9 +143,11 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 
 **VÉRIFICATION EXPERTE (RÉSULTATS DU MOTEUR) :**
 - Score de fiabilité globale : {reliability_score}/100
-- Notes d'audit : {" | ".join(expert_audit_notes) if expert_audit_notes else "Aucun écart majeur détecté sur les salaires déclarés."}
-- Projection estimée : {career_projection.get('estimated_monthly_pension', 'N/A')}€ / mois à l'âge légal.
+- Salaire Annuel Moyen (SAM) calculé : {career_projection.get('sam', 0)}€
+- Projection estimée (Total) : {career_projection.get('technical_monthly_estimate', 'N/A')}€ / mois à l'âge légal.
+- Base : {round(float(base_pension/12.0), 2) if 'base_pension' in locals() else 'N/A'}€ | Complémentaire : {round(float(comp_pension/12.0), 2) if 'comp_pension' in locals() else 'N/A'}€
 - Taux plein : {"Oui" if career_projection.get("has_full_rate", False) else "Non (Décote estimée de " + str(career_projection.get("malus_applied", 0)) + "% sur Agirc-Arrco)"}
+- Notes d'audit : {" | ".join(expert_audit_notes) if expert_audit_notes else "Aucun écart majeur détecté sur les salaires déclarés."}
 """
 
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).

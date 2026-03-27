@@ -17,6 +17,11 @@ def parse_ris_file(file_path: str):
     is_scanned = False
     images = []
     
+    def cleanup_ocr_text(text: str):
+        """Fixes common OCR errors and archaic notations."""
+        text = text.replace("FRF", "€").replace("pts", "points").replace("trim", "trimestres")
+        text = text.replace("0trim", "0 trimestre")
+        return text
     try:
         doc = fitz.open(file_path)
         for page in doc:
@@ -42,6 +47,9 @@ def parse_ris_file(file_path: str):
             "error": f"Impossible de lire le fichier PDF : {str(e)}",
             "detailed_report": []
         }
+
+    # Final text cleanup (OCR typos, archaic currency)
+    doc_text = cleanup_ocr_text(doc_text)
 
     # Basic validation
     if is_scanned:
@@ -121,20 +129,34 @@ def parse_ris_file(file_path: str):
                                 regime_name = name
                                 break
                         
-                        if current_year not in found_points:
-                            found_points[current_year] = []
-                        found_points[current_year].append((pts_val, regime_name))
+                        if current_year:
+                             if current_year not in found_points:
+                                 found_points[current_year] = []
+                             found_points[current_year].append((pts_val, regime_name))
                     except: pass
 
-            # 3. Salaries (DETAIL)
+            # 3. Salaries (DETAIL) - Aggregation Logic
             if current_context == "DETAIL":
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d))", line_clean)
-                if date_match and current_year:
-                    sal_match = re.search(r"(\d{1,6}(?:[\s,]\d{3})*(?:[.,]\d{2})?)\s*€", line_clean)
+                if date_match:
+                    row_year = date_match.group(2)
+                    current_year = row_year
+                    all_detected.append(int(row_year))
+                
+                # Check for year even without full date (e.g. 2024 at start of line)
+                elif re.match(r"^(19[5-9]\d|20[0-2]\d)\b", line_clean):
+                    row_year = line_clean[:4]
+                    current_year = row_year
+                    all_detected.append(int(row_year))
+                
+                if current_year:
+                    sal_match = re.search(r"(\d{1,6}(?:[\s,]\d{3})*(?:[.,]\d{2})?)\s*[€$F]", line_clean)
                     if sal_match:
                         raw_sal = sal_match.group(1).replace(' ', '').replace(',', '.')
                         try:
-                            found_salaries[current_year] = float(raw_sal)
+                            val = float(raw_sal)
+                            # Cumulative sum for the same year
+                            found_salaries[current_year] = found_salaries.get(current_year, 0.0) + val
                         except: pass
 
         # 4. Anomaly Synthesis

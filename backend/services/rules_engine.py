@@ -19,6 +19,14 @@ GENERATION_RULES = {
     1968: {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172},
 }
 
+# For younger generations, the rule remains 64 years and 172 quarters unless new reform
+def get_params_for_year(birth_year: int) -> Dict[str, Any]:
+    if birth_year >= 1968:
+        return {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172}
+    if birth_year < 1955:
+        return {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166}
+    return GENERATION_RULES.get(birth_year, {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172})
+
 # Historical data for Plafond Annuel de la Sécurité Sociale (PASS) and Agirc-Arrco point values
 RETIREMENT_RESOURCES = {
     2026: {"pass": 48060.0, "unified": {"purchase": 20.1877, "service": 1.4386}},
@@ -110,11 +118,8 @@ class RetirementRulesEngine:
         pre_data = data.get("arrco") or data.get("unified")
         if not isinstance(pre_data, dict):
              purchase_val = 15.0
-        else:
-             purchase_val = float(pre_data.get("purchase", 15.0))
-             
-        points = (salary * 0.06) / purchase_val 
-        return {"points": round(float(points), 2), "purchase_value": purchase_val}
+        points = (float(salary) * 0.06) / float(purchase_val)
+        return {"points": round(float(points), 2), "purchase_value": float(purchase_val)}
 
     @staticmethod
     def calculate_theoretical_quarters(salary: float, year: int) -> int:
@@ -278,3 +283,35 @@ class RetirementRulesEngine:
             "estimated_monthly_pension": round(float(estimated_annual_pension / 12.0), 2),
             "malus_applied": round(float((1.0 - malus) * 100), 1)
         }
+
+    @staticmethod
+    def calculate_base_pension(sam: float, validated_quarters: int, required_quarters: int, rate: float = 0.5) -> float:
+        """
+        Calculates base pension: SAM * rate * (validated / required).
+        User formula: pension = SAM × taux × (trimestres validés / trimestres requis)
+        """
+        if required_quarters <= 0: return 0.0
+        ratio = min(1.0, float(validated_quarters) / float(required_quarters))
+        return sam * rate * ratio
+
+    @staticmethod
+    def calculate_complementary_pension(total_points: float, service_value: float) -> float:
+        """
+        Calculates complementary pension: points * service_value.
+        User formula: pension complémentaire = total des points × valeur du point.
+        """
+        return total_points * service_value
+
+    @staticmethod
+    def calculate_sam(career_data: List[Dict[str, Any]]) -> float:
+        """
+        Calculates the Average Annual Salary (SAM) based on the 25 best years.
+        Only years with salary > 0 are considered.
+        """
+        salaries = [float(item.get("salary", 0.0)) for item in career_data if float(item.get("salary", 0.0)) > 0]
+        if not salaries: return 0.0
+        salaries.sort(reverse=True)
+        # Take up to 25 best years
+        end_idx = min(25, len(salaries))
+        best_25 = [salaries[i] for i in range(end_idx)]
+        return sum(best_25) / len(best_25)

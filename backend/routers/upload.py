@@ -4,6 +4,7 @@ import os
 import uuid
 import shutil
 import asyncio
+import re
 from datetime import datetime
 from typing import Optional, List
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request, BackgroundTasks
@@ -134,11 +135,14 @@ async def run_full_analysis_worker(
             max_retries = 2
             for attempt in range(max_retries):
                 try:
-                    # Extract birth year from identity_birth_date (DD/MM/YYYY)
-                    birth_year = 1980
-                    if db_scan.identity_birth_date and "/" in db_scan.identity_birth_date:
+                    # Extract birth year from identity_birth_date (DD/MM/YYYY or string)
+                    birth_year = 1965
+                    if db_scan.identity_birth_date:
                         try:
-                            birth_year = int(db_scan.identity_birth_date.split("/")[-1])
+                            # Try to find a 4-digit year in the string
+                            year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                            if year_match:
+                                birth_year = int(year_match.group(1))
                         except: pass
 
                     ai_commentary = await ai_service.generate_ai_audit(
@@ -158,6 +162,16 @@ async def run_full_analysis_worker(
                     await asyncio.sleep(2)
 
             if ai_commentary and ai_service.is_valid_json(ai_commentary):
+                # Add OCR uncertainty warning if scanned
+                if db_scan.is_scanned:
+                    try:
+                        ai_data = json.loads(ai_commentary) if isinstance(ai_commentary, str) else ai_commentary
+                        warning_prefix = "⚠️ L'analyse est basée sur un document scanné dont la restitution peut comporter des approximations. Veuillez vérifier les informations.\n\n"
+                        if "resume_global" in ai_data:
+                            ai_data["resume_global"] = warning_prefix + ai_data["resume_global"]
+                        ai_commentary = json.dumps(ai_data)
+                    except: pass
+                
                 db_scan.ai_analysis = ai_commentary
                 try:
                     ai_data = json.loads(ai_commentary)
