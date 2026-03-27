@@ -280,6 +280,15 @@ async def run_full_analysis_worker(
                         precision_career.sort(key=lambda x: x['year'])
                         db_scan.career_data = json.dumps(precision_career, ensure_ascii=False)
                         db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(precision_career)
+                    elif not full_timeline and technical_audit:
+                        # Fallback for native PDFs: if AI failed to return a timeline, use technical precision
+                        native_fallback_career = []
+                        for tech_entry in technical_audit:
+                            if tech_entry.get("year", 0) < datetime.now().year:
+                                native_fallback_career.append(RetirementRulesEngine.get_year_validation_status(tech_entry))
+                        if native_fallback_career:
+                            native_fallback_career.sort(key=lambda x: x['year'])
+                            db_scan.career_data = json.dumps(native_fallback_career, ensure_ascii=False)
 
                 ### FROZEN MODULE: NON-NATIVE ANALYSIS - TECHNICAL BACKFILL ###
                 # 4. Backfill technical career_data for scanned documents if empty

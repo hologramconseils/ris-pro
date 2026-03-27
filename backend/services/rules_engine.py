@@ -126,6 +126,10 @@ class RetirementRulesEngine:
     @staticmethod
     def calculate_theoretical_quarters(salary: float, year: int) -> int:
         """Calculates theoretical quarters based on SMIC rules."""
+        # Rule: Current year or future years are not analyzed for quarters
+        if year >= datetime.now().year:
+            return 0
+            
         smic = SMIC_HISTORY.get(year, SMIC_HISTORY[1972] if year < 1972 else SMIC_HISTORY[2025])
         # 150h pre-2014, 200h post-2014
         threshold_h = 200 if year < 2014 else 150

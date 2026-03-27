@@ -130,7 +130,13 @@ def parse_ris_file(file_path: str):
             year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
             if year_match:
                 detected_year = year_match.group(1)
-                all_detected.append(int(detected_year))
+                y_int = int(detected_year)
+                
+                # Rule: Never analyze current year or future years
+                if y_int >= datetime.datetime.now().year:
+                    continue
+                    
+                all_detected.append(y_int)
                 # If we see a year and no context yet, default to SYNTHESE-like scanning
                 if current_context == "GENERAL":
                     current_context = "SYNTHESE"
@@ -166,76 +172,84 @@ def parse_ris_file(file_path: str):
                                 regime_name = name
                                 break
                         
-                        if current_year:
+                        if current_year is not None:
                              if current_year not in found_points:
                                  found_points[current_year] = []
                              found_points[current_year].append((pts_val, regime_name))
                     except: pass
 
-            # 3. Salaries (DETAIL) - Aggregation Logic
             if current_context == "DETAIL":
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
                 if date_match:
                     row_year = date_match.group(2)
-                    current_year = row_year
-                    all_detected.append(int(row_year))
+                    y_int = int(row_year)
+                    if y_int < datetime.datetime.now().year:
+                        current_year = row_year
+                        all_detected.append(y_int)
+                    else:
+                        current_year = None
+                else:
+                    # Check for year anywhere in line if no full date found
+                    year_anywhere = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
+                    if year_anywhere:
+                        row_year = year_anywhere.group(1)
+                        y_int = int(row_year)
+                        if y_int < datetime.datetime.now().year:
+                            current_year = row_year
+                            all_detected.append(y_int)
+                        else:
+                            current_year = None
                 
-                # Check for year even without full date (e.g. 2024 at start of line)
-                elif re.match(r"^(19[5-9]\d|20[0-2]\d|2030)\b", line_clean):
-                    row_year = line_clean[:4]
-                    current_year = row_year
-                    all_detected.append(int(row_year))
-                
-                    # Ultimate Salary Extraction: find all number-like strings and pick the best one
-                    potential_vals = []
-                    for m in re.finditer(r"\b(\d[\d\s.,\xa0]*\d|\d)\b", line_clean):
-                        s = m.group(1).strip()
-                        # Basic cleanup of spaces and non-breaking spaces
-                        s_clean = s.replace(' ', '').replace('\xa0', '')
-                        
-                        # Handle mixed separators (1.000,00 or 1,000.00)
-                        if ',' in s_clean and '.' in s_clean:
-                            if s_clean.rfind('.') < s_clean.rfind(','):
-                                s_clean = s_clean.replace('.', '').replace(',', '.')
-                            else:
-                                s_clean = s_clean.replace(',', '')
-                        elif ',' in s_clean:
-                            # Check if it looks like a thousands separator (e.g. 15,000) or decimal (15000,00)
-                            if len(s_clean.split(',')[1]) == 3 and '.' not in s_clean:
-                                s_clean = s_clean.replace(',', '')
-                            else:
-                                s_clean = s_clean.replace(',', '.')
-                        elif '.' in s_clean:
-                            # Same for dot
-                            if len(s_clean.split('.')[1]) == 3:
-                                s_clean = s_clean.replace('.', '')
-                        
-                        try:
-                            v = float(s_clean)
-                            # Exclude if it perfectly matches the current year
-                            if abs(v - int(current_year or 0)) < 0.1: continue
-                            
-                            # Exclude if it looks like part of a date (surrounded by /)
-                            start, end = m.span()
-                            if start > 0 and line_clean[start-1] == '/': continue
-                            if end < len(line_clean) and line_clean[end] == '/': continue
-                            
-                            potential_vals.append(v)
-                        except: pass
+                # Ultimate Salary Extraction for current context
+                potential_vals = []
+                for m in re.finditer(r"\b(\d[\d\s.,\xa0]*\d|\d)\b", line_clean):
+                    s = m.group(1).strip()
+                    s_clean = s.replace(' ', '').replace('\xa0', '')
                     
-                    if potential_vals:
-                        # In a detailed line, the largest non-year number is almost always the salary
-                        best_v = max(potential_vals)
+                    if ',' in s_clean and '.' in s_clean:
+                        if s_clean.rfind('.') < s_clean.rfind(','):
+                            s_clean = s_clean.replace('.', '').replace(',', '.')
+                        else:
+                            s_clean = s_clean.replace(',', '')
+                    elif ',' in s_clean:
+                        if len(s_clean.split(',')[1]) == 3 and '.' not in s_clean:
+                            s_clean = s_clean.replace(',', '')
+                        else:
+                            s_clean = s_clean.replace(',', '.')
+                    elif '.' in s_clean:
+                        if len(s_clean.split('.')[1]) == 3:
+                            s_clean = s_clean.replace('.', '')
+                    
+                    try:
+                        v = float(s_clean)
+                        if v < 10: continue
+                        if current_year is not None and abs(v - int(str(current_year))) < 0.1: continue
                         
-                        # Anti-DocID Filter: Ignore 6-9 digit numbers > 150k unless explicitly labeled
+                        start, end = m.span()
+                        if start > 0 and line_clean[start-1] == '/': continue
+                        if end < len(line_clean) and line_clean[end] == '/': continue
+                        
+                        potential_vals.append(v)
+                    except: pass
+                
+                if potential_vals and current_year:
+                    filtered_vals = []
+                    for v in potential_vals:
                         is_explicit = any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"])
-                        is_suspicious = best_v > 150000 and len(str(int(best_v))) >= 6
-                        
+                        is_suspicious = v > 150000 and "." not in str(v)
                         if is_suspicious and not is_explicit:
-                            best_v = 0.0 # Redact suspicious salary
-
+                            continue
+                        filtered_vals.append(v)
+                    
+                    if filtered_vals:
+                        best_v = max(filtered_vals)
+                        # Final Safety: if best_v is still > 1M and not explicit, it's likely noise
+                        is_explicit = any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"])
+                        if best_v > 1000000 and not is_explicit:
+                            best_v = 0.0
+                        
                         if best_v > 0:
-                            found_salaries[current_year] = found_salaries.get(current_year, 0.0) + best_v
+                            found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
 
         # 4. Anomaly Synthesis
         if all_detected:
