@@ -19,8 +19,8 @@ def parse_ris_file(file_path: str):
     
     def cleanup_ocr_text(text: str):
         """Fixes common OCR errors and archaic notations."""
-        # Normalize common keywords without breaking word boundaries
-        text = re.sub(r"\bFRF\b", "€", text)
+        # Normalize common keywords and archaic French Francs (FRF, Francs, F.)
+        text = re.sub(r"\b(FRF|Francs|F\.)\b", "€", text, flags=re.IGNORECASE)
         text = re.sub(r"\bpts\b", " points ", text, flags=re.IGNORECASE)
         # Only replace 'trim' if not already part of 'trimestre'
         text = re.sub(r"\btrim(?!\.|es)\b", " trimestres ", text, flags=re.IGNORECASE)
@@ -181,27 +181,30 @@ def parse_ris_file(file_path: str):
                     except: pass
 
             if current_context == "DETAIL":
+                # Date Detection and Year Tracking (Same line priority)
+                line_year = None
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
                 if date_match:
-                    row_year = date_match.group(2)
-                    y_int = int(row_year)
+                    line_year = date_match.group(2)
+                    y_int = int(line_year)
                     if y_int < datetime.datetime.now().year:
-                        current_year = row_year
+                        current_year = line_year
                         all_detected.append(y_int)
                     else:
-                        current_year = None
-                else:
-                    # Check for year anywhere in line if no full date found
+                        line_year = None # Invalid future year
+                
+                # Check for year anywhere in line if no full date found
+                if not line_year:
                     year_anywhere = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
                     if year_anywhere:
-                        row_year = year_anywhere.group(1)
-                        y_int = int(row_year)
+                        line_year = year_anywhere.group(1)
+                        y_int = int(line_year)
                         if y_int < datetime.datetime.now().year:
-                            current_year = row_year
-                            all_detected.append(y_int)
+                             current_year = line_year
+                             all_detected.append(y_int)
                         else:
-                            current_year = None
-                
+                             line_year = None
+
                 # Ultimate Salary Extraction for current context
                 
                 # End of Career Section (ignore everything after)
@@ -225,7 +228,7 @@ def parse_ris_file(file_path: str):
                 
                 explicit_vals = [] # Values next to € or salary keywords
                 
-                # Broad number search on the date-neutralized line
+                # Broad number search
                 for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_no_dates):
                     s = m.group(2).strip()
                     s_clean = s.replace(' ', '').replace('\xa0', '')
@@ -248,32 +251,34 @@ def parse_ris_file(file_path: str):
                     try:
                         v = float(s_clean)
                         if v < 1: continue 
+                        if line_year is not None and abs(v - int(str(line_year))) < 0.1: continue
                         if current_year is not None and abs(v - int(str(current_year))) < 0.1: continue
                         
                         # HARD PROTECTION: Salaries in RIS are never > 200,000 per line (usually technical codes)
                         if v > 200000: continue
                         
                         start, end = m.span(2)
-                        # Check context in the original line (line_clean) at roughly the same position
+                        # Check context in the original line (line_clean)
                         context = line_clean[max(0, start-15):min(len(line_clean), end+15)].lower()
                         is_monetary = any(k in context for k in ["€", "eur", "euro"])
                         is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant", "base"])
                         
                         # GOLDEN RULE for native PDFs: ONLY accept numbers with explicit context (€ or Keyword)
                         if is_monetary or is_salary_kw:
-                             # Round to 2 decimals to ensure perfect merging in sets
                              explicit_vals.append(round(v, 2))
                     except: pass
-                if current_year:
+                
+                target_year = line_year or current_year
+                if target_year:
                     # GOLDEN RULE: Only take values with € symbols to include micro-revenues and exclude NIR/Codes
                     best_v = 0.0
                     if explicit_vals:
                         best_v = max(explicit_vals)
                     
                     if best_v > 0:
-                        if str(current_year) not in yearly_salaries_list:
-                            yearly_salaries_list[str(current_year)] = []
-                        yearly_salaries_list[str(current_year)].append(best_v)
+                        if str(target_year) not in yearly_salaries_list:
+                            yearly_salaries_list[str(target_year)] = []
+                        yearly_salaries_list[str(target_year)].append(best_v)
                         # DEBUG
                         # print(f"DEBUG: Added {best_v} to {current_year} from line: {line_clean[:50]}")
 
