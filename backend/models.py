@@ -38,6 +38,8 @@ class ScanResult(Base):
     identity_hash = Column(String, index=True, nullable=True) # Hash of Name + BirthDate
     identity_name = Column(String, nullable=True)
     identity_birth_date = Column(String, nullable=True)
+    reliability_score = Column(Integer, default=100)
+    career_data = Column(Text, nullable=True) # JSON of granular year data
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
 
     user = relationship("User", back_populates="scans")

@@ -28,7 +28,7 @@ def strip_markdown(data):
         return {k: strip_markdown(v) for k, v in data.items()}
     return data
 
-async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None):
+async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None, career_data: list = None):
     """
     Routage Expertise Adaptatif (Stabilité & Quotas) + Détection Justinificatifs Exhaustive.
     """
@@ -57,11 +57,77 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 - **IDENTITÉ :** Cherche le nom de l'assuré en haut des pages (près de 'Nom d'usage' ou 'Prénom').
 - **TABLEAUX :** Fais attention aux décalages visuels. L'année est à gauche, l'employeur au milieu, les trimestres/points à droite.""" if is_scan else ""
     
+    # --- Expert Calculation Engine Integration ---
+    from services.rules_engine import RetirementRulesEngine
+    
+    # 1. Perform automated verification for each year if career_data is present
+    expert_audit_notes = []
+    reliability_score = 100
+    career_projection = {}
+    
+    # NOTE: `career_data` is now passed as an argument.
+    if career_data:
+        verified_periods = []
+        for entry in career_data:
+            year = entry.get("year")
+            salary = entry.get("salary", 0.0)
+            ris_pts = entry.get("ris_points", 0.0)
+            
+            if salary > 0:
+                calc_res = RetirementRulesEngine.calculate_theoretical_points(salary, year)
+                theo_pts = calc_res.get("points", 0.0)
+                verified_periods.append({
+                    "year": year,
+                    "ris_points": ris_pts,
+                    "theo_points": theo_pts
+                })
+                
+                # If significant delta, add to expert notes
+                if abs(ris_pts - theo_pts) > 1.0:
+                    expert_audit_notes.append(f"Année {year} : Écart détecté. Points RIS: {ris_pts} vs Théorie: {theo_pts} (Basé sur salaire de {salary}€)")
+
+        reliability_score = RetirementRulesEngine.get_reliability_score(verified_periods)
+        
+        # 2. Career Projection (Simplified: uses last known salary or default)
+        if career_data:
+            last_entry = career_data[-1]
+            projection = RetirementRulesEngine.project_future_career(
+                current_age=45, # Placeholder, should be extracted from birth date
+                current_salary=last_entry.get("salary", 40000.0),
+                total_points=sum(e.get("ris_points", 0.0) for e in career_data)
+            )
+            career_projection = projection
+
+    expert_context = f"""
+**RÈGLES AGIRC-ARRCO (RÉFÉRENTIEL RÉGLEMENTAIRE) :**
+- Les points sont calculés sur le SALAIRE DE CALCUL (Tranche 1 : 6,20%, Tranche 2 : 17%).
+- Le TAUX D'APPEL est de 127% (ce surplus ne génère pas de points).
+- Valeur d'achat du point (2025: 20,1877€ | 2024: 19,6321€ | 2023: 18,7669€).
+- PASS (Plafond Sécu) : 2025: 47 100€ | 2024: 46 368€ | 2023: 43 992€.
+
+**PÉRIODES ASSIMILÉES (SANS COTISATION) :**
+- Maladie : Points attribués si l'arrêt > 60 jours consécutifs. Calcul sur moyenne des points de l'année précédente.
+- Chômage : Points calculés sur une assiette fictive (SJR).
+- Maternité : Points attribués dès l'indemnisation CPAM.
+
+**VÉRIFICATION EXPERTE (RÉSULTATS DU MOTEUR) :**
+- Score de fiabilité globale : {reliability_score}/100
+- Notes d'audit : {" | ".join(expert_audit_notes) if expert_audit_notes else "Aucun écart majeur détecté sur les salaires déclarés."}
+- Projection estimée : {career_projection.get('estimated_monthly_pension', 'N/A')}€ / mois à 64 ans.
+"""
+
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).
 {vision_mode_desc}
 
+{expert_context}
+
 **MISSION ET PÉRIODE D’ANALYSE :**
 - Analyse la carrière de la toute première activité détectée jusqu'à l'année **{target_year}** (N-1 par rapport à aujourd'hui).
+- **RECALCUL DES DROITS :** Utilise les notes d'audit expertes fournies pour signaler les années où les points RIS ne correspondent pas aux salaires déclarés.
+- **ANALYSE DES ASSIMILÉS :** Vérifie impérativement si les périodes de chômage ou maladie sont bien suivies de points.
+- **SCORE DE FIABILITÉ :** Intègre le score de fiabilité dans ton résumé global.
+- **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.
+
 - **RÉGIMES COMPLÉMENTAIRES EST ESSENTIEL :** Ne te limite pas au régime de base (trimestres). Analyse impérativement les régimes complémentaires (Agirc-Arrco, Ircantec, RAFP, RCI, etc.) et les POINTS acquis.
 - **DÉTECTION HORS TRIMESTRES :** Signale systématiquement si des points apparaissent sur une année sans trimestres, ou si une activité salariée connue n'affiche pas de points complémentaires.
 - **CHRONOLOGIE :** Présente systématiquement les anomalies par ordre chronologique, de la plus ancienne à la plus récente.

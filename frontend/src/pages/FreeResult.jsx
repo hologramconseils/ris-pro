@@ -163,6 +163,39 @@ export default function FreeResult({ result: initialResult, onReset }) {
                 <h2 className={`verdict-title ${hasAnomalies ? 'danger' : 'success'}`} style={{ marginTop: 8 }}>
                   Anomalies détectées : {hasAnomalies ? 'OUI' : 'NON'}
                 </h2>
+                
+                {/* Reliability Score Gauge */}
+                <div style={{ marginTop: 20, marginBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ position: 'relative', width: 140, height: 140 }}>
+                    <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.05)"
+                        strokeWidth="3"
+                      />
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke={result.reliability_score > 80 ? '#22c55e' : (result.reliability_score > 50 ? '#eab308' : '#ef4444')}
+                        strokeWidth="3"
+                        strokeDasharray={`${result.reliability_score || 0}, 100`}
+                        style={{ transition: 'stroke-dasharray 1s ease-out' }}
+                      />
+                    </svg>
+                    <div style={{
+                      position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ fontSize: 24, fontWeight: 900 }}>{result.reliability_score || 0}%</div>
+                      <div style={{ fontSize: 9, fontWeight: 700, opacity: 0.6, textTransform: 'uppercase' }}>Fiabilité</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
+                    Score basé sur la cohérence des points Agirc-Arrco déclarés.
+                  </p>
+                </div>
+
                 <p className="verdict-subtitle" style={{ marginBottom: 0 }}>
                   {hasAnomalies
                     ? 'Le système d’audit a identifié des incohérences nécessitant une régularisation pour garantir vos droits à la retraite.'

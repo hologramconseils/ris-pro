@@ -38,6 +38,8 @@ class ScanResultResponse(ScanResultBase):
     identity_hash: Optional[str] = None
     identity_name: Optional[str] = None
     identity_birth_date: Optional[str] = None
+    reliability_score: int = 100
+    career_data: Optional[str] = None
     created_at: datetime
 
     class Config:

@@ -196,14 +196,28 @@ def parse_ris_file(file_path: str):
                         "needs_justificatifs": False
                     })
 
-    has_anomalies = len(anomalies_list) > 0
+    # 5. Granular Career Data for Rules Engine
+    career_data = []
+    if all_detected:
+        all_unique_years = sorted(list(set(all_detected)))
+        for y in all_unique_years:
+            y_str = str(y)
+            career_data.append({
+                "year": y,
+                "salary": found_salaries.get(y_str, 0.0),
+                "ris_points": sum(item[0] for item in found_points.get(y_str, [])),
+                "quarters": found_years.get(y_str, 0),
+                "regime": found_points.get(y_str, [None, "Agirc-Arrco"])[0][1] if found_points.get(y_str) else "Agirc-Arrco"
+            })
+
     identity_data = extract_identity(doc_text)
-    
+
     return {
-        "has_anomalies": has_anomalies,
+        "has_anomalies": len(anomalies_list) > 0,
         "is_scanned": is_scanned,
         "is_valid_ris": is_ris,
         "detailed_report": sorted(anomalies_list, key=lambda x: x.get("year", 0)),
+        "career_data": career_data,
         "raw_text": doc_text,
         "images": images,
         "identity_name": identity_data[0],
