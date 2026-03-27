@@ -212,6 +212,34 @@ async def run_full_analysis_worker(
                         db_scan.detailed_report = json.dumps(ai_anomalies)
                         db_scan.has_anomalies = True
                     
+                    # NEW: For scanned documents, backfill the technical career_data from AI extraction
+                    if db_scan.is_scanned and full_timeline:
+                        ai_career_data = []
+                        for item in full_timeline:
+                            year = item.get("annee")
+                            if not year or not str(year).isdigit(): continue
+                            
+                            salary = item.get("salaire_brut", 0.0)
+                            ris_quarters = item.get("trimestres_valides", 0)
+                            ris_points = item.get("points_complementaires", 0.0)
+                            
+                            entry = {
+                                "year": int(year),
+                                "salary": float(salary) if salary else 0.0,
+                                "ris_quarters": int(ris_quarters) if ris_quarters else 0,
+                                "ris_points": float(ris_points) if ris_points else 0.0,
+                                "regime": item.get("activite", "Détecté par IA")
+                            }
+                            # Re-run mathematical validation (SMIC/PASS/Points)
+                            validated_entry = RetirementRulesEngine.get_year_validation_status(entry)
+                            ai_career_data.append(validated_entry)
+                        
+                        if ai_career_data:
+                            ai_career_data.sort(key=lambda x: x['year'])
+                            db_scan.career_data = json.dumps(ai_career_data)
+                            # Update reliability score based on new data
+                            db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+
                 except Exception as json_err:
                     print(f"JSON Parse AI error: {json_err}")
 

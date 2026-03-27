@@ -228,9 +228,10 @@ Format de sortie attendu (JSON valide) :
   "full_timeline": [
     {{
       "annee": "XXXX",
-      "statut": "manquant/incomplet",
+      "statut": "manquant/incomplet/complet",
+      "salaire_brut": N.NN,
       "trimestres_valides": N,
-      "points_complementaires": N,
+      "points_complementaires": N.NN,
       "activite": "Employeur / Statut",
       "anomalie_specifique": "Explication rapide",
       "justificatif_suggere": "• Premier justificatif\\n• Deuxième justificatif"
@@ -239,7 +240,7 @@ Format de sortie attendu (JSON valide) :
   "compte_rendu": "• Observation 1\\n• Observation 2"
 }}
 
-**CONSIGNE DE RAPIDITÉ :** Ne génère un élément dans `full_timeline` QUE si c'est une anomalie (incomplet/manquant) ou un point critique. Ignore les années "complet" sans problème.
+**CONSIGNE D’EXHAUSTIVITÉ :** Tu DOIS extraire CHAQUE année de carrière présente dans le détail du relevé (même les années sans anomalie). C'est crucial pour le tableau de contrôle technique.
 
 Données pré-analysées par l’algorithme :
 {json.dumps(anomalies, ensure_ascii=False, indent=2)}

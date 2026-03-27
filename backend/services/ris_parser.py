@@ -28,7 +28,8 @@ def parse_ris_file(file_path: str):
     try:
         doc = fitz.open(file_path)
         for page in doc:
-            doc_text += page.get_text()
+            # Sort=True is CRITICAL for native PDFs to keep column order
+            doc_text += page.get_text("text", sort=True) + "\n"
         
         # Detection of scanned PDF (OCR fallback needed)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
@@ -58,7 +59,11 @@ def parse_ris_file(file_path: str):
     if is_scanned:
         doc_text = f"[MODE SCAN DETECTÉ - ANALYSE VISUELLE PRIORITAIRE]\n{doc_text}"
 
-    is_ris = is_scanned or any(keyword in doc_text.lower() for keyword in ["relevé individuel", "ris", "retraites", "assurance vieillesse", "carrière"])
+    # Detection logic: broader keywords for various RIS issuers (CNAV, Agirc-Arrco, etc.)
+    is_ris = is_scanned or any(keyword in doc_text.lower() for keyword in [
+        "relevé individuel", "ris", "retraites", "assurance vieillesse", 
+        "carrière", "situation", "points", "trimestres", "employeur"
+    ])
     
     anomalies_list = []
     
@@ -162,15 +167,49 @@ def parse_ris_file(file_path: str):
                     current_year = row_year
                     all_detected.append(int(row_year))
                 
-                if current_year:
-                    sal_match = re.search(r"(\d{1,6}(?:[\s,]\d{3})*(?:[.,]\d{2})?)\s*[€$F]", line_clean)
-                    if sal_match:
-                        raw_sal = sal_match.group(1).replace(' ', '').replace(',', '.')
+                    # Ultimate Salary Extraction: find all number-like strings and pick the best one
+                    potential_vals = []
+                    for m in re.finditer(r"\b(\d[\d\s.,\xa0]*\d|\d)\b", line_clean):
+                        s = m.group(1).strip()
+                        # Basic cleanup of spaces and non-breaking spaces
+                        s_clean = s.replace(' ', '').replace('\xa0', '')
+                        
+                        # Handle mixed separators (1.000,00 or 1,000.00)
+                        if ',' in s_clean and '.' in s_clean:
+                            if s_clean.rfind('.') < s_clean.rfind(','):
+                                s_clean = s_clean.replace('.', '').replace(',', '.')
+                            else:
+                                s_clean = s_clean.replace(',', '')
+                        elif ',' in s_clean:
+                            # Check if it looks like a thousands separator (e.g. 15,000) or decimal (15000,00)
+                            if len(s_clean.split(',')[1]) == 3 and '.' not in s_clean:
+                                s_clean = s_clean.replace(',', '')
+                            else:
+                                s_clean = s_clean.replace(',', '.')
+                        elif '.' in s_clean:
+                            # Same for dot
+                            if len(s_clean.split('.')[1]) == 3:
+                                s_clean = s_clean.replace('.', '')
+                        
                         try:
-                            val = float(raw_sal)
-                            # Cumulative sum for the same year
-                            found_salaries[current_year] = found_salaries.get(current_year, 0.0) + val
+                            v = float(s_clean)
+                            # Exclude if it perfectly matches the current year
+                            if abs(v - int(current_year or 0)) < 0.1: continue
+                            
+                            # Exclude if it looks like part of a date (surrounded by /)
+                            start, end = m.span()
+                            if start > 0 and line_clean[start-1] == '/': continue
+                            if end < len(line_clean) and line_clean[end] == '/': continue
+                            
+                            potential_vals.append(v)
                         except: pass
+                    
+                    if potential_vals:
+                        # In a detailed line, the largest non-year number is almost always the salary
+                        # (Points and quarters are much smaller)
+                        best_v = max(potential_vals)
+                        if best_v > 100 or any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"]):
+                            found_salaries[current_year] = found_salaries.get(current_year, 0.0) + best_v
 
         # 4. Anomaly Synthesis
         if all_detected:
