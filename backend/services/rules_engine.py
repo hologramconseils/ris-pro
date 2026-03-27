@@ -166,28 +166,21 @@ class RetirementRulesEngine:
                 status = "anomalie"
                 explanation = "Points enregistrés sans salaire correspondant."
         
-        # Quarter gap (Strict: 4 quarters required for a full year)
+        # Quarter gap (Strict: 1 year = 4 quarters)
         if ris_q < 4:
             status = "anomalie"
-            if ris_q == 0:
-                explanation = f"Aucun trimestre validé pour l'année {year}."
-            else:
-                explanation = f"Année incomplète : seulement {ris_q}/4 trimestres validés."
-            
-            # Context if salary should have validated more
-            if theo_q > ris_q:
-                explanation += f" (Cohérence : le salaire permettrait de valider {theo_q} trimestres)."
-            
+            explanation = f"Année incomplète : {ris_q} / 4 trimestres — anomalie détectée"
+        
         if not explanation:
             status = "conforme"
-            explanation = "Les données sont cohérentes avec les calculs théoriques."
+            explanation = f"Année complète : {ris_q} / 4 trimestres"
 
         return {
             "year": year,
             "regime": regime,
             "salary": salary,
             "ris_quarters": ris_q,
-            "theo_quarters": theo_q,
+            "theo_quarters": 4, # Fixed denominator as requested
             "ris_points": ris_p,
             "theo_points": theo_p,
             "gap": round(gap, 2),

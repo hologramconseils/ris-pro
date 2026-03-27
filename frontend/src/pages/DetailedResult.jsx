@@ -198,7 +198,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {JSON.parse(result.career_data).slice(-15).reverse().map((d, idx) => {
+                      {(result.career_data ? JSON.parse(result.career_data) : []).sort((a, b) => parseInt(a.year) - parseInt(b.year)).map((d, idx) => {
                         const statusColors = {
                           'conforme': { color: '#22c55e', bg: 'rgba(34,197,94,0.1)', label: 'CONFORME' },
                           'écart': { color: '#eab308', bg: 'rgba(234,179,8,0.1)', label: 'ÉCART' },
@@ -213,7 +213,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                             <td style={{ padding: '12px 8px' }}>{d.salary > 0 ? `${d.salary.toLocaleString()} €` : '—'}</td>
                             <td style={{ padding: '12px 8px' }}>
                               <span style={{ fontWeight: 700 }}>{d.ris_quarters}</span>
-                              <span style={{ color: 'var(--text-muted)', fontSize: 10 }}> / {d.theo_quarters}</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 10 }}> / 4</span>
                             </td>
                             <td style={{ padding: '12px 8px' }}>
                               <span style={{ fontWeight: 700 }}>{d.ris_points > 0 ? d.ris_points.toFixed(2) : '—'}</span>
@@ -262,7 +262,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
 
           {aiData?.full_timeline && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {aiData.full_timeline.map((item, i) => {
+              {aiData.full_timeline.sort((a, b) => parseInt(a.annee) - parseInt(b.annee)).map((item, i) => {
                 if (!item) return null
                 const qCount = parseInt(item.trimestres_valides) || 0
                 let stat = String(item.statut || '').toLowerCase()

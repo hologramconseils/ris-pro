@@ -263,7 +263,7 @@ def parse_ris_file(file_path: str):
                     
                     anomalies_list.append({
                         "year": y, 
-                        "title": f"Année {y} : {q} {title_suffix}",
+                        "title": f"Année {y} : {q} / 4 trimestres — anomalie détectée",
                         "description": description,
                         "needs_justificatifs": True,
                         "points_complementaires": p if p > 0 else None
