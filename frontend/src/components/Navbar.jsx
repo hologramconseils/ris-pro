@@ -43,7 +43,7 @@ export default function Navbar() {
 
         <div id="navbar-portal-root" className="navbar-portal-root" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}></div>
 
-        <div className="navbar-actions" style={{ flex: 1, justifyContent: 'flex-end', display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div className="navbar-actions">
           <div className="desktop-theme-switcher">
             <ThemeSwitcher />
           </div>
