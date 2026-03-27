@@ -19,8 +19,11 @@ def parse_ris_file(file_path: str):
     
     def cleanup_ocr_text(text: str):
         """Fixes common OCR errors and archaic notations."""
-        text = text.replace("FRF", "€").replace("pts", "points").replace("trim", "trimestres")
-        text = text.replace("0trim", "0 trimestre")
+        # Normalize common keywords without breaking word boundaries
+        text = re.sub(r"\bFRF\b", "€", text)
+        text = re.sub(r"\bpts\b", " points ", text, flags=re.IGNORECASE)
+        # Only replace 'trim' if not already part of 'trimestre'
+        text = re.sub(r"\btrim(?!\.|es)\b", " trimestres ", text, flags=re.IGNORECASE)
         return text
     try:
         doc = fitz.open(file_path)
@@ -59,7 +62,8 @@ def parse_ris_file(file_path: str):
     
     anomalies_list = []
     
-    if is_ris and not is_scanned:
+    # Enable analysis for both native and scanned text
+    if is_ris:
         found_years = {}
         found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
@@ -85,11 +89,16 @@ def parse_ris_file(file_path: str):
             line_clean = line.strip()
             if not line_clean: continue
             
-            # Context switchers
-            if "synthèse de vos droits" in line_clean.lower() or "détail par année" in line_clean.lower():
+            # Context switchers (Broadened to handle variant layouts)
+            if re.search(r"(synthèse|détail)\s+(de\s+)?(vos\s+)?droits", line_clean, re.IGNORECASE) or \
+               re.search(r"situation\s+(au|de|individuelle)", line_clean, re.IGNORECASE):
                 current_context = "SYNTHESE"
-            elif "détail de votre carrière" in line_clean.lower():
+            elif re.search(r"détail\s+(de\s+votre\s+)?carrière", line_clean, re.IGNORECASE) or \
+                 re.search(r"périodes\s+retenues", line_clean, re.IGNORECASE):
                 current_context = "DETAIL"
+            elif re.search(r"points\s+de\s+retraite", line_clean, re.IGNORECASE):
+                # Points can also appear in a separate section, often treated like SYNTHESE
+                current_context = "SYNTHESE"
             
             # Birth year detection
             if "né(e) le" in line_clean.lower() or "né le" in line_clean.lower():
@@ -102,12 +111,16 @@ def parse_ris_file(file_path: str):
             if year_match:
                 detected_year = year_match.group(1)
                 all_detected.append(int(detected_year))
+                # If we see a year and no context yet, default to SYNTHESE-like scanning
+                if current_context == "GENERAL":
+                    current_context = "SYNTHESE"
                 if current_context == "SYNTHESE":
                     current_year = detected_year
 
-            # 2. Quarters and Points (SYNTHESE)
-            if current_context == "SYNTHESE" and current_year:
-                q_match = re.search(r"(\d+)\s*(?:trimestr|trim\.|T)\b", line_clean, re.IGNORECASE)
+            # 2. Quarters and Points (SYNTHESE or general)
+            if current_year:
+                # Quarters - Relaxed regex (removed strict trailing \b after complex words)
+                q_match = re.search(r"(\d+)\s*(?:trimestr|trim\.|T)", line_clean, re.IGNORECASE)
                 if q_match:
                     quarters = int(q_match.group(1))
                     if quarters > 4: quarters = 4
