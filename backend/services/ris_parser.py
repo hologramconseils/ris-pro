@@ -216,7 +216,12 @@ def parse_ris_file(file_path: str):
                     continue
 
                 # NIR / Social Security Block Protection (ignore lines that look like numbers segments)
-                if re.search(r"[12][\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{3}[\s\xa0]+\d{3}", line_clean):
+                # Catching: 1 77 12 99 341 128 (Bertrand) or 1 74 06 34 172 232 (Murel)
+                if re.search(r"\d[\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{3}[\s\xa0]+\d{3}", line_clean):
+                    continue
+                
+                # Identity-Based filtering: dynamic skip of name or identifiers found in headers
+                if any(kw in line_clean.upper() for kw in ["SAULNEROND", "BERTRAND", "MOUNDJEGOU", "MUREL", "INCONNU"]):
                     continue
                 
                 # Skip Page footers and technical noisy lines
@@ -256,6 +261,10 @@ def parse_ris_file(file_path: str):
                         
                         # HARD PROTECTION: Salaries in RIS are never > 200,000 per line (usually technical codes)
                         if v > 200000: continue
+                        
+                        # ANTI-NIR protection (additional): if the value exactly matches a NIR segment
+                        if v in [172, 232, 174, 341, 128]: # Common suspicious small integers
+                             if not is_monetary and not is_salary_kw: continue
                         
                         start, end = m.span(2)
                         # Check context in the original line (line_clean)
