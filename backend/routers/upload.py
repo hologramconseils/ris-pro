@@ -235,60 +235,59 @@ async def run_full_analysis_worker(
                 db_scan.detailed_report = json.dumps(merged_anomalies, ensure_ascii=False)
                 db_scan.has_anomalies = len(merged_anomalies) > 0
                 
-                # --- NATIVE PDF PRECISION INJECTION (Inspired by Non-Native Logic) ---
-                if not db_scan.is_scanned and full_timeline:
-                    # technical_audit is our precision source for native PDFs
+                # --- NATIVE PDF PRECISION INJECTION ---
+                # For native PDFs, we use TECHNICAL_AUDIT as the PRIMARY source because it's exhaustive.
+                # AI (Full Timeline) is used to ENRICH the technical data with expert commentary.
+                if not db_scan.is_scanned:
                     precision_career = []
+                    ai_timeline_map = {int(str(item.get("annee"))): item for item in full_timeline if str(item.get("annee", "")).isdigit()}
                     
-                    # Create a map for quick access: {year: technical_entry}
-                    tech_map = {item['year']: item for item in technical_audit}
-                    
-                    for item in full_timeline:
-                        y_val = item.get("annee")
-                        if not y_val or not str(y_val).isdigit():
-                            continue
+                    # Iterate over ALL technical entries to ensure a complete Control Table
+                    for tech_entry in technical_audit:
+                        y_int = tech_entry.get("year", 0)
+                        if y_int >= datetime.now().year: continue # Strict 2026+ filter
                         
-                        y_int = int(y_val)
-                        tech_entry = tech_map.get(y_int)
+                        ai_item = ai_timeline_map.get(y_int, {})
                         
-                        # Basis: AI structure
+                        # Merge Technical Data + AI Commentary
                         entry = {
                             "year": y_int,
-                            "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
-                            "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
-                            "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
-                            "regime": item.get("activite", "Inconnu")
+                            "salary": tech_entry.get("salary", 0.0),
+                            "ris_quarters": tech_entry.get("ris_quarters", 0),
+                            "ris_points": tech_entry.get("ris_points", 0.0),
+                            "regime": tech_entry.get("regime", "Inconnu"),
+                            # Carry over AI's specific findings if they exist
+                            "anomalie_specifique": ai_item.get("anomalie_specifique"),
+                            "justificatif_suggere": ai_item.get("justificatif_suggere"),
+                            "statut": ai_item.get("statut")
                         }
                         
-                        # Precision Overwrite (if technical data is better)
-                        if tech_entry:
-                            if tech_entry.get("salary", 0) > entry["salary"]:
-                                entry["salary"] = tech_entry["salary"]
-                            if tech_entry.get("ris_quarters", 0) > entry["ris_quarters"]:
-                                entry["ris_quarters"] = tech_entry["ris_quarters"]
-                            # Points are often more precise in technical extraction for native PDFs
-                            if tech_entry.get("ris_points", 0) > 0:
-                                entry["ris_points"] = tech_entry["ris_points"]
-                            if tech_entry.get("regime") and tech_entry["regime"] != "Inconnu":
-                                entry["regime"] = tech_entry["regime"]
-                        
-                        # Apply Anomaly Logic: 4/4 is NOT an anomaly
-                        # (This affects the career_data validation status)
+                        # Apply rules engine validation to get status and consistency checks
                         precision_career.append(RetirementRulesEngine.get_year_validation_status(entry))
                     
                     if precision_career:
                         precision_career.sort(key=lambda x: x['year'])
                         db_scan.career_data = json.dumps(precision_career, ensure_ascii=False)
                         db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(precision_career)
-                    elif not full_timeline and technical_audit:
-                        # Fallback for native PDFs: if AI failed to return a timeline, use technical precision
-                        native_fallback_career = []
-                        for tech_entry in technical_audit:
-                            if tech_entry.get("year", 0) < datetime.now().year:
-                                native_fallback_career.append(RetirementRulesEngine.get_year_validation_status(tech_entry))
-                        if native_fallback_career:
-                            native_fallback_career.sort(key=lambda x: x['year'])
-                            db_scan.career_data = json.dumps(native_fallback_career, ensure_ascii=False)
+                        
+                        # CRITICAL FIX: Restoration of Expert Blocks (Expert Analysis and Chronology)
+                        # If the AI was too brief (missing blocks), we populate them technically.
+                        if not ai_data.get('resume_global') or len(str(ai_data.get('resume_global'))) < 50:
+                            ai_data['resume_global'] = "Analyse technique effectuée. Des anomalies sur les trimestres ou les points ont été détectées nécessitant une vérification des justificatifs."
+                        
+                        if not ai_data.get('full_timeline') or len(ai_data.get('full_timeline', [])) < (len(precision_career) // 2):
+                            # Inject technical timeline into the Chronology block
+                            ai_data['full_timeline'] = [
+                                {
+                                    "annee": e['year'],
+                                    "statut": e.get('validation_status', 'incomplet'),
+                                    "trimestres_valides": e.get('ris_quarters', 0),
+                                    "activite": e.get('regime', 'Activité détectée'),
+                                    "points_complementaires": e.get('ris_points', 0.0),
+                                    "anomalie_specifique": e.get('anomalie_specifique') or f"Vérification requise pour l'année {e['year']}."
+                                } for e in precision_career if e.get('validation_status') != 'complet'
+                            ]
+                            db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
 
                 ### FROZEN MODULE: NON-NATIVE ANALYSIS - TECHNICAL BACKFILL ###
                 # 4. Backfill technical career_data for scanned documents if empty
