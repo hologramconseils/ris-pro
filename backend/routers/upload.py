@@ -128,12 +128,20 @@ async def run_full_analysis_worker(
             max_retries = 2
             for attempt in range(max_retries):
                 try:
+                    # Extract birth year from identity_birth_date (DD/MM/YYYY)
+                    birth_year = 1980
+                    if db_scan.identity_birth_date and "/" in db_scan.identity_birth_date:
+                        try:
+                            birth_year = int(db_scan.identity_birth_date.split("/")[-1])
+                        except: pass
+
                     ai_commentary = await ai_service.generate_ai_audit(
                         result.get("detailed_report", []), 
                         db_scan.filename,
                         raw_text=db_scan.raw_text,
                         images=result.get("images", []),
-                        career_data=career_data
+                        career_data=career_data,
+                        birth_year=birth_year
                     )
                     if ai_service.is_valid_json(ai_commentary):
                         break

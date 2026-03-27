@@ -28,7 +28,7 @@ def strip_markdown(data):
         return {k: strip_markdown(v) for k, v in data.items()}
     return data
 
-async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None, career_data: list = None):
+async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", images: list = None, career_data: list = None, **kwargs):
     """
     Routage Expertise Adaptatif (Stabilité & Quotas) + Détection Justinificatifs Exhaustive.
     """
@@ -66,6 +66,8 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     career_projection = {}
     
     # NOTE: `career_data` is now passed as an argument.
+    birth_year = kwargs.get("birth_year", 1980)
+    
     if career_data:
         verified_periods = []
         for entry in career_data:
@@ -88,13 +90,16 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 
         reliability_score = RetirementRulesEngine.get_reliability_score(verified_periods)
         
-        # 2. Career Projection (Simplified: uses last known salary or default)
+        # 2. Career Projection (Expert: uses birth year and total quarters)
         if career_data:
             last_entry = career_data[-1]
+            total_q = sum(e.get("quarters", 0) for e in career_data)
+            
             projection = RetirementRulesEngine.project_future_career(
-                current_age=45, # Placeholder, should be extracted from birth date
+                total_points=sum(e.get("ris_points", 0.0) for e in career_data),
+                birth_year=birth_year,
                 current_salary=last_entry.get("salary", 40000.0),
-                total_points=sum(e.get("ris_points", 0.0) for e in career_data)
+                current_quarters=total_q
             )
             career_projection = projection
 
@@ -102,18 +107,19 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 **RÈGLES AGIRC-ARRCO (RÉFÉRENTIEL RÉGLEMENTAIRE) :**
 - Les points sont calculés sur le SALAIRE DE CALCUL (Tranche 1 : 6,20%, Tranche 2 : 17%).
 - Le TAUX D'APPEL est de 127% (ce surplus ne génère pas de points).
-- Valeur d'achat du point (2025: 20,1877€ | 2024: 19,6321€ | 2023: 18,7669€).
+- Valeur d'achat du point (2025: 19,6321€ | 2024: 18,7669€ | 2023: 17,4316€).
 - PASS (Plafond Sécu) : 2025: 47 100€ | 2024: 46 368€ | 2023: 43 992€.
 
-**PÉRIODES ASSIMILÉES (SANS COTISATION) :**
-- Maladie : Points attribués si l'arrêt > 60 jours consécutifs. Calcul sur moyenne des points de l'année précédente.
-- Chômage : Points calculés sur une assiette fictive (SJR).
-- Maternité : Points attribués dès l'indemnisation CPAM.
+**SYSTÈME DE RETRAITE (RÉFORME 2023) :**
+- Âge légal de départ : {career_projection.get('legal_age_display', '64 ans')} pour la génération {birth_year}.
+- Trimestres requis pour le taux plein : {career_projection.get('required_quarters', 172)}.
+- Situation projetée : {career_projection.get('projected_quarters', 0)} trimestres à l'âge légal.
 
 **VÉRIFICATION EXPERTE (RÉSULTATS DU MOTEUR) :**
 - Score de fiabilité globale : {reliability_score}/100
 - Notes d'audit : {" | ".join(expert_audit_notes) if expert_audit_notes else "Aucun écart majeur détecté sur les salaires déclarés."}
-- Projection estimée : {career_projection.get('estimated_monthly_pension', 'N/A')}€ / mois à 64 ans.
+- Projection estimée : {career_projection.get('estimated_monthly_pension', 'N/A')}€ / mois à l'âge légal.
+- Taux plein : {"Oui" if career_projection.get("has_full_rate", False) else "Non (Décote estimée de " + str(career_projection.get("malus_applied", 0)) + "% sur Agirc-Arrco)"}
 """
 
     prompt = f"""Tu es l'expert retraite de Hologram Conseils. Analyse ce Relevé Individuel de Situation (RIS) pour identifier précisément les anomalies et les justificatifs de régularisation ({filename}).

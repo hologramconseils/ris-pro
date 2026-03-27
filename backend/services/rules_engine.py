@@ -1,13 +1,31 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
+# Reform 2023: Generation-based legal age and required quarters
+GENERATION_RULES = {
+    1955: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166},
+    1956: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166},
+    1957: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166},
+    1958: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 167},
+    1959: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 167},
+    1960: {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 167},
+    1961: {"legal_age_years": 62, "legal_age_months": 3, "required_quarters": 169},
+    1962: {"legal_age_years": 62, "legal_age_months": 6, "required_quarters": 169},
+    1963: {"legal_age_years": 62, "legal_age_months": 9, "required_quarters": 170},
+    1964: {"legal_age_years": 63, "legal_age_months": 0, "required_quarters": 171},
+    1965: {"legal_age_years": 63, "legal_age_months": 3, "required_quarters": 172},
+    1966: {"legal_age_years": 63, "legal_age_months": 6, "required_quarters": 172},
+    1967: {"legal_age_years": 63, "legal_age_months": 9, "required_quarters": 172},
+    1968: {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172},
+}
+
 # Historical data for Plafond Annuel de la Sécurité Sociale (PASS) and Agirc-Arrco point values
-# Unified since 2019. Separate Agirc/Arrco before.
 RETIREMENT_RESOURCES = {
-    2025: {"pass": 47100.0, "unified": {"purchase": 20.1877, "service": 1.4386}},
-    2024: {"pass": 46368.0, "unified": {"purchase": 19.6321, "service": 1.4159}},
-    2023: {"pass": 43992.0, "unified": {"purchase": 18.7669, "service": 1.3498}},
-    2022: {"pass": 41136.0, "unified": {"purchase": 17.4316, "service": 1.2841}},
+    2026: {"pass": 48060.0, "unified": {"purchase": 20.1877, "service": 1.4386}},
+    2025: {"pass": 47100.0, "unified": {"purchase": 19.6321, "service": 1.4386}},
+    2024: {"pass": 46368.0, "unified": {"purchase": 18.7669, "service": 1.4159}},
+    2023: {"pass": 43992.0, "unified": {"purchase": 17.4316, "service": 1.3498}},
+    2022: {"pass": 41136.0, "unified": {"purchase": 16.8223, "service": 1.2841}},
     2021: {"pass": 41136.0, "unified": {"purchase": 17.3982, "service": 1.2714}},
     2020: {"pass": 41136.0, "unified": {"purchase": 17.3982, "service": 1.2714}},
     2019: {"pass": 40524.0, "unified": {"purchase": 17.0571, "service": 1.2588}},
@@ -114,29 +132,66 @@ class RetirementRulesEngine:
             daily_points = float(prev_year_points) / 365.0
             return round(float(daily_points * duration_days), 2)
         elif type_p == "chômage":
-            # Simplified: 60% of previous activity points
-            return round(float(prev_year_points * 0.6 * (duration_days / 365.0)), 2)
+            # Rule: Based on SJR (ARE) or N-1 daily points (ASS). 
+            # For audit estimates without SJR, N-1 daily points is the expert standard.
+            daily_points = float(prev_year_points) / 365.0
+            return round(float(daily_points * duration_days), 2)
         return 0.0
 
     @staticmethod
-    def project_future_career(current_age: int, current_salary: float, total_points: float, target_age: int = 64) -> Dict[str, Any]:
-        """Simple career projection."""
-        years_left = max(0, target_age - current_age)
+    def get_generation_parameters(birth_year: int) -> Dict[str, Any]:
+        """Returns legal age and required quarters for a given birth year (Reform 2023)."""
+        if birth_year >= 1968:
+            return {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172}
+        if birth_year < 1955:
+            return {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166}
+        return GENERATION_RULES.get(birth_year, {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172})
+
+    @staticmethod
+    def project_future_career(total_points: float, birth_year: int, current_salary: float, current_quarters: int = 0) -> Dict[str, Any]:
+        """Expert career projection based on birth year and 2023 Reform."""
+        params = RetirementRulesEngine.get_generation_parameters(birth_year)
+        legal_age = float(params["legal_age_years"]) + (float(params["legal_age_months"]) / 12.0)
+        required_q = params["required_quarters"]
+        
+        current_year = datetime.now().year
+        current_age = current_year - birth_year
+        
+        years_to_legal = max(0.0, legal_age - current_age)
+        
+        # Points calculation
         calc_res = RetirementRulesEngine.calculate_theoretical_points(current_salary, 2025)
         annual_points = float(calc_res.get("points", 0.0))
         
-        projected_points = total_points + (annual_points * years_left)
-        data_2025 = RETIREMENT_RESOURCES.get(2025)
-        if isinstance(data_2025, dict) and "unified" in data_2025:
-             service_val = float(data_2025["unified"].get("service", 1.4))
-        else:
-             service_val = 1.4
-             
-        estimated_annual_pension = projected_points * service_val
+        projected_points_at_legal = total_points + (annual_points * years_to_legal)
         
+        # Quarters estimation at legal age
+        projected_quarters_at_legal = current_quarters + int(years_to_legal * 4)
+        
+        has_full_rate = projected_quarters_at_legal >= required_q
+        
+        data_2025 = RETIREMENT_RESOURCES.get(2025)
+        service_val = 1.4386
+        if isinstance(data_2025, dict) and "unified" in data_2025:
+             service_val = float(data_2025["unified"].get("service", 1.4386))
+             
+        estimated_annual_pension = projected_points_at_legal * service_val
+        
+        # Apply minoration if not full rate (approx 1.25% per missing quarter)
+        malus = 1.0
+        if not has_full_rate:
+            missing_q = min(20, required_q - projected_quarters_at_legal) # Cap at 20 quarters
+            malus = max(0.75, 1.0 - (missing_q * 0.0125)) 
+            estimated_annual_pension *= malus
+
         return {
-            "years_left": years_left,
-            "projected_points": round(float(projected_points), 2),
-            "estimated_annual_pension": round(float(estimated_annual_pension), 2),
-            "estimated_monthly_pension": round(float(estimated_annual_pension / 12.0), 2)
+            "birth_year": birth_year,
+            "legal_age_display": f"{params['legal_age_years']} ans" + (f" et {params['legal_age_months']} mois" if params['legal_age_months'] > 0 else ""),
+            "required_quarters": required_q,
+            "projected_quarters": projected_quarters_at_legal,
+            "has_full_rate": has_full_rate,
+            "years_to_retirement": round(float(years_to_legal), 1),
+            "projected_points": round(float(projected_points_at_legal), 2),
+            "estimated_monthly_pension": round(float(estimated_annual_pension / 12.0), 2),
+            "malus_applied": round(float((1.0 - malus) * 100), 1)
         }
