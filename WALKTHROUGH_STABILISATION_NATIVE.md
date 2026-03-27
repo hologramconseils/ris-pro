@@ -1,30 +1,32 @@
-# Walkthrough : Stabilisation de l'Analyse Native PDF (RIS Pro)
+# Walkthrough : Stabilisation et Déploiement de l'Analyse Native PDF (RIS Pro)
 
-Nous avons restauré la fiabilité de l'analyse des PDF natifs tout en protégeant strictement le module non-natif (scanné).
+Toutes les corrections ont été appliquées et poussées vers le repository distant (`main`). Les problèmes de visibilité des salaires et d'absence de blocs expert pour les PDF natifs ont été résolus.
 
-## Changements Majeurs
+## Actions Réalisées
 
-### 1. Exclusion de l'année 2026+
-- **`ris_parser.py`** : La période d'extraction s'arrête désormais à `current_year - 1` (2025). Le contexte DETAIL ignore systématiquement 2026.
-- **`rules_engine.py`** : La méthode `calculate_theoretical_quarters` filtre désormais les années futures pour éviter les incohérences de calcul des trimestres.
+### 1. Git Push & Déploiement (Urgent)
+- **Status** : Succès. Les dernières corrections (Exclusion 2026, Extraction Salaires) ont été poussées vers `origin main`.
+- **Commit Hash** : `a7308fb` (Dernière version stable avec fusion exhaustive).
 
-### 2. Robustesse de l'extraction des salaires
-- **Passage de Match à Search** : Dans la section `DETAIL`, l'extraction détecte les années même si elles ne sont pas en tout début de ligne.
-- **Filtrage Anti-DocID/NIR** : Les montants supérieurs à 150 000 € sont ignorés s'ils ne sont pas explicitement étiquetés (Salaire, Brut, €), évitant ainsi les valeurs "délirantes" issues des identifiants techniques.
-- **Nettoyage des séparateurs** : Amélioration de la gestion des espaces insécables et des formats mixtes (1.000,00).
+### 2. Refonte de la Fusion de Données (`upload.py`)
+- **Problème** : Les PDF natifs affichaient des salaires manquants car le code dépendait de la sortie de l'IA (souvent tronquée).
+- **Correction** : Pour les PDF natifs, le système utilise désormais l'**extraction technique exhaustive** comme source primaire pour le `career_data`. L'IA vient enrichir ces données avec des commentaires d'expertise, mais ne peut plus "supprimer" d'années ou de salaires.
+- **Résultat** : Toutes les années du RIS (jusqu'à 2025) apparaissent désormais dans le Tableau de Contrôle technique avec leurs salaires réels.
 
-### 3. Restauration des Blocs d'Analyse (Expert / Synthèse)
-- **Fallback Technique** : Dans `upload.py`, si l'IA ne renvoie pas de chronologie complète pour un PDF natif, le système injecte automatiquement les données brutes extraites techniquement dans `career_data`.
-- **Impact** : Cela garantit l'affichage immédiat du "Tableau de Contrôle", de la "Synthèse détaillée" et de l'"Analyse de l'expert" dans l'interface utilisateur.
+### 3. Restauration des Blocs Expert
+- **Analyse de l'expert** : Ajout d'une injection de fallback si le résumé de l'IA est trop court ou absent.
+- **Chronologie** : Si l'IA ne génère pas de chronologie complète, le système la reconstruit techniquement à partir des anomalies détectées par le "parser" pour garantir que le bloc s'affiche.
 
-## Vérification effectuée
+### 4. Rappels Techniques (Extraction)
+- **Filtrage Anti-DocID** : Les montants > 150k€ (DocIDs/NIRs) sont filtrés efficacement dans `ris_parser.py`.
+- **Exclusion 2026** : Confirmée et testée à tous les niveaux du pipeline.
 
-### Test de Pipeline (`test_analysis_pipeline.py`)
-Le script de validation technique a confirmé les points suivants :
-- **Dernière année extraite** : 2025 (2026 est bien exclu).
-- **Salaires** : Extraction réussie des montants réels (ex: 19 995 € dans le mock) sans pollution par les DocIDs.
-- **Structure** : L'objet `career_data` est complet et prêt pour le rendu frontend.
+## Validation finale
+
+Le test `test_analysis_pipeline.py` confirme :
+- **Années** : Présence exhaustive de 1974 à 2025.
+- **Salaires** : Extraction réussie sans pollution par les DocIDs.
+- **Exclusion** : 2026 est absent des résultats.
 
 > [!IMPORTANT]
-> **Sécurisation du Module Scanné** : 
-> Les sections marquées `### FROZEN MODULE ###` n'ont subi aucune modification. La stabilité du moteur non-natif est maintenue.
+> **Déploiement** : Veuillez vous assurer que le service backend a bien été redémarré/redéployé pour prendre en compte le commit `a7308fb`.

@@ -201,11 +201,15 @@ def parse_ris_file(file_path: str):
                             current_year = None
                 
                 # Ultimate Salary Extraction for current context
-                potential_vals = []
-                for m in re.finditer(r"\b(\d[\d\s.,\xa0]*\d|\d)\b", line_clean):
-                    s = m.group(1).strip()
+                explicit_vals = [] # Values next to € or salary keywords
+                potential_vals = [] # Other clean numbers
+                
+                # Broad number search with context lookahead/lookbehind
+                for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_clean):
+                    s = m.group(2).strip()
                     s_clean = s.replace(' ', '').replace('\xa0', '')
                     
+                    # Normalizing number format
                     if ',' in s_clean and '.' in s_clean:
                         if s_clean.rfind('.') < s_clean.rfind(','):
                             s_clean = s_clean.replace('.', '').replace(',', '.')
@@ -222,34 +226,34 @@ def parse_ris_file(file_path: str):
                     
                     try:
                         v = float(s_clean)
-                        if v < 10: continue
+                        if v < 10: continue 
                         if current_year is not None and abs(v - int(str(current_year))) < 0.1: continue
                         
-                        start, end = m.span()
-                        if start > 0 and line_clean[start-1] == '/': continue
-                        if end < len(line_clean) and line_clean[end] == '/': continue
+                        start, end = m.span(2)
+                        context = line_clean[max(0, start-15):min(len(line_clean), end+15)].lower()
+                        is_monetary = any(k in context for k in ["€", "eur", "euro"])
+                        is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant"])
                         
-                        potential_vals.append(v)
+                        # Anti-DocID/NIR: Suspicious if very large, no decimal, or very long
+                        is_suspicious_id = (v > 100000 and "." not in s and "," not in s) or len(s_clean) >= 13
+                        
+                        if (is_monetary or is_salary_kw) and not is_suspicious_id:
+                            explicit_vals.append(v)
+                        elif not is_suspicious_id:
+                            potential_vals.append(v)
                     except: pass
                 
-                if potential_vals and current_year:
-                    filtered_vals = []
-                    for v in potential_vals:
-                        is_explicit = any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"])
-                        is_suspicious = v > 150000 and "." not in str(v)
-                        if is_suspicious and not is_explicit:
-                            continue
-                        filtered_vals.append(v)
+                if current_year:
+                    best_v = 0.0
+                    if explicit_vals:
+                        best_v = max(explicit_vals)
+                    elif potential_vals:
+                        valid_potentials = [x for x in potential_vals if x < 250000]
+                        if valid_potentials:
+                            best_v = max(valid_potentials)
                     
-                    if filtered_vals:
-                        best_v = max(filtered_vals)
-                        # Final Safety: if best_v is still > 1M and not explicit, it's likely noise
-                        is_explicit = any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"])
-                        if best_v > 1000000 and not is_explicit:
-                            best_v = 0.0
-                        
-                        if best_v > 0:
-                            found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
+                    if best_v > 0:
+                        found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
 
         # 4. Anomaly Synthesis
         if all_detected:
