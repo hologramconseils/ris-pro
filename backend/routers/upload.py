@@ -209,6 +209,8 @@ async def run_full_analysis_worker(
                         })
                     
                     if ai_anomalies:
+                        # Sort anomalies by year (chronological)
+                        ai_anomalies.sort(key=lambda x: int(str(x.get("year", 0))))
                         db_scan.detailed_report = json.dumps(ai_anomalies)
                         db_scan.has_anomalies = True
                     

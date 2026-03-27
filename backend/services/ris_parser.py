@@ -253,12 +253,10 @@ def parse_ris_file(file_path: str):
                 p_desc = " | ".join([f"{item[0]} pts ({item[1]})" for item in p_list])
                 s = found_salaries.get(y_str, 0)
                 
-                # USER RULE: 0, 1, 2, 3 trimestres = Anomalie
+                # USER RULE: 0, 1, 2, 3 trimestres = Anomalie (Consistent with Rules Engine)
                 if q < 4:
                     title_suffix = "trimestre" if q <= 1 else "trimestres"
-                    description = f"L'année {y} est incomplète au régime de base ({q}/4 trimestres)."
-                    if q == 0:
-                        description = f"Aucun trimestre validé au régime de base pour l'année {y}."
+                    description = f"L'année {y} est incomplète ({q}/4 trimestres)."
                     
                     if p > 0:
                         description += f" Cependant, {p_desc} ont été détectés."
@@ -306,6 +304,9 @@ def parse_ris_file(file_path: str):
                 "ris_quarters": found_years.get(y_str, 0),
                 "regime": base_regime
             })
+        
+        # Enforce chronological sorting (ascending)
+        career_data.sort(key=lambda x: x["year"])
 
     identity_data = extract_identity(doc_text)
 
