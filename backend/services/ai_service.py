@@ -13,10 +13,19 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 
 def is_valid_json(text: str) -> bool:
-    """Vérifie si la réponse ressemble à un JSON valide."""
+    """Vérifie si la réponse contient un JSON valide."""
     if not text: return False
     text = text.strip()
-    return text.startswith("{") and text.endswith("}")
+    # Check if there's at least one { and }
+    start = text.find('{')
+    end = text.rfind('}')
+    if start == -1 or end == -1 or end < start:
+        return False
+    try:
+        json.loads(text[start:end+1])
+        return True
+    except:
+        return False
 
 def strip_markdown(data):
     """Supprime les astérisques de formatage Markdown récursivement."""

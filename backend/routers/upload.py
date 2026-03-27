@@ -145,10 +145,13 @@ async def run_full_analysis_worker(
                                 birth_year = int(year_match.group(1))
                         except: pass
 
+                    # Truncate raw_text if too large to prevent API payload errors
+                    truncated_text = db_scan.raw_text[:35000] if db_scan.raw_text else ""
+                    
                     ai_commentary = await ai_service.generate_ai_audit(
                         parser_res.get("detailed_report", []), 
                         db_scan.filename,
-                        raw_text=db_scan.raw_text,
+                        raw_text=truncated_text,
                         images=parser_res.get("images", []),
                         career_data=technical_audit,
                         birth_year=birth_year
@@ -161,89 +164,98 @@ async def run_full_analysis_worker(
                 if attempt < max_retries - 1:
                     await asyncio.sleep(2)
 
-            if ai_commentary and ai_service.is_valid_json(ai_commentary):
-                # Add OCR uncertainty warning if scanned
-                if db_scan.is_scanned:
-                    try:
-                        ai_data = json.loads(ai_commentary) if isinstance(ai_commentary, str) else ai_commentary
-                        warning_prefix = "⚠️ L'analyse est basée sur un document scanné dont la restitution peut comporter des approximations. Veuillez vérifier les informations.\n\n"
-                        if "resume_global" in ai_data:
-                            ai_data["resume_global"] = warning_prefix + ai_data["resume_global"]
-                        ai_commentary = json.dumps(ai_data)
-                    except: pass
-                
-                db_scan.ai_analysis = ai_commentary
+            # --- POST-PROCESSING & DATA UNIFICATION ---
+            
+            # 1. Ensure ai_analysis is NEVER NULL if the document was processed
+            if not ai_commentary or not ai_service.is_valid_json(ai_commentary):
+                # Fallback report if AI fails
+                ai_commentary = json.dumps({
+                    "anomalie_detectee": "oui" if db_scan.has_anomalies else "non",
+                    "niveau_risque": "moyen" if db_scan.has_anomalies else "faible",
+                    "resume_global": "L’expertise approfondie par IA est temporairement limitée pour ce document, mais l’analyse technique a été effectuée avec succès.",
+                    "premiere_annee": str(career_raw[0]['year']) if career_raw else "N/A",
+                    "derniere_annee": str(career_raw[-1]['year']) if career_raw else "N/A",
+                    "full_timeline": [],
+                    "compte_rendu": "• Analyse technique effectuée sur la base de l'extraction standard."
+                }, ensure_ascii=False)
+
+            # 2. Add OCR uncertainty warning if scanned
+            if db_scan.is_scanned:
                 try:
                     ai_data = json.loads(ai_commentary)
-                    # Use a more robust check for timeline anomalies
-                    full_timeline = ai_data.get("full_timeline", [])
-                    ai_anomalies = []
+                    warning_prefix = "⚠️ L'analyse est basée sur un document scanné dont la restitution peut comporter des approximations. Veuillez vérifier les informations.\n\n"
+                    if "resume_global" in ai_data:
+                        ai_data["resume_global"] = warning_prefix + ai_data["resume_global"]
+                    ai_commentary = json.dumps(ai_data, ensure_ascii=False)
+                except: pass
+            
+            db_scan.ai_analysis = ai_commentary
+            
+            # 3. CRITICAL DATA MERGE: Algorithmic Anomalies + AI Anomalies
+            try:
+                ai_data = json.loads(ai_commentary)
+                full_timeline = ai_data.get("full_timeline", [])
+                
+                # Start with algorithmic anomalies
+                merged_anomalies = parser_res.get("detailed_report", [])
+                
+                # Append AI-detected anomalies without duplicates (by year)
+                existing_years = {str(x.get("year")) for x in merged_anomalies}
+                
+                for item in full_timeline:
+                    statut = str(item.get("statut", "")).lower()
+                    year = str(item.get("annee", ""))
                     
+                    if statut == "complet" or not year or year in existing_years:
+                        continue
+                        
+                    q_count = 0
+                    try:
+                        q_count = int(item.get("trimestres_valides", 0))
+                    except: pass
+                    
+                    activite_str = str(item.get("activite", "")).lower()
+                    is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou"])
+                    needs_justificatifs = (q_count < 4) or is_missing_act
+                    
+                    merged_anomalies.append({
+                        "year": int(year) if year.isdigit() else year, 
+                        "title": f"Année {year} : {item.get('statut', 'Anomalie')}", 
+                        "description": item.get("anomalie_specifique", "Incohérence détectée par l'expertise complémentaire"),
+                        "justificatif": item.get("justificatif_suggere"),
+                        "needs_justificatifs": needs_justificatifs,
+                        "points_complementaires": item.get("points_complementaires"),
+                        "trimestres_valides": q_count
+                    })
+                
+                # Final sorting and update
+                merged_anomalies.sort(key=lambda x: int(str(x.get("year", 0))) if str(x.get("year")).isdigit() else 0)
+                db_scan.detailed_report = json.dumps(merged_anomalies, ensure_ascii=False)
+                db_scan.has_anomalies = len(merged_anomalies) > 0
+                
+                # 4. Backfill technical career_data for scanned documents if empty
+                if db_scan.is_scanned and full_timeline and not career_raw:
+                    ai_career_data = []
                     for item in full_timeline:
-                        # Skip 'complet' years only if they truly have no issues
-                        # But prioritize the AI's flagging of anomalies
-                        statut = str(item.get("statut", "")).lower()
-                        if statut == "complet":
-                            continue
-                            
-                        # Extract data safely with default values
-                        year = item.get("annee", "N/A")
-                        activite_str = str(item.get("activite", "")).lower()
-                        q_count = 0
-                        try:
-                            q_count = int(item.get("trimestres_valides", 0))
-                        except (TypeError, ValueError):
-                            pass
+                        year = item.get("annee")
+                        if not year or not str(year).isdigit(): continue
                         
-                        is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou", "non détecté"])
-                        needs_justificatifs = (q_count < 4) or is_missing_act
-                        
-                        ai_anomalies.append({
-                            "year": year, 
-                            "title": f"Année {year} : {item.get('statut', 'Anomalie')}", 
-                            "description": item.get("anomalie_specifique", "Incohérence détectée"),
-                            "justificatif": item.get("justificatif_suggere"),
-                            "needs_justificatifs": needs_justificatifs,
-                            "points_complementaires": item.get("points_complementaires"),
-                            "trimestres_valides": q_count
-                        })
+                        entry = {
+                            "year": int(year),
+                            "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
+                            "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
+                            "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
+                            "regime": item.get("activite", "Détecté par IA")
+                        }
+                        ai_career_data.append(RetirementRulesEngine.get_year_validation_status(entry))
                     
-                    if ai_anomalies:
-                        # Sort anomalies by year (chronological)
-                        ai_anomalies.sort(key=lambda x: int(str(x.get("year", 0))))
-                        db_scan.detailed_report = json.dumps(ai_anomalies)
-                        db_scan.has_anomalies = True
-                    
-                    # NEW: For scanned documents, backfill the technical career_data from AI extraction
-                    if db_scan.is_scanned and full_timeline:
-                        ai_career_data = []
-                        for item in full_timeline:
-                            year = item.get("annee")
-                            if not year or not str(year).isdigit(): continue
-                            
-                            salary = item.get("salaire_brut", 0.0)
-                            ris_quarters = item.get("trimestres_valides", 0)
-                            ris_points = item.get("points_complementaires", 0.0)
-                            
-                            entry = {
-                                "year": int(year),
-                                "salary": float(salary) if salary else 0.0,
-                                "ris_quarters": int(ris_quarters) if ris_quarters else 0,
-                                "ris_points": float(ris_points) if ris_points else 0.0,
-                                "regime": item.get("activite", "Détecté par IA")
-                            }
-                            # Re-run mathematical validation (SMIC/PASS/Points)
-                            validated_entry = RetirementRulesEngine.get_year_validation_status(entry)
-                            ai_career_data.append(validated_entry)
-                        
-                        if ai_career_data:
-                            ai_career_data.sort(key=lambda x: x['year'])
-                            db_scan.career_data = json.dumps(ai_career_data)
-                            # Update reliability score based on new data
-                            db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                    if ai_career_data:
+                        ai_career_data.sort(key=lambda x: x['year'])
+                        db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
+                        db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
 
-                except Exception as json_err:
-                    print(f"JSON Parse AI error: {json_err}")
+            except Exception as final_err:
+                print(f"Final Data Merging error: {final_err}")
 
         # Final update
         db_scan.ocr_status = "success"
