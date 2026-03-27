@@ -126,8 +126,8 @@ def parse_ris_file(file_path: str):
                 if b_match:
                     birth_year = b_match.group(1)
 
-            # 1. Year Tracking
-            year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", line_clean)
+            # 1. Year Tracking (Native PDF approach)
+            year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
             if year_match:
                 detected_year = year_match.group(1)
                 all_detected.append(int(detected_year))
@@ -152,6 +152,10 @@ def parse_ris_file(file_path: str):
                     raw_pts = p_match.group(1).replace(' ', '').replace(',', '.')
                     try:
                         pts_val = float(raw_pts)
+                        # Anti-DocID for points: very large numbers without decimals are suspicious
+                        if pts_val > 2000 and "." not in p_match.group(1) and "," not in p_match.group(1):
+                            pts_val = 0.0 # Redact suspicious point value
+                        
                         regime_name = "Complémentaire"
                         context_window = ""
                         for j in range(max(0, i-2), min(len(lines), i+2)):
@@ -170,14 +174,14 @@ def parse_ris_file(file_path: str):
 
             # 3. Salaries (DETAIL) - Aggregation Logic
             if current_context == "DETAIL":
-                date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d))", line_clean)
+                date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
                 if date_match:
                     row_year = date_match.group(2)
                     current_year = row_year
                     all_detected.append(int(row_year))
                 
                 # Check for year even without full date (e.g. 2024 at start of line)
-                elif re.match(r"^(19[5-9]\d|20[0-2]\d)\b", line_clean):
+                elif re.match(r"^(19[5-9]\d|20[0-2]\d|2030)\b", line_clean):
                     row_year = line_clean[:4]
                     current_year = row_year
                     all_detected.append(int(row_year))
@@ -221,9 +225,16 @@ def parse_ris_file(file_path: str):
                     
                     if potential_vals:
                         # In a detailed line, the largest non-year number is almost always the salary
-                        # (Points and quarters are much smaller)
                         best_v = max(potential_vals)
-                        if best_v > 100 or any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"]):
+                        
+                        # Anti-DocID Filter: Ignore 6-9 digit numbers > 150k unless explicitly labeled
+                        is_explicit = any(k in line_clean.lower() for k in ["€", "salaire", "revenu", "brut", "montant"])
+                        is_suspicious = best_v > 150000 and len(str(int(best_v))) >= 6
+                        
+                        if is_suspicious and not is_explicit:
+                            best_v = 0.0 # Redact suspicious salary
+
+                        if best_v > 0:
                             found_salaries[current_year] = found_salaries.get(current_year, 0.0) + best_v
 
         # 4. Anomaly Synthesis

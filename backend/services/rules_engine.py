@@ -156,24 +156,33 @@ class RetirementRulesEngine:
         gap = 0.0
 
         # Point gap (Agirc-Arrco only)
+        # Point gap (Agirc-Arrco only) - Informative if 4/4 quarters
         if "agirc" in regime.lower() or "arrco" in regime.lower():
             if salary > 0:
                 gap = ris_p - theo_p
                 if abs(gap) > (theo_p * 0.15) and theo_p > 5:
-                    status = "anomalie"
-                    explanation = f"Écart de {round(gap, 2)} pts détecté par rapport au salaire déclaré."
+                    # Only mark as anomaly if quarters are also incomplete, 
+                    # otherwise just keep as informative warning if quarters are 4/4
+                    if ris_q < 4:
+                        status = "anomalie"
+                        explanation = f"Écart de {round(gap, 2)} pts détecté par rapport au salaire déclaré."
+                    else:
+                        explanation = f"Points cohérents (Écart mineur de {round(gap, 2)} pts)."
             elif ris_p > 0:
-                status = "anomalie"
-                explanation = "Points enregistrés sans salaire correspondant."
+                if ris_q < 4:
+                    status = "anomalie"
+                    explanation = "Points enregistrés sans salaire correspondant."
+                else:
+                    explanation = "Points enregistrés (Année complète)."
         
-        # Quarter gap (Strict: 1 year = 4 quarters)
-        if ris_q < 4:
+        # Quarter gap (Master Rule: 4/4 = Pass)
+        if ris_q >= 4:
+            status = "conforme"
+            if not explanation:
+                explanation = f"Année complète : {ris_q} / 4 trimestres"
+        else:
             status = "anomalie"
             explanation = f"Année incomplète : {ris_q} / 4 trimestres — anomalie détectée"
-        
-        if not explanation:
-            status = "conforme"
-            explanation = f"Année complète : {ris_q} / 4 trimestres"
 
         return {
             "year": year,

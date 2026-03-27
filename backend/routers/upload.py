@@ -235,6 +235,52 @@ async def run_full_analysis_worker(
                 db_scan.detailed_report = json.dumps(merged_anomalies, ensure_ascii=False)
                 db_scan.has_anomalies = len(merged_anomalies) > 0
                 
+                # --- NATIVE PDF PRECISION INJECTION (Inspired by Non-Native Logic) ---
+                if not db_scan.is_scanned and full_timeline:
+                    # technical_audit is our precision source for native PDFs
+                    precision_career = []
+                    
+                    # Create a map for quick access: {year: technical_entry}
+                    tech_map = {item['year']: item for item in technical_audit}
+                    
+                    for item in full_timeline:
+                        y_val = item.get("annee")
+                        if not y_val or not str(y_val).isdigit():
+                            continue
+                        
+                        y_int = int(y_val)
+                        tech_entry = tech_map.get(y_int)
+                        
+                        # Basis: AI structure
+                        entry = {
+                            "year": y_int,
+                            "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
+                            "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
+                            "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
+                            "regime": item.get("activite", "Inconnu")
+                        }
+                        
+                        # Precision Overwrite (if technical data is better)
+                        if tech_entry:
+                            if tech_entry.get("salary", 0) > entry["salary"]:
+                                entry["salary"] = tech_entry["salary"]
+                            if tech_entry.get("ris_quarters", 0) > entry["ris_quarters"]:
+                                entry["ris_quarters"] = tech_entry["ris_quarters"]
+                            # Points are often more precise in technical extraction for native PDFs
+                            if tech_entry.get("ris_points", 0) > 0:
+                                entry["ris_points"] = tech_entry["ris_points"]
+                            if tech_entry.get("regime") and tech_entry["regime"] != "Inconnu":
+                                entry["regime"] = tech_entry["regime"]
+                        
+                        # Apply Anomaly Logic: 4/4 is NOT an anomaly
+                        # (This affects the career_data validation status)
+                        precision_career.append(RetirementRulesEngine.get_year_validation_status(entry))
+                    
+                    if precision_career:
+                        precision_career.sort(key=lambda x: x['year'])
+                        db_scan.career_data = json.dumps(precision_career, ensure_ascii=False)
+                        db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(precision_career)
+
                 ### FROZEN MODULE: NON-NATIVE ANALYSIS - TECHNICAL BACKFILL ###
                 # 4. Backfill technical career_data for scanned documents if empty
                 if db_scan.is_scanned and full_timeline and not career_raw:
