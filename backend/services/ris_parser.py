@@ -28,8 +28,12 @@ def parse_ris_file(file_path: str):
     try:
         doc = fitz.open(file_path)
         for page in doc:
-            # Sort=True is CRITICAL for native PDFs to keep column order
-            doc_text += page.get_text("text", sort=True) + "\n"
+            try:
+                # Sort=True is CRITICAL for native PDFs to keep column order
+                doc_text += page.get_text("text", sort=True) + "\n"
+            except Exception as e:
+                # Fallback to normal text extraction if sort=True fails for some reason
+                doc_text += page.get_text("text") + "\n"
         
         # Detection of scanned PDF (OCR fallback needed)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
@@ -60,9 +64,14 @@ def parse_ris_file(file_path: str):
         doc_text = f"[MODE SCAN DETECTÉ - ANALYSE VISUELLE PRIORITAIRE]\n{doc_text}"
 
     # Detection logic: broader keywords for various RIS issuers (CNAV, Agirc-Arrco, etc.)
-    is_ris = is_scanned or any(keyword in doc_text.lower() for keyword in [
+    # Filename fallback for detection
+    filename_lower = file_path.lower()
+    is_ris_filename = any(k in filename_lower for k in ["ris", "relevé", "carriere", "retraite"])
+
+    is_ris = is_scanned or is_ris_filename or any(keyword in doc_text.lower() for keyword in [
         "relevé individuel", "ris", "retraites", "assurance vieillesse", 
-        "carrière", "situation", "points", "trimestres", "employeur"
+        "carrière", "situation", "points", "trimestres", "employeur",
+        "droits", "période", "salaire", "cotisation", "relevé de situation"
     ])
     
     anomalies_list = []

@@ -116,8 +116,10 @@ class RetirementRulesEngine:
         
         # Pre-2019: Simplified approach
         pre_data = data.get("arrco") or data.get("unified")
-        if not isinstance(pre_data, dict):
-             purchase_val = 15.0
+        purchase_val = 15.0 # Default fallback
+        if isinstance(pre_data, dict):
+            purchase_val = float(pre_data.get("purchase", 15.0))
+            
         points = (float(salary) * 0.06) / float(purchase_val)
         return {"points": round(float(points), 2), "purchase_value": float(purchase_val)}
 
