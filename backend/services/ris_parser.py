@@ -87,8 +87,9 @@ def parse_ris_file(file_path: str):
         found_years = {}
         found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
-        yearly_seen_values = {} # { "year": set([val1, val2, ...]) } to avoid duplicates (base/compl)
+        yearly_salaries_list = {} # { "year": [val1, val2, ...] } for unique aggregation
         all_detected = []
+        extraction_finished = False # Stop after career detail
         birth_year = None
 
         REGIMES_MAP = {
@@ -203,11 +204,26 @@ def parse_ris_file(file_path: str):
                 
                 # Ultimate Salary Extraction for current context
                 
-                # PRE-STEP: Neutralize dates (DD/MM/YYYY) to avoid picking up the DD or MM as salaries
+                # End of Career Section (ignore everything after)
+                if re.search(r"(En savoir plus|Mots-clés|Informations complémentaires|Calcul de votre retraite)", line_clean, re.IGNORECASE):
+                    extraction_finished = True
+                    continue
+                
+                if extraction_finished:
+                    continue
+
+                # NIR / Social Security Block Protection (ignore lines that look like numbers segments)
+                if re.search(r"[12][\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{2}[\s\xa0]+\d{3}[\s\xa0]+\d{3}", line_clean):
+                    continue
+                
+                # Skip Page footers and technical noisy lines
+                if re.search(r"(Edité le|Page\s+\d+|DAICRISE|SAULNEROND|Numéro de Séc|Inconnu)", line_clean, re.IGNORECASE):
+                    continue
+
+                # PRE-STEP: Neutralize dates (JJ/MM/AAAA) to avoid picking up the DD or MM as salaries
                 line_no_dates = re.sub(r"\d{2}/\d{2}/\d{4}", " [DATE] ", line_clean)
                 
                 explicit_vals = [] # Values next to € or salary keywords
-                potential_vals = [] # Other clean numbers
                 
                 # Broad number search on the date-neutralized line
                 for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_no_dates):
@@ -231,8 +247,11 @@ def parse_ris_file(file_path: str):
                     
                     try:
                         v = float(s_clean)
-                        if v < 10: continue # Noise (digits, small constants)
+                        if v < 1: continue 
                         if current_year is not None and abs(v - int(str(current_year))) < 0.1: continue
+                        
+                        # HARD PROTECTION: Salaries in RIS are never > 200,000 per line (usually technical codes)
+                        if v > 200000: continue
                         
                         start, end = m.span(2)
                         # Check context in the original line (line_clean) at roughly the same position
@@ -240,38 +259,31 @@ def parse_ris_file(file_path: str):
                         is_monetary = any(k in context for k in ["€", "eur", "euro"])
                         is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant", "base"])
                         
-                        # Anti-DocID/NIR: Suspicious if very large (>250k), no decimal, or long
-                        is_suspicious_id = (v > 250000 and "." not in s and "," not in s) or len(s_clean) >= 11
-                        
+                        # GOLDEN RULE for native PDFs: ONLY accept numbers with explicit context (€ or Keyword)
                         if is_monetary or is_salary_kw:
-                            if not is_suspicious_id:
-                                explicit_vals.append(v)
-                        else:
-                            # Only accept non-explicit candidates if they are > 500 (threshold for noise)
-                            # to avoid "12" (months), "22" (day), etc.
-                            if v > 500 and not is_suspicious_id:
-                                potential_vals.append(v)
+                             # Round to 2 decimals to ensure perfect merging in sets
+                             explicit_vals.append(round(v, 2))
                     except: pass
                 if current_year:
+                    # GOLDEN RULE: Only take values with € symbols to include micro-revenues and exclude NIR/Codes
                     best_v = 0.0
                     if explicit_vals:
-                        # Prioritize explicit money values (with €)
                         best_v = max(explicit_vals)
-                    elif potential_vals:
-                        # Fallback to realistic salary numbers (> 500)
-                        best_v = max(potential_vals)
                     
                     if best_v > 0:
-                        # DEDUPLICATION LOGIC:
-                        # Many RIS report the same annual salary for different regimes (Base / Complementary).
-                        # We only sum different values for the same year to avoid double counting.
-                        seen_set = yearly_seen_values.get(str(current_year), set())
-                        if best_v not in seen_set:
-                            found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
-                            seen_set.add(best_v)
-                            yearly_seen_values[str(current_year)] = seen_set
+                        if str(current_year) not in yearly_salaries_list:
+                            yearly_salaries_list[str(current_year)] = []
+                        yearly_salaries_list[str(current_year)].append(best_v)
+                        # DEBUG
+                        # print(f"DEBUG: Added {best_v} to {current_year} from line: {line_clean[:50]}")
 
-        # 4. Anomaly Synthesis
+        # 4. Salary Aggregation with Deduplication
+        # For native PDFs, we sum unique values per year to avoid double counting across regimes
+        for y, vals in yearly_salaries_list.items():
+            unique_vals = sorted(list(set(vals)), reverse=True)
+            found_salaries[y] = sum(unique_vals)
+
+        # 5. Anomaly Synthesis
         if all_detected:
             years_list = sorted(list(set(all_detected)))
             if not years_list:
