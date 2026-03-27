@@ -102,23 +102,28 @@ async def run_full_analysis_worker(
         db_session.commit()
 
         # Step 1: Initial Parsing (Fast)
-        result = ris_parser.parse_ris_file(file_path)
+        parser_res = ris_parser.parse_ris_file(file_path)
         
-        # Step 2: Update scan info
-        db_scan.is_scanned = result.get("is_scanned", False)
-        db_scan.is_valid_ris = result.get("is_valid_ris", False)
-        db_scan.raw_text = result.get("raw_text", "")
-        db_scan.has_anomalies = result.get("has_anomalies", False)
-        db_scan.detailed_report = json.dumps(result.get("detailed_report", []))
-        
-        # Identity logic
-        db_scan.identity_hash = result.get("identity_hash")
-        db_scan.identity_name = result.get("identity_name")
-        db_scan.identity_birth_date = result.get("identity_birth_date")
-        
-        # Expert career data
-        career_data = result.get("career_data", [])
-        db_scan.career_data = json.dumps(career_data)
+        # Calculate reliability score and technical audit
+        career_raw = parser_res.get("career_data", [])
+        technical_audit = []
+        for year_item in career_raw:
+            audit_item = RetirementRulesEngine.get_year_validation_status(year_item)
+            technical_audit.append(audit_item)
+            
+        reliability_score = RetirementRulesEngine.get_reliability_score(technical_audit)
+
+        # Update ScanResult
+        db_scan.is_valid_ris = parser_res.get("is_valid_ris", False)
+        db_scan.has_anomalies = parser_res.get("has_anomalies", False)
+        db_scan.is_scanned = parser_res.get("is_scanned", False)
+        db_scan.raw_text = parser_res.get("raw_text", "")
+        db_scan.detailed_report = json.dumps(parser_res.get("detailed_report", []))
+        db_scan.identity_hash = parser_res.get("identity_hash")
+        db_scan.identity_name = parser_res.get("identity_name")
+        db_scan.identity_birth_date = parser_res.get("identity_birth_date")
+        db_scan.reliability_score = reliability_score
+        db_scan.career_data = json.dumps(technical_audit) # Enriched data
         
         db_session.commit()
 

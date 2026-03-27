@@ -179,44 +179,61 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                  </p>
               </div>
 
-              {/* Point Verification Table */}
+              {/* Technical Control Table (Tableau de Contrôle) */}
               {result.career_data && (
                 <div style={{ marginBottom: 32, overflowX: 'auto' }}>
-                  <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--primary-light)', marginBottom: 16 }}>📊 Vérification technique des points (Calculé vs Relevé)</h4>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                    <h4 style={{ fontSize: 16, fontWeight: 800, color: 'var(--primary-light)', margin: 0 }}>🛡️ Tableau de Contrôle Technique</h4>
+                    <span style={{ fontSize: 11, background: 'rgba(79,70,229,0.1)', padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>AUDIT RÉGLEMENTAIRE</span>
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                     <thead>
-                      <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border)' }}>
+                      <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
                         <th style={{ padding: '12px 8px' }}>Année</th>
+                        <th style={{ padding: '12px 8px' }}>Régime</th>
                         <th style={{ padding: '12px 8px' }}>Salaire Brut</th>
-                        <th style={{ padding: '12px 8px' }}>Points RIS</th>
-                        <th style={{ padding: '12px 8px' }}>Points Théoriques</th>
-                        <th style={{ padding: '12px 8px' }}>Écart</th>
+                        <th style={{ padding: '12px 8px' }}>Trimestres (RIS/Théo)</th>
+                        <th style={{ padding: '12px 8px' }}>Points (RIS/Théo)</th>
+                        <th style={{ padding: '12px 8px' }}>Statut</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {JSON.parse(result.career_data).filter(d => d.salary > 0).slice(-10).map((d, idx) => {
-                        // Simple frontend calculation for UI display (matches backend engine)
-                        const theo = (d.salary * 0.0621 / 20.1877).toFixed(2); // Simplified post-2019 rule for UI
-                        const diff = (d.ris_points - theo).toFixed(2);
-                        const isSignificant = Math.abs(diff) > 2;
+                      {JSON.parse(result.career_data).slice(-15).reverse().map((d, idx) => {
+                        const statusColors = {
+                          'conforme': { color: '#22c55e', bg: 'rgba(34,197,94,0.1)', label: 'CONFORME' },
+                          'écart': { color: '#eab308', bg: 'rgba(234,179,8,0.1)', label: 'ÉCART' },
+                          'anomalie': { color: '#ef4444', bg: 'rgba(239,68,68,0.1)', label: 'ANOMALIE' }
+                        }
+                        const s = statusColors[d.status] || statusColors['conforme']
                         
                         return (
-                          <tr key={idx} style={{ borderBottom: '1px solid var(--border)', background: isSignificant ? 'rgba(239,68,68,0.03)' : 'transparent' }}>
+                          <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: d.salary > 0 ? 1 : 0.6 }}>
                             <td style={{ padding: '12px 8px', fontWeight: 700 }}>{d.year}</td>
-                            <td style={{ padding: '12px 8px' }}>{d.salary.toLocaleString()} €</td>
-                            <td style={{ padding: '12px 8px' }}>{d.ris_points}</td>
-                            <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{theo}</td>
-                            <td style={{ padding: '12px 8px', fontWeight: 800, color: isSignificant ? 'var(--danger)' : 'var(--success)' }}>
-                              {diff > 0 ? `+${diff}` : diff}
+                            <td style={{ padding: '12px 8px', fontSize: 10, fontWeight: 600 }}>{d.regime}</td>
+                            <td style={{ padding: '12px 8px' }}>{d.salary > 0 ? `${d.salary.toLocaleString()} €` : '—'}</td>
+                            <td style={{ padding: '12px 8px' }}>
+                              <span style={{ fontWeight: 700 }}>{d.ris_quarters}</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 10 }}> / {d.theo_quarters}</span>
+                            </td>
+                            <td style={{ padding: '12px 8px' }}>
+                              <span style={{ fontWeight: 700 }}>{d.ris_points > 0 ? d.ris_points.toFixed(2) : '—'}</span>
+                              {d.theo_points > 0 && <span style={{ color: 'var(--text-muted)', fontSize: 10 }}> / {d.theo_points.toFixed(2)}</span>}
+                            </td>
+                            <td style={{ padding: '12px 8px' }}>
+                              <div style={{ background: s.bg, color: s.color, padding: '2px 8px', borderRadius: 4, fontSize: 9, fontWeight: 900, textAlign: 'center', border: `1px solid ${s.color}33`, width: 'fit-content' }}>
+                                {s.label}
+                              </div>
                             </td>
                           </tr>
                         );
                       })}
                     </tbody>
                   </table>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italics' }}>
-                    * Affichage des 10 dernières années actives. Le calcul théorique utilise les taux et valeurs de point réglementaires Agirc-Arrco extraits des circulaires 2024-2025.
-                  </p>
+                  <div style={{ marginTop: 12, padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--border)' }}>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                      💡 <strong>Note d'audit :</strong> Ce tableau compare vos droits enregistrés au calcul théorique basé sur le SMIC historique (pour les trimestres) et les valeurs de service Agirc-Arrco. Un écart peut s'expliquer par des périodes d'arrêt, de chômage ou des dépassements de plafond de SS.
+                    </p>
+                  </div>
                 </div>
               )}
 

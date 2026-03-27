@@ -202,12 +202,26 @@ def parse_ris_file(file_path: str):
         all_unique_years = sorted(list(set(all_detected)))
         for y in all_unique_years:
             y_str = str(y)
+            # Find the best salary for this year (often the max found in DETAIL)
+            salary = found_salaries.get(y_str, 0.0)
+            
+            # Points list to determine main regime and total points
+            points_info = found_points.get(y_str, [])
+            total_points = sum(item[0] for item in points_info)
+            
+            # Use the first specific regime found, or default to Agirc-Arrco
+            base_regime = "Agirc-Arrco"
+            for pts, reg in points_info:
+                if reg != "Complémentaire":
+                    base_regime = reg
+                    break
+            
             career_data.append({
                 "year": y,
-                "salary": found_salaries.get(y_str, 0.0),
-                "ris_points": sum(item[0] for item in found_points.get(y_str, [])),
-                "quarters": found_years.get(y_str, 0),
-                "regime": found_points.get(y_str, [None, "Agirc-Arrco"])[0][1] if found_points.get(y_str) else "Agirc-Arrco"
+                "salary": salary,
+                "ris_points": total_points,
+                "ris_quarters": found_years.get(y_str, 0),
+                "regime": base_regime
             })
 
     identity_data = extract_identity(doc_text)

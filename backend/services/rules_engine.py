@@ -50,6 +50,21 @@ RETIREMENT_RESOURCES = {
     2000: {"pass": 26892.0, "arrco": {"purchase": 11.5345, "service": 1.0171}, "agirc": {"purchase": 4.0231, "service": 0.3596}},
 }
 
+# Historical SMIC hourly gross values as of Jan 1st
+SMIC_HISTORY = {
+    2026: 12.02, 2025: 11.88, 2024: 11.65, 2023: 11.27, 2022: 10.57,
+    2021: 10.25, 2020: 10.15, 2019: 10.03, 2018: 9.88, 2017: 9.76,
+    2016: 9.67, 2015: 9.61, 2014: 9.53, 2013: 9.43, 2012: 9.22,
+    2011: 9.00, 2010: 8.86, 2009: 8.71, 2008: 8.44, 2007: 8.27,
+    2006: 8.03, 2005: 7.61, 2004: 7.19, 2003: 6.83, 2002: 6.67,
+    2001: 6.41, 2000: 6.21, 1999: 6.01, 1998: 5.88, 1997: 5.65,
+    1996: 5.51, 1995: 5.38, 1994: 5.27, 1993: 5.16, 1992: 5.06,
+    1991: 4.89, 1990: 4.56, 1989: 4.38, 1988: 4.25, 1987: 4.10,
+    1986: 3.98, 1985: 3.78, 1984: 3.48, 1983: 3.16, 1982: 2.84,
+    1981: 2.37, 1980: 1.85, 1979: 1.63, 1978: 1.45, 1977: 1.28,
+    1976: 1.13, 1975: 1.05, 1974: 0.88, 1973: 0.76, 1972: 0.69
+}
+
 RATES = {
     "T1_CALC": 0.062, # 6.20% since 2019
     "T2_CALC": 0.170, # 17% since 2019
@@ -100,6 +115,74 @@ class RetirementRulesEngine:
              
         points = (salary * 0.06) / purchase_val 
         return {"points": round(float(points), 2), "purchase_value": purchase_val}
+
+    @staticmethod
+    def calculate_theoretical_quarters(salary: float, year: int) -> int:
+        """Calculates theoretical quarters based on SMIC rules."""
+        smic = SMIC_HISTORY.get(year, SMIC_HISTORY[1972] if year < 1972 else SMIC_HISTORY[2025])
+        # 150h pre-2014, 200h post-2014
+        threshold_h = 200 if year < 2014 else 150
+        q_threshold = smic * threshold_h
+        
+        if q_threshold <= 0: return 0
+        quarters = int(salary // q_threshold)
+        return min(4, quarters)
+
+    @staticmethod
+    def get_year_validation_status(year_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compares RIS data with theoretical calculations for a specific year.
+        Expected year_data: {"year": int, "regime": str, "salary": float, "ris_quarters": int, "ris_points": float}
+        """
+        year = year_data.get("year", 0)
+        salary = year_data.get("salary", 0.0)
+        ris_q = year_data.get("ris_quarters", 0)
+        ris_p = year_data.get("ris_points", 0.0)
+        regime = year_data.get("regime", "CNAV")
+
+        theo_q = RetirementRulesEngine.calculate_theoretical_quarters(salary, year)
+        theo_p_res = RetirementRulesEngine.calculate_theoretical_points(salary, year, regime)
+        theo_p = theo_p_res.get("points", 0.0)
+
+        status = "conforme"
+        explanation = ""
+        gap = 0.0
+
+        # Point gap (Agirc-Arrco only)
+        if "agirc" in regime.lower() or "arrco" in regime.lower():
+            if salary > 0:
+                gap = ris_p - theo_p
+                if abs(gap) > (theo_p * 0.15) and theo_p > 5:
+                    status = "anomalie"
+                    explanation = f"Écart de {round(gap, 2)} pts détecté par rapport au salaire déclaré."
+            elif ris_p > 0:
+                status = "anomalie"
+                explanation = "Points enregistrés sans salaire correspondant."
+        
+        # Quarter gap
+        if ris_q < theo_q:
+            status = "anomalie"
+            explanation = f"Seulement {ris_q}/4 trimestres validés malgré un salaire de {salary}€."
+        elif salary > 0 and ris_q == 0:
+            status = "anomalie"
+            explanation = "Salaire présent mais aucun trimestre validé."
+            
+        if not explanation:
+            status = "conforme"
+            explanation = "Les données sont cohérentes avec les calculs théoriques."
+
+        return {
+            "year": year,
+            "regime": regime,
+            "salary": salary,
+            "ris_quarters": ris_q,
+            "theo_quarters": theo_q,
+            "ris_points": ris_p,
+            "theo_points": theo_p,
+            "gap": round(gap, 2),
+            "status": status,
+            "explanation": explanation
+        }
 
     @staticmethod
     def get_reliability_score(calculated_periods: List[Dict[str, Any]]) -> int:
