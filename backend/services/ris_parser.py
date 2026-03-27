@@ -87,6 +87,7 @@ def parse_ris_file(file_path: str):
         found_years = {}
         found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
+        yearly_seen_values = {} # { "year": set([val1, val2, ...]) } to avoid duplicates (base/compl)
         all_detected = []
         birth_year = None
 
@@ -251,7 +252,6 @@ def parse_ris_file(file_path: str):
                             if v > 500 and not is_suspicious_id:
                                 potential_vals.append(v)
                     except: pass
-                
                 if current_year:
                     best_v = 0.0
                     if explicit_vals:
@@ -262,7 +262,14 @@ def parse_ris_file(file_path: str):
                         best_v = max(potential_vals)
                     
                     if best_v > 0:
-                        found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
+                        # DEDUPLICATION LOGIC:
+                        # Many RIS report the same annual salary for different regimes (Base / Complementary).
+                        # We only sum different values for the same year to avoid double counting.
+                        seen_set = yearly_seen_values.get(str(current_year), set())
+                        if best_v not in seen_set:
+                            found_salaries[str(current_year)] = found_salaries.get(str(current_year), 0.0) + best_v
+                            seen_set.add(best_v)
+                            yearly_seen_values[str(current_year)] = seen_set
 
         # 4. Anomaly Synthesis
         if all_detected:
