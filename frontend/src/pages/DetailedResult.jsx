@@ -179,8 +179,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                  </p>
               </div>
 
-              {/* ### FROZEN MODULE: TECHNICAL CONTROL TABLE ### */}
-              {/* Technical Control Table (Tableau de Contrôle) */}
+              {/* ### DÉBUT MODULE GELÉ : TABLEAU DE CONTRÔLE TECHNIQUE (STRUCTURE ET COLONNE EMPLOYEUR) ### */}
               {result.career_data && (
                 <div style={{ marginBottom: 32, overflowX: 'auto' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -237,7 +236,7 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                   </div>
                 </div>
               )}
-              {/* ### END FROZEN MODULE ### */}
+              {/* ### FIN MODULE GELÉ : TABLEAU DE CONTRÔLE TECHNIQUE ### */}
 
               {(aiData.compte_rendu || aiData.analyse_detaillee) && (
                 <div style={{ padding: '20px', borderRadius: 12, background: 'rgba(79,70,229,0.03)', borderLeft: '4px solid var(--primary-light)' }}>

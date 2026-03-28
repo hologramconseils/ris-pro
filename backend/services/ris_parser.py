@@ -83,7 +83,6 @@ def parse_ris_file(file_path: str):
     
     anomalies_list = []
     
-    ### FROZEN MODULE: NATIVE PDF ANALYSIS & EMPLOYER EXTRACTION ###
     # Enable analysis for both native and scanned text
     if is_ris:
         found_years = {}
@@ -130,9 +129,11 @@ def parse_ris_file(file_path: str):
                 current_context = "SYNTHESE"
                 continue
 
+            ### DÉBUT MODULE GELÉ : PROTECTION MÉTADONNÉES ET FILTRAGE DES ANNÉES ###
             # 2. GLOBAL METADATA BLACKLIST: Skip headers/footers (2025 ghost years)
             if any(kw in line_clean.lower() for kw in ["relevé de carrière", "informations au", "edité le", "édité le", "page ", "nire"]):
                  continue
+            ### FIN MODULE GELÉ : PROTECTION MÉTADONNÉES ###
             
             # Birth year detection
             if "né(e) le" in line_clean.lower() or "né le" in line_clean.lower():
@@ -223,12 +224,14 @@ def parse_ris_file(file_path: str):
                         pass
 
             if current_context == "DETAIL":
+                ### DÉBUT MODULE GELÉ : EXTRACTION HEURISTIQUE DES EMPLOYEURS ###
                 # Employer Detection (Lines without dates/amounts often contain the company name)
                 if not re.search(r"\d{2}/\d{2}/\d{4}", line_clean) and not re.search(r"\d+[\s.,]\d{2}", line_clean):
                     # If it's pure uppercase or looks like a company name
                     if len(line_clean) > 3 and not any(kw in line_clean.lower() for kw in ["détail", "carrière", "page", "n°", "nire"]):
                         if line_clean.isupper() or (re.match(r"^[A-Z][A-Z\s\-]+$", line_clean) and len(line_clean) > 5):
                             current_employer = line_clean.strip()
+                ### FIN MODULE GELÉ : EXTRACTION EMPLOYEURS ###
 
                 # Date Detection and Year Tracking (Same line priority)
                 line_year = None
@@ -409,6 +412,7 @@ def parse_ris_file(file_path: str):
             if birth_year is not None:
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
+            ### DÉBUT MODULE GELÉ : BORNAGE DE CARRIÈRE (STRICT_YEARS) ###
             # RULE: Strictly bound the analysis to the real career end (as requested by user)
             # Find the last year with ANY recorded POSITIVE activity AND present in strict_years
             # This effectively filters out ghost years found in headers/footers
@@ -422,6 +426,7 @@ def parse_ris_file(file_path: str):
 
             max_active_year = max(active_years_data) if active_years_data else (max(all_detected) if all_detected else datetime.date.today().year - 1)
             target_year = min(datetime.date.today().year - 1, max_active_year)
+            ### FIN MODULE GELÉ : BORNAGE DE CARRIÈRE ###
             
             # Final Sanity Check for 2025 Ghost Year removal (for short careers ending before 2020)
             if target_year >= 2025 and max_active_year < 2025:
@@ -499,7 +504,6 @@ def parse_ris_file(file_path: str):
         career_data = [d for d in career_data if d["year"] <= target_year]
         # Enforce chronological sorting (ascending)
         career_data.sort(key=lambda x: x["year"])
-    ### END FROZEN MODULE: NATIVE PDF ANALYSIS & EMPLOYER EXTRACTION ###
 
     identity_data = extract_identity(doc_text)
 
