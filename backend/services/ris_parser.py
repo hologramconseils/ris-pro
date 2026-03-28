@@ -139,6 +139,10 @@ def parse_ris_file(file_path: str):
                 if y_int >= datetime.datetime.now().year:
                     continue
                     
+                # Metadata Protection: Ignore header/footer dates (au 01/01/2025)
+                if re.search(r"(au\s+|le\s+)\d{2}/\d{2}/\d{4}", line_clean, re.IGNORECASE):
+                    continue
+                    
                 all_detected.append(y_int)
                 # If we see a year and no context yet, default to SYNTHESE-like scanning
                 if current_context == "GENERAL":
@@ -161,8 +165,10 @@ def parse_ris_file(file_path: str):
                     raw_pts = p_match.group(1).replace(' ', '').replace(',', '.')
                     try:
                         pts_val = float(raw_pts)
-                        # Anti-DocID for points: very large numbers without decimals are suspicious
-                        if pts_val > 2000 and "." not in p_match.group(1) and "," not in p_match.group(1):
+                        # Sanity Check for points: 
+                        # - No single year/regime gives > 600 points unless it's a sum (which we handle)
+                        # - Anti-DocID: very large numbers without decimals are suspicious
+                        if pts_val > 600 or (pts_val > 100 and "." not in p_match.group(1) and "," not in p_match.group(1)):
                             pts_val = 0.0 # Redact suspicious point value
                         
                         regime_name = "Complémentaire"
@@ -209,7 +215,7 @@ def parse_ris_file(file_path: str):
                 # Ultimate Salary Extraction for current context
                 
                 # End of Career Section (ignore everything after)
-                if re.search(r"(En savoir plus|Mots-clés|Informations complémentaires|Calcul de votre retraite)", line_clean, re.IGNORECASE):
+                if re.search(r"(En savoir plus|Mots-clés|Informations complémentaires|Calcul de votre retraite|Lexique|Glossaire)", line_clean, re.IGNORECASE):
                     extraction_finished = True
                     continue
                 
@@ -238,7 +244,6 @@ def parse_ris_file(file_path: str):
                 for m in re.finditer(r"([^\d\s.,\xa0/]?)\b(\d[\d\s.,\xa0]*\d|\d)\b([^\d\s.,\xa0/]?)", line_no_dates):
                     s = m.group(2).strip()
                     s_clean = s.replace(' ', '').replace('\xa0', '')
-                    
                     # Normalizing number format
                     if ',' in s_clean and '.' in s_clean:
                         if s_clean.rfind('.') < s_clean.rfind(','):
@@ -254,6 +259,10 @@ def parse_ris_file(file_path: str):
                         if len(s_clean.split('.')[1]) == 3:
                             s_clean = s_clean.replace('.', '')
                     
+                    # Note/Reference exclusion: if it matches common note markers like (1), (A)
+                    if m.group(1) == "(" and m.group(3) == ")":
+                        continue
+                        
                     try:
                         v = float(s_clean)
                         if v < 1: continue 
@@ -272,9 +281,17 @@ def parse_ris_file(file_path: str):
                         is_franc = "currency_frf" in context_window or "currency_frf" in line_lower
                         is_salary_kw = any(k in context_window for k in ["salaire", "revenu", "brut", "montant", "base"]) or any(k in line_lower for k in ["salaire", "brut"])
                         
-                        # ANTI-NIR protection (additional): if the value exactly matches a NIR segment
-                        if v in [172, 232, 174, 341, 128]: # Common suspicious small integers
+                        # ANTI-NIR protection (additional): if the value matches a segment but has NO context
+                        # Catching NIR segments: 172, 232 (Murel), 341, 128 (Bertrand), etc.
+                        if v in [172, 232, 174, 341, 128, 99, 1387, 8129, 6808]: # Also catching common noisy technical codes
                              if not (is_euro or is_franc) and not is_salary_kw: continue
+                             
+                        # Tighter protection for small integers (like note indices)
+                        if v < 10:
+                            # Must be very close to a currency symbol or explicitly labelled
+                            immediate_context = line_no_dates[max(0, start-5):min(len(line_no_dates), end+5)].lower()
+                            if "€" not in immediate_context and "frf" not in immediate_context and "pts" not in immediate_context:
+                                continue
                         
                         # GOLDEN RULE for native PDFs: ONLY accept numbers with explicit context
                         if is_euro or is_franc or is_salary_kw:
