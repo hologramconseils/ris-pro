@@ -190,6 +190,11 @@ def parse_ris_file(file_path: str):
             if current_context == "DETAIL":
                 # Date Detection and Year Tracking (Same line priority)
                 line_year = None
+                
+                # Metadata Protection: Ignore header dates in Detail (au 01/01/2025)
+                if re.search(r"(au\s+|le\s+)\d{2}/\d{2}/\d{4}", line_clean, re.IGNORECASE):
+                    continue
+                
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
                 if date_match:
                     line_year = date_match.group(2)
