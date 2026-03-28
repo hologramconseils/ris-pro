@@ -112,6 +112,12 @@ def parse_ris_file(file_path: str):
             line_clean = line.strip()
             if not line_clean: continue
             
+            # GLOBAL HEADER BLACKLIST: Prevent metadata years (2025) from entering career data
+            if any(kw in line_clean.lower() for kw in ["relevé de carrière", "informations au", "edité le", "édité le"]):
+                # Skip the line if it contains a potential document metadata year
+                if re.search(r"(19|20)\d{2}", line_clean):
+                    continue
+            
             # Context switchers (Broadened to handle variant layouts)
             if re.search(r"(synthèse|détail)\s+(de\s+)?(vos\s+)?droits", line_clean, re.IGNORECASE) or \
                re.search(r"situation\s+(au|de|individuelle)", line_clean, re.IGNORECASE):
@@ -130,7 +136,13 @@ def parse_ris_file(file_path: str):
                     birth_year = b_match.group(1)
 
             # 1. Year Tracking (Native PDF approach)
-            year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
+            # GOLDEN RULE: In SYNTHESE context, years often start the line.
+            # We use a tighter regex for general year detection to avoid technical IDs.
+            year_match = re.search(r"^\s*(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
+            if not year_match and current_context == "GENERAL":
+                 # Fallback for year anywhere if context is unknown, but still protected.
+                 year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
+            
             if year_match:
                 detected_year = year_match.group(1)
                 y_int = int(detected_year)
@@ -191,8 +203,8 @@ def parse_ris_file(file_path: str):
                 # Date Detection and Year Tracking (Same line priority)
                 line_year = None
                 
-                # Metadata Protection: Ignore header dates in Detail (au 01/01/2025)
-                if re.search(r"(au\s+|le\s+)\d{2}/\d{2}/\d{4}", line_clean, re.IGNORECASE):
+                # Metadata Protection: Ignore lines that look like headers in Detail
+                if any(kw in line_clean.lower() for kw in ["détail de", "informations au", "relevé", "page "]):
                     continue
                 
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
