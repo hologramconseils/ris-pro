@@ -88,7 +88,9 @@ def parse_ris_file(file_path: str):
         found_years = {}
         found_points = {}  # {year: [(pts_val, regime_name), ...]}
         found_salaries = {}
+        found_employers = {} # {year: employer_name}
         yearly_salaries_list = {} # { "year": [val1, val2, ...] } for unique aggregation
+        strict_years = set() # Years found in valid career contexts (table row starts or date lines)
         all_detected = []
         extraction_finished = False # Stop after career detail
         birth_year = None
@@ -105,6 +107,7 @@ def parse_ris_file(file_path: str):
 
         # Stateful Parsing Machine
         current_year = None
+        current_employer = "Agirc-Arrco"
         current_context = "GENERAL"
         
         lines = doc_text.split('\n')
@@ -112,26 +115,23 @@ def parse_ris_file(file_path: str):
             line_clean = line.strip()
             if not line_clean: continue
             
-            # GLOBAL HEADER BLACKLIST: Prevent metadata years (2025) from entering career data
-            if any(kw in line_clean.lower() for kw in ["relevé de carrière", "informations au", "edité le", "édité le"]):
-                # Skip the line if it contains metadata, BUT ONLY IF it doesn't also look like a valid career line
-                # (A valid career line often starts with the year in SYNTHESE)
-                if re.search(r"(19|20)\d{2}", line_clean) and not re.match(r"^\s*(19|20)\d{2}", line_clean):
-                    # CRITICAL FIX: Don't skip if the line is a section header (synthèse/détail/carrière/situation)
-                    if not re.search(r"(synthèse|détail|carrière|situation|période)", line_clean, re.IGNORECASE):
-                        continue
-            
-            # Context switchers (Broadened to handle variant layouts)
+            # 1. Context switchers (Handle first to ensure we know section even if metadata keywords exist)
             if re.search(r"(synthèse|détail)\s+(de\s+)?(vos\s+)?droits", line_clean, re.IGNORECASE) or \
                re.search(r"situation\s+(au|de|individuelle)", line_clean, re.IGNORECASE) or \
                re.search(r"détail\s+par\s+année", line_clean, re.IGNORECASE):
                 current_context = "SYNTHESE"
+                continue
             elif re.search(r"détail\s+(de\s+votre\s+)?carrière", line_clean, re.IGNORECASE) or \
                  re.search(r"périodes\s+retenues", line_clean, re.IGNORECASE):
                 current_context = "DETAIL"
+                continue
             elif re.search(r"points\s+de\s+retraite", line_clean, re.IGNORECASE):
-                # Points can also appear in a separate section, often treated like SYNTHESE
                 current_context = "SYNTHESE"
+                continue
+
+            # 2. GLOBAL METADATA BLACKLIST: Skip headers/footers (2025 ghost years)
+            if any(kw in line_clean.lower() for kw in ["relevé de carrière", "informations au", "edité le", "édité le", "page ", "nire"]):
+                 continue
             
             # Birth year detection
             if "né(e) le" in line_clean.lower() or "né le" in line_clean.lower():
@@ -147,15 +147,6 @@ def parse_ris_file(file_path: str):
             if year_match:
                 detected_year = year_match.group(1)
                 y_int = int(detected_year)
-                
-                # Rule: Never analyze current year or future years
-                if y_int >= datetime.datetime.now().year:
-                    continue
-                    
-                # Metadata Protection: Ignore header/footer dates (au 01/01/2025)
-                if re.search(r"(au\s+|le\s+)\d{2}/\d{2}/\d{4}", line_clean, re.IGNORECASE):
-                    continue
-                    
                 all_detected.append(y_int)
                 # If we see a year and no context yet, default to SYNTHESE-like scanning
                 if current_context == "GENERAL":
@@ -163,15 +154,18 @@ def parse_ris_file(file_path: str):
                 
                 # IMPORTANT: Map current_year to the detected year for the current and subsequent lines
                 if current_context == "SYNTHESE":
+                    # In SYNTHESE, a valid year often starts the line
+                    if re.match(r"^\s*(19|20)\d{2}\b", line_clean):
+                        strict_years.add(y_int)
+                    
                     current_year = str(detected_year)
                     if int(current_year) not in all_detected:
                         all_detected.append(int(current_year))
 
             # 2. Quarters and Points (SYNTHESE or general)
             if current_year:
-                # 2. Quarters: Match 0-4 quarters. Using [^\d] prefix to avoid matching technical IDs.
-                # Matching '4 trim.' or '4 trimestres' or '4 T'
-                q_match = re.search(r"(?:^|[^\d])([0-4])\s*(?:trimest|trim\.|[Tt])", line_clean)
+                # 2. Quarters: Match 0-4 quarters. Using stricter keywords to avoid footer 'Page 4' interference.
+                q_match = re.search(r"(?:^|[^\d])([0-4])\s*(?:trimest|trim\.|trim\.?|TRIMESTRES)", line_clean, re.IGNORECASE)
                 if q_match:
                     quarters = int(q_match.group(1))
                     y_key = str(current_year)
@@ -228,6 +222,13 @@ def parse_ris_file(file_path: str):
                         pass
 
             if current_context == "DETAIL":
+                # Employer Detection (Lines without dates/amounts often contain the company name)
+                if not re.search(r"\d{2}/\d{2}/\d{4}", line_clean) and not re.search(r"\d+[\s.,]\d{2}", line_clean):
+                    # If it's pure uppercase or looks like a company name
+                    if len(line_clean) > 3 and not any(kw in line_clean.lower() for kw in ["détail", "carrière", "page", "n°", "nire"]):
+                        if line_clean.isupper() or (re.match(r"^[A-Z][A-Z\s\-]+$", line_clean) and len(line_clean) > 5):
+                            current_employer = line_clean.strip()
+
                 # Date Detection and Year Tracking (Same line priority)
                 line_year = None
                 
@@ -246,6 +247,7 @@ def parse_ris_file(file_path: str):
                         if y_int < datetime.datetime.now().year:
                             current_year = line_year
                             all_detected.append(y_int)
+                            strict_years.add(y_int)
                         else:
                             line_year = None # Invalid future year
                 
@@ -369,7 +371,8 @@ def parse_ris_file(file_path: str):
                         if str(target_year) not in yearly_salaries_list:
                             yearly_salaries_list[str(target_year)] = []
                         yearly_salaries_list[str(target_year)].append(best_v)
-                        # DEBUG
+                        if str(target_year) not in found_employers or found_employers[str(target_year)] == "Agirc-Arrco":
+                            found_employers[str(target_year)] = current_employer
                         # print(f"DEBUG: Added {best_v} to {current_year} from line: {line_clean[:50]}")
 
         # 4. Salary Aggregation with Intelligent Deduplication
@@ -406,14 +409,16 @@ def parse_ris_file(file_path: str):
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
             # RULE: Strictly bound the analysis to the real career end (as requested by user)
-            # Find the last year with ANY recorded activity (salary, points, or explicitly found in SYNTHESE)
-            active_years_data = [int(y) for y, q in found_years.items() if q > 0] + \
-                                [int(y) for y, s in found_salaries.items() if s > 0] + \
-                                [int(y) for y, p_list in found_points.items() if any(item[0] > 0 for item in p_list)] + \
-                                [int(y) for y in found_years.keys()] # All years that at least have a trimestre entry (even 0)
+            # Find the last year with ANY recorded POSITIVE activity AND present in strict_years
+            # This effectively filters out ghost years found in headers/footers
+            active_years_data = [int(y) for y, q in found_years.items() if q > 0 and int(y) in strict_years] + \
+                                [int(y) for y, s in found_salaries.items() if s > 0 and int(y) in strict_years] + \
+                                [int(y) for y, p_list in found_points.items() if any(item[0] > 0 for item in p_list) and int(y) in strict_years]
             
-            # Filter all_detected to exclude ghost years (like 2025 found in metadata)
-            # Actually, we use active_years_data as the golden source for the end year
+            # Safety: if no strict years were found (shouldn't happen), fallback to last detected year < this year
+            if not active_years_data:
+                active_years_data = [y for y in all_detected if y < datetime.datetime.now().year]
+
             max_active_year = max(active_years_data) if active_years_data else (max(all_detected) if all_detected else datetime.date.today().year - 1)
             target_year = min(datetime.date.today().year - 1, max_active_year)
             
@@ -485,7 +490,8 @@ def parse_ris_file(file_path: str):
                 "salary": salary,
                 "ris_points": total_points,
                 "ris_quarters": found_years.get(y_str, 0),
-                "regime": base_regime
+                "regime": base_regime,
+                "employer": found_employers.get(y_str, base_regime)
             })
         
         # Final cleanup: ONLY include years that are within the documented career range
