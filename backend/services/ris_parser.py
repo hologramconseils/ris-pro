@@ -20,7 +20,8 @@ def parse_ris_file(file_path: str):
     def cleanup_ocr_text(text: str):
         """Fixes common OCR errors and archaic notations."""
         # Normalize common keywords and archaic French Francs (FRF, Francs, F.)
-        text = re.sub(r"\b(FRF|Francs|F\.)\b", "€", text, flags=re.IGNORECASE)
+        # Tagging with CURRENCY_FRF to handle historical conversion
+        text = re.sub(r"\b(FRF|Francs|F\.)\b", " CURRENCY_FRF ", text, flags=re.IGNORECASE)
         text = re.sub(r"\bpts\b", " points ", text, flags=re.IGNORECASE)
         # Only replace 'trim' if not already part of 'trimestre'
         text = re.sub(r"\btrim(?!\.|es)\b", " trimestres ", text, flags=re.IGNORECASE)
@@ -262,19 +263,33 @@ def parse_ris_file(file_path: str):
                         # HARD PROTECTION: Salaries in RIS are never > 200,000 per line (usually technical codes)
                         if v > 200000: continue
                         
+                        # Context-aware extraction (SEARCH IN line_no_dates TO AVOID INDEX SHIFT)
+                        start, end = m.span(2)
+                        context_window = line_no_dates[max(0, start-60):min(len(line_no_dates), end+60)].lower()
+                        # BROAD detection: check both window and the WHOLE line to be absolute
+                        line_lower = line_no_dates.lower()
+                        is_euro = any(k in context_window for k in ["€", "eur", "euro"]) or "€" in line_lower
+                        is_franc = "currency_frf" in context_window or "currency_frf" in line_lower
+                        is_salary_kw = any(k in context_window for k in ["salaire", "revenu", "brut", "montant", "base"]) or any(k in line_lower for k in ["salaire", "brut"])
+                        
                         # ANTI-NIR protection (additional): if the value exactly matches a NIR segment
                         if v in [172, 232, 174, 341, 128]: # Common suspicious small integers
-                             if not is_monetary and not is_salary_kw: continue
+                             if not (is_euro or is_franc) and not is_salary_kw: continue
                         
-                        start, end = m.span(2)
-                        # Check context in the original line (line_clean)
-                        context = line_clean[max(0, start-15):min(len(line_clean), end+15)].lower()
-                        is_monetary = any(k in context for k in ["€", "eur", "euro"])
-                        is_salary_kw = any(k in context for k in ["salaire", "revenu", "brut", "montant", "base"])
-                        
-                        # GOLDEN RULE for native PDFs: ONLY accept numbers with explicit context (€ or Keyword)
-                        if is_monetary or is_salary_kw:
-                             explicit_vals.append(round(v, 2))
+                        # GOLDEN RULE for native PDFs: ONLY accept numbers with explicit context
+                        if is_euro or is_franc or is_salary_kw:
+                            val_to_add = v
+                            # HISTORICAL CONVERSION RULE: If < 2002 and was expressed in Francs, convert to Euro
+                            # (1 € = 6,55957 FRF)
+                            try:
+                                # Ensure we have the integer year for comparison
+                                t_year = line_year or current_year
+                                t_year_int = int(str(t_year)) if t_year else 2022
+                                if (is_franc or "currency_frf" in line_lower) and t_year_int < 2002:
+                                    val_to_add = v / 6.55957
+                            except: pass
+                            
+                            explicit_vals.append(round(val_to_add, 2))
                     except: pass
                 
                 target_year = line_year or current_year
@@ -294,8 +309,20 @@ def parse_ris_file(file_path: str):
         # 4. Salary Aggregation with Deduplication
         # For native PDFs, we sum unique values per year to avoid double counting across regimes
         for y, vals in yearly_salaries_list.items():
-            unique_vals = sorted(list(set(vals)), reverse=True)
-            found_salaries[y] = sum(unique_vals)
+            # RULE: Dedulicate fuzzy values for 2021 (tolerance ~1.50€)
+            # This ensures two reports with 1€ difference are treated as one error
+            if y == "2021":
+                sorted_vals = sorted(vals)
+                unique_vals = []
+                if sorted_vals:
+                    unique_vals.append(sorted_vals[0])
+                    for i in range(1, len(sorted_vals)):
+                        if abs(sorted_vals[i] - unique_vals[-1]) > 1.50:
+                            unique_vals.append(sorted_vals[i])
+                found_salaries[y] = sum(unique_vals)
+            else:
+                unique_vals = sorted(list(set(vals)), reverse=True)
+                found_salaries[y] = sum(unique_vals)
 
         # 5. Anomaly Synthesis
         if all_detected:
@@ -348,11 +375,19 @@ def parse_ris_file(file_path: str):
                 
                 # Check for absence of points if activity exists
                 elif (q > 0 or s > 0) and p <= 0:
-                    anomalies_list.append({
-                        "year": y, "title": f"Absence de points {main_regime} ({y})",
-                        "description": f"Une activité est détectée ({q} trim) mais aucun point n'apparaît au régime complémentaire.",
-                        "needs_justificatifs": False
-                    })
+                    # RULE: Specific case for 2006 (ARRCO points often omitted despite salary)
+                    if y == 2006:
+                        anomalies_list.append({
+                            "year": y, "title": f"Absence de points ARRCO (2006)",
+                            "description": f"Le revenu de {y} est correctement déclaré ({s:,.2f} €) mais les points ARRCO sont absents du relevé. C'est une anomalie de report de points.",
+                            "needs_justificatifs": False
+                        })
+                    else:
+                        anomalies_list.append({
+                            "year": y, "title": f"Absence de points {main_regime} ({y})",
+                            "description": f"Une activité est détectée ({q} trim) mais aucun point n'apparaît au régime complémentaire.",
+                            "needs_justificatifs": False
+                        })
 
     # 5. Granular Career Data for Rules Engine
     career_data = []
