@@ -356,7 +356,9 @@ def parse_ris_file(file_path: str):
             if birth_year is not None:
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
-            target_year = datetime.date.today().year - 1
+            max_year_detected = max(all_detected) if all_detected else datetime.date.today().year - 1
+            # RULE: Strictly bound the analysis to the real career end (as requested by user)
+            target_year = min(datetime.date.today().year - 1, max_year_detected)
             main_regime = "Agirc-Arrco"
             for p_list in found_points.values():
                 for _, r_name in p_list:
