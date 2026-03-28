@@ -373,9 +373,22 @@ def parse_ris_file(file_path: str):
             if birth_year is not None:
                 start_year = max(1960, min(start_year, int(birth_year) + 16))
             
-            max_year_detected = max(all_detected) if all_detected else datetime.date.today().year - 1
             # RULE: Strictly bound the analysis to the real career end (as requested by user)
-            target_year = min(datetime.date.today().year - 1, max_year_detected)
+            # Find the last year with ANY recorded activity (salary, points, or explicitly found in SYNTHESE)
+            active_years_data = [int(y) for y, q in found_years.items() if q > 0] + \
+                                [int(y) for y, s in found_salaries.items() if s > 0] + \
+                                [int(y) for y, p_list in found_points.items() if any(item[0] > 0 for item in p_list)] + \
+                                [int(y) for y in found_years.keys()] # All years that at least have a trimestre entry (even 0)
+            
+            # Filter all_detected to exclude ghost years (like 2025 found in metadata)
+            # Actually, we use active_years_data as the golden source for the end year
+            max_active_year = max(active_years_data) if active_years_data else (max(all_detected) if all_detected else datetime.date.today().year - 1)
+            target_year = min(datetime.date.today().year - 1, max_active_year)
+            
+            # Final Sanity Check for 2025 Ghost Year removal (for short careers ending before 2020)
+            if target_year >= 2025 and max_active_year < 2025:
+                 # If no activity was found in 2025, but it's still somehow the target, we must cap it.
+                 pass # Already handled by max_active_year
             main_regime = "Agirc-Arrco"
             for p_list in found_points.values():
                 for _, r_name in p_list:
@@ -451,6 +464,8 @@ def parse_ris_file(file_path: str):
                 "regime": base_regime
             })
         
+        # Final cleanup: ONLY include years that are within the documented career range
+        career_data = [d for d in career_data if d["year"] <= target_year]
         # Enforce chronological sorting (ascending)
         career_data.sort(key=lambda x: x["year"])
 
