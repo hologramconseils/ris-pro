@@ -83,6 +83,7 @@ def parse_ris_file(file_path: str):
     
     anomalies_list = []
     
+    ### FROZEN MODULE: NATIVE PDF ANALYSIS & EMPLOYER EXTRACTION ###
     # Enable analysis for both native and scanned text
     if is_ris:
         found_years = {}
@@ -498,6 +499,7 @@ def parse_ris_file(file_path: str):
         career_data = [d for d in career_data if d["year"] <= target_year]
         # Enforce chronological sorting (ascending)
         career_data.sort(key=lambda x: x["year"])
+    ### END FROZEN MODULE: NATIVE PDF ANALYSIS & EMPLOYER EXTRACTION ###
 
     identity_data = extract_identity(doc_text)
 
