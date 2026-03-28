@@ -114,13 +114,17 @@ def parse_ris_file(file_path: str):
             
             # GLOBAL HEADER BLACKLIST: Prevent metadata years (2025) from entering career data
             if any(kw in line_clean.lower() for kw in ["relevé de carrière", "informations au", "edité le", "édité le"]):
-                # Skip the line if it contains a potential document metadata year
-                if re.search(r"(19|20)\d{2}", line_clean):
-                    continue
+                # Skip the line if it contains metadata, BUT ONLY IF it doesn't also look like a valid career line
+                # (A valid career line often starts with the year in SYNTHESE)
+                if re.search(r"(19|20)\d{2}", line_clean) and not re.match(r"^\s*(19|20)\d{2}", line_clean):
+                    # CRITICAL FIX: Don't skip if the line is a section header (synthèse/détail/carrière/situation)
+                    if not re.search(r"(synthèse|détail|carrière|situation|période)", line_clean, re.IGNORECASE):
+                        continue
             
             # Context switchers (Broadened to handle variant layouts)
             if re.search(r"(synthèse|détail)\s+(de\s+)?(vos\s+)?droits", line_clean, re.IGNORECASE) or \
-               re.search(r"situation\s+(au|de|individuelle)", line_clean, re.IGNORECASE):
+               re.search(r"situation\s+(au|de|individuelle)", line_clean, re.IGNORECASE) or \
+               re.search(r"détail\s+par\s+année", line_clean, re.IGNORECASE):
                 current_context = "SYNTHESE"
             elif re.search(r"détail\s+(de\s+votre\s+)?carrière", line_clean, re.IGNORECASE) or \
                  re.search(r"périodes\s+retenues", line_clean, re.IGNORECASE):
@@ -138,10 +142,7 @@ def parse_ris_file(file_path: str):
             # 1. Year Tracking (Native PDF approach)
             # GOLDEN RULE: In SYNTHESE context, years often start the line.
             # We use a tighter regex for general year detection to avoid technical IDs.
-            year_match = re.search(r"^\s*(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
-            if not year_match and current_context == "GENERAL":
-                 # Fallback for year anywhere if context is unknown, but still protected.
-                 year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
+            year_match = re.search(r"\b(19[5-9]\d|20[0-2]\d|2030)\b", line_clean)
             
             if year_match:
                 detected_year = year_match.group(1)
@@ -159,33 +160,45 @@ def parse_ris_file(file_path: str):
                 # If we see a year and no context yet, default to SYNTHESE-like scanning
                 if current_context == "GENERAL":
                     current_context = "SYNTHESE"
+                
+                # IMPORTANT: Map current_year to the detected year for the current and subsequent lines
                 if current_context == "SYNTHESE":
-                    current_year = detected_year
+                    current_year = str(detected_year)
+                    if int(current_year) not in all_detected:
+                        all_detected.append(int(current_year))
 
             # 2. Quarters and Points (SYNTHESE or general)
             if current_year:
-                # Quarters - Relaxed regex (removed strict trailing \b after complex words)
-                q_match = re.search(r"(\d+)\s*(?:trimestr|trim\.|T)", line_clean, re.IGNORECASE)
+                # 2. Quarters: Match 0-4 quarters. Using [^\d] prefix to avoid matching technical IDs.
+                # Matching '4 trim.' or '4 trimestres' or '4 T'
+                q_match = re.search(r"(?:^|[^\d])([0-4])\s*(?:trimest|trim\.|[Tt])", line_clean)
                 if q_match:
                     quarters = int(q_match.group(1))
-                    if quarters > 4: quarters = 4
-                    if current_year not in found_years or quarters > found_years[current_year]:
-                        found_years[current_year] = quarters
+                    y_key = str(current_year)
+                    if y_key not in found_years or quarters > found_years.get(y_key, 0):
+                        found_years[y_key] = quarters
                 
-                p_match = re.search(r"(\d{1,4}(?:[\s.,]\d{1,3})?)\s*(?:pts|points|pt)\b", line_clean, re.IGNORECASE)
-                if p_match:
+                # 3. Points: Using finditer to handle multiple amounts on the same line (merged columns)
+                # Relaxed boundary after points (removing \b) to handle technical codes adjacent to 'pts'
+                for p_match in re.finditer(r"(\d{1,4}(?:[\s.,]+\d{1,3})?)\s*(?:pts|points|pt)", line_clean, re.IGNORECASE):
                     raw_pts = p_match.group(1).replace(' ', '').replace(',', '.')
                     try:
+                        # Handle merged amounts (e.g., 32,626 pts pts -> 32.62 and 6)
+                        # Truncating to 2 decimals for Agirc-Arrco standards if concatenated
+                        if '.' in raw_pts:
+                            parts = raw_pts.split('.')
+                            if len(parts[1]) > 2:
+                                raw_pts = parts[0] + "." + parts[1][:2]
+                        
                         pts_val = float(raw_pts)
-                        # Sanity Check for points: 
-                        # - No single year/regime gives > 600 points unless it's a sum (which we handle)
-                        # - Anti-DocID: very large numbers without decimals are suspicious
-                        if pts_val > 600 or (pts_val > 100 and "." not in p_match.group(1) and "," not in p_match.group(1)):
-                            pts_val = 0.0 # Redact suspicious point value
+                        # Sanity Check for points:
+                        if pts_val > 800: # Slightly higher cap for Agirc-Arrco
+                            pts_val = 0.0
                         
                         regime_name = "Complémentaire"
+                        # Wider search context for regimes (native PDFs can have large offsets)
                         context_window = ""
-                        for j in range(max(0, i-2), min(len(lines), i+2)):
+                        for j in range(max(0, i-10), min(len(lines), i+5)):
                             context_window += lines[j].lower() + " "
                             
                         for name, keywords in REGIMES_MAP.items():
@@ -193,11 +206,26 @@ def parse_ris_file(file_path: str):
                                 regime_name = name
                                 break
                         
+                        # Fallback for Agirc-Arrco: if "arrco" appears anywhere near, it's Agirc-Arrco
+                        if regime_name == "Complémentaire" and ("agirc" in context_window or "arrco" in context_window):
+                            regime_name = "Agirc-Arrco"
+                        
                         if current_year is not None:
-                             if current_year not in found_points:
-                                 found_points[current_year] = []
-                             found_points[current_year].append((pts_val, regime_name))
-                    except: pass
+                             y_key = str(current_year)
+                             
+                             # ANTI-OFFSET: If the line itself contains a different year, prioritize it
+                             line_year_match = re.search(r"\b(19|20)\d{2}\b", line_clean)
+                             if line_year_match and line_year_match.group(0) != y_key:
+                                 y_key = line_year_match.group(0)
+                             
+                             if y_key not in found_points:
+                                 found_points[y_key] = []
+                             
+                             # Deduplicate: if exactly this value/regime already exists, skip
+                             if not any(abs(item[0] - pts_val) < 0.001 and item[1] == regime_name for item in found_points[y_key]):
+                                 found_points[y_key].append((pts_val, regime_name))
+                    except Exception as e: 
+                        pass
 
             if current_context == "DETAIL":
                 # Date Detection and Year Tracking (Same line priority)
@@ -209,13 +237,17 @@ def parse_ris_file(file_path: str):
                 
                 date_match = re.search(r"(\d{2}/\d{2}/(19[5-9]\d|20[0-2]\d|2030))", line_clean)
                 if date_match:
-                    line_year = date_match.group(2)
-                    y_int = int(line_year)
-                    if y_int < datetime.datetime.now().year:
-                        current_year = line_year
-                        all_detected.append(y_int)
+                    # Metadata Protection: Ignore header/footer dates (au 01/01/2025)
+                    if re.search(r"(au\s+|le\s+|informations\s+au\s+)\d{2}/\d{2}/\d{4}", line_clean, re.IGNORECASE):
+                        pass # Continue processing to detect headers, but don't set current_year
                     else:
-                        line_year = None # Invalid future year
+                        line_year = date_match.group(2)
+                        y_int = int(line_year)
+                        if y_int < datetime.datetime.now().year:
+                            current_year = line_year
+                            all_detected.append(y_int)
+                        else:
+                            line_year = None # Invalid future year
                 
                 # Check for year anywhere in line if no full date found
                 if not line_year:
@@ -295,8 +327,8 @@ def parse_ris_file(file_path: str):
                         # BROAD detection: check both window and the WHOLE line to be absolute
                         line_lower = line_no_dates.lower()
                         is_euro = any(k in context_window for k in ["€", "eur", "euro"]) or "€" in line_lower
-                        is_franc = "currency_frf" in context_window or "currency_frf" in line_lower
-                        is_salary_kw = any(k in context_window for k in ["salaire", "revenu", "brut", "montant", "base"]) or any(k in line_lower for k in ["salaire", "brut"])
+                        is_franc = "currency_frf" in context_window or "currency_frf" in line_lower or any(k in context_window for k in ["frf", "franc", "f."])
+                        is_salary_kw = any(k in context_window for k in ["salaire", "revenu", "brut", "montant", "base"]) or any(k in line_lower for k in ["salaire", "brut", "revenu"])
                         
                         # ANTI-NIR protection (additional): if the value matches a segment but has NO context
                         # Catching NIR segments: 172, 232 (Murel), 341, 128 (Bertrand), etc.
@@ -422,19 +454,11 @@ def parse_ris_file(file_path: str):
                 
                 # Check for absence of points if activity exists
                 elif (q > 0 or s > 0) and p <= 0:
-                    # RULE: Specific case for 2006 (ARRCO points often omitted despite salary)
-                    if y == 2006:
-                        anomalies_list.append({
-                            "year": y, "title": f"Absence de points ARRCO (2006)",
-                            "description": f"Le revenu de {y} est correctement déclaré ({s:,.2f} €) mais les points ARRCO sont absents du relevé. C'est une anomalie de report de points.",
-                            "needs_justificatifs": False
-                        })
-                    else:
-                        anomalies_list.append({
-                            "year": y, "title": f"Absence de points {main_regime} ({y})",
-                            "description": f"Une activité est détectée ({q} trim) mais aucun point n'apparaît au régime complémentaire.",
-                            "needs_justificatifs": False
-                        })
+                    anomalies_list.append({
+                        "year": y, "title": f"Absence de points {main_regime} ({y})",
+                        "description": f"Une activité est détectée ({q} trim) mais aucun point n'apparaît au régime complémentaire.",
+                        "needs_justificatifs": False
+                    })
 
     # 5. Granular Career Data for Rules Engine
     career_data = []
