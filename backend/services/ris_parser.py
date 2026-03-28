@@ -306,23 +306,21 @@ def parse_ris_file(file_path: str):
                         # DEBUG
                         # print(f"DEBUG: Added {best_v} to {current_year} from line: {line_clean[:50]}")
 
-        # 4. Salary Aggregation with Deduplication
-        # For native PDFs, we sum unique values per year to avoid double counting across regimes
+        # 4. Salary Aggregation with Intelligent Deduplication
+        # For native PDFs, we sum values while filtering near-identical reports (tolerance 1.50€)
+        # This handles cases where the same salary is reported twice with minor differences (cents, ~1€)
         for y, vals in yearly_salaries_list.items():
-            # RULE: Dedulicate fuzzy values for 2021 (tolerance ~1.50€)
-            # This ensures two reports with 1€ difference are treated as one error
-            if y == "2021":
-                sorted_vals = sorted(vals)
-                unique_vals = []
-                if sorted_vals:
-                    unique_vals.append(sorted_vals[0])
-                    for i in range(1, len(sorted_vals)):
-                        if abs(sorted_vals[i] - unique_vals[-1]) > 1.50:
-                            unique_vals.append(sorted_vals[i])
-                found_salaries[y] = sum(unique_vals)
-            else:
-                unique_vals = sorted(list(set(vals)), reverse=True)
-                found_salaries[y] = sum(unique_vals)
+            sorted_vals = sorted(vals)
+            unique_filtered_vals = []
+            if sorted_vals:
+                unique_filtered_vals.append(sorted_vals[0])
+                for i in range(1, len(sorted_vals)):
+                    # If the gap between two amounts is > 1.50€, we treat them as separate incomes
+                    # Otherwise, it's considered a duplicate report (same income, different regime/rounding)
+                    if abs(sorted_vals[i] - unique_filtered_vals[-1]) > 1.50:
+                        unique_filtered_vals.append(sorted_vals[i])
+                
+            found_salaries[y] = sum(unique_filtered_vals)
 
         # 5. Anomaly Synthesis
         if all_detected:
