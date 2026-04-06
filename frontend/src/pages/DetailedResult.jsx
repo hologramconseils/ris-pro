@@ -205,7 +205,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                     <thead>
                       <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
                         <th style={{ padding: '12px 8px' }}>Année</th>
-                        <th style={{ padding: '12px 8px' }}>Employeur</th>
                         <th style={{ padding: '12px 8px' }}>Salaire Brut</th>
                         <th style={{ padding: '12px 8px' }}>Trimestres (RIS/Théo)</th>
                         <th style={{ padding: '12px 8px' }}>Points (RIS/Théo)</th>
@@ -224,7 +223,6 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                         return (
                           <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: d.salary > 0 ? 1 : 0.6 }}>
                             <td style={{ padding: '12px 8px', fontWeight: 700 }}>{d.year}</td>
-                            <td style={{ padding: '12px 8px', fontSize: 10, fontWeight: 600 }}>{d.employer || d.regime}</td>
                             <td style={{ padding: '12px 8px' }}>{d.salary > 0 ? `${d.salary.toLocaleString()} €` : '—'}</td>
                             <td style={{ padding: '12px 8px' }}>
                               <span style={{ fontWeight: 700 }}>{d.ris_quarters}</span>
