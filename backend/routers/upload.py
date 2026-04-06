@@ -386,14 +386,22 @@ async def run_full_analysis_worker(
                             "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
                             "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
                             "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
-                            "regime": item.get("activite", "Détecté par IA")
+                            "regime": item.get("activite", "Détecté par IA"),
+                            "employer": item.get("activite", "")
                         }
-                        ai_career_data.append(RetirementRulesEngine.get_year_validation_status(entry))
+                        validated_entry = RetirementRulesEngine.get_year_validation_status(entry)
+                        ai_career_data.append(validated_entry)
+                        
+                        # Enrich the AI timeline item to ensure justifications exist just like native docs
+                        item['anomalie_specifique'] = item.get('anomalie_specifique') or validated_entry.get('explanation') or (f"Vérification requise pour l'année {year}." if validated_entry.get('status') != 'conforme' else f"Année {year} conforme.")
+                        item['justificatif_suggere'] = item.get('justificatif_suggere') or validated_entry.get('justificatif_suggere') or _generate_justificatifs_for_entry(validated_entry)
+                        item['needs_justificatifs'] = validated_entry.get('status') != 'conforme'
                     
                     if ai_career_data:
                         ai_career_data.sort(key=lambda x: x['year'])
                         db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
                         db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                        db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
                 ### END FROZEN MODULE ###
 
             except Exception as final_err:
@@ -678,13 +686,21 @@ async def run_full_analysis_worker_from_existing_text(
                         "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
                         "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
                         "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
-                        "regime": item.get("activite", "Détecté par IA")
+                        "regime": item.get("activite", "Détecté par IA"),
+                        "employer": item.get("activite", "")
                     }
-                    ai_career_data.append(RetirementRulesEngine.get_year_validation_status(entry))
+                    validated_entry = RetirementRulesEngine.get_year_validation_status(entry)
+                    ai_career_data.append(validated_entry)
+                    
+                    item['anomalie_specifique'] = item.get('anomalie_specifique') or validated_entry.get('explanation') or (f"Vérification requise pour l'année {year}." if validated_entry.get('status') != 'conforme' else f"Année {year} conforme.")
+                    item['justificatif_suggere'] = item.get('justificatif_suggere') or validated_entry.get('justificatif_suggere') or _generate_justificatifs_for_entry(validated_entry)
+                    item['needs_justificatifs'] = validated_entry.get('status') != 'conforme'
+
                 if ai_career_data:
                     ai_career_data.sort(key=lambda x: x['year'])
                     db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
                     db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                    db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
 
         except Exception as final_err:
             print(f"Retry data merging error: {final_err}")
