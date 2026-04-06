@@ -165,8 +165,23 @@ export default function DetailedResult({ result, onReset, onRefresh }) {
                       {aiData.projection_estimee || '—'}
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 700, opacity: 0.6 }}>ESTIMATION MENSUELLE (BRUT)</div>
-                    <div style={{ marginTop: 16, padding: '8px', background: 'rgba(79,70,229,0.05)', borderRadius: '8px', fontSize: 11 }}>
-                      Hypothèse : Retraite à taux plein à 64 ans, maintien du dernier salaire connu.
+                    {aiData.projection_detail && (
+                      <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <div style={{ padding: '6px 12px', background: 'rgba(34,197,94,0.08)', borderRadius: 8, fontSize: 11 }}>
+                          <div style={{ fontWeight: 700, opacity: 0.6 }}>Base</div>
+                          <div style={{ fontWeight: 900, fontSize: 14 }}>{aiData.projection_detail.base_mensuelle} €</div>
+                        </div>
+                        <div style={{ padding: '6px 12px', background: 'rgba(79,70,229,0.08)', borderRadius: 8, fontSize: 11 }}>
+                          <div style={{ fontWeight: 700, opacity: 0.6 }}>Complémentaire</div>
+                          <div style={{ fontWeight: 900, fontSize: 14 }}>{aiData.projection_detail.complementaire_mensuelle} €</div>
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ marginTop: 12, padding: '8px', background: 'rgba(79,70,229,0.05)', borderRadius: '8px', fontSize: 11 }}>
+                      {aiData.projection_detail
+                        ? `Hypothèse : Retraite ${aiData.projection_detail.taux_plein ? 'à taux plein' : 'avec décote'} à ${aiData.projection_detail.age_legal || '64 ans'}, SAM: ${aiData.projection_detail.sam} €.`
+                        : 'Hypothèse : Retraite à taux plein à 64 ans, maintien du dernier salaire connu.'
+                      }
                     </div>
                   </div>
                 </div>

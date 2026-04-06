@@ -87,6 +87,20 @@ async def upload_file(
         print(f"CRITICAL UPLOAD ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Échec de l'upload: {str(e)}")
 
+def _generate_justificatifs_for_entry(entry):
+    """CORRECTIF 4: Génère la liste des justificatifs en fonction du type d'anomalie."""
+    q = entry.get('ris_quarters', 0)
+    salary = entry.get('salary', 0)
+    status = entry.get('status', 'anomalie')
+    justifs = []
+    if q < 4 or salary == 0 or status == 'anomalie':
+        justifs.append("• Bulletins de salaire pour la période concernée")
+        justifs.append("• Contrat de travail")
+        justifs.append("• Certificat de travail")
+        justifs.append("• Attestation employeur")
+        justifs.append("• Attestation sur l'honneur d'activité ou de non-activité")
+    return "\n".join(justifs) if justifs else None
+
 async def run_full_analysis_worker(
     scan_id: int, 
     file_path: str
@@ -204,6 +218,48 @@ async def run_full_analysis_worker(
             ### END FROZEN MODULE ###
             
             db_scan.ai_analysis = ai_commentary
+
+            # CORRECTIF 1: Injection de la projection de pension calculée par le moteur expert
+            try:
+                ai_data_proj = json.loads(db_scan.ai_analysis)
+                if career_raw and technical_audit:
+                    proj_birth_year = birth_year  # Already computed above
+                    total_pts = sum(float(e.get("ris_points", 0.0)) for e in technical_audit)
+                    total_q = sum(int(e.get("ris_quarters", 0)) for e in technical_audit)
+                    last_salary = next((float(e.get("salary", 0)) for e in reversed(technical_audit) if float(e.get("salary", 0)) > 0), 30000)
+                    
+                    proj_result = RetirementRulesEngine.project_future_career(
+                        total_points=total_pts, birth_year=proj_birth_year,
+                        current_salary=last_salary, current_quarters=total_q
+                    )
+                    sam_val = RetirementRulesEngine.calculate_sam(career_raw)
+                    base_p = RetirementRulesEngine.calculate_base_pension(
+                        sam_val,
+                        proj_result.get("projected_quarters", total_q),
+                        proj_result.get("required_quarters", 172)
+                    )
+                    svc_val = 1.4386
+                    res_2025 = RetirementRulesEngine.RETIREMENT_RESOURCES.get(2025, {})
+                    if isinstance(res_2025, dict) and "unified" in res_2025:
+                        svc_val = float(res_2025["unified"].get("service", 1.4386))
+                    comp_p = RetirementRulesEngine.calculate_complementary_pension(
+                        proj_result.get("projected_points", total_pts), svc_val
+                    )
+                    total_monthly = round((base_p + comp_p) / 12.0, 2)
+                    
+                    ai_data_proj["projection_estimee"] = f"{total_monthly} €/mois"
+                    ai_data_proj["projection_detail"] = {
+                        "base_mensuelle": round(base_p / 12.0, 2),
+                        "complementaire_mensuelle": round(comp_p / 12.0, 2),
+                        "total_mensuel": total_monthly,
+                        "sam": round(sam_val, 2),
+                        "trimestres_projetes": proj_result.get("projected_quarters", 0),
+                        "taux_plein": proj_result.get("has_full_rate", False),
+                        "age_legal": proj_result.get("legal_age_display", "64 ans")
+                    }
+                    db_scan.ai_analysis = json.dumps(ai_data_proj, ensure_ascii=False)
+            except Exception as proj_err:
+                print(f"Projection injection error: {proj_err}")
             
             # 3. CRITICAL DATA MERGE: Algorithmic Anomalies + AI Anomalies
             try:
@@ -261,6 +317,14 @@ async def run_full_analysis_worker(
                         
                         ai_item = ai_timeline_map.get(y_int, {})
                         
+                        # CORRECTIF 2: Enrichir l'employeur depuis l'IA
+                        ai_activite = ai_item.get("activite", "")
+                        employer_val = tech_entry.get("employer", tech_entry.get("regime", "Inconnu"))
+                        if ai_activite and ai_activite.lower() not in ["agirc-arrco", "n/a", "inconnu", "", "complémentaire"]:
+                            employer_val = ai_activite
+                        elif employer_val.lower() in ["agirc-arrco", "complémentaire"]:
+                            employer_val = ai_activite if ai_activite else tech_entry.get("regime", "Inconnu")
+                        
                         # Merge Technical Data + AI Commentary
                         entry = {
                             "year": y_int,
@@ -268,6 +332,7 @@ async def run_full_analysis_worker(
                             "ris_quarters": tech_entry.get("ris_quarters", 0),
                             "ris_points": tech_entry.get("ris_points", 0.0),
                             "regime": tech_entry.get("regime", "Inconnu"),
+                            "employer": employer_val,
                             # Carry over AI's specific findings if they exist
                             "anomalie_specifique": ai_item.get("anomalie_specifique"),
                             "justificatif_suggere": ai_item.get("justificatif_suggere"),
@@ -288,16 +353,19 @@ async def run_full_analysis_worker(
                             ai_data['resume_global'] = "Analyse technique effectuée. Des anomalies sur les trimestres ou les points ont été détectées nécessitant une vérification des justificatifs."
                         
                         if not ai_data.get('full_timeline') or len(ai_data.get('full_timeline', [])) < (len(precision_career) // 2):
-                            # Inject technical timeline into the Chronology block
+                            # CORRECTIF 3+4: Timeline complète avec toutes les années + justificatifs auto-générés
                             ai_data['full_timeline'] = [
                                 {
                                     "annee": e['year'],
-                                    "statut": e.get('validation_status', 'incomplet'),
+                                    "statut": e.get('status', 'incomplet'),
                                     "trimestres_valides": e.get('ris_quarters', 0),
-                                    "activite": e.get('regime', 'Activité détectée'),
+                                    "activite": e.get('employer', e.get('regime', 'Activité détectée')),
                                     "points_complementaires": e.get('ris_points', 0.0),
-                                    "anomalie_specifique": e.get('anomalie_specifique') or f"Vérification requise pour l'année {e['year']}."
-                                } for e in precision_career if e.get('validation_status') != 'complet'
+                                    "salaire_brut": e.get('salary', 0.0),
+                                    "anomalie_specifique": e.get('explanation') or (f"Vérification requise pour l'année {e['year']}." if e.get('status') != 'conforme' else f"Année {e['year']} conforme."),
+                                    "justificatif_suggere": e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                                    "needs_justificatifs": e.get('status') != 'conforme'
+                                } for e in precision_career
                             ]
                             db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
 
