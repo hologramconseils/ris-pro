@@ -263,7 +263,7 @@ async def run_full_analysis_worker(
             
             # 3. CRITICAL DATA MERGE: Algorithmic Anomalies + AI Anomalies
             try:
-                ai_data = json.loads(ai_commentary)
+                ai_data = json.loads(db_scan.ai_analysis)  # Lire depuis ai_analysis, pas ai_commentary, pour conserver la projection (Correctif 1)
                 full_timeline = ai_data.get("full_timeline", [])
                 
                 # Start with algorithmic anomalies
@@ -352,22 +352,26 @@ async def run_full_analysis_worker(
                         if not ai_data.get('resume_global') or len(str(ai_data.get('resume_global'))) < 50:
                             ai_data['resume_global'] = "Analyse technique effectuée. Des anomalies sur les trimestres ou les points ont été détectées nécessitant une vérification des justificatifs."
                         
-                        if not ai_data.get('full_timeline') or len(ai_data.get('full_timeline', [])) < (len(precision_career) // 2):
-                            # CORRECTIF 3+4: Timeline complète avec toutes les années + justificatifs auto-générés
-                            ai_data['full_timeline'] = [
-                                {
-                                    "annee": e['year'],
-                                    "statut": e.get('status', 'incomplet'),
-                                    "trimestres_valides": e.get('ris_quarters', 0),
-                                    "activite": e.get('employer', e.get('regime', 'Activité détectée')),
-                                    "points_complementaires": e.get('ris_points', 0.0),
-                                    "salaire_brut": e.get('salary', 0.0),
-                                    "anomalie_specifique": e.get('explanation') or (f"Vérification requise pour l'année {e['year']}." if e.get('status') != 'conforme' else f"Année {e['year']} conforme."),
-                                    "justificatif_suggere": e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
-                                    "needs_justificatifs": e.get('status') != 'conforme'
-                                } for e in precision_career
-                            ]
-                            db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                        # CORRECTIF 3+4 AMÉLIORÉ: TOUJOURS reconstruire la timeline depuis precision_career
+                        # pour garantir que les employeurs enrichis (Correctif 2) apparaissent dans l'activité.
+                        # On préserve les commentaires IA (anomalie_specifique, justificatif_suggere) quand ils existent.
+                        existing_ai_timeline = {int(str(t.get('annee', 0))): t for t in ai_data.get('full_timeline', []) if str(t.get('annee', '')).isdigit()}
+                        ai_data['full_timeline'] = []
+                        for e in precision_career:
+                            yr = e['year']
+                            ai_t = existing_ai_timeline.get(yr, {})
+                            ai_data['full_timeline'].append({
+                                "annee": yr,
+                                "statut": e.get('status', 'incomplet'),
+                                "trimestres_valides": e.get('ris_quarters', 0),
+                                "activite": e.get('employer', e.get('regime', 'Activité détectée')),
+                                "points_complementaires": e.get('ris_points', 0.0),
+                                "salaire_brut": e.get('salary', 0.0),
+                                "anomalie_specifique": ai_t.get('anomalie_specifique') or e.get('explanation') or (f"Vérification requise pour l'année {yr}." if e.get('status') != 'conforme' else f"Année {yr} conforme."),
+                                "justificatif_suggere": ai_t.get('justificatif_suggere') or e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                                "needs_justificatifs": e.get('status') != 'conforme'
+                            })
+                        db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
 
                 ### FROZEN MODULE: NON-NATIVE ANALYSIS - TECHNICAL BACKFILL ###
                 # 4. Backfill technical career_data for scanned documents if empty
@@ -575,7 +579,7 @@ async def run_full_analysis_worker_from_existing_text(
 
         # === CORRECTIFS 2/3/4: Anomaly merge, employer enrichment, timeline, justificatifs ===
         try:
-            ai_data = json.loads(ai_commentary)
+            ai_data = json.loads(db_scan.ai_analysis)  # Lire depuis ai_analysis, pas ai_commentary, pour conserver la projection (Correctif 1)
             full_timeline = ai_data.get("full_timeline", [])
             
             # Merge anomalies
@@ -644,22 +648,24 @@ async def run_full_analysis_worker_from_existing_text(
                     db_scan.career_data = json.dumps(precision_career, ensure_ascii=False)
                     db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(precision_career)
                     
-                    # CORRECTIF 3+4: Timeline complète + justificatifs
-                    if not ai_data.get('full_timeline') or len(ai_data.get('full_timeline', [])) < (len(precision_career) // 2):
-                        ai_data['full_timeline'] = [
-                            {
-                                "annee": e['year'],
-                                "statut": e.get('status', 'incomplet'),
-                                "trimestres_valides": e.get('ris_quarters', 0),
-                                "activite": e.get('employer', e.get('regime', 'Activité détectée')),
-                                "points_complementaires": e.get('ris_points', 0.0),
-                                "salaire_brut": e.get('salary', 0.0),
-                                "anomalie_specifique": e.get('explanation') or (f"Vérification requise pour l'année {e['year']}." if e.get('status') != 'conforme' else f"Année {e['year']} conforme."),
-                                "justificatif_suggere": e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
-                                "needs_justificatifs": e.get('status') != 'conforme'
-                            } for e in precision_career
-                        ]
-                        db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                    # CORRECTIF 3+4 AMÉLIORÉ: TOUJOURS reconstruire la timeline depuis precision_career
+                    existing_ai_timeline = {int(str(t.get('annee', 0))): t for t in ai_data.get('full_timeline', []) if str(t.get('annee', '')).isdigit()}
+                    ai_data['full_timeline'] = []
+                    for e in precision_career:
+                        yr = e['year']
+                        ai_t = existing_ai_timeline.get(yr, {})
+                        ai_data['full_timeline'].append({
+                            "annee": yr,
+                            "statut": e.get('status', 'incomplet'),
+                            "trimestres_valides": e.get('ris_quarters', 0),
+                            "activite": e.get('employer', e.get('regime', 'Activité détectée')),
+                            "points_complementaires": e.get('ris_points', 0.0),
+                            "salaire_brut": e.get('salary', 0.0),
+                            "anomalie_specifique": ai_t.get('anomalie_specifique') or e.get('explanation') or (f"Vérification requise pour l'année {yr}." if e.get('status') != 'conforme' else f"Année {yr} conforme."),
+                            "justificatif_suggere": ai_t.get('justificatif_suggere') or e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                            "needs_justificatifs": e.get('status') != 'conforme'
+                        })
+                    db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
 
             # Scanned doc backfill
             if db_scan.is_scanned and full_timeline and not technical_audit:
