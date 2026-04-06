@@ -99,7 +99,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 30, alignItems: 'start' }}>
+        <div className="dashboard-grid">
           
           {/* Main List */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -119,6 +119,8 @@ export default function Dashboard() {
                 {scans.slice(0, 5).map(scan => (
                   <div key={scan.id} 
                     className="scan-list-item" 
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       if (scan.ocr_status === 'pending' || scan.ocr_status === 'processing') return
                       if (user?.has_paid_access || user?.is_admin) {
@@ -128,6 +130,17 @@ export default function Dashboard() {
                         navigate(`/preview/${scan.id}`)
                       }
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (scan.ocr_status === 'pending' || scan.ocr_status === 'processing') return;
+                        if (user?.has_paid_access || user?.is_admin) {
+                          navigate(`/detailed-result/${scan.id}`)
+                        } else {
+                          navigate(`/preview/${scan.id}`)
+                        }
+                      }
+                    }}
                     style={{ 
                       padding: '16px 24px', 
                       borderBottom: '1px solid var(--border-color)',
@@ -135,7 +148,8 @@ export default function Dashboard() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       cursor: (scan.ocr_status === 'pending' || scan.ocr_status === 'processing') ? 'default' : 'pointer',
-                      transition: 'background 0.2s'
+                      transition: 'background 0.2s',
+                      outline: 'none'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

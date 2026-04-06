@@ -14,6 +14,7 @@ import Security from './pages/Security'
 import AdminDashboard from './pages/AdminDashboard'
 import Dashboard from './pages/Dashboard'
 import PreviewPage from './pages/PreviewPage'
+import NotFound from './pages/NotFound'
 import Footer from './components/Footer'
 
 function AppContent() {
@@ -45,6 +46,7 @@ function AppContent() {
           <Route path="/security" element={<Security />} />
           <Route path="/legal" element={<Mentions />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       <Footer />
