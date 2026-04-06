@@ -239,7 +239,7 @@ async def run_full_analysis_worker(
                         proj_result.get("required_quarters", 172)
                     )
                     svc_val = 1.4386
-                    res_2025 = RetirementRulesEngine.RETIREMENT_RESOURCES.get(2025, {})
+                    res_2025 = RetirementRulesEngine.get_year_data(2025) or {}
                     if isinstance(res_2025, dict) and "unified" in res_2025:
                         svc_val = float(res_2025["unified"].get("service", 1.4386))
                     comp_p = RetirementRulesEngine.calculate_complementary_pension(
@@ -555,7 +555,7 @@ async def run_full_analysis_worker_from_existing_text(
                     proj_result.get("required_quarters", 172)
                 )
                 svc_val = 1.4386
-                res_2025 = RetirementRulesEngine.RETIREMENT_RESOURCES.get(2025, {})
+                res_2025 = RetirementRulesEngine.get_year_data(2025) or {}
                 if isinstance(res_2025, dict) and "unified" in res_2025:
                     svc_val = float(res_2025["unified"].get("service", 1.4386))
                 comp_p = RetirementRulesEngine.calculate_complementary_pension(

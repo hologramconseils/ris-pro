@@ -191,6 +191,7 @@ class RetirementRulesEngine:
         return {
             "year": year,
             "regime": regime,
+            "employer": year_data.get("employer", ""),
             "salary": salary,
             "ris_quarters": ris_q,
             "theo_quarters": 4, # Fixed denominator as requested
