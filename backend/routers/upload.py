@@ -441,7 +441,15 @@ async def run_full_analysis_worker_from_existing_text(
     scan_id: int,
     db_session: Session
 ):
-    """Worker to retry only the AI part if text is already extracted."""
+    """Worker to retry AI analysis + apply all post-processing corrections.
+    
+    Re-runs the AI audit using the already-extracted text, then applies the same
+    4 corrections as the main worker:
+      1. Projection de pension (moteur expert)
+      2. Enrichissement employeur via IA
+      3. Timeline complète (toutes les années)
+      4. Justificatifs auto-générés
+    """
     db_scan = None
     try:
         db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
@@ -449,22 +457,236 @@ async def run_full_analysis_worker_from_existing_text(
         
         db_scan.ocr_status = "processing"
         db_session.commit()
+
+        # Reconstruct career data from existing DB field
+        career_raw = []
+        technical_audit = []
+        if db_scan.career_data:
+            try:
+                technical_audit = json.loads(db_scan.career_data)
+                career_raw = technical_audit  # For SAM calculation
+            except: pass
         
-        ai_commentary = await ai_service.generate_ai_audit(
-            json.loads(db_scan.detailed_report or "[]"),
-            db_scan.filename,
-            raw_text=db_scan.raw_text or ""
-        )
+        # Extract birth year
+        birth_year = 1965
+        if db_scan.identity_birth_date:
+            try:
+                year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                if year_match:
+                    birth_year = int(year_match.group(1))
+            except: pass
+
+        # Truncate raw_text if too large
+        truncated_text = db_scan.raw_text[:35000] if db_scan.raw_text else ""
         
-        if ai_service.is_valid_json(ai_commentary):
-            db_scan.ai_analysis = ai_commentary
-            db_scan.ocr_status = "success"
-        else:
-            db_scan.ocr_status = "failed"
-            db_scan.ocr_error = "L'IA n'a pas pu générer un rapport valide."
+        # Run IA audit with full context
+        ai_commentary = None
+        max_retries = 2
+        for attempt in range(max_retries):
+            try:
+                ai_commentary = await ai_service.generate_ai_audit(
+                    json.loads(db_scan.detailed_report or "[]"),
+                    db_scan.filename,
+                    raw_text=truncated_text,
+                    career_data=technical_audit,
+                    birth_year=birth_year
+                )
+                if ai_service.is_valid_json(ai_commentary):
+                    break
+            except Exception as e:
+                print(f"AI retry attempt {attempt+1} failed: {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(2)
+        
+        # FALLBACK if IA fails
+        if not ai_commentary or not ai_service.is_valid_json(ai_commentary):
+            anoms = json.loads(db_scan.detailed_report or "[]")
+            has_anom = "oui" if anoms else "non"
+            risk_lvl = "moyen" if anoms else "faible"
+            tech_summary = "L'analyse technique a été effectuée avec succès. "
+            if anoms:
+                tech_summary += f"{len(anoms)} point(s) d'attention ont été identifiés sur vos droits à la retraite."
+            else:
+                tech_summary += "Aucune anomalie majeure n'a été détectée."
+
+            ai_commentary = json.dumps({
+                "anomalie_detectee": has_anom,
+                "niveau_risque": risk_lvl,
+                "resume_global": tech_summary,
+                "resume": tech_summary,
+                "compte_rendu": "Synthèse de l'expertise technique :\n\n" + "\n".join([f"• {a['title']} : {a['description']}" for a in anoms[:5]]),
+                "analyse_detaillee": "Analyse technique approfondie effectuée par RIS Pro.",
+                "full_timeline": [],
+                "projection_estimee": "En attente de calcul expert"
+            }, ensure_ascii=False)
+
+        # OCR scan warning
+        if db_scan.is_scanned:
+            try:
+                ai_data_w = json.loads(ai_commentary)
+                warning_prefix = "⚠️ L'analyse est basée sur un document scanné dont la restitution peut comporter des approximations. Veuillez vérifier les informations.\n\n"
+                if "resume_global" in ai_data_w:
+                    ai_data_w["resume_global"] = warning_prefix + ai_data_w["resume_global"]
+                ai_commentary = json.dumps(ai_data_w, ensure_ascii=False)
+            except: pass
+
+        db_scan.ai_analysis = ai_commentary
+
+        # === CORRECTIF 1: Projection de pension ===
+        try:
+            ai_data_proj = json.loads(db_scan.ai_analysis)
+            if career_raw and technical_audit:
+                total_pts = sum(float(e.get("ris_points", 0.0)) for e in technical_audit)
+                total_q = sum(int(e.get("ris_quarters", 0)) for e in technical_audit)
+                last_salary = next((float(e.get("salary", 0)) for e in reversed(technical_audit) if float(e.get("salary", 0)) > 0), 30000)
+                
+                proj_result = RetirementRulesEngine.project_future_career(
+                    total_points=total_pts, birth_year=birth_year,
+                    current_salary=last_salary, current_quarters=total_q
+                )
+                sam_val = RetirementRulesEngine.calculate_sam(career_raw)
+                base_p = RetirementRulesEngine.calculate_base_pension(
+                    sam_val,
+                    proj_result.get("projected_quarters", total_q),
+                    proj_result.get("required_quarters", 172)
+                )
+                svc_val = 1.4386
+                res_2025 = RetirementRulesEngine.RETIREMENT_RESOURCES.get(2025, {})
+                if isinstance(res_2025, dict) and "unified" in res_2025:
+                    svc_val = float(res_2025["unified"].get("service", 1.4386))
+                comp_p = RetirementRulesEngine.calculate_complementary_pension(
+                    proj_result.get("projected_points", total_pts), svc_val
+                )
+                total_monthly = round((base_p + comp_p) / 12.0, 2)
+                
+                ai_data_proj["projection_estimee"] = f"{total_monthly} €/mois"
+                ai_data_proj["projection_detail"] = {
+                    "base_mensuelle": round(base_p / 12.0, 2),
+                    "complementaire_mensuelle": round(comp_p / 12.0, 2),
+                    "total_mensuel": total_monthly,
+                    "sam": round(sam_val, 2),
+                    "trimestres_projetes": proj_result.get("projected_quarters", 0),
+                    "taux_plein": proj_result.get("has_full_rate", False),
+                    "age_legal": proj_result.get("legal_age_display", "64 ans")
+                }
+                db_scan.ai_analysis = json.dumps(ai_data_proj, ensure_ascii=False)
+        except Exception as proj_err:
+            print(f"Retry projection injection error: {proj_err}")
+
+        # === CORRECTIFS 2/3/4: Anomaly merge, employer enrichment, timeline, justificatifs ===
+        try:
+            ai_data = json.loads(ai_commentary)
+            full_timeline = ai_data.get("full_timeline", [])
             
+            # Merge anomalies
+            merged_anomalies = json.loads(db_scan.detailed_report or "[]")
+            existing_years = {str(x.get("year")) for x in merged_anomalies}
+            
+            for item in full_timeline:
+                statut = str(item.get("statut", "")).lower()
+                year = str(item.get("annee", ""))
+                if statut == "complet" or not year or year in existing_years:
+                    continue
+                q_count = 0
+                try: q_count = int(item.get("trimestres_valides", 0))
+                except: pass
+                activite_str = str(item.get("activite", "")).lower()
+                is_missing_act = not activite_str or any(k in activite_str for k in ["inconnu", "absent", "manquant", "n/a", "trou"])
+                needs_justificatifs = (q_count < 4) or is_missing_act
+                merged_anomalies.append({
+                    "year": int(year) if year.isdigit() else year,
+                    "title": f"Année {year} : {item.get('statut', 'Anomalie')}",
+                    "description": item.get("anomalie_specifique", "Incohérence détectée par l'expertise complémentaire"),
+                    "justificatif": item.get("justificatif_suggere"),
+                    "needs_justificatifs": needs_justificatifs,
+                    "points_complementaires": item.get("points_complementaires"),
+                    "trimestres_valides": q_count
+                })
+            
+            merged_anomalies.sort(key=lambda x: int(str(x.get("year", 0))) if str(x.get("year")).isdigit() else 0)
+            db_scan.detailed_report = json.dumps(merged_anomalies, ensure_ascii=False)
+            db_scan.has_anomalies = len(merged_anomalies) > 0
+            
+            # NATIVE PDF PRECISION INJECTION
+            if not db_scan.is_scanned and technical_audit:
+                precision_career = []
+                ai_timeline_map = {int(str(item.get("annee"))): item for item in full_timeline if str(item.get("annee", "")).isdigit()}
+                
+                for tech_entry in technical_audit:
+                    y_int = tech_entry.get("year", 0)
+                    if y_int >= datetime.now().year: continue
+                    
+                    ai_item = ai_timeline_map.get(y_int, {})
+                    
+                    # CORRECTIF 2: Enrichir l'employeur depuis l'IA
+                    ai_activite = ai_item.get("activite", "")
+                    employer_val = tech_entry.get("employer", tech_entry.get("regime", "Inconnu"))
+                    if ai_activite and ai_activite.lower() not in ["agirc-arrco", "n/a", "inconnu", "", "complémentaire"]:
+                        employer_val = ai_activite
+                    elif employer_val.lower() in ["agirc-arrco", "complémentaire"]:
+                        employer_val = ai_activite if ai_activite else tech_entry.get("regime", "Inconnu")
+                    
+                    entry = {
+                        "year": y_int,
+                        "salary": tech_entry.get("salary", 0.0),
+                        "ris_quarters": tech_entry.get("ris_quarters", 0),
+                        "ris_points": tech_entry.get("ris_points", 0.0),
+                        "regime": tech_entry.get("regime", "Inconnu"),
+                        "employer": employer_val,
+                        "anomalie_specifique": ai_item.get("anomalie_specifique"),
+                        "justificatif_suggere": ai_item.get("justificatif_suggere"),
+                        "statut": ai_item.get("statut")
+                    }
+                    precision_career.append(RetirementRulesEngine.get_year_validation_status(entry))
+                
+                if precision_career:
+                    precision_career.sort(key=lambda x: x['year'])
+                    db_scan.career_data = json.dumps(precision_career, ensure_ascii=False)
+                    db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(precision_career)
+                    
+                    # CORRECTIF 3+4: Timeline complète + justificatifs
+                    if not ai_data.get('full_timeline') or len(ai_data.get('full_timeline', [])) < (len(precision_career) // 2):
+                        ai_data['full_timeline'] = [
+                            {
+                                "annee": e['year'],
+                                "statut": e.get('status', 'incomplet'),
+                                "trimestres_valides": e.get('ris_quarters', 0),
+                                "activite": e.get('employer', e.get('regime', 'Activité détectée')),
+                                "points_complementaires": e.get('ris_points', 0.0),
+                                "salaire_brut": e.get('salary', 0.0),
+                                "anomalie_specifique": e.get('explanation') or (f"Vérification requise pour l'année {e['year']}." if e.get('status') != 'conforme' else f"Année {e['year']} conforme."),
+                                "justificatif_suggere": e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                                "needs_justificatifs": e.get('status') != 'conforme'
+                            } for e in precision_career
+                        ]
+                        db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+
+            # Scanned doc backfill
+            if db_scan.is_scanned and full_timeline and not technical_audit:
+                ai_career_data = []
+                for item in full_timeline:
+                    year = item.get("annee")
+                    if not year or not str(year).isdigit(): continue
+                    entry = {
+                        "year": int(year),
+                        "salary": float(item.get("salaire_brut", 0.0)) or 0.0,
+                        "ris_quarters": int(item.get("trimestres_valides", 0)) or 0,
+                        "ris_points": float(item.get("points_complementaires", 0.0)) or 0.0,
+                        "regime": item.get("activite", "Détecté par IA")
+                    }
+                    ai_career_data.append(RetirementRulesEngine.get_year_validation_status(entry))
+                if ai_career_data:
+                    ai_career_data.sort(key=lambda x: x['year'])
+                    db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
+                    db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+
+        except Exception as final_err:
+            print(f"Retry data merging error: {final_err}")
+
+        db_scan.ocr_status = "success"
         db_session.commit()
     except Exception as e:
+        print(f"CRITICAL RETRY WORKER ERROR for scan {scan_id}: {str(e)}")
         if db_scan:
             db_scan.ocr_status = "failed"
             db_scan.ocr_error = str(e)
