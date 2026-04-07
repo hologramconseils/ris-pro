@@ -156,6 +156,12 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 - Carrière longue : {career_projection.get('early_retirement_options', {}).get('carriere_longue', {}).get('details', 'Non calculé')}
 - Retraite progressive : {career_projection.get('early_retirement_options', {}).get('retraite_progressive', {}).get('details', 'Non calculé')}
 
+**OPTIONS D'OPTIMISATION FINANCIÈRE :**
+- Rachat de trimestres : {career_projection.get('optimization_options', {}).get('rachat_trimestres', {}).get('details', 'Non évalué')}
+- Surcote : {career_projection.get('optimization_options', {}).get('surcote', {}).get('details', 'Non évalué')}
+- Cumul Emploi-Retraite : {career_projection.get('optimization_options', {}).get('cumul_emploi_retraite', {}).get('details', 'Non évalué')}
+- Majorations Familiales : {career_projection.get('optimization_options', {}).get('majorations_familiales', {}).get('details', 'Non évalué')}
+
 **VÉRIFICATION EXPERTE (RÉSULTATS DU MOTEUR) :**
 - Score de fiabilité globale : {reliability_score}/100
 - Salaire Annuel Moyen (SAM) calculé : {career_projection.get('sam', 0)}€

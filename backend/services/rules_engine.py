@@ -292,6 +292,40 @@ class RetirementRulesEngine:
         return options
 
     @staticmethod
+    def analyze_optimization_options(projected_quarters_at_legal: float, required_quarters: int) -> Dict[str, Any]:
+        """Analyzes options to improve the pension (Rachat, Surcote, Cumul, Majorations)."""
+        options = {
+            "rachat_trimestres": {"eligible": False, "suggested_quarters": 0, "details": "Aucun rachat nécessaire (taux plein atteint)."},
+            "surcote": {"eligible": False, "details": "Taux plein non atteint à l'âge légal, la surcote n'est pas applicable."},
+            "cumul_emploi_retraite": {"details": "Depuis 2023, le cumul intégral génère de nouveaux droits à retraite (limités à 5% du plafond annuel SS)."},
+            "majorations_familiales": {"details": "Rappel : +10% de la pension pour les parents d'au moins 3 enfants."}
+        }
+
+        missing_quarters = required_quarters - projected_quarters_at_legal
+
+        if missing_quarters > 0:
+            if missing_quarters <= 12:
+                options["rachat_trimestres"] = {
+                    "eligible": True, 
+                    "suggested_quarters": int(missing_quarters),
+                    "details": f"Possibilité de racheter jusqu'à {int(missing_quarters)} trimestres (limite légale de 12) pour annuler la décote."
+                }
+            else:
+                options["rachat_trimestres"] = {
+                    "eligible": True,
+                    "suggested_quarters": 12,
+                    "details": "Possibilité de racheter 12 trimestres (le maximum légal) pour réduire partiellement la décote."
+                }
+        else:
+            # Surcote eligible
+            options["surcote"] = {
+                "eligible": True,
+                "details": "Taux plein validé. Chaque trimestre entier cotisé en prolongeant l'activité au-delà de l'âge légal rapportera 1,25% de majoration."
+            }
+
+        return options
+
+    @staticmethod
     def project_future_career(total_points: float, birth_year: int, current_salary: float, current_quarters: int = 0, birth_month: int = 1, career_data: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Expert career projection based on birth year and 2023 Reform."""
         params = RetirementRulesEngine.get_generation_parameters(birth_year, birth_month)
@@ -329,6 +363,7 @@ class RetirementRulesEngine:
             estimated_annual_pension *= malus
 
         early_options = RetirementRulesEngine.analyze_early_retirement_options(current_quarters, birth_year, birth_month, career_data)
+        optimization_opts = RetirementRulesEngine.analyze_optimization_options(projected_quarters_at_legal, required_q)
 
         return {
             "birth_year": birth_year,
@@ -340,7 +375,8 @@ class RetirementRulesEngine:
             "projected_points": round(float(projected_points_at_legal), 2),
             "estimated_monthly_pension": round(float(estimated_annual_pension / 12.0), 2),
             "malus_applied": round(float((1.0 - malus) * 100), 1),
-            "early_retirement_options": early_options
+            "early_retirement_options": early_options,
+            "optimization_options": optimization_opts
         }
 
     @staticmethod
