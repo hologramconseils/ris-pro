@@ -20,12 +20,8 @@ GENERATION_RULES = {
 }
 
 # For younger generations, the rule remains 64 years and 172 quarters unless new reform
-def get_params_for_year(birth_year: int) -> Dict[str, Any]:
-    if birth_year >= 1968:
-        return {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172}
-    if birth_year < 1955:
-        return {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166}
-    return GENERATION_RULES.get(birth_year, {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172})
+def get_params_for_year(birth_year: int, birth_month: int = 1) -> Dict[str, Any]:
+    return RetirementRulesEngine.get_generation_parameters(birth_year, birth_month)
 
 # Historical data for Plafond Annuel de la Sécurité Sociale (PASS) and Agirc-Arrco point values
 RETIREMENT_RESOURCES = {
@@ -240,18 +236,65 @@ class RetirementRulesEngine:
         return 0.0
 
     @staticmethod
-    def get_generation_parameters(birth_year: int) -> Dict[str, Any]:
-        """Returns legal age and required quarters for a given birth year (Reform 2023)."""
+    def get_generation_parameters(birth_year: int, birth_month: int = 1) -> Dict[str, Any]:
+        """Returns legal age and required quarters for a given birth year and month (Reform 2023)."""
         if birth_year >= 1968:
             return {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172}
         if birth_year < 1955:
             return {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 166}
+            
+        if birth_year == 1961:
+            if birth_month <= 8:
+                return {"legal_age_years": 62, "legal_age_months": 0, "required_quarters": 168}
+            else:
+                return {"legal_age_years": 62, "legal_age_months": 3, "required_quarters": 169}
+                
         return GENERATION_RULES.get(birth_year, {"legal_age_years": 64, "legal_age_months": 0, "required_quarters": 172})
 
     @staticmethod
-    def project_future_career(total_points: float, birth_year: int, current_salary: float, current_quarters: int = 0) -> Dict[str, Any]:
+    def analyze_early_retirement_options(total_quarters: int, birth_year: int, birth_month: int = 1, career_data: List[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Analyzes early retirement options based on Reform 2023."""
+        options = {
+            "carriere_longue": {"eligible": False, "earliest_age": None, "details": "Non éligible (Trimestres avant 16/18/20/21 ans insuffisants)."},
+            "travailleur_handicape": {"eligible": "Conditionnelle", "earliest_age": 55, "details": "Départ possible dès 55 ans sous condition de trimestres cotisés avec un taux d'incapacité >= 50%."},
+            "incapacite_permanente": {"eligible": "Conditionnelle", "earliest_age": 60, "details": "Départ à 60 ans (si IP >= 20%) ou 2 ans avant l'âge légal (si IP 10-19% avec 17 ans d'exposition)."},
+            "retraite_progressive": {"eligible": "Conditionnelle", "earliest_age": 60, "details": "Possible dès 60 ans avec au moins 150 trimestres validés et un temps partiel évalué entre 40% et 80%."}
+        }
+        
+        # Check Progressive
+        if total_quarters >= 150:
+            options["retraite_progressive"]["eligible"] = True
+            options["retraite_progressive"]["details"] = "Éligible sur le critère d'assurance (>= 150 trimestres). Départ dès 60 ans si temps partiel (40-80%)."
+        else:
+            options["retraite_progressive"]["eligible"] = False
+            options["retraite_progressive"]["details"] = f"Non éligible : {total_quarters}/150 trimestres requis."
+
+        # Analyze Carrière Longue based on actual career
+        if career_data:
+            q_at_16 = sum(int(y.get("ris_quarters", 0)) for y in career_data if y.get("year", 9999) <= birth_year + 16)
+            q_at_18 = sum(int(y.get("ris_quarters", 0)) for y in career_data if y.get("year", 9999) <= birth_year + 18)
+            q_at_20 = sum(int(y.get("ris_quarters", 0)) for y in career_data if y.get("year", 9999) <= birth_year + 20)
+            q_at_21 = sum(int(y.get("ris_quarters", 0)) for y in career_data if y.get("year", 9999) <= birth_year + 21)
+            
+            # Require 5 quarters, or 4 if born between Oct and Dec.
+            required_early_q = 4 if birth_month >= 10 else 5
+            
+            if q_at_16 >= required_early_q:
+                options["carriere_longue"] = {"eligible": True, "earliest_age": 58, "details": f"Éligible départ 58 ans ({q_at_16} trimestres validés à la fin de l'année des 16 ans)."}
+            elif q_at_18 >= required_early_q:
+                options["carriere_longue"] = {"eligible": True, "earliest_age": 60, "details": f"Éligible départ 60 ans ({q_at_18} trimestres validés à la fin de l'année des 18 ans)."}
+            elif q_at_20 >= required_early_q:
+                age_cl_20 = 60 if birth_year <= 1969 else (62 if birth_year >= 1970 else 61) # Simplified rules mapping
+                options["carriere_longue"] = {"eligible": True, "earliest_age": age_cl_20, "details": f"Éligible départ {age_cl_20} ans ({q_at_20} trimestres validés à la fin de l'année des 20 ans)."}
+            elif q_at_21 >= required_early_q:
+                options["carriere_longue"] = {"eligible": True, "earliest_age": 63, "details": f"Éligible départ 63 ans ({q_at_21} trimestres validés à la fin de l'année des 21 ans)."}
+
+        return options
+
+    @staticmethod
+    def project_future_career(total_points: float, birth_year: int, current_salary: float, current_quarters: int = 0, birth_month: int = 1, career_data: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Expert career projection based on birth year and 2023 Reform."""
-        params = RetirementRulesEngine.get_generation_parameters(birth_year)
+        params = RetirementRulesEngine.get_generation_parameters(birth_year, birth_month)
         legal_age = float(params["legal_age_years"]) + (float(params["legal_age_months"]) / 12.0)
         required_q = params["required_quarters"]
         
@@ -285,6 +328,8 @@ class RetirementRulesEngine:
             malus = max(0.75, 1.0 - (missing_q * 0.0125)) 
             estimated_annual_pension *= malus
 
+        early_options = RetirementRulesEngine.analyze_early_retirement_options(current_quarters, birth_year, birth_month, career_data)
+
         return {
             "birth_year": birth_year,
             "legal_age_display": f"{params['legal_age_years']} ans" + (f" et {params['legal_age_months']} mois" if params['legal_age_months'] > 0 else ""),
@@ -294,7 +339,8 @@ class RetirementRulesEngine:
             "years_to_retirement": round(float(years_to_legal), 1),
             "projected_points": round(float(projected_points_at_legal), 2),
             "estimated_monthly_pension": round(float(estimated_annual_pension / 12.0), 2),
-            "malus_applied": round(float((1.0 - malus) * 100), 1)
+            "malus_applied": round(float((1.0 - malus) * 100), 1),
+            "early_retirement_options": early_options
         }
 
     @staticmethod

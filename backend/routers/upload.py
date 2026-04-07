@@ -149,14 +149,20 @@ async def run_full_analysis_worker(
             max_retries = 2
             for attempt in range(max_retries):
                 try:
-                    # Extract birth year from identity_birth_date (DD/MM/YYYY or string)
+                    # Extract birth year and month from identity_birth_date (DD/MM/YYYY or string)
                     birth_year = 1965
+                    birth_month = 1
                     if db_scan.identity_birth_date:
                         try:
-                            # Try to find a 4-digit year in the string
-                            year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
-                            if year_match:
-                                birth_year = int(year_match.group(1))
+                            # Try to find DD/MM/YYYY
+                            b_match = re.search(r"(\d{2})/(\d{2})/(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                            if b_match:
+                                birth_month = int(b_match.group(2))
+                                birth_year = int(b_match.group(3))
+                            else:
+                                year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                                if year_match:
+                                    birth_year = int(year_match.group(1))
                         except: pass
 
                     # Truncate raw_text if too large to prevent API payload errors
@@ -168,7 +174,8 @@ async def run_full_analysis_worker(
                         raw_text=truncated_text,
                         images=parser_res.get("images", []),
                         career_data=technical_audit,
-                        birth_year=birth_year
+                        birth_year=birth_year,
+                        birth_month=birth_month
                     )
                     if ai_service.is_valid_json(ai_commentary):
                         break
@@ -230,7 +237,8 @@ async def run_full_analysis_worker(
                     
                     proj_result = RetirementRulesEngine.project_future_career(
                         total_points=total_pts, birth_year=proj_birth_year,
-                        current_salary=last_salary, current_quarters=total_q
+                        current_salary=last_salary, current_quarters=total_q,
+                        birth_month=birth_month, career_data=career_raw
                     )
                     sam_val = RetirementRulesEngine.calculate_sam(career_raw)
                     base_p = RetirementRulesEngine.calculate_base_pension(
@@ -479,13 +487,19 @@ async def run_full_analysis_worker_from_existing_text(
                 career_raw = technical_audit  # For SAM calculation
             except: pass
         
-        # Extract birth year
+        # Extract birth year and month
         birth_year = 1965
+        birth_month = 1
         if db_scan.identity_birth_date:
             try:
-                year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
-                if year_match:
-                    birth_year = int(year_match.group(1))
+                b_match = re.search(r"(\d{2})/(\d{2})/(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                if b_match:
+                    birth_month = int(b_match.group(2))
+                    birth_year = int(b_match.group(3))
+                else:
+                    year_match = re.search(r"(19[5-9]\d|20[0-2]\d)", str(db_scan.identity_birth_date))
+                    if year_match:
+                        birth_year = int(year_match.group(1))
             except: pass
 
         # Truncate raw_text if too large
@@ -501,7 +515,8 @@ async def run_full_analysis_worker_from_existing_text(
                     db_scan.filename,
                     raw_text=truncated_text,
                     career_data=technical_audit,
-                    birth_year=birth_year
+                    birth_year=birth_year,
+                    birth_month=birth_month
                 )
                 if ai_service.is_valid_json(ai_commentary):
                     break
@@ -554,7 +569,8 @@ async def run_full_analysis_worker_from_existing_text(
                 
                 proj_result = RetirementRulesEngine.project_future_career(
                     total_points=total_pts, birth_year=birth_year,
-                    current_salary=last_salary, current_quarters=total_q
+                    current_salary=last_salary, current_quarters=total_q,
+                    birth_month=birth_month, career_data=career_raw
                 )
                 sam_val = RetirementRulesEngine.calculate_sam(career_raw)
                 base_p = RetirementRulesEngine.calculate_base_pension(

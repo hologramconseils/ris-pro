@@ -76,6 +76,7 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
     
     # NOTE: `career_data` is now passed as an argument.
     birth_year = kwargs.get("birth_year", 1980)
+    birth_month = kwargs.get("birth_month", 1)
     
     if career_data:
         verified_periods = []
@@ -109,7 +110,8 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
                 total_points=total_pts,
                 birth_year=birth_year,
                 current_salary=last_entry.get("salary", 40000.0),
-                current_quarters=total_q
+                current_quarters=total_q,
+                birth_month=birth_month
             )
             
             # Technical Pension Estimate based on consolidated formulas
@@ -149,6 +151,10 @@ async def generate_ai_audit(anomalies: list, filename: str, raw_text: str = "", 
 - Âge légal de départ : {career_projection.get('legal_age_display', '64 ans')} pour la génération {birth_year}.
 - Trimestres requis pour le taux plein : {career_projection.get('required_quarters', 172)}.
 - Situation projetée : {career_projection.get('projected_quarters', 0)} trimestres à l'âge légal.
+
+**OPTIONS DE DÉPART ANTICIPÉ (À titre indicatif) :**
+- Carrière longue : {career_projection.get('early_retirement_options', {}).get('carriere_longue', {}).get('details', 'Non calculé')}
+- Retraite progressive : {career_projection.get('early_retirement_options', {}).get('retraite_progressive', {}).get('details', 'Non calculé')}
 
 **VÉRIFICATION EXPERTE (RÉSULTATS DU MOTEUR) :**
 - Score de fiabilité globale : {reliability_score}/100
