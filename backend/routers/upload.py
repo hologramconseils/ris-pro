@@ -409,7 +409,62 @@ async def run_full_analysis_worker(
                         ai_career_data.sort(key=lambda x: x['year'])
                         db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
                         db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                        
+                        # --- UNIFICATION: Apply same timeline rebuild as native ---
+                        existing_ai_tl = {int(str(t.get('annee', 0))): t for t in ai_data.get('full_timeline', []) if str(t.get('annee', '')).isdigit()}
+                        ai_data['full_timeline'] = []
+                        for e in ai_career_data:
+                            yr = e['year']
+                            ai_t = existing_ai_tl.get(yr, {})
+                            ai_data['full_timeline'].append({
+                                "annee": yr,
+                                "statut": e.get('status', 'incomplet'),
+                                "trimestres_valides": e.get('ris_quarters', 0),
+                                "activite": e.get('employer', e.get('regime', 'Activité détectée')),
+                                "points_complementaires": e.get('ris_points', 0.0),
+                                "salaire_brut": e.get('salary', 0.0),
+                                "anomalie_specifique": ai_t.get('anomalie_specifique') or e.get('explanation') or (f"Vérification requise pour l'année {yr}." if e.get('status') != 'conforme' else f"Année {yr} conforme."),
+                                "justificatif_suggere": ai_t.get('justificatif_suggere') or e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                                "needs_justificatifs": e.get('status') != 'conforme'
+                            })
                         db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                        
+                        # --- UNIFICATION: Recalculate projection with backfilled data ---
+                        try:
+                            scan_total_pts = sum(float(x.get("ris_points", 0.0)) for x in ai_career_data)
+                            scan_total_q = sum(int(x.get("ris_quarters", 0)) for x in ai_career_data)
+                            scan_last_salary = next((float(x.get("salary", 0)) for x in reversed(ai_career_data) if float(x.get("salary", 0)) > 0), 30000)
+                            scan_proj = RetirementRulesEngine.project_future_career(
+                                total_points=scan_total_pts, birth_year=birth_year,
+                                current_salary=scan_last_salary, current_quarters=scan_total_q,
+                                birth_month=birth_month, career_data=ai_career_data
+                            )
+                            scan_sam = RetirementRulesEngine.calculate_sam(ai_career_data)
+                            scan_base_p = RetirementRulesEngine.calculate_base_pension(
+                                scan_sam, scan_proj.get("projected_quarters", scan_total_q),
+                                scan_proj.get("required_quarters", 172)
+                            )
+                            scan_svc = 1.4386
+                            scan_res = RetirementRulesEngine.get_year_data(2025) or {}
+                            if isinstance(scan_res, dict) and "unified" in scan_res:
+                                scan_svc = float(scan_res["unified"].get("service", 1.4386))
+                            scan_comp_p = RetirementRulesEngine.calculate_complementary_pension(
+                                scan_proj.get("projected_points", scan_total_pts), scan_svc
+                            )
+                            scan_total_monthly = round((scan_base_p + scan_comp_p) / 12.0, 2)
+                            ai_data["projection_estimee"] = f"{scan_total_monthly} €/mois"
+                            ai_data["projection_detail"] = {
+                                "base_mensuelle": round(scan_base_p / 12.0, 2),
+                                "complementaire_mensuelle": round(scan_comp_p / 12.0, 2),
+                                "total_mensuel": scan_total_monthly,
+                                "sam": round(scan_sam, 2),
+                                "trimestres_projetes": scan_proj.get("projected_quarters", 0),
+                                "taux_plein": scan_proj.get("has_full_rate", False),
+                                "age_legal": scan_proj.get("legal_age_display", "64 ans")
+                            }
+                            db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                        except Exception as scan_proj_err:
+                            print(f"Scan projection recalculation error: {scan_proj_err}")
                 ### END FROZEN MODULE ###
 
             except Exception as final_err:
@@ -716,7 +771,62 @@ async def run_full_analysis_worker_from_existing_text(
                     ai_career_data.sort(key=lambda x: x['year'])
                     db_scan.career_data = json.dumps(ai_career_data, ensure_ascii=False)
                     db_scan.reliability_score = RetirementRulesEngine.get_reliability_score(ai_career_data)
+                    
+                    # --- UNIFICATION: Apply same timeline rebuild as native ---
+                    existing_ai_tl = {int(str(t.get('annee', 0))): t for t in ai_data.get('full_timeline', []) if str(t.get('annee', '')).isdigit()}
+                    ai_data['full_timeline'] = []
+                    for e in ai_career_data:
+                        yr = e['year']
+                        ai_t = existing_ai_tl.get(yr, {})
+                        ai_data['full_timeline'].append({
+                            "annee": yr,
+                            "statut": e.get('status', 'incomplet'),
+                            "trimestres_valides": e.get('ris_quarters', 0),
+                            "activite": e.get('employer', e.get('regime', 'Activité détectée')),
+                            "points_complementaires": e.get('ris_points', 0.0),
+                            "salaire_brut": e.get('salary', 0.0),
+                            "anomalie_specifique": ai_t.get('anomalie_specifique') or e.get('explanation') or (f"Vérification requise pour l'année {yr}." if e.get('status') != 'conforme' else f"Année {yr} conforme."),
+                            "justificatif_suggere": ai_t.get('justificatif_suggere') or e.get('justificatif_suggere') or _generate_justificatifs_for_entry(e),
+                            "needs_justificatifs": e.get('status') != 'conforme'
+                        })
                     db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                    
+                    # --- UNIFICATION: Recalculate projection with backfilled data ---
+                    try:
+                        scan_total_pts = sum(float(x.get("ris_points", 0.0)) for x in ai_career_data)
+                        scan_total_q = sum(int(x.get("ris_quarters", 0)) for x in ai_career_data)
+                        scan_last_salary = next((float(x.get("salary", 0)) for x in reversed(ai_career_data) if float(x.get("salary", 0)) > 0), 30000)
+                        scan_proj = RetirementRulesEngine.project_future_career(
+                            total_points=scan_total_pts, birth_year=birth_year,
+                            current_salary=scan_last_salary, current_quarters=scan_total_q,
+                            birth_month=birth_month, career_data=ai_career_data
+                        )
+                        scan_sam = RetirementRulesEngine.calculate_sam(ai_career_data)
+                        scan_base_p = RetirementRulesEngine.calculate_base_pension(
+                            scan_sam, scan_proj.get("projected_quarters", scan_total_q),
+                            scan_proj.get("required_quarters", 172)
+                        )
+                        scan_svc = 1.4386
+                        scan_res = RetirementRulesEngine.get_year_data(2025) or {}
+                        if isinstance(scan_res, dict) and "unified" in scan_res:
+                            scan_svc = float(scan_res["unified"].get("service", 1.4386))
+                        scan_comp_p = RetirementRulesEngine.calculate_complementary_pension(
+                            scan_proj.get("projected_points", scan_total_pts), scan_svc
+                        )
+                        scan_total_monthly = round((scan_base_p + scan_comp_p) / 12.0, 2)
+                        ai_data["projection_estimee"] = f"{scan_total_monthly} €/mois"
+                        ai_data["projection_detail"] = {
+                            "base_mensuelle": round(scan_base_p / 12.0, 2),
+                            "complementaire_mensuelle": round(scan_comp_p / 12.0, 2),
+                            "total_mensuel": scan_total_monthly,
+                            "sam": round(scan_sam, 2),
+                            "trimestres_projetes": scan_proj.get("projected_quarters", 0),
+                            "taux_plein": scan_proj.get("has_full_rate", False),
+                            "age_legal": scan_proj.get("legal_age_display", "64 ans")
+                        }
+                        db_scan.ai_analysis = json.dumps(ai_data, ensure_ascii=False)
+                    except Exception as scan_proj_err:
+                        print(f"Retry scan projection recalculation error: {scan_proj_err}")
 
         except Exception as final_err:
             print(f"Retry data merging error: {final_err}")
