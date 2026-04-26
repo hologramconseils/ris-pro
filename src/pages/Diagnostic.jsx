@@ -240,7 +240,7 @@ export default function Diagnostic() {
             {hasMore ? `Votre audit révèle ${sortedAnomalies.length - freemiumAnomalies.length} autres anomalies` : "Accédez à votre bilan détaillé"}
           </h2>
           <p className="text-muted" style={{ maxWidth: '500px', marginBottom: '2rem' }}>
-            Débloquez le bilan complet pour voir l'intégralité de votre carrière, la liste des justificatifs requis et générer vos courriers de réclamation pré-remplis.
+            Débloquer l’analyse complète et détaillée pour voir l’intégralité des anomalies détectées en quelques minutes ainsi que la liste (non exhaustive) des pièces justificatives requises pour demander la correction de votre carrière.
           </p>
           
           {showSignup ? (
