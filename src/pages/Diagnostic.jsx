@@ -106,7 +106,7 @@ export default function Diagnostic() {
         sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
       }
 
-      const response = await fetch('http://localhost:3001/api/create-checkout-session', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
