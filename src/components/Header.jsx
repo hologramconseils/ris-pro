@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { ShieldCheck, Sun, Moon, Monitor } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Sun, Moon, Monitor } from 'lucide-react'
+import { useAuth } from '../AuthContext'
+import { supabase } from '../lib/supabase'
 
 function ThemeToggle() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system')
@@ -34,6 +36,14 @@ function ThemeToggle() {
 }
 
 export default function Header() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
   return (
     <header className="glass" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
@@ -47,16 +57,20 @@ export default function Header() {
             Hologram Conseils
           </a>
           <div className="h-4 w-px bg-border mx-1" />
-          {localStorage.getItem('isAdmin') === 'true' ? (
+          
+          {user ? (
             <button 
-              className="text-xs font-bold text-success flex items-center gap-1 border border-success/30 px-2 py-1 rounded"
-              onClick={() => { localStorage.removeItem('isAdmin'); window.location.reload(); }}
+              className="text-sm font-medium text-primary hover:underline cursor-pointer bg-transparent border-none p-0"
+              onClick={handleLogout}
             >
-              Mode Admin (Déconnexion)
+              Se déconnecter
             </button>
           ) : (
-            <Link to="/login" className="text-sm font-medium text-primary hover:underline">Admin</Link>
+            <Link to="/login" className="text-sm font-medium text-primary hover:underline">
+              Se connecter
+            </Link>
           )}
+
           <ThemeToggle />
         </nav>
       </div>
