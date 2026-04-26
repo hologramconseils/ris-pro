@@ -40,32 +40,38 @@ export default async function handler(req, res) {
       Tu es un expert en retraite française (CNAV, Agirc-Arrco, MSA, Ircantec). 
       Analyse ce relevé de carrière (RIS) et identifie TOUTES les anomalies potentielles.
       
-      Recherche spécifiquement et OBLIGATOIREMENT :
-      - RÈGLE MÉTIER STRICTE : Toute année comportant MOINS de 4 trimestres validés EST UNE ANOMALIE NON CONFORME. Tu dois obligatoirement créer une entrée d'anomalie pour CHAQUE année incomplète, de la première à la dernière année de carrière.
-      - Les erreurs d'employeurs (orthographe, périodes incohérentes).
-      - Les jobs d'été, stages ou jobs étudiants oubliés.
-      - Les périodes de chômage, maladie ou service militaire non validées.
+      CRITÈRES DE DÉTECTION (ANOMALIE = ANNÉE NON CONFORME) :
+      1. Toute année comportant MOINS de 4 trimestres validés (ex: 0/4, 1/4, 2/4, 3/4).
+      2. Toute année comportant 0 point de retraite complémentaire (Agirc-Arrco, etc.), même si elle a 4 trimestres.
+      
+      RÈGLES MÉTIER :
+      - Inclus une entrée pour CHAQUE année en anomalie (incomplète ou sans point).
+      - Une année avec 4 trimestres mais 0 point DOIT apparaître.
+      - Une année avec moins de 4 trimestres même avec des points DOIT apparaître.
+      - Une année avec 4 trimestres ET des points ne doit PAS apparaître (année conforme).
+      - Ordonne obligatoirement les résultats de l'année la plus ancienne à la plus récente.
 
       IMPORTANT : Ta réponse doit être un objet JSON valide uniquement.
-      TU DOIS RÉPONDRE EXCLUSIVEMENT EN FRANÇAIS. CHAQUE CHAMP TEXTE DOIT ÊTRE EN FRANÇAIS.
-      Structure attendue pour CHAQUE anomalie :
+      TU DOIS RÉPONDRE EXCLUSIVEMENT EN FRANÇAIS.
+      
+      Structure attendue :
       {
         "anomalies": [
           {
             "year": "YYYY",
-            "title": "Titre court de l'anomalie (OBLIGATOIREMENT EN FRANÇAIS)",
-            "description": "Description concise (OBLIGATOIREMENT EN FRANÇAIS)",
+            "title": "Titre court (ex: Année incomplète ou Manque de points)",
+            "description": "Description concise de l'impact",
             "employer": "Nom de l'employeur ou organisme",
-            "salary": "Salaire brut ou 'Indemnités'",
+            "salary": "Salaire brut ou nature des revenus",
             "trimesters": "X/4",
             "points": "Nombre de points ou 0",
-            "reason": "Explication détaillée de l'anomalie (OBLIGATOIREMENT EN FRANÇAIS)",
-            "solution": "Action concrète pour régulariser (OBLIGATOIREMENT EN FRANÇAIS)",
-            "docs": ["Document 1 en français", "Document 2 en français"],
+            "reason": "Explication détaillée de l'anomalie",
+            "solution": "Démarche concrète pour régulariser",
+            "docs": ["Liste des justificatifs requis"],
             "severity": "high" | "medium" | "low"
           }
         ],
-        "summary": "Résumé de l'audit en une phrase (OBLIGATOIREMENT EN FRANÇAIS)."
+        "summary": "Résumé de l'audit en une phrase."
       }
     `;
 

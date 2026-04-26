@@ -157,9 +157,30 @@ export default function Diagnostic() {
     )
   }
 
-  const anomalies = results.anomalies || []
-  const freemiumAnomalies = anomalies.slice(0, 2)
-  const hasMore = anomalies.length > 2
+  const rawAnomalies = results.anomalies || []
+  const currentYear = new Date().getFullYear()
+  
+  // Sort and filter for freemium: only oldest and newest (excluding current year)
+  const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
+    const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
+    const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0')
+    return yearA - yearB
+  })
+
+  const validAnomalies = sortedAnomalies.filter(a => {
+    const year = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
+    return year < currentYear
+  })
+
+  const freemiumAnomalies = []
+  if (validAnomalies.length > 0) {
+    freemiumAnomalies.push(validAnomalies[0]) // Plus ancienne
+    if (validAnomalies.length > 1) {
+      freemiumAnomalies.push(validAnomalies[validAnomalies.length - 1]) // Plus récente
+    }
+  }
+
+  const hasMore = sortedAnomalies.length > freemiumAnomalies.length;
 
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
@@ -178,7 +199,7 @@ export default function Diagnostic() {
         <div className="flex flex-col gap-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <AlertCircle className="text-warning" size={24} />
-            Anomalies identifiées ({anomalies.length})
+            Anomalies identifiées ({sortedAnomalies.length})
           </h2>
           
           {freemiumAnomalies.map((anom, idx) => (
@@ -216,7 +237,7 @@ export default function Diagnostic() {
           
           <Lock size={32} className="text-primary" style={{ marginBottom: '1rem' }} />
           <h2 className="text-2xl font-bold" style={{ marginBottom: '0.5rem' }}>
-            {hasMore ? `Votre audit révèle ${anomalies.length - 2} autres anomalies` : "Accédez à votre bilan détaillé"}
+            {hasMore ? `Votre audit révèle ${sortedAnomalies.length - freemiumAnomalies.length} autres anomalies` : "Accédez à votre bilan détaillé"}
           </h2>
           <p className="text-muted" style={{ maxWidth: '500px', marginBottom: '2rem' }}>
             Débloquez le bilan complet pour voir l'intégralité de votre carrière, la liste des justificatifs requis et générer vos courriers de réclamation pré-remplis.
