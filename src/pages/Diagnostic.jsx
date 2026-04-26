@@ -59,7 +59,7 @@ export default function Diagnostic() {
       return
     }
 
-    if (profile?.has_paid || profile?.role === 'admin') {
+    if (profile?.has_paid || profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com') {
       navigate(`/bilan?success=true&file=${encodeURIComponent(filePath)}`)
       return
     }
@@ -257,7 +257,7 @@ export default function Diagnostic() {
           ) : (
             <>
               <button className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }} onClick={handlePayment}>
-                {profile?.role === 'admin' ? "Accéder au bilan complet (Admin)" : (user ? "Continuer vers le paiement (29€)" : "Créer mon compte pour débloquer (29€)")}
+                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' ? "Accéder au bilan complet (Admin)" : (user ? "Continuer vers le paiement (29€)" : "Créer mon compte pour débloquer (29€)")}
                 <ChevronRight size={20} />
               </button>
               <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

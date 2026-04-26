@@ -40,8 +40,8 @@ export default async function handler(req, res) {
       Tu es un expert en retraite française (CNAV, Agirc-Arrco, MSA, Ircantec). 
       Analyse ce relevé de carrière (RIS) et identifie TOUTES les anomalies potentielles.
       
-      Recherche spécifiquement :
-      - Les trimestres manquants (moins de 4 trimestres par an sans raison apparente).
+      Recherche spécifiquement et OBLIGATOIREMENT :
+      - RÈGLE MÉTIER STRICTE : Toute année comportant MOINS de 4 trimestres validés EST UNE ANOMALIE NON CONFORME. Tu dois obligatoirement créer une entrée d'anomalie pour CHAQUE année incomplète, de la première à la dernière année de carrière.
       - Les erreurs d'employeurs (orthographe, périodes incohérentes).
       - Les jobs d'été, stages ou jobs étudiants oubliés.
       - Les périodes de chômage, maladie ou service militaire non validées.
