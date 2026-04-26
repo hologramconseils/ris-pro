@@ -256,3 +256,19 @@ a:hover {
 .badge-error { background-color: var(--error-bg); color: var(--error); }
 .badge-warning { background-color: var(--warning-bg); color: var(--warning); }
 .badge-success { background-color: var(--success-bg); color: var(--success); }
+
+/* Responsive Utilities */
+.hidden { display: none !important; }
+
+@media (min-width: 768px) {
+  .md\:flex { display: flex !important; }
+  .md\:hidden { display: none !important; }
+}
+
+@media (max-width: 767px) {
+  /* Smaller text on mobile for header */
+  .mobile-text-xs { font-size: 0.75rem !important; }
+  .mobile-text-sm { font-size: 0.875rem !important; }
+  .mobile-text-base { font-size: 1rem !important; }
+  .mobile-text-lg { font-size: 1.125rem !important; }
+}

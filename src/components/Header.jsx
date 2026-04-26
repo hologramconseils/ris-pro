@@ -51,7 +51,7 @@ export default function Header() {
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
         <Link to="/" className="flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
           <img src="/logo.png" alt="Hologram Conseils" className="brand-logo" style={{ height: '36px', width: 'auto' }} />
-          <span className="font-bold text-xl tracking-tight">RIS Pro</span>
+          <span className="font-bold text-xl tracking-tight mobile-text-lg">RIS Pro</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -80,8 +80,7 @@ export default function Header() {
 
         {/* Mobile Toggle Button */}
         <div className="md:hidden flex items-center gap-3">
-          <ThemeToggle />
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-main">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-main" aria-label="Menu">
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -89,22 +88,30 @@ export default function Header() {
 
       {/* Mobile Navigation Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-[70px] left-0 w-full bg-page border-b border-border shadow-lg p-4 flex flex-col gap-4 animate-fade-in">
-          <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-main hover:text-primary">Accueil</Link>
-          <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-main hover:text-primary">
-            Hologram Conseils
-          </a>
-          <div className="h-px w-full bg-border my-1" />
+        <div className="md:hidden absolute top-[70px] left-0 w-full bg-page border-b border-border shadow-lg p-6 flex flex-col gap-6 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider">Navigation</span>
+            <ThemeToggle />
+          </div>
+          
+          <div className="flex flex-col gap-4">
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-main hover:text-primary mobile-text-sm">Accueil</Link>
+            <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-main hover:text-primary mobile-text-sm">
+              Hologram Conseils
+            </a>
+          </div>
+
+          <div className="h-px w-full bg-border" />
           
           {user ? (
             <button 
-              className="text-base font-medium text-primary text-left cursor-pointer bg-transparent border-none p-0"
+              className="text-base font-medium text-primary text-left cursor-pointer bg-transparent border-none p-0 mobile-text-sm"
               onClick={handleLogout}
             >
               Se déconnecter
             </button>
           ) : (
-            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-primary">
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-primary mobile-text-sm">
               Se connecter
             </Link>
           )}
