@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Sun, Moon, Monitor } from 'lucide-react'
+import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -38,10 +38,12 @@ function ThemeToggle() {
 export default function Header() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/');
+    setIsMenuOpen(false);
   };
 
   return (
@@ -51,7 +53,9 @@ export default function Header() {
           <img src="/logo.png" alt="Hologram Conseils" className="brand-logo" style={{ height: '36px', width: 'auto' }} />
           <span className="font-bold text-xl tracking-tight">RIS Pro</span>
         </Link>
-        <nav className="flex gap-4 items-center">
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-4 items-center">
           <Link to="/" className="text-sm font-medium text-muted hover:text-main">Accueil</Link>
           <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted hover:text-main">
             Hologram Conseils
@@ -73,7 +77,39 @@ export default function Header() {
 
           <ThemeToggle />
         </nav>
+
+        {/* Mobile Toggle Button */}
+        <div className="md:hidden flex items-center gap-3">
+          <ThemeToggle />
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-main">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-[70px] left-0 w-full bg-page border-b border-border shadow-lg p-4 flex flex-col gap-4 animate-fade-in">
+          <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-main hover:text-primary">Accueil</Link>
+          <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-main hover:text-primary">
+            Hologram Conseils
+          </a>
+          <div className="h-px w-full bg-border my-1" />
+          
+          {user ? (
+            <button 
+              className="text-base font-medium text-primary text-left cursor-pointer bg-transparent border-none p-0"
+              onClick={handleLogout}
+            >
+              Se déconnecter
+            </button>
+          ) : (
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-primary">
+              Se connecter
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   )
 }
