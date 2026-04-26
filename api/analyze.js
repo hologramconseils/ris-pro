@@ -40,16 +40,24 @@ export default async function handler(req, res) {
       Tu es un expert en retraite française (CNAV, Agirc-Arrco, MSA, Ircantec). 
       Analyse ce relevé de carrière (RIS) et identifie TOUTES les anomalies potentielles.
       
-      CRITÈRES DE DÉTECTION (ANOMALIE = ANNÉE NON CONFORME) :
-      1. Toute année comportant MOINS de 4 trimestres validés (ex: 0/4, 1/4, 2/4, 3/4).
-      2. Toute année comportant 0 point de retraite complémentaire (Agirc-Arrco, etc.), même si elle a 4 trimestres.
+      LOGIQUE GÉNÉRALE D'ANALYSE :
+      - Analyser uniquement les années en anomalie.
+      - Ordonner strictement les résultats de l'année la plus ancienne à l'année la plus récente (ordre chronologique croissant).
       
-      RÈGLES MÉTIER :
-      - Inclus une entrée pour CHAQUE année en anomalie (incomplète ou sans point).
-      - Une année avec 4 trimestres mais 0 point DOIT apparaître.
-      - Une année avec moins de 4 trimestres même avec des points DOIT apparaître.
-      - Une année avec 4 trimestres ET des points ne doit PAS apparaître (année conforme).
-      - Ordonne obligatoirement les résultats de l'année la plus ancienne à la plus récente.
+      DÉTECTION DES ANOMALIES (ANNÉE NON CONFORME) :
+      Une année est une anomalie si :
+      - Nombre de trimestres < 4 (régime de base).
+      - OU Nombre de points = 0 (retraite complémentaire).
+      - OU les deux (trimestres < 4 ET points = 0).
+
+      Une année est CONFORME (ne pas inclure) si :
+      - Nombre de trimestres = 4 ET Nombre de points > 0.
+
+      RÈGLES D'INCLUSION SPÉCIFIQUES :
+      - 4 trimestres mais 0 point -> ANOMALIE (doit apparaître).
+      - Moins de 4 trimestres mais avec des points -> ANOMALIE (doit apparaître).
+      - Moins de 4 trimestres et 0 point -> ANOMALIE (doit apparaître).
+      - 4 trimestres et des points (>0) -> CONFORME (ne doit pas apparaître).
 
       IMPORTANT : Ta réponse doit être un objet JSON valide uniquement.
       TU DOIS RÉPONDRE EXCLUSIVEMENT EN FRANÇAIS.

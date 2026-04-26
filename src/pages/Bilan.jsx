@@ -146,14 +146,19 @@ export default function Bilan() {
     )
   }
 
+  const currentYear = new Date().getFullYear()
   const rawAnomalies = results.anomalies || []
   const anomalies = Array.isArray(rawAnomalies) 
-    ? [...rawAnomalies].sort((a, b) => {
-        // Extraire l'année (4 premiers chiffres) pour le tri
-        const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
-        const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0')
-        return yearA - yearB
-      })
+    ? [...rawAnomalies]
+        .filter(a => {
+          const year = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
+          return year > 0 && year < currentYear
+        })
+        .sort((a, b) => {
+          const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
+          const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0')
+          return yearA - yearB
+        })
     : []
 
   return (
@@ -223,7 +228,7 @@ export default function Bilan() {
                     <div className="font-semibold">{anom.trimesters}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted">Points Agirc-Arrco</div>
+                    <div className="text-xs text-muted">Points Validés</div>
                     <div className="font-semibold">{anom.points}</div>
                   </div>
                 </div>
