@@ -302,6 +302,7 @@ export default function Diagnostic() {
           )}
         </div>
 
+      </div>
     </div>
   )
 }
