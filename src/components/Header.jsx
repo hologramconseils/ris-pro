@@ -65,13 +65,14 @@ export default function Header() {
           
           {user ? (
             <button 
-              className="text-sm font-medium text-primary hover:underline cursor-pointer bg-transparent border-none p-0"
+              className="btn btn-primary"
+              style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}
               onClick={handleLogout}
             >
               {LABELS.CTA_LOGOUT}
             </button>
           ) : (
-            <Link to="/login" className="text-sm font-medium text-primary hover:underline">
+            <Link to="/login" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
               {LABELS.CTA_LOGIN}
             </Link>
           )}
@@ -106,13 +107,13 @@ export default function Header() {
           
           {user ? (
             <button 
-              className="text-base font-medium text-primary text-left cursor-pointer bg-transparent border-none p-0 mobile-text-sm"
+              className="btn btn-primary w-full"
               onClick={handleLogout}
             >
               {LABELS.CTA_LOGOUT}
             </button>
           ) : (
-            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-primary mobile-text-sm">
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full">
               Se connecter
             </Link>
           )}
