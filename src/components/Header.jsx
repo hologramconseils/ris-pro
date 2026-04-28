@@ -50,9 +50,9 @@ export default function Header() {
   return (
     <header className="glass" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
-        <Link to="/" className="flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
-          <img src="/logo.png" alt={LABELS.BRAND_NAME} className="brand-logo" style={{ height: '36px', width: 'auto' }} />
-          <span className="font-bold text-xl tracking-tight mobile-text-lg">{LABELS.APP_NAME}</span>
+        <Link to="/" className="flex items-center gap-3" style={{ color: 'var(--text-main)' }}>
+          <img src="/logo.png" alt={LABELS.BRAND_NAME} className="brand-logo" style={{ height: '44px', width: 'auto' }} />
+          <span className="font-bold text-2xl tracking-tight mobile-text-xl">{LABELS.APP_NAME}</span>
         </Link>
         
         {/* Desktop Navigation */}
