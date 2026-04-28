@@ -302,6 +302,18 @@ export default function Diagnostic() {
           )}
         </div>
 
+        <div className="flex flex-col items-center gap-4 mt-8 mb-12">
+          <a 
+            href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn btn-primary"
+            style={{ fontSize: '1.125rem', padding: '1rem 2rem' }}
+          >
+            Ou réservez un appel gratuit de 20 min
+          </a>
+        </div>
+
       </div>
     </div>
   )

@@ -57,8 +57,8 @@ export default function Header() {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-4 items-center">
-          <Link to="/" className="text-sm font-medium text-muted hover:text-main">Accueil</Link>
-          <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted hover:text-main">
+          <Link to="/" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>Accueil</Link>
+          <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
             {LABELS.BRAND_NAME}
           </a>
           <div className="h-4 w-px bg-border mx-1" />
@@ -96,8 +96,8 @@ export default function Header() {
           </div>
           
           <div className="flex flex-col gap-4">
-            <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-main hover:text-primary mobile-text-sm">Accueil</Link>
-            <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-main hover:text-primary mobile-text-sm">
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full">Accueil</Link>
+            <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full">
               {LABELS.BRAND_NAME}
             </a>
           </div>
