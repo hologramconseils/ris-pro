@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
+import { LABELS } from '../config/labels'
 
 function ThemeToggle() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system')
@@ -50,15 +51,15 @@ export default function Header() {
     <header className="glass" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
         <Link to="/" className="flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
-          <img src="/logo.png" alt="Hologram Conseils" className="brand-logo" style={{ height: '36px', width: 'auto' }} />
-          <span className="font-bold text-xl tracking-tight mobile-text-lg">RIS Pro</span>
+          <img src="/logo.png" alt={LABELS.BRAND_NAME} className="brand-logo" style={{ height: '36px', width: 'auto' }} />
+          <span className="font-bold text-xl tracking-tight mobile-text-lg">{LABELS.APP_NAME}</span>
         </Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-4 items-center">
           <Link to="/" className="text-sm font-medium text-muted hover:text-main">Accueil</Link>
           <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted hover:text-main">
-            Hologram Conseils
+            {LABELS.BRAND_NAME}
           </a>
           <div className="h-4 w-px bg-border mx-1" />
           
@@ -67,11 +68,11 @@ export default function Header() {
               className="text-sm font-medium text-primary hover:underline cursor-pointer bg-transparent border-none p-0"
               onClick={handleLogout}
             >
-              Se déconnecter
+              {LABELS.CTA_LOGOUT}
             </button>
           ) : (
             <Link to="/login" className="text-sm font-medium text-primary hover:underline">
-              Se connecter
+              {LABELS.CTA_LOGIN}
             </Link>
           )}
 
@@ -97,7 +98,7 @@ export default function Header() {
           <div className="flex flex-col gap-4">
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-main hover:text-primary mobile-text-sm">Accueil</Link>
             <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium text-main hover:text-primary mobile-text-sm">
-              Hologram Conseils
+              {LABELS.BRAND_NAME}
             </a>
           </div>
 
@@ -108,7 +109,7 @@ export default function Header() {
               className="text-base font-medium text-primary text-left cursor-pointer bg-transparent border-none p-0 mobile-text-sm"
               onClick={handleLogout}
             >
-              Se déconnecter
+              {LABELS.CTA_LOGOUT}
             </button>
           ) : (
             <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-base font-medium text-primary mobile-text-sm">

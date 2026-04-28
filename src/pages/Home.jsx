@@ -2,9 +2,12 @@ import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../AuthContext'
+import { LABELS } from '../config/labels'
 
 export default function Home() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -28,7 +31,7 @@ export default function Home() {
       setError(null)
       handleFileUpload(droppedFile)
     } else {
-      setError("Veuillez sélectionner un fichier PDF valide.")
+      setError(LABELS.ERROR_INVALID_PDF)
     }
   }
 
@@ -38,7 +41,7 @@ export default function Home() {
       setError(null)
       handleFileUpload(selectedFile)
     } else {
-      setError("Veuillez sélectionner un fichier PDF valide.")
+      setError(LABELS.ERROR_INVALID_PDF)
     }
   }
 
@@ -48,12 +51,10 @@ export default function Home() {
     setError(null)
     
     try {
-      // 1. Générer un nom de fichier unique sécurisé
       const fileExt = selectedFile.name.split('.').pop()
       const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
       const filePath = `uploads/${fileName}`
 
-      // 2. Upload dans le bucket Supabase
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('documents')
         .upload(filePath, selectedFile, {
@@ -63,23 +64,25 @@ export default function Home() {
 
       if (uploadError) throw uploadError
 
-      // 3. Enregistrer l'analyse dans la base de données
       const { error: dbError } = await supabase
         .from('analyses')
         .insert([
-          { file_path: filePath, status: 'pending' }
+          { 
+            file_path: filePath, 
+            status: 'pending',
+            user_id: user?.id 
+          }
         ])
 
       if (dbError) throw dbError
 
-      // Redirection automatique vers le diagnostic en passant le chemin du fichier
       setTimeout(() => {
         navigate(`/diagnostic?file=${encodeURIComponent(filePath)}`)
       }, 1500)
       
     } catch (err) {
       console.error("Erreur d'upload :", err)
-      setError("Une erreur est survenue lors de l'envoi du fichier. Assurez-vous d'avoir configuré les clés Supabase dans .env.local.")
+      setError(LABELS.ERROR_UPLOAD)
     } finally {
       setIsUploading(false)
     }
@@ -100,7 +103,7 @@ export default function Home() {
         </h1>
         
         <p className="text-xl text-muted" style={{ maxWidth: '600px', marginBottom: '2rem' }}>
-          Détectez automatiquement les anomalies de droits à la retraite, vérifiez vos trimestres et obtenez un plan de régularisation concret.
+          {LABELS.TAGLINE}
         </p>
 
         {error && (
@@ -117,7 +120,7 @@ export default function Home() {
               <ShieldCheck size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--primary)' }} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Analyse experte et Sécurisation en cours...</h3>
+              <h3 className="text-lg font-semibold">{LABELS.ANALYZING}</h3>
               <p className="text-sm text-muted">Vérification de 145 règles métiers et chiffrement du document</p>
             </div>
           </div>
@@ -146,7 +149,7 @@ export default function Home() {
               </div>
               <label className="btn btn-primary" style={{ marginTop: '1rem', cursor: 'pointer' }} onClick={(e) => e.stopPropagation()}>
                 <FileText size={18} />
-                Sélectionner un fichier
+                {LABELS.CTA_SELECT_FILE}
                 <input ref={fileInputRef} type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleFileChange} />
               </label>
             </div>

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
+import { LABELS } from '../config/labels'
 
 export default function Diagnostic() {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ export default function Diagnostic() {
     if (filePath) {
       performAnalysis(filePath)
     }
-  }, [filePath])
+  }, [filePath, user?.id])
 
   const performAnalysis = async (path) => {
     try {
@@ -34,22 +35,25 @@ export default function Diagnostic() {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filePath: path })
+        body: JSON.stringify({ filePath: path, userId: user?.id })
       })
 
-      if (!response.ok) throw new Error("L'analyse a échoué")
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || LABELS.ERROR_ANALYSIS);
+      }
       
       const data = await response.json()
       setResults(data)
     } catch (err) {
       console.error(err)
-      setError("Désolé, nous n'avons pas pu analyser votre document. Vérifiez votre clé d'accès au moteur d'analyse.")
+      setError(err.message || LABELS.ERROR_ANALYSIS)
     } finally {
       setLoading(false)
     }
   }
 
-  const handlePayment = async () => {
+  const handleAction = async () => {
     if (results) {
       sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
     }
@@ -59,11 +63,16 @@ export default function Diagnostic() {
       return
     }
 
-    if (profile?.has_paid || profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com') {
+    // Si admin ou a déjà payé (legacy) ou a des crédits
+    const hasCredits = profile?.analysis_credits > 0;
+    const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
+
+    if (isAdmin || hasCredits) {
       navigate(`/bilan?success=true&file=${encodeURIComponent(filePath)}`)
       return
     }
 
+    // Sinon -> Paiement
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -151,7 +160,7 @@ export default function Diagnostic() {
           <p className="text-muted mb-6">
             {error || "Veuillez d'abord uploader votre relevé de carrière sur la page d'accueil."}
           </p>
-          <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">Retour à l'accueil</button>
+          <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
         </div>
       </div>
     )
@@ -160,7 +169,6 @@ export default function Diagnostic() {
   const rawAnomalies = results.anomalies || []
   const currentYear = new Date().getFullYear()
   
-  // Sort and filter for freemium: only oldest and newest (excluding current year)
   const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
     const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
     const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0')
@@ -190,7 +198,7 @@ export default function Diagnostic() {
           <div className="badge badge-warning" style={{ marginBottom: '1rem' }}>
             Diagnostic Freemium
           </div>
-          <h1 className="text-3xl font-bold">Votre analyse est prête.</h1>
+          <h1 className="text-3xl font-bold">{LABELS.ANALYSIS_READY}</h1>
           <p className="text-lg text-muted" style={{ marginTop: '0.5rem' }}>
             {results.summary || "Nous avons audité votre document. Voici un aperçu des erreurs identifiées."}
           </p>
@@ -272,23 +280,28 @@ export default function Diagnostic() {
               )}
 
               <button type="submit" className="btn btn-primary mt-2 w-full py-3" disabled={authLoading}>
-                {authLoading ? <Loader2 className="animate-spin" /> : 'Créer mon compte et Payer 29€'}
+                {authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}
               </button>
             </form>
           ) : (
             <>
-              <button className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }} onClick={handlePayment}>
-                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' ? "Accéder au bilan complet (Admin)" : (user ? "Continuer vers le paiement (29€)" : "Créer mon compte pour débloquer (29€)")}
+              <button className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }} onClick={handleAction}>
+                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
+                  ? "Accéder au bilan complet (Admin)" 
+                  : (user 
+                      ? (profile?.analysis_credits > 0 
+                          ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
+                          : (profile?.is_paid ? LABELS.PAYMENT_RENEW : LABELS.PAYMENT_REQUIRED))
+                      : "Créer mon compte pour débloquer (29€)")}
                 <ChevronRight size={20} />
               </button>
               <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Lock size={12} /> Paiement 100% sécurisé via Stripe
+                <Lock size={12} /> {LABELS.PAYMENT_SECURE}
               </div>
             </>
           )}
         </div>
 
-      </div>
     </div>
   )
 }

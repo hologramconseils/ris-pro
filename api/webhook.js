@@ -42,27 +42,44 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
+      const { data: currentProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('analysis_credits')
+        .eq('id', userId)
+        .single();
+
+      const newCredits = (currentProfile?.analysis_credits || 0) + 4;
+
       const { error } = await supabaseAdmin
         .from('profiles')
-        .update({ has_paid: true })
+        .update({ 
+          is_paid: true,
+          analysis_credits: newCredits 
+        })
         .eq('id', userId);
 
       if (error) {
         console.error("[Webhook] Erreur mise à jour profil :", error.message);
       } else {
-        // Envoi email de bienvenue
+        // Envoi email de bienvenue (Contenu mis à jour selon instructions)
         if (process.env.RESEND_API_KEY && userEmail) {
           try {
             await resend.emails.send({
               from: 'RIS Pro <bertrand.saulnerond@hologramconseils.com>',
               to: [userEmail],
-              subject: 'Bienvenue sur RIS Pro - Accès illimité activé !',
+              subject: 'Confirmation de votre accès RIS Pro',
               html: `
-                <h1>Merci pour votre confiance !</h1>
-                <p>Votre paiement a bien été validé. Vous disposez désormais d'un accès illimité à vie pour toutes vos analyses détaillées.</p>
-                <p>Connectez-vous à tout moment sur RIS Pro pour réaliser de nouvelles analyses.</p>
+                <h1>Confirmation de votre accès RIS Pro</h1>
+                <p>Votre paiement a bien été pris en compte.</p>
+                <p>Vous bénéficiez désormais de :</p>
+                <ul>
+                  <li><strong>4 analyses détaillées</strong> de relevés de carrière</li>
+                </ul>
+                <p>Chaque analyse correspond à une identité unique.</p>
+                <p>Vous pouvez vous reconnecter à tout moment avec votre adresse email pour continuer vos analyses. Un compteur vous indiquera le nombre d'analyses restantes.</p>
+                <p>Une fois les 4 analyses utilisées, un nouveau paiement sera nécessaire pour accéder à un nouveau pack.</p>
                 <br/>
-                <p>L'équipe Hologram Conseils</p>
+                <p>L'équipe RIS Pro</p>
               `
             });
           } catch (resendError) {

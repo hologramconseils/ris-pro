@@ -1,15 +1,16 @@
 import React from 'react'
+import { LABELS } from '../config/labels'
 
 export default function MentionsLegales() {
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1, maxWidth: '800px' }}>
-      <h1 className="text-3xl font-bold mb-6">Mentions Légales</h1>
+      <h1 className="text-3xl font-bold mb-6">{LABELS.LEGAL_MENTIONS}</h1>
       
       <div className="card flex flex-col gap-6">
         <section>
           <h2 className="text-xl font-semibold mb-2">1. Éditeur du site</h2>
           <p className="text-muted">
-            Le site RIS Pro est édité par <strong>Hologram Conseils</strong>.<br/>
+            Le site {LABELS.APP_NAME} est édité par <strong>{LABELS.BRAND_NAME}</strong>.<br/>
             Forme juridique : Entreprise individuelle<br/>
             Siège social : 7 rue javary, 59800 Lille<br/>
             SIREN : 899864318<br/>

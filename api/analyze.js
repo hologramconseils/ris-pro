@@ -15,11 +15,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
-  const { filePath } = req.body;
+  const { filePath, userId } = req.body;
 
   if (!filePath) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
+
+  const nirSalt = process.env.NIR_SALT || 'default_salt_for_ris_pro';
 
   try {
     // 1. Télécharger le fichier depuis Supabase Storage
@@ -39,6 +41,9 @@ export default async function handler(req, res) {
     const prompt = `
       Tu es un expert en retraite française (CNAV, Agirc-Arrco, MSA, Ircantec). 
       Analyse ce relevé de carrière (RIS) et identifie TOUTES les anomalies potentielles.
+      
+      EXTRACTION CRITIQUE :
+      - Extrais le Numéro de Sécurité Sociale (NIR) complet de la personne (15 chiffres).
       
       LOGIQUE GÉNÉRALE D'ANALYSE :
       - Analyser uniquement les années en anomalie.
@@ -64,6 +69,7 @@ export default async function handler(req, res) {
       
       Structure attendue :
       {
+        "nir": "XXXXXXXXXXXXXXX",
         "anomalies": [
           {
             "year": "YYYY",
@@ -100,13 +106,52 @@ export default async function handler(req, res) {
       throw new Error("Le moteur d'analyse n'a pas renvoyé un format JSON valide");
     }
     const analysisResults = JSON.parse(jsonMatch[0]);
+    const nir = analysisResults.nir;
+    delete analysisResults.nir; // On ne stocke pas le NIR en clair dans les résultats
 
-    // 3. Mettre à jour le statut et les résultats dans la base de données
+    // 3. Gestion de la sécurité et des crédits (NIR Hashing)
+    const crypto = await import('crypto');
+    const nirHash = crypto.createHash('sha256').update(nir + nirSalt).digest('hex');
+    
+    if (userId) {
+      // Vérifier si cette identité a déjà été analysée par cet utilisateur
+      const { data: existingAnalysis } = await supabase
+        .from('analyses')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('nir_hash', nirHash)
+        .limit(1);
+
+      if (!existingAnalysis || existingAnalysis.length === 0) {
+        // Nouvelle identité : vérifier et décrémenter les crédits
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('analysis_credits, role')
+          .eq('id', userId)
+          .single();
+
+        if (profile && profile.role !== 'admin') {
+          if (profile.analysis_credits <= 0) {
+            return res.status(403).json({ 
+              error: "Crédits insuffisants", 
+              message: "Vous avez utilisé vos 4 analyses. Veuillez renouveler votre pack." 
+            });
+          }
+          
+          // Décrémenter via la fonction RPC sécurisée
+          await supabase.rpc('decrement_analysis_credits', { user_uuid: userId });
+        }
+      }
+    }
+
+    // 4. Mettre à jour le statut, les résultats et le hash dans la base de données
     await supabase
       .from('analyses')
       .update({ 
         status: 'completed',
-        results: analysisResults 
+        results: analysisResults,
+        nir_hash: nirHash,
+        user_id: userId
       })
       .eq('file_path', filePath);
 

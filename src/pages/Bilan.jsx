@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate, Navigate } from 'react-router-dom'
 import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle, Loader2, Lock } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
+import { LABELS } from '../config/labels'
 
 export default function Bilan() {
   const [searchParams] = useSearchParams()
@@ -22,19 +23,18 @@ export default function Bilan() {
     }
 
     // Si on vient de payer mais que le profil n'est pas encore à jour (latence Webhook)
-    if (isSuccess && user && profile && !profile.has_paid) {
+    if (isSuccess && user && profile && profile.analysis_credits === 0) {
       const timer = setTimeout(() => {
         refreshProfile()
-      }, 3000) // 3 secondes pour être large
+      }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [filePath, isSuccess, user, profile?.has_paid])
+  }, [filePath, isSuccess, user, profile?.analysis_credits])
 
   const fetchAnalysis = async (path) => {
     try {
       setLoading(true)
 
-      // 1. D'abord on vérifie la session (pour l'affichage instantané après analyse)
       const cached = sessionStorage.getItem(`ris_pro_analysis_${path}`);
       if (cached) {
         setResults(JSON.parse(cached));
@@ -42,7 +42,6 @@ export default function Bilan() {
         return;
       }
 
-      // 2. Sinon, on tente la base de données
       const { data, error: dbError } = await supabase
         .from('analyses')
         .select('results')
@@ -54,7 +53,7 @@ export default function Bilan() {
       if (data && data.length > 0 && data[0].results) {
         setResults(data[0].results)
       } else {
-        throw new Error("Aucun résultat trouvé pour ce document. Assurez-vous d'avoir lancé l'analyse sur la page d'accueil.")
+        throw new Error("Aucun résultat trouvé pour ce document.")
       }
     } catch (err) {
       console.error(err)
@@ -64,40 +63,20 @@ export default function Bilan() {
     }
   }
 
-  const handleExport = () => {
-    window.print()
-  }
-
-  if (authLoading) {
-    return (
-      <div className="container flex items-center justify-center" style={{ flex: 1 }}>
-        <div className="flex flex-col items-center gap-4 text-primary">
-          <Loader2 className="animate-spin" size={32} />
-          <p>Vérification des accès...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // État de transition : on vient de payer, on attend la confirmation du webhook
-  const isWaitingForPayment = isSuccess && user && profile && !profile.has_paid
-
-  // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Utilisateur a payé) OU (Retour immédiat de paiement réussi)
-  const isAuthorized = profile?.role === 'admin' || isMock || profile?.has_paid || isSuccess
-
-  // Si on est en train de charger l'auth
   if (authLoading && !isSuccess) {
     return (
-      <div className="container flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: '1.5rem' }}>
-        <Loader2 size={48} className="animate-spin text-primary" />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Vérification de votre accès...</h2>
+      <div className="container flex items-center justify-center" style={{ minHeight: '60vh' }}>
+        <div className="flex flex-col items-center gap-4 text-primary">
+          <Loader2 className="animate-spin" size={32} />
+          <p>{LABELS.VERIFYING_ACCESS}</p>
         </div>
       </div>
     )
   }
 
-  // Si on n'est pas autorisé
+  // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Accès payé legacy) OU (Crédits > 0) OU (Retour immédiat de paiement réussi)
+  const isAuthorized = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess
+
   if (!isAuthorized) {
     return (
       <div className="container flex flex-col items-center justify-center gap-6" style={{ flex: 1, padding: '4rem 1.5rem', textAlign: 'center' }}>
@@ -106,14 +85,14 @@ export default function Bilan() {
         </div>
         <h1 className="text-3xl font-bold">Accès Restreint</h1>
         <p className="text-muted max-w-lg">
-          Vous devez posséder un compte et avoir débloqué l'accès Premium pour consulter le bilan détaillé.
+          Vous devez avoir débloqué l'accès pour consulter le bilan détaillé.
         </p>
         <div className="flex gap-4">
           <button className="btn btn-secondary" onClick={() => refreshProfile()}>
-            Actualiser mon statut
+            {LABELS.CTA_REFRESH_STATUS}
           </button>
-          <button className="btn btn-primary" onClick={() => navigate('/login')}>
-            Se connecter
+          <button className="btn btn-primary" onClick={() => navigate('/')}>
+            {LABELS.CTA_START_ANALYSIS}
           </button>
         </div>
       </div>
@@ -125,7 +104,7 @@ export default function Bilan() {
       <div className="container flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: '2rem' }}>
         <Loader2 size={48} className="animate-spin text-primary" />
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Chargement de votre bilan premium...</h2>
+          <h2 className="text-2xl font-bold mb-2">{LABELS.LOADING_REPORT}</h2>
           <p className="text-muted">Récupération des données sécurisées</p>
         </div>
       </div>
@@ -139,8 +118,9 @@ export default function Bilan() {
           <AlertTriangle size={48} className="text-warning mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Erreur de récupération</h2>
           <p className="text-muted mb-6">
-            {error || "Nous n'avons pas pu charger votre bilan. Veuillez réessayer."}
+            {error || LABELS.ERROR_FETCH}
           </p>
+          <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
         </div>
       </div>
     )
@@ -202,7 +182,6 @@ export default function Bilan() {
 
           {anomalies.map((anom, idx) => (
             <div key={idx} className="card" style={{ padding: '0', overflow: 'hidden', marginBottom: '2rem' }}>
-              {/* Header */}
               <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="flex justify-between items-center flex-wrap gap-4">
                 <div className="flex items-center gap-4">
                   <div style={{ background: 'var(--error-bg)', color: 'var(--error)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
@@ -215,9 +194,7 @@ export default function Bilan() {
                 <div className="badge badge-error">Anomalie confirmée</div>
               </div>
               
-              {/* Body */}
               <div style={{ padding: '1.5rem' }} className="flex flex-col gap-6">
-                {/* Data context */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', background: 'var(--bg-page)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
                   <div>
                     <div className="text-xs text-muted">Salaire Brut (ou nature)</div>
@@ -233,7 +210,6 @@ export default function Bilan() {
                   </div>
                 </div>
 
-                {/* Explanation */}
                 <div>
                   <h4 className="font-semibold flex items-center gap-2 text-error mb-2">
                     <AlertTriangle size={16} /> Explication de l'erreur
@@ -241,7 +217,6 @@ export default function Bilan() {
                   <p className="text-muted">{anom.reason}</p>
                 </div>
                 
-                {/* Solution & Docs */}
                 <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
                   <h4 className="font-semibold flex items-center gap-2 text-success mb-2">
                     <CheckCircle2 size={16} /> Action requise
