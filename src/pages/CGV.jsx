@@ -26,7 +26,7 @@ export default function CGV() {
         <section>
           <h2 className="text-xl font-semibold mb-2">3. Délivrance du service</h2>
           <p className="text-muted">
-            Les crédits d'analyse sont crédités sur le compte de l'utilisateur instantanément après la validation du paiement par Stripe. Chaque analyse d'une nouvelle identité (détectée par le numéro de sécurité sociale) décompte un crédit.
+            Les crédits d'analyse sont crédités sur le compte de l'utilisateur instantanément après la validation du paiement par Stripe. Chaque analyse d'une nouvelle identité décompte un crédit.
           </p>
         </section>
 
