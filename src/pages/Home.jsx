@@ -147,7 +147,7 @@ export default function Home() {
                 <h3 className="text-lg font-semibold">Uploader mon relevé de carrière</h3>
                 <p className="text-sm text-muted">Glissez-déposez votre RIS / EIG au format PDF ou cliquez pour parcourir.</p>
               </div>
-              <label className="btn btn-primary" style={{ marginTop: '1rem', cursor: 'pointer' }} onClick={(e) => e.stopPropagation()}>
+              <label className="btn btn-primary" style={{ cursor: 'pointer' }} onClick={(e) => e.stopPropagation()}>
                 <FileText size={18} />
                 {LABELS.CTA_SELECT_FILE}
                 <input ref={fileInputRef} type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleFileChange} />

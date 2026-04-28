@@ -198,7 +198,7 @@ export default function Login() {
 
           <button 
             type="submit" 
-            className="btn btn-primary mt-4 py-3" 
+            className="btn btn-primary" 
             disabled={loading}
           >
             {loading ? <Loader2 className="animate-spin" /> : (isResetting ? 'Mettre à jour le mot de passe' : (isLogin ? 'Se connecter' : 'Créer mon compte'))}

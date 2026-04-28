@@ -279,13 +279,13 @@ export default function Diagnostic() {
                 </div>
               )}
 
-              <button type="submit" className="btn btn-primary mt-2 w-full py-3" disabled={authLoading}>
+              <button type="submit" className="btn btn-primary mt-2 w-full" disabled={authLoading}>
                 {authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}
               </button>
             </form>
           ) : (
             <>
-              <button className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }} onClick={handleAction}>
+              <button className="btn btn-primary" onClick={handleAction}>
                 {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
                   ? "Accéder au bilan complet (Admin)" 
                   : (user 
@@ -308,7 +308,6 @@ export default function Diagnostic() {
             target="_blank" 
             rel="noopener noreferrer"
             className="btn btn-primary"
-            style={{ fontSize: '1.125rem', padding: '1rem 2rem' }}
           >
             Ou réservez un appel gratuit de 20 min
           </a>

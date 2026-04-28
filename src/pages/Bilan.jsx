@@ -88,7 +88,7 @@ export default function Bilan() {
           Vous devez avoir débloqué l'accès pour consulter le bilan détaillé.
         </p>
         <div className="flex gap-4">
-          <button className="btn btn-secondary" onClick={() => refreshProfile()}>
+          <button className="btn btn-primary" onClick={() => refreshProfile()}>
             {LABELS.CTA_REFRESH_STATUS}
           </button>
           <button className="btn btn-primary" onClick={() => navigate('/')}>
@@ -120,7 +120,7 @@ export default function Bilan() {
           <p className="text-muted mb-6">
             {error || LABELS.ERROR_FETCH}
           </p>
-          <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
+          <button onClick={() => navigate('/')} className="btn btn-primary">{LABELS.CTA_RETRY}</button>
         </div>
       </div>
     )

@@ -57,8 +57,8 @@ export default function Header() {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-4 items-center">
-          <Link to="/" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>Accueil</Link>
-          <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
+          <Link to="/" className="btn btn-primary">Accueil</Link>
+          <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
             {LABELS.BRAND_NAME}
           </a>
           <div className="h-4 w-px bg-border mx-1" />
@@ -66,13 +66,12 @@ export default function Header() {
           {user ? (
             <button 
               className="btn btn-primary"
-              style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}
               onClick={handleLogout}
             >
               {LABELS.CTA_LOGOUT}
             </button>
           ) : (
-            <Link to="/login" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
+            <Link to="/login" className="btn btn-primary">
               {LABELS.CTA_LOGIN}
             </Link>
           )}
