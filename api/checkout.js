@@ -17,8 +17,8 @@ export default async function handler(req, res) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: 'Audit Complet RIS Pro',
-              description: 'Analyse détaillée de votre relevé de carrière et plan de régularisation.',
+              name: 'Pack 4 Analyses RIS Pro',
+              description: 'Accès complet pour 4 analyses détaillées de relevés de carrière (RIS / EIG).',
             },
             unit_amount: 2900,
           },
