@@ -4,6 +4,9 @@ import fitz # PyMuPDF
 import re
 import base64
 import datetime
+import pytesseract
+from PIL import Image
+import io
 
 def parse_ris_file(file_path: str):
     """
@@ -51,6 +54,22 @@ def parse_ris_file(file_path: str):
         # Detection of scanned PDF (UI flag for OCR warning)
         if len(doc_text.strip()) < 2000 or len(doc_text.strip()) / max(1, len(doc)) < 100:
             is_scanned = True
+            
+            # Perform OCR on the first 5 pages to get meaningful text for Mistral
+            # We use the already captured images if available, or generate them specifically
+            ocr_text = ""
+            for i in range(min(5, len(images))):
+                try:
+                    img_bytes = base64.b64decode(images[i])
+                    img = Image.open(io.BytesIO(img_bytes))
+                    # OCR with French language support
+                    page_text = pytesseract.image_to_string(img, lang='fra')
+                    ocr_text += f"\n--- PAGE {i+1} (OCR) ---\n{page_text}\n"
+                except Exception as ocr_err:
+                    print(f"OCR Error on page {i}: {ocr_err}")
+            
+            if ocr_text:
+                doc_text = ocr_text + "\n" + doc_text
         ### END FROZEN MODULE ###
         
         doc.close()

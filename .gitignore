@@ -3,8 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
+test_env/
 .env
 *.db
+*.md
+!README.md
 
 # Node
 node_modules/
