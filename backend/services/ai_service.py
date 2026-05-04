@@ -227,7 +227,10 @@ Format de sortie attendu (JSON valide) :
     res = None
     
     # 1. Priorité MISTRAL (Texte uniquement)
-    if MISTRAL_API_KEY and not MISTRAL_DISABLED:
+    # OPTIMISATION : Si c'est un scan et qu'on a presque pas de texte (pas d'OCR), on saute Mistral
+    skip_mistral = is_scan and len(raw_text.strip()) < 200
+    
+    if MISTRAL_API_KEY and not MISTRAL_DISABLED and not skip_mistral:
         logger.info(f"Début analyse Mistral pour {filename}...")
         mistral_prompt = base_prompt + f"\n\nDonnées pré-analysées :\n{json.dumps(anomalies, ensure_ascii=False, indent=2)}\n\nTexte extrait :\n{raw_text}"
         start_time = time.time()

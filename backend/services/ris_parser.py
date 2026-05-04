@@ -58,15 +58,23 @@ def parse_ris_file(file_path: str):
             # Perform OCR on the first 5 pages to get meaningful text for Mistral
             # We use the already captured images if available, or generate them specifically
             ocr_text = ""
-            for i in range(min(5, len(images))):
-                try:
-                    img_bytes = base64.b64decode(images[i])
-                    img = Image.open(io.BytesIO(img_bytes))
-                    # OCR with French language support
-                    page_text = pytesseract.image_to_string(img, lang='fra')
-                    ocr_text += f"\n--- PAGE {i+1} (OCR) ---\n{page_text}\n"
-                except Exception as ocr_err:
-                    print(f"OCR Error on page {i}: {ocr_err}")
+            
+            # Check if tesseract is installed (Vercel/Serverless safety)
+            import shutil
+            tesseract_exists = shutil.which("tesseract") is not None
+            
+            if tesseract_exists:
+                for i in range(min(5, len(images))):
+                    try:
+                        img_bytes = base64.b64decode(images[i])
+                        img = Image.open(io.BytesIO(img_bytes))
+                        # OCR with French language support
+                        page_text = pytesseract.image_to_string(img, lang='fra')
+                        ocr_text += f"\n--- PAGE {i+1} (OCR) ---\n{page_text}\n"
+                    except Exception as ocr_err:
+                        print(f"OCR Error on page {i}: {ocr_err}")
+            else:
+                print("Tesseract binary not found. Skipping local OCR, will rely on Gemini Vision.")
             
             if ocr_text:
                 doc_text = ocr_text + "\n" + doc_text
