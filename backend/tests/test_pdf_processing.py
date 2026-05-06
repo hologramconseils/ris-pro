@@ -46,7 +46,9 @@ class TestPDFProcessing(unittest.IsolatedAsyncioTestCase):
     @patch("services.ris_parser.fitz.open")
     @patch("services.ris_parser.pytesseract.image_to_string")
     @patch("services.ris_parser.Image.open")
-    def test_ris_parser_scanned(self, mock_img_open, mock_ocr, mock_fitz):
+    @patch("shutil.which")
+    def test_ris_parser_scanned(self, mock_which, mock_img_open, mock_ocr, mock_fitz):
+        mock_which.return_value = "/usr/bin/tesseract"
         # Mock a scanned PDF (very little native text)
         mock_doc = MagicMock()
         mock_page = MagicMock()
@@ -101,7 +103,7 @@ class TestPDFProcessing(unittest.IsolatedAsyncioTestCase):
             "compte_rendu": "RAS"
         })
         
-        res_json = await ai_service.generate_ai_audit([], "test.pdf", raw_text="OCR text", images=["img1"])
+        res_json = await ai_service.generate_ai_audit([], "test.pdf", raw_text="OCR text" * 50, images=["img1"])
         res = json.loads(res_json)
         
         self.assertIn("Vision OK", res["resume_global"])

@@ -120,6 +120,9 @@ async def run_full_analysis_worker(
         # Step 1: Initial Parsing (Fast)
         parser_res = ris_parser.parse_ris_file(file_path)
         
+        if "error" in parser_res and parser_res["error"]:
+            raise Exception(parser_res["error"])
+        
         # Calculate reliability score and technical audit
         career_raw = parser_res.get("career_data", [])
         technical_audit = []

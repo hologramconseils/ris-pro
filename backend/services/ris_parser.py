@@ -7,6 +7,7 @@ import datetime
 import pytesseract
 from PIL import Image
 import io
+import concurrent.futures
 
 def parse_ris_file(file_path: str):
     """
@@ -41,11 +42,11 @@ def parse_ris_file(file_path: str):
         
         
         # ALWAYS capture page images for AI context (Gemini Vision is superior for table analysis)
-        # Limit to first 12 pages for performance/cost balance
-        for i in range(min(12, len(doc))):
+        # Limit to first 4 pages for performance/cost balance and memory constraints
+        for i in range(min(4, len(doc))):
             page = doc[i]
-            pix = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5)) # Standard quality
-            img_data = pix.tobytes("jpg", jpg_quality=65)
+            pix = page.get_pixmap(matrix=fitz.Matrix(1.0, 1.0)) # Reduced quality for anti-OOM
+            img_data = pix.tobytes("jpg", jpg_quality=50)
             base64_img = base64.b64encode(img_data).decode('utf-8')
             images.append(base64_img)
             pix = None
@@ -64,15 +65,20 @@ def parse_ris_file(file_path: str):
             tesseract_exists = shutil.which("tesseract") is not None
             
             if tesseract_exists:
-                for i in range(min(5, len(images))):
-                    try:
-                        img_bytes = base64.b64decode(images[i])
-                        img = Image.open(io.BytesIO(img_bytes))
-                        # OCR with French language support
-                        page_text = pytesseract.image_to_string(img, lang='fra')
-                        ocr_text += f"\n--- PAGE {i+1} (OCR) ---\n{page_text}\n"
-                    except Exception as ocr_err:
-                        print(f"OCR Error on page {i}: {ocr_err}")
+                # Use ThreadPoolExecutor to enforce a strict timeout on OCR per page
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    for i in range(min(4, len(images))): # Limit to 4 pages max matching the images length
+                        try:
+                            img_bytes = base64.b64decode(images[i])
+                            img = Image.open(io.BytesIO(img_bytes))
+                            # OCR with French language support, with a 6 seconds timeout
+                            future = executor.submit(pytesseract.image_to_string, img, lang='fra')
+                            page_text = future.result(timeout=6)
+                            ocr_text += f"\n--- PAGE {i+1} (OCR) ---\n{page_text}\n"
+                        except concurrent.futures.TimeoutError:
+                            print(f"OCR Timeout on page {i} (exceeded 6s), skipping page.")
+                        except Exception as ocr_err:
+                            print(f"OCR Error on page {i}: {ocr_err}")
             else:
                 print("Tesseract binary not found. Skipping local OCR, will rely on Gemini Vision.")
             
