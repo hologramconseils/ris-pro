@@ -84,7 +84,7 @@ export default async function handler(req, res) {
 
     // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles)
     // On privilégie 1.5-flash pour la rapidité et l'OCR performant sur Vercel (limite 10s)
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest", "gemini-1.5-flash"];
     let analysisResults = null;
     let nir = null;
     let lastError = null;
