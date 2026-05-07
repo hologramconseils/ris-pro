@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
 
@@ -46,26 +46,15 @@ export default function Diagnostic() {
       })
 
       if (!response.ok) {
-        let errorMessage = LABELS.ERROR_ANALYSIS;
-        try {
-          const errData = await response.json();
-          errorMessage = errData.message || errData.error || errData.details || errData.detail || LABELS.ERROR_ANALYSIS;
-        } catch (e) {
-          const text = await response.text().catch(() => "");
-          errorMessage = text || `Erreur serveur (${response.status})`;
-        }
-        throw new Error(errorMessage);
+        const errData = await response.json();
+        throw new Error(errData.message || LABELS.ERROR_ANALYSIS);
       }
       
       const data = await response.json()
       setResults(data)
-      if (path) {
-        sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(data));
-      }
     } catch (err) {
-      console.error("Erreur performAnalysis:", err)
-      const msg = err instanceof Error ? err.message : String(err);
-      setError(msg || LABELS.ERROR_ANALYSIS)
+      console.error(err)
+      setError(err.message || LABELS.ERROR_ANALYSIS)
     } finally {
       setLoading(false)
     }
@@ -178,16 +167,6 @@ export default function Diagnostic() {
           <p className="text-muted mb-6">
             {error || "Veuillez d'abord uploader votre relevé de carrière sur la page d'accueil."}
           </p>
-          
-          {error && (
-            <details style={{ textAlign: 'left', marginBottom: '2rem', fontSize: '12px' }}>
-              <summary style={{ cursor: 'pointer', color: 'var(--text-subtle)', marginBottom: '0.5rem' }}>Détails techniques</summary>
-              <pre style={{ background: 'var(--bg-page)', padding: '1rem', borderRadius: 'var(--radius-sm)', overflowX: 'auto', color: 'var(--danger)' }}>
-                {error}
-              </pre>
-            </details>
-          )}
-
           <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
         </div>
       </div>

@@ -104,6 +104,7 @@ export default function Home() {
         
         <p className="text-xl text-muted" style={{ maxWidth: '600px', marginBottom: '2rem' }}>
           {LABELS.TAGLINE}
+          <span style={{ display: 'none' }}>v2.2-20260507 (Restored UI)</span>
         </p>
 
         {error && (

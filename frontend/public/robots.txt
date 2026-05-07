@@ -1,10 +1,4 @@
 User-agent: *
 Allow: /
-Allow: /politique-de-confidentialite
-Allow: /mentions-legales
-Disallow: /dashboard
-Disallow: /history
-Disallow: /result
-Disallow: /admin
 
 Sitemap: https://ris.hologramconseils.com/sitemap.xml

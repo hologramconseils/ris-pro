@@ -1,75 +1,41 @@
-import { Routes, Route, useSearchParams } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
-import { ThemeProvider } from './context/ThemeContext'
-import Navbar from './components/Navbar'
-import LandingPage from './pages/LandingPage'
-import PaymentSuccess from './pages/PaymentSuccess'
-import History from './pages/History'
-import ResetPassword from './pages/ResetPassword'
-import DetailedResultPage from './pages/DetailedResultPage'
-import Mentions from './pages/Mentions'
-import CGV from './pages/CGV'
-import Privacy from './pages/Privacy'
-import Security from './pages/Security'
-import AdminDashboard from './pages/AdminDashboard'
-import Dashboard from './pages/Dashboard'
-import PreviewPage from './pages/PreviewPage'
-import Diagnostic from './pages/Diagnostic'
-import NotFound from './pages/NotFound'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Header from './components/Header'
 import Footer from './components/Footer'
+import Home from './pages/Home'
+import Diagnostic from './pages/Diagnostic'
+import Bilan from './pages/Bilan'
+import Login from './pages/Login'
+import MentionsLegales from './pages/MentionsLegales'
+import CGV from './pages/CGV'
+import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite'
+import Securite from './pages/Securite'
+import { AuthProvider } from './AuthContext'
 
-function AppContent() {
-  const { user } = useAuth()
-  const [searchParams] = useSearchParams()
-  const isPaymentSuccess = searchParams.get('payment_success') === '1'
-
+function App() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
-      <div style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={
-            user ? <Dashboard /> : (isPaymentSuccess ? <PaymentSuccess /> : <LandingPage />)
-          } />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
-          <Route path="/preview/:id" element={<PreviewPage />} />
-          <Route path="/diagnostic" element={<Diagnostic />} />
-          {/* Legacy Routes for compatibility */}
-          <Route path="/result/:id" element={<DetailedResultPage />} />
-          <Route path="/detailed/:id" element={<DetailedResultPage />} />
-          <Route path="/login" element={<LandingPage />} />
-          <Route path="/register" element={<LandingPage />} />
-          <Route path="/mentions" element={<Mentions />} />
-          <Route path="/cgv" element={<CGV />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="/legal" element={<Mentions />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+    <AuthProvider>
+      <Router>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Header />
+        <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/diagnostic" element={<Diagnostic />} />
+            <Route path="/bilan" element={<Bilan />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/cgv" element={<CGV />} />
+            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+            <Route path="/securite" element={<Securite />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </Router>
+    </AuthProvider>
   )
 }
 
-import ErrorBoundary from './components/ErrorBoundary'
-import { ColdStartProvider, ColdStartLoader } from './context/ColdStartContext'
 
-export default function App() {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <ColdStartProvider>
-          <ColdStartLoader />
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
-        </ColdStartProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  )
-}
+export default App
