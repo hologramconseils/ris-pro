@@ -178,6 +178,16 @@ export default function Diagnostic() {
           <p className="text-muted mb-6">
             {error || "Veuillez d'abord uploader votre relevé de carrière sur la page d'accueil."}
           </p>
+          
+          {error && (
+            <details style={{ textAlign: 'left', marginBottom: '2rem', fontSize: '12px' }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--text-subtle)', marginBottom: '0.5rem' }}>Détails techniques</summary>
+              <pre style={{ background: 'var(--bg-page)', padding: '1rem', borderRadius: 'var(--radius-sm)', overflowX: 'auto', color: 'var(--danger)' }}>
+                {error}
+              </pre>
+            </details>
+          )}
+
           <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
         </div>
       </div>
