@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     return res.status(200).json({ 
       status: 'ok', 
-      version: 'v2.3-20260507',
+      version: 'v2.4-20260507',
       config: {
         google: !!apiKey,
         mistral: !!mistralApiKey,
