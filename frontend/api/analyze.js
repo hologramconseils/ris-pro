@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import axios from "axios";
 
 // Initialisation de Supabase (Admin pour lire les fichiers privés)
 const supabase = createClient(
