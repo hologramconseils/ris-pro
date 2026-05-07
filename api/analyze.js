@@ -75,41 +75,47 @@ export default async function handler(req, res) {
     let lastError = null;
 
     const prompt = `
-      Tu es l'expert retraite de Hologram Conseils spécialisé dans l'audit des relevés de carrière (RIS). 
-      Analyse ce document et identifie TOUTES les anomalies potentielles.
+      Tu es l'expert retraite de Hologram Conseils spécialisé dans l'audit des relevés de carrière (RIS / EIG). 
+      
+      TON OBJECTIF : 
+      Extraire avec une précision de 100% les données de carrière du document PDF fourni. 
+      Le document peut être un PDF natif ou un document scanné (OCR requis).
       
       EXTRACTION CRITIQUE :
-      - Extrais le Numéro de Sécurité Sociale (NIR) complet de la personne (15 chiffres).
+      - NIR : Identifie le Numéro de Sécurité Sociale (15 chiffres). Il est souvent en haut du document.
+      - CARRIÈRE : Liste toutes les années travaillées. Pour chaque année, identifie :
+        - Les trimestres validés (ex: 4/4).
+        - Les points Agirc-Arrco (souvent dans une colonne dédiée à la fin).
+        - L'employeur ou le régime.
       
-      RÈGLES MÉTIER RIS PRO :
-      1. Analyser uniquement les années révolues (jusqu'à l'année dernière).
-      2. Une année est en ANOMALIE si :
-         - Trimestres validés < 4 (Régime de base).
-         - OU Points < 1 (Retraite complémentaire Agirc-Arrco).
-      3. Une année est CONFORME (ne pas inclure) si :
-         - Trimestres = 4 ET Points > 0.
-
-      IMPORTANT : Réponds EXCLUSIVEMENT en JSON valide. Pas de texte avant ou après.
+      RÈGLES D'AUDIT RIS PRO :
+      1. Ignorer l'année en cours.
+      2. ANOMALIE si : Trimestres < 4 OU Points < 1 (pour les salariés du privé).
+      3. Ignorer les années conformes (4 trimestres et points > 0).
       
-      Structure attendue :
+      INSTRUCTIONS SPÉCIALES POUR LES SCANS :
+      - Si le texte est mal reconnu, utilise le contexte visuel pour déduire les chiffres.
+      - Les montants de salaires doivent être extraits sans les symboles monétaires.
+      
+      STRUCTURE JSON ATTENDUE :
       {
         "nir": "XXXXXXXXXXXXXXX",
         "anomalies": [
           {
             "year": "YYYY",
-            "title": "Titre court (ex: Année incomplète)",
-            "description": "Description concise de l'écart observé",
-            "employer": "Nom de l'employeur ou régime",
-            "salary": "Salaire déclaré",
+            "title": "Titre explicatif",
+            "description": "Détail de l'anomalie",
+            "employer": "Nom de l'employeur",
+            "salary": "Montant",
             "trimesters": "X/4",
             "points": "X.XX",
-            "reason": "Pourquoi est-ce une anomalie ?",
-            "solution": "Action corrective à mener",
-            "docs": ["Liste des justificatifs requis"],
-            "severity": "high"
+            "reason": "Explication technique",
+            "solution": "Comment corriger ?",
+            "docs": ["Justificatif 1", "Justificatif 2"],
+            "severity": "high/medium"
           }
         ],
-        "summary": "Résumé global de l'audit (ex: Bonjour [Prénom], votre carrière présente X anomalies...)"
+        "summary": "Message personnalisé pour l'utilisateur"
       }
     `;
 
