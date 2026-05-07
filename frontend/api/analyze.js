@@ -10,8 +10,8 @@ const supabase = createClient(
 
 // Initialisation du moteur d'analyse
 // On utilise la clé du projet ou la clé de secours validée
-const apiKey = process.env.GOOGLE_API_KEY || "AIzaSyCxM3UCKEDTGYq0De5R6Vq_kMdOWeEGpLs";
-const genAI = new GoogleGenerativeAI(apiKey);
+const apiKey = process.env.GOOGLE_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export default async function handler(req, res) {
   // Gestion CORS pour Vercel Functions
@@ -34,6 +34,10 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
+
+  if (!genAI) {
+    return res.status(500).json({ error: 'Le moteur d\'IA n\'est pas configuré (Clé API manquante)' });
   }
 
   const { filePath, userId } = req.body;

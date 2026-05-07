@@ -107,6 +107,7 @@ export default function LandingPage() {
           <p className="hero-subtitle">
             Votre Relevé Individuel de Situation contient peut-être des erreurs qui impactent votre future retraite.
             Téléversez votre fichier et obtenez un diagnostic gratuit immédiat.
+            <span style={{ display: 'none' }}>v2.1-20260507</span>
           </p>
         </motion.div>
 
