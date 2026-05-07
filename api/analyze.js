@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({ status: 'ok', message: 'Analysis engine is ready', version: 'v2.1-20260507' });
+    return res.status(200).json({ status: 'ok', message: 'Analysis engine is ready', version: 'v2.2-20260507' });
   }
 
   if (req.method !== 'POST') {
@@ -69,11 +69,14 @@ export default async function handler(req, res) {
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
     // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles)
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"];
+    // On privilégie 1.5-flash pour la rapidité et l'OCR performant sur Vercel (limite 10s)
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
     let analysisResults = null;
     let nir = null;
     let lastError = null;
 
+    console.log("Starting Gemini analysis...");
+    
     const prompt = `
       Tu es l'expert retraite de Hologram Conseils spécialisé dans l'audit des relevés de carrière (RIS / EIG). 
       
@@ -118,13 +121,18 @@ export default async function handler(req, res) {
         "summary": "Message personnalisé pour l'utilisateur"
       }
     `;
-
     for (const modelName of modelsToTry) {
       try {
+        const startTime = Date.now();
         console.log(`Tentative avec le modèle : ${modelName}`);
+        
         const model = genAI.getGenerativeModel({ 
             model: modelName,
-            generationConfig: { responseMimeType: "application/json" }
+            generationConfig: { 
+              responseMimeType: "application/json",
+              temperature: 0.1,
+              topP: 0.95,
+            }
         });
         
         const result = await model.generateContent([
@@ -138,26 +146,40 @@ export default async function handler(req, res) {
         ]);
 
         const responseText = result.response.text();
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.nir) {
-            nir = parsed.nir.replace(/\s/g, '');
-            analysisResults = parsed;
-            delete analysisResults.nir;
-            console.log(`Analyse réussie avec ${modelName}`);
-            break; 
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(`Réponse reçue de ${modelName} en ${duration}s`);
+
+        if (responseText) {
+          try {
+            const parsed = JSON.parse(responseText);
+            if (parsed.nir || parsed.anomalies) {
+              nir = (parsed.nir || "").replace(/\s/g, '');
+              analysisResults = parsed;
+              console.log(`Analyse réussie avec ${modelName}`);
+              break; 
+            }
+          } catch (parseErr) {
+            console.warn(`Erreur parsing JSON de ${modelName}:`, responseText.substring(0, 100));
+            lastError = new Error(`JSON invalide retourné par l'IA`);
           }
         }
       } catch (err) {
         console.error(`Échec avec ${modelName}:`, err.message);
         lastError = err;
+        // Si c'est un timeout ou quota, on continue vers le suivant
       }
     }
 
     if (!analysisResults) {
-      throw new Error(lastError ? `Erreur Expertise (${lastError.message})` : "Le moteur d'analyse n'a pas pu extraire de données valides.");
+      const finalError = lastError ? lastError.message : "Le moteur d'analyse n'a pas pu extraire de données valides.";
+      
+      // On log l'échec dans Supabase pour le diagnostic
+      await supabase.from('analyses').update({ 
+        status: 'failed', 
+        results: { error: finalError, timestamp: new Date().toISOString() } 
+      }).eq('file_path', filePath);
+
+      throw new Error(finalError);
     }
 
     // 3. Gestion de la sécurité et des crédits (NIR Hashing)
@@ -176,19 +198,22 @@ export default async function handler(req, res) {
       .eq('file_path', filePath);
 
     if (updateError) {
-        console.warn("Erreur mise à jour base de données (non-critique):", updateError.message);
-    }
-
-    // 4. Décompte des crédits si userId est fourni
-    if (userId) {
-       // On pourrait appeler ici la RPC decrement_analysis_credits
-       // Mais pour la stabilisation, on privilégie le retour du résultat
+        console.warn("Erreur mise à jour base de données:", updateError.message);
     }
 
     return res.status(200).json(analysisResults);
 
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
+    
+    // Tentative de log de l'erreur fatale
+    try {
+      await supabase.from('analyses').update({ 
+        status: 'error', 
+        results: { error: error.message, stack: error.stack } 
+      }).eq('file_path', filePath);
+    } catch (e) {}
+
     return res.status(500).json({ 
       error: "L'analyse a échoué", 
       details: error.message,
