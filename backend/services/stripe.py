@@ -28,7 +28,7 @@ def create_checkout_session(user: models.User, success_url: str, cancel_url: str
                     'name': 'Audit Expert RIS - Dossier Individuel',
                     'description': 'Accès à vie au rapport détaillé pour ce dossier (Particuliers uniquement)',
                 },
-                'unit_amount': 1900, # 19.00 EUR
+                'unit_amount': 2900, # 29.00 EUR
             },
             'quantity': 1,
         }],

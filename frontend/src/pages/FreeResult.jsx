@@ -16,6 +16,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
   const [detailedData, setDetailedData] = useState(null)
   const [error, setError] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showAuthChoice, setShowAuthChoice] = useState(false)
 
   const hasAnomalies = result.has_anomalies
   const isFinished = result.is_analysis_complete
@@ -388,7 +389,7 @@ export default function FreeResult({ result: initialResult, onReset }) {
                    ✓ Analyse standard : réalisée (gratuite)
                  </div>
                  <div style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 4 }}>Rapport détaillé :</div>
-                 <span className="cta-price" style={{ fontSize: 56 }}>19€</span>
+                 <span className="cta-price" style={{ fontSize: 56 }}>29€</span>
               </div>
               
               <div className="cta-price-label">Accès illimité à vie · Rapport exportable Word</div>
@@ -402,6 +403,32 @@ export default function FreeResult({ result: initialResult, onReset }) {
                 <button className="btn btn-primary btn-large btn-glow" onClick={loadDetailed} disabled={loading}>
                   {loading ? 'Chargement en cours…' : '📋 Accéder à mon rapport expert'}
                 </button>
+              ) : !user ? (
+                !showAuthChoice ? (
+                  <button 
+                    className="btn btn-primary btn-large btn-glow" 
+                    onClick={() => setShowAuthChoice(true)}
+                  >
+                    Se connecter ou créer mon compte pour débloquer (29€)
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 500, margin: '0 auto' }}>
+                    <button 
+                      className="btn btn-secondary btn-large" 
+                      style={{ flex: 1 }}
+                      onClick={() => { setAuthMode('login'); setShowAuth(true); }}
+                    >
+                      Se connecter
+                    </button>
+                    <button 
+                      className="btn btn-primary btn-large btn-glow" 
+                      style={{ flex: 1.5 }}
+                      onClick={() => { setAuthMode('register'); setShowAuth(true); }}
+                    >
+                      Créer mon compte et payer 29€
+                    </button>
+                  </div>
+                )
               ) : (
                 <button className="btn btn-primary btn-large btn-glow" onClick={handleGetDetailed} disabled={loading}>
                   {loading ? 'Redirection sécurisée…' : '💳 Débloquer mon expertise pour ce dossier'}
