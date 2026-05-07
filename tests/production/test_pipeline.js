@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+// Native fetch is used (Node 18+)
 
 const BASE_URL = process.env.TEST_URL || "https://ris.hologramconseils.com";
 

@@ -11,7 +11,12 @@ const supabase = createClient(
 // Initialisation du moteur d'analyse
 // On utilise la clé du projet ou la clé de secours validée
 const apiKey = process.env.GOOGLE_API_KEY;
+const mistralApiKey = process.env.MISTRAL_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const mistralClient = mistralApiKey ? axios.create({
+  baseURL: 'https://api.mistral.ai/v1',
+  headers: { 'Authorization': `Bearer ${mistralApiKey}` }
+}) : null;
 
 export default async function handler(req, res) {
   // Gestion CORS pour Vercel Functions
@@ -29,7 +34,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({ status: 'ok', message: 'Analysis engine is ready', version: 'v2.2-20260507' });
+    return res.status(200).json({ 
+      status: 'ok', 
+      version: 'v2.3-20260507',
+      config: {
+        google: !!apiKey,
+        mistral: !!mistralApiKey,
+        supabase: !!process.env.VITE_SUPABASE_URL
+      }
+    });
   }
 
   if (req.method !== 'POST') {
