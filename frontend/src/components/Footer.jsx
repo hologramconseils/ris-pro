@@ -1,38 +1,27 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
+import { LABELS } from '../config/labels'
 
 export default function Footer() {
   return (
-    <footer className="footer" style={{ 
-      marginTop: 'auto', 
-      padding: '40px 20px', 
-      borderTop: '1px solid var(--border)',
-      background: 'rgba(255,255,255,0.02)',
-      textAlign: 'center'
-    }}>
-      <div className="container">
-        <div style={{ marginBottom: 20 }}>
-          <span style={{ fontSize: 18, fontWeight: 'bold', color: 'var(--primary)' }}>🔍 RIS Pro</span>
-          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 8 }}>
-            L'outil d'analyse expert pour votre relevé de carrière.
-          </p>
-        </div>
+    <footer style={{ borderTop: '1px solid rgba(0,0,0,0.05)', padding: '3rem 0', marginTop: 'auto', backgroundColor: 'var(--bg-card)' }}>
+      <div className="container flex flex-col items-center gap-6 text-center">
         
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          gap: '30px', 
-          marginBottom: 20,
-          flexWrap: 'wrap'
-        }}>
-          <Link to="/mentions" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Mentions Légales</Link>
-          <Link to="/cgv" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>CGV</Link>
-          <Link to="/privacy" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Politique de Confidentialité</Link>
-          <Link to="/security" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Sécurité des données</Link>
-        </div>
-        
-        <p style={{ color: 'var(--text-subtle)', fontSize: 12 }}>
-          © {new Date().getFullYear()} Hologram Conseils. Tous droits réservés.
+        <p className="text-base text-muted font-medium">
+          {LABELS.TAGLINE}
         </p>
+
+        <div className="flex gap-6 flex-wrap justify-center text-sm text-muted font-medium">
+          <Link to="/mentions-legales" className="hover:text-main">{LABELS.LEGAL_MENTIONS}</Link>
+          <Link to="/cgv" className="hover:text-main">{LABELS.CGV}</Link>
+          <Link to="/politique-confidentialite" className="hover:text-main">{LABELS.PRIVACY_POLICY}</Link>
+          <Link to="/securite" className="hover:text-main">{LABELS.DATA_SECURITY}</Link>
+        </div>
+        
+        <div className="text-sm text-muted">
+          <p>{LABELS.COPYRIGHT}</p>
+        </div>
+
       </div>
     </footer>
   )

@@ -14,6 +14,7 @@ import Security from './pages/Security'
 import AdminDashboard from './pages/AdminDashboard'
 import Dashboard from './pages/Dashboard'
 import PreviewPage from './pages/PreviewPage'
+import Diagnostic from './pages/Diagnostic'
 import NotFound from './pages/NotFound'
 import Footer from './components/Footer'
 
@@ -35,6 +36,7 @@ function AppContent() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/detailed-result/:id" element={<DetailedResultPage />} />
           <Route path="/preview/:id" element={<PreviewPage />} />
+          <Route path="/diagnostic" element={<Diagnostic />} />
           {/* Legacy Routes for compatibility */}
           <Route path="/result/:id" element={<DetailedResultPage />} />
           <Route path="/detailed/:id" element={<DetailedResultPage />} />

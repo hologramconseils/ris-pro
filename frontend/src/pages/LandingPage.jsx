@@ -3,8 +3,10 @@ import UploadZone from '../components/UploadZone'
 import AnalysisLoader from '../components/AnalysisLoader'
 import FreeResult from './FreeResult'
 import AuthModal from '../components/AuthModal'
+import { supabase } from '../lib/supabase'
 import { scanAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const FEATURES = [
@@ -15,6 +17,7 @@ const FEATURES = [
 ]
 
 export default function LandingPage() {
+  const navigate = useNavigate()
   const [file, setFile] = useState(null)
   const [status, setStatus] = useState('idle') // idle | loading | result | error
   const [result, setResult] = useState(null)
@@ -27,11 +30,35 @@ export default function LandingPage() {
     setStatus('loading')
     setError('')
     try {
-      const res = await scanAPI.upload(file)
-      setResult(res.data)
-      setStatus('result')
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
+      const filePath = `uploads/${fileName}`
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) throw uploadError
+
+      const { error: dbError } = await supabase
+        .from('analyses')
+        .insert([
+          { 
+            file_path: filePath, 
+            status: 'pending',
+            user_id: user?.id 
+          }
+        ])
+
+      if (dbError) throw dbError
+
+      navigate(`/diagnostic?file=${encodeURIComponent(filePath)}`)
     } catch (err) {
-      setError('Une erreur est survenue lors de l\'analyse. Veuillez réessayer.')
+      console.error("Erreur d'upload :", err)
+      setError('Une erreur est survenue lors de l\'upload du fichier. Veuillez réessayer.')
       setStatus('error')
     }
   }
