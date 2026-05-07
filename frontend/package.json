@@ -1,7 +1,7 @@
 {
-  "name": "frontend",
+  "name": "ris-pro-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.39.3",
     "axios": "^1.13.6",
     "docx": "^9.6.1",
+    "dotenv": "^16.4.1",
     "framer-motion": "^12.38.0",
     "html2pdf.js": "^0.14.0",
     "react": "^19.2.4",
