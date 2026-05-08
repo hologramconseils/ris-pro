@@ -237,6 +237,18 @@ export default function Bilan() {
           ))}
         </div>
 
+        <div className="flex flex-col items-center gap-4 mt-8 mb-12">
+          <a 
+            href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn btn-secondary btn-cta-premium"
+            style={{ padding: '1rem 2rem' }}
+          >
+            <span>{LABELS.CTA_CALL}</span>
+          </a>
+        </div>
+
       </div>
     </div>
   )

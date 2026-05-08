@@ -11,10 +11,10 @@ export const LABELS = {
   CTA_LOGIN: "Se connecter",
   CTA_LOGOUT: "Se déconnecter",
   CTA_REFRESH_STATUS: "Actualiser mon statut",
-  CTA_CONSULTATION_CALL: "Si vous hésitez, je vous explique dans un appel gratuit de 15 minutes",
+  CTA_CALL: "Si vous hésitez, je vous explique dans un appel gratuit de 15 minutes",
   
   // Payment related
-  PAYMENT_REQUIRED: "Accédez à l’analyse complète pour 29€",
+  PAYMENT_REQUIRED: "Accédez à l’analyse détaillée pour 29€",
   PAYMENT_SUCCESS: "Accédez à votre bilan détaillé",
   PAYMENT_RENEW: "Vous avez utilisé vos 4 analyses. Renouvelez pour 4 nouvelles analyses (29€)",
   PAYMENT_SECURE: "Paiement 100% sécurisé via Stripe",

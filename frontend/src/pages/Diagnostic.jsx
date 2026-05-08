@@ -286,8 +286,8 @@ export default function Diagnostic() {
                 </div>
               )}
 
-              <button type="submit" className="btn btn-primary btn-premium-hover mt-2 w-full" disabled={authLoading}>
-                {authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}
+              <button type="submit" className="btn btn-primary btn-cta-premium mt-2 w-full" disabled={authLoading}>
+                <span>{authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}</span>
               </button>
             </form>
           ) : showAuthChoice ? (
@@ -299,22 +299,26 @@ export default function Diagnostic() {
                 Se connecter
               </button>
               <button 
-                className="btn btn-primary flex-1 btn-premium-hover" 
+                className="btn btn-primary flex-1 btn-cta-premium" 
                 onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
               >
-                Créer mon compte et payer 29€
+                <span>Créer mon compte et payer 29€</span>
               </button>
             </div>
           ) : (
             <>
-              <button className="btn btn-primary btn-premium-hover" onClick={handleAction}>
+              <button className="btn btn-primary btn-cta-premium" onClick={handleAction} style={{ padding: '1.2rem 2.5rem' }}>
+                <span>
                 {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
                   ? "Accéder au bilan complet (Admin)" 
                   : (user 
                       ? (profile?.analysis_credits > 0 
                           ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
-                          : (profile?.is_paid ? LABELS.PAYMENT_RENEW : LABELS.PAYMENT_REQUIRED))
-                      : "Se connecter ou créer mon compte pour débloquer (29€)")}
+                          : (profile?.is_paid 
+                              ? LABELS.PAYMENT_RENEW 
+                              : LABELS.PAYMENT_REQUIRED))
+                      : LABELS.PAYMENT_REQUIRED)}
+                </span>
                 <ChevronRight size={20} />
               </button>
               <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -329,9 +333,10 @@ export default function Diagnostic() {
             href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="btn btn-primary btn-premium-hover"
+            className="btn btn-secondary btn-cta-premium"
+            style={{ padding: '1rem 2rem' }}
           >
-            {LABELS.CTA_CONSULTATION_CALL}
+            <span>{LABELS.CTA_CALL}</span>
           </a>
         </div>
 

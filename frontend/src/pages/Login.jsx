@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { LogIn, ShieldAlert, Loader2, UserPlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { LABELS } from '../config/labels'
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -113,7 +114,7 @@ export default function Login() {
               ? 'Saisissez votre nouveau mot de passe pour sécuriser votre compte.'
               : (isLogin 
                 ? 'Connectez-vous pour accéder à vos analyses illimitées.' 
-                : 'Créez votre compte pour débloquer la version complète de RIS Pro.')}
+                : `Créez votre compte pour débloquer la version complète de ${LABELS.APP_NAME}.`)}
           </p>
         </div>
 

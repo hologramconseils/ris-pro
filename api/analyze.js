@@ -138,7 +138,54 @@ export default async function handler(req, res) {
     const cleanNir = (analysisResults.nir || "").replace(/\s/g, '') || "000000000000000";
     const nirHash = crypto.createHash('sha256').update(cleanNir + nirSalt).digest('hex');
 
-    // 4. Mettre à jour la base de données
+    // 4. Logique de Crédits et Unicité d'Identité (PRD Compliance)
+    if (userId) {
+      // Vérifier si cette identité a déjà été analysée par cet utilisateur
+      const { data: existingAnalysis } = await supabase
+        .from('analyses')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('nir_hash', nirHash)
+        .eq('status', 'completed')
+        .limit(1);
+
+      const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
+
+      if (isNewIdentity) {
+        // Récupérer le profil pour vérifier les crédits
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('analysis_credits, role')
+          .eq('id', userId)
+          .single();
+
+        const currentCredits = profile?.analysis_credits || 0;
+        const isAdmin = profile?.role === 'admin';
+
+        if (currentCredits <= 0 && !isAdmin) {
+          // Si plus de crédits, on restreint les résultats (on ne sauvegarde pas le 'completed' premium)
+          // On peut retourner un flag pour le frontend
+          analysisResults.is_restricted = true;
+          console.log(`[Credits] Accès restreint pour ${userId} (0 crédits)`);
+        } else if (!isAdmin) {
+          // Décrémenter les crédits pour une nouvelle identité
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ analysis_credits: currentCredits - 1 })
+            .eq('id', userId);
+          
+          if (updateError) {
+            console.error("[Credits] Erreur décrémentation:", updateError.message);
+          } else {
+            console.log(`[Credits] -1 pour ${userId}. Restant: ${currentCredits - 1}`);
+          }
+        }
+      } else {
+        console.log(`[Credits] Identité déjà analysée pour ${userId}, pas de décompte.`);
+      }
+    }
+
+    // 5. Mettre à jour la base de données
     await supabase
       .from('analyses')
       .update({ 

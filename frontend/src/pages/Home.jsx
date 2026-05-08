@@ -7,7 +7,7 @@ import { LABELS } from '../config/labels'
 
 export default function Home() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -99,6 +99,15 @@ export default function Home() {
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
         <h1 className="text-4xl font-bold" style={{ letterSpacing: '-0.02em' }}>
+          {user && profile && (
+            <div className="flex justify-center mb-6">
+              <div className="badge badge-primary animate-fade-in" style={{ padding: '0.8rem 1.2rem', fontSize: '0.9rem', fontWeight: 'bold', background: 'var(--primary)', color: 'white' }}>
+                {profile.analysis_credits > 0 
+                  ? `Analyse détaillée (crédits restants : ${profile.analysis_credits}/4)`
+                  : "Vous avez utilisé vos 4 analyses. Renouvelez pour 29€"}
+              </div>
+            </div>
+          )}
           Auditez votre relevé de carrière en <span style={{ color: 'var(--primary)' }}>quelques secondes.</span>
         </h1>
         
@@ -157,18 +166,32 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex items-center gap-8" style={{ marginTop: '3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <CheckCircle2 size={18} className="text-success" />
-            <span>95% de précision</span>
+        <div className="flex flex-col items-center gap-8" style={{ marginTop: '3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="flex gap-8 flex-wrap justify-center">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <CheckCircle2 size={18} className="text-success" />
+              <span>95% de précision</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <CheckCircle2 size={18} className="text-success" />
+              <span>100% Confidentiel</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <CheckCircle2 size={18} className="text-success" />
+              <span>Support Régimes de Base & Complémentaires</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <CheckCircle2 size={18} className="text-success" />
-            <span>100% Confidentiel</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <CheckCircle2 size={18} className="text-success" />
-            <span>Support Régimes de Base & Complémentaires</span>
+
+          <div style={{ marginTop: '2rem' }}>
+            <a 
+              href="https://calendly.com/hologramconseils/audit" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn btn-secondary btn-cta-premium"
+              style={{ padding: '1rem 2rem', borderRadius: 'var(--radius-lg)' }}
+            >
+              <span>{LABELS.CTA_CALL}</span>
+            </a>
           </div>
         </div>
 
