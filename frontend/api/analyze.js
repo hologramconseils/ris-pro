@@ -215,10 +215,17 @@ export default async function handler(req, res) {
     // Log de l'erreur dans Supabase
     try {
       await supabase.from('analyses')
-        .update({ status: 'failed', results: { error: error.message } })
+        .update({ status: 'failed', results: { error: error.message, stack: error.stack } })
         .eq('file_path', filePath);
-    } catch (e) {}
+    } catch (e) {
+      console.error("Failed to log error to Supabase:", e.message);
+    }
 
-    return res.status(500).json({ error: "L'analyse a échoué", details: error.message });
+    return res.status(500).json({ 
+      error: "L'analyse a échoué", 
+      message: error.message,
+      code: error.code || 'UNKNOWN_ERROR',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+    });
   }
 }
