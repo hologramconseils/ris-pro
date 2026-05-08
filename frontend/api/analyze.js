@@ -68,6 +68,12 @@ export default async function handler(req, res) {
       - CAS 2 : Nombre de points égal à 0.
       - CAS 3 : 4 trimestres validés MAIS avec 0 point.
       - CAS 4 : Toute combinaison où (trimestres < 4) OU (points <= 0).
+      - CAS 5 : Année totalement ABSENTE du relevé alors qu'elle se situe entre le début et la fin de la carrière (trou de carrière).
+
+      ANALYSE DE CONTINUITÉ OBLIGATOIRE :
+      1. Identifie l'année la plus ancienne et l'année la plus récente du relevé.
+      2. Vérifie chaque année dans cet intervalle.
+      3. Si une année est manquante, ajoute-la aux anomalies avec le titre "Année absente du relevé".
 
       DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
       Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
