@@ -60,15 +60,22 @@ export default async function handler(req, res) {
 
     const prompt = `
       Tu es l'expert retraite de RIS Pro spécialisé dans l'audit des relevés de carrière (RIS / EIG).
-      Analyse ce relevé de carrière et identifie toutes les anomalies.
-      
-      TON OBJECTIF : 
-      Extraire avec précision les données de carrière et identifier les erreurs de trimestres ou de points.
-      
-      EXTRACTION :
-      - NIR : Numéro de Sécurité Sociale (15 chiffres).
-      - ANOMALIES : Liste des incohérences (ex: trimestres < 4 sur une année travaillée).
-      
+      Ton analyse doit suivre STRICTEMENT les règles métier suivantes pour détecter les anomalies :
+
+      RÈGLES DE DÉTECTION DES ANOMALIES :
+      Une année est une ANOMALIE si elle remplit l'une des conditions suivantes :
+      - CAS 1 : Moins de 4 trimestres validés.
+      - CAS 2 : Nombre de points égal à 0.
+      - CAS 3 : 4 trimestres validés MAIS avec 0 point.
+      - CAS 4 : Toute combinaison où (trimestres < 4) OU (points <= 0).
+
+      DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
+      Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
+      NE JAMAIS inclure d'année normale dans la liste des anomalies.
+
+      EXCLUSION SYSTÉMATIQUE :
+      - Exclure l'année en cours (2026) car non consolidée.
+
       STRUCTURE JSON ATTENDUE :
       {
         "nir": "XXXXXXXXXXXXXXX",
@@ -76,10 +83,10 @@ export default async function handler(req, res) {
           {
             "year": "YYYY",
             "employer": "Nom de l'employeur",
-            "title": "Titre court de l'anomalie (ex: Trimestres manquants)",
-            "description": "Explication détaillée pour le diagnostic gratuit",
-            "reason": "Explication technique détaillée pour le bilan premium",
-            "solution": "Action corrective à entreprendre (ex: Contacter la CNAV)",
+            "title": "Titre court de l'anomalie",
+            "description": "Explication pour le diagnostic gratuit",
+            "reason": "Explication technique pour le bilan premium",
+            "solution": "Action corrective à entreprendre",
             "docs": ["Document 1", "Document 2"],
             "salary": "Montant ou nature des revenus",
             "trimesters": "X/4",
