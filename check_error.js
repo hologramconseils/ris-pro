@@ -6,24 +6,21 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function checkSchema() {
+async function checkLastAnalysis() {
   const { data, error } = await supabase
     .from('analyses')
-    .select('*')
+    .select('status, results')
+    .order('created_at', { ascending: false })
     .limit(1);
 
   if (error) {
-    console.error("Error fetching analyses:", error);
+    console.error("Error fetching last analysis:", error);
   } else if (data && data.length > 0) {
-    console.log("Columns in 'analyses':", Object.keys(data[0]));
-    if (Object.keys(data[0]).includes('nir_hash')) {
-        console.log("SUCCESS: Column 'nir_hash' exists.");
-    } else {
-        console.log("FAILURE: Column 'nir_hash' is missing.");
-    }
+    console.log("Last Analysis Status:", data[0].status);
+    console.log("Results/Error:", data[0].results);
   } else {
-    console.log("No data in 'analyses' to check columns.");
+    console.log("No analyses found.");
   }
 }
 
-checkSchema();
+checkLastAnalysis();

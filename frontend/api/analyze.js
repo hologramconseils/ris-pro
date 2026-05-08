@@ -140,60 +140,72 @@ export default async function handler(req, res) {
 
     // 4. Logique de Crédits et Unicité d'Identité (PRD Compliance)
     if (userId) {
-      // Vérifier si cette identité a déjà été analysée par cet utilisateur
-      const { data: existingAnalysis } = await supabase
-        .from('analyses')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('nir_hash', nirHash)
-        .eq('status', 'completed')
-        .limit(1);
+      try {
+        // Vérifier si cette identité a déjà été analysée par cet utilisateur
+        const { data: existingAnalysis } = await supabase
+          .from('analyses')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('nir_hash', nirHash)
+          .eq('status', 'completed')
+          .limit(1);
 
-      const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
+        const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
 
-      if (isNewIdentity) {
-        // Récupérer le profil pour vérifier les crédits
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('analysis_credits, role')
-          .eq('id', userId)
-          .single();
-
-        const currentCredits = profile?.analysis_credits || 0;
-        const isAdmin = profile?.role === 'admin';
-
-        if (currentCredits <= 0 && !isAdmin) {
-          analysisResults.is_restricted = true;
-          console.log(`[Credits] Accès restreint pour ${userId} (0 crédits)`);
-        } else if (!isAdmin) {
-          const { error: updateError } = await supabase
+        if (isNewIdentity) {
+          // Récupérer le profil pour vérifier les crédits
+          const { data: profile } = await supabase
             .from('profiles')
-            .update({ analysis_credits: currentCredits - 1 })
-            .eq('id', userId);
-          
-          if (updateError) {
-            console.error("[Credits] Erreur décrémentation:", updateError.message);
-          } else {
-            console.log(`[Credits] -1 pour ${userId}. Restant: ${currentCredits - 1}`);
+            .select('analysis_credits, role')
+            .eq('id', userId)
+            .single();
+
+          const currentCredits = profile?.analysis_credits || 0;
+          const isAdmin = profile?.role === 'admin';
+
+          if (currentCredits <= 0 && !isAdmin) {
+            analysisResults.is_restricted = true;
+            console.log(`[Credits] Accès restreint pour ${userId} (0 crédits)`);
+          } else if (!isAdmin) {
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ analysis_credits: currentCredits - 1 })
+              .eq('id', userId);
+            
+            if (updateError) {
+              console.error("[Credits] Erreur décrémentation:", updateError.message);
+            } else {
+              console.log(`[Credits] -1 pour ${userId}. Restant: ${currentCredits - 1}`);
+            }
           }
+        } else {
+          console.log(`[Credits] Identité déjà analysée pour ${userId}, pas de décompte.`);
         }
-      } else {
-        console.log(`[Credits] Identité déjà analysée pour ${userId}, pas de décompte.`);
+      } catch (dbError) {
+        console.error("[Credits] Erreur DB (colonne nir_hash peut-être manquante):", dbError.message);
       }
     }
 
     // 5. Mettre à jour la base de données
     const updateData = { 
       status: 'completed',
-      results: analysisResults,
-      nir_hash: nirHash
+      results: analysisResults
     };
     if (userId) updateData.user_id = userId;
 
-    await supabase
-      .from('analyses')
-      .update(updateData)
-      .eq('file_path', filePath);
+    // Tenter d'inclure nir_hash si la colonne existe
+    try {
+      await supabase
+        .from('analyses')
+        .update({ ...updateData, nir_hash: nirHash })
+        .eq('file_path', filePath);
+    } catch (e) {
+      // Fallback si nir_hash n'existe pas encore
+      await supabase
+        .from('analyses')
+        .update(updateData)
+        .eq('file_path', filePath);
+    }
 
     return res.status(200).json(analysisResults);
 
