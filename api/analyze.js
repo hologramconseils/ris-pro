@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
     // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles)
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
     let analysisResults = null;
     let lastError = null;
 
@@ -186,14 +186,17 @@ export default async function handler(req, res) {
     }
 
     // 5. Mettre à jour la base de données
+    const updateData = { 
+      status: 'completed',
+      results: analysisResults,
+      nir_hash: nirHash
+    };
+    
+    if (userId) updateData.user_id = userId;
+
     await supabase
       .from('analyses')
-      .update({ 
-        status: 'completed',
-        results: analysisResults,
-        nir_hash: nirHash,
-        user_id: userId
-      })
+      .update(updateData)
       .eq('file_path', filePath);
 
     return res.status(200).json(analysisResults);

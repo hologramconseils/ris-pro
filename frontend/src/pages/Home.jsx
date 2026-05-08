@@ -184,7 +184,7 @@ export default function Home() {
 
           <div style={{ marginTop: '2rem' }}>
             <a 
-              href="https://calendly.com/hologramconseils/audit" 
+              href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn btn-secondary btn-cta-premium"
