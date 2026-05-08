@@ -1,338 +1,182 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert } from 'lucide-react'
-import { useAuth } from '../AuthContext'
-import { supabase } from '../lib/supabase'
-import { LABELS } from '../config/labels'
+import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2 } from 'lucide-react'
 
 export default function Diagnostic() {
   const navigate = useNavigate()
-  const { user, profile } = useAuth()
   const [searchParams] = useSearchParams()
   const filePath = searchParams.get('file')
   
   const [loading, setLoading] = useState(!!filePath)
-  const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
-
-  const [showSignup, setShowSignup] = useState(false)
-  const [showAuthChoice, setShowAuthChoice] = useState(false)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
-  const [authError, setAuthError] = useState('')
+  const [results, setResults] = useState(null)
 
   useEffect(() => {
     if (filePath) {
-      const cached = sessionStorage.getItem(`ris_pro_analysis_${filePath}`)
-      if (cached) {
-        setResults(JSON.parse(cached))
-        setLoading(false)
-      } else {
-        performAnalysis(filePath)
-      }
+      runAnalysis()
     }
-  }, [filePath, user?.id])
+  }, [filePath])
 
-  const performAnalysis = async (path) => {
+  const runAnalysis = async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filePath: path, userId: user?.id })
+        body: JSON.stringify({ filePath })
       })
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || LABELS.ERROR_ANALYSIS);
-      }
       
       const data = await response.json()
-      setResults(data)
+      
+      if (response.ok) {
+        setResults(data)
+      } else {
+        throw new Error(data.details || data.error || "L'analyse a échoué")
+      }
     } catch (err) {
-      console.error(err)
-      setError(err.message || LABELS.ERROR_ANALYSIS)
+      console.error("Erreur API Analyze:", err)
+      setError(err.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleAction = async () => {
-    if (results) {
-      sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-    }
-
-    if (!user) {
-      setShowAuthChoice(true)
-      return
-    }
-
-    // Si admin ou a déjà payé (legacy) ou a des crédits
-    const hasCredits = profile?.analysis_credits > 0;
-    const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
-
-    if (isAdmin || hasCredits) {
-      navigate(`/bilan?success=true&file=${encodeURIComponent(filePath)}`)
-      return
-    }
-
-    // Sinon -> Paiement
+  const handlePayment = async () => {
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('http://localhost:8000/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: user.id, 
-          userEmail: user.email,
-          filePath: filePath
-        })
+        body: JSON.stringify({ filePath })
       });
-      
       const data = await response.json();
+      
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = data.url; // Redirect to Stripe
       } else {
-        setError("Erreur d'initialisation du paiement.");
+        alert("Erreur lors de la création de la session de paiement.");
       }
-    } catch (err) {
-      console.error("Erreur Checkout:", err)
-      setError("Le service de paiement est indisponible.");
+    } catch (error) {
+      console.error("Erreur de connexion à Stripe:", error);
+      alert("Redirection vers Stripe Checkout (Simulation car backend injoignable)...");
+      navigate('/bilan?success=true');
     }
   }
 
-  const handleSignupAndPay = async (e) => {
-    e.preventDefault()
-    setAuthLoading(true)
-    setAuthError('')
-    
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { first_name: firstName, last_name: lastName } }
-      })
-      if (signUpError) throw signUpError
-      
-      const createdUser = data.user
-      
-      if (results) {
-        sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-      }
-
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: createdUser.id, 
-          userEmail: createdUser.email,
-          filePath: filePath
-        })
-      });
-      const resData = await response.json();
-      
-      if (resData.url) {
-        window.location.href = resData.url;
-      } else {
-        setAuthError("Erreur d'initialisation du paiement.");
-      }
-    } catch (err) {
-      console.error(err)
-      setAuthError(err.message || "Une erreur est survenue lors de l'inscription.")
-    } finally {
-      setAuthLoading(false)
+  // Données de secours si aucune analyse n'est en cours (pour la démo)
+  const demoAnomalies = [
+    {
+      year: '1998',
+      employer: 'DURAND SA',
+      salary: '12 450 €',
+      trimesters: '3/4',
+      points: '85.2',
+      reason: 'Salaire brut suffisant pour valider 4 trimestres, mais seulement 3 ont été reportés par la caisse.',
+    },
+    {
+      year: '2023',
+      employer: 'TECH CORP',
+      salary: '45 000 €',
+      trimesters: '4/4',
+      points: '0.0',
+      reason: 'Points Agirc-Arrco manquants. L\'employeur a déclaré les revenus à l\'Urssaf mais le flux vers la caisse complémentaire a échoué.',
     }
-  }
+  ]
+
+  const anomalies = results?.anomalies || demoAnomalies
 
   if (loading) {
     return (
-      <div className="container flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: '2rem' }}>
-        <Loader2 size={48} className="animate-spin text-primary" />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Analyse intelligente en cours...</h2>
-          <p className="text-muted">Le moteur d'expertise examine votre relevé de carrière (RIS / EIG)</p>
-        </div>
+      <div className="container flex flex-col items-center justify-center" style={{ minHeight: '60vh' }}>
+        <Loader2 className="animate-spin text-primary" size={48} />
+        <h2 className="text-2xl font-bold mt-4">Analyse de votre carrière en cours...</h2>
+        <p className="text-muted mt-2">Nous vérifions vos trimestres et points Agirc-Arrco (env. 30s)</p>
       </div>
     )
   }
-
-  if (error || (!results && !loading)) {
-    return (
-      <div className="container" style={{ padding: '4rem 1.5rem' }}>
-        <div className="card glass text-center p-8">
-          <AlertTriangle size={48} className="text-warning mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">{error ? "Erreur d'analyse" : "Aucun document"}</h2>
-          <p className="text-muted mb-6">
-            {error || "Veuillez d'abord uploader votre relevé de carrière sur la page d'accueil."}
-          </p>
-          <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
-        </div>
-      </div>
-    )
-  }
-
-  const rawAnomalies = results.anomalies || []
-  const currentYear = new Date().getFullYear()
-  
-  const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
-    const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
-    const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0')
-    return yearA - yearB
-  })
-
-  const validAnomalies = sortedAnomalies.filter(a => {
-    const year = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0')
-    return year < currentYear
-  })
-
-  const freemiumAnomalies = []
-  if (validAnomalies.length > 0) {
-    freemiumAnomalies.push(validAnomalies[0]) // Plus ancienne
-    if (validAnomalies.length > 1) {
-      freemiumAnomalies.push(validAnomalies[validAnomalies.length - 1]) // Plus récente
-    }
-  }
-
-  const hasMore = sortedAnomalies.length > freemiumAnomalies.length;
 
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
-      <div className="flex flex-col gap-8" style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div className="flex flex-col gap-8" style={{ maxWidth: '900px', margin: '0 auto' }}>
         
         <div className="text-center">
           <div className="badge badge-warning" style={{ marginBottom: '1rem' }}>
-            Diagnostic Freemium
+            {results ? 'Audit Réel' : 'Diagnostic de Démonstration'}
           </div>
-          <h1 className="text-3xl font-bold">{LABELS.ANALYSIS_READY}</h1>
-          <p className="text-lg text-muted" style={{ marginTop: '0.5rem' }}>
-            {results.summary || "Nous avons audité votre document. Voici un aperçu des erreurs identifiées."}
-          </p>
+          <h1 className="text-3xl font-bold">
+            {error ? "L'analyse a rencontré un problème" : "Votre analyse est prête."}
+          </h1>
+          {error ? (
+            <div className="text-danger mt-4 p-4 glass rounded-lg border border-red-200">
+              {error}
+              <button onClick={runAnalysis} className="btn btn-sm btn-outline-danger ml-4">Réessayer</button>
+            </div>
+          ) : (
+            <p className="text-lg text-muted" style={{ marginTop: '0.5rem' }}>
+              Nous avons audité votre document. Voici un aperçu des erreurs identifiées.
+            </p>
+          )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <AlertCircle className="text-warning" size={24} />
-            Anomalies identifiées ({sortedAnomalies.length})
-          </h2>
-          
-          {freemiumAnomalies.map((anom, idx) => (
-            <div key={idx} className="card" style={{ padding: '1.5rem', borderLeft: `4px solid ${anom.severity === 'high' ? 'var(--danger)' : 'var(--warning)'}` }}>
-              <div className="flex justify-between items-start" style={{ flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                  <h3 className="font-bold text-lg flex items-center gap-2">
-                    <Calendar size={18} className="text-muted" /> {anom.year || "Année non spécifiée"}
-                  </h3>
-                </div>
-                
-                <div className="flex gap-4 flex-wrap">
-                  <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
-                    <div className="text-[10px] text-muted uppercase tracking-wider">Sévérité</div>
-                    <div className="font-bold uppercase text-xs" style={{ color: anom.severity === 'high' ? 'var(--danger)' : 'var(--warning)' }}>
-                      {anom.severity === 'high' ? 'Critique' : 'Moyenne'}
+        {!error && (
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <AlertCircle className="text-warning" size={24} />
+              Extrait des anomalies {results ? '(Données réelles)' : '(Gratuit)'}
+            </h2>
+            
+            {anomalies.map((anom, idx) => (
+              <div key={idx} className="card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--warning)' }}>
+                <div className="flex justify-between items-start" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                      <Calendar size={18} className="text-muted" /> Année {anom.year}
+                    </h3>
+                    <div className="text-muted font-medium flex items-center gap-2" style={{ marginTop: '0.25rem' }}>
+                      <Building size={16} /> {anom.employer || 'Non spécifié'}
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4 flex-wrap">
+                    <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
+                      <div className="text-xs text-muted uppercase tracking-wider flex items-center gap-1"><DollarSign size={12}/> Salaire</div>
+                      <div className="font-semibold">{anom.salary || '-'}</div>
+                    </div>
+                    <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
+                      <div className="text-xs text-muted uppercase tracking-wider flex items-center gap-1"><Calendar size={12}/> Trimestres</div>
+                      <div className="font-semibold">{anom.trimesters}</div>
+                    </div>
+                    <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
+                      <div className="text-xs text-muted uppercase tracking-wider flex items-center gap-1"><Award size={12}/> Points</div>
+                      <div className="font-semibold">{anom.points || '0.00'}</div>
                     </div>
                   </div>
                 </div>
+                <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--warning-bg)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem' }}>
+                  <strong>Explication :</strong> {anom.reason}
+                </div>
               </div>
-              
-              <div style={{ marginTop: '1rem' }}>
-                <h4 className="font-bold text-base mb-1">{anom.title}</h4>
-                <p className="text-muted text-sm leading-relaxed">
-                  {anom.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {/* Upgrade Card / Signup Form */}
         <div className="card glass flex flex-col items-center text-center" style={{ background: 'linear-gradient(to right bottom, var(--bg-card), var(--bg-page))', border: '1px solid var(--primary)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'var(--primary)', opacity: 0.05, borderRadius: '50%', filter: 'blur(40px)' }} />
           
           <Lock size={32} className="text-primary" style={{ marginBottom: '1rem' }} />
           <h2 className="text-2xl font-bold" style={{ marginBottom: '0.5rem' }}>
-            {hasMore ? `Votre audit révèle ${sortedAnomalies.length - freemiumAnomalies.length} autres anomalies` : "Accédez à votre bilan détaillé"}
+            {results ? `Votre audit révèle ${results.anomalies.length} anomalies` : "Votre audit révèle d'autres anomalies"}
           </h2>
           <p className="text-muted" style={{ maxWidth: '500px', marginBottom: '2rem' }}>
-            Débloquer l’analyse complète et détaillée pour voir l’intégralité des anomalies détectées en quelques minutes ainsi que la liste (non exhaustive) des pièces justificatives requises pour demander la correction de votre carrière.
+            Débloquez le bilan complet pour voir l'intégralité de votre carrière, la liste des justificatifs requis et générer vos courriers de réclamation pré-remplis.
           </p>
           
-          {showSignup ? (
-            <form onSubmit={handleSignupAndPay} className="flex flex-col gap-4 text-left w-full max-w-md bg-page p-6 rounded-xl border" style={{ borderColor: 'var(--border)' }}>
-              <div className="flex gap-4">
-                <div className="flex flex-col gap-1 w-full">
-                  <label className="text-sm font-semibold">Prénom</label>
-                  <input type="text" className="input" placeholder="Jean" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                </div>
-                <div className="flex flex-col gap-1 w-full">
-                  <label className="text-sm font-semibold">Nom</label>
-                  <input type="text" className="input" placeholder="Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold">Email</label>
-                <input type="email" className="input" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold">Mot de passe</label>
-                <input type="password" className="input" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              </div>
-              
-              {authError && (
-                <div className="flex items-center gap-2 text-error text-sm p-3 bg-error-bg rounded-lg">
-                  <ShieldAlert size={16} />
-                  {authError}
-                </div>
-              )}
-
-              <button type="submit" className="btn btn-primary btn-premium-hover mt-2 w-full" disabled={authLoading}>
-                {authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}
-              </button>
-            </form>
-          ) : showAuthChoice ? (
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-2xl mx-auto" style={{ marginTop: '1rem' }}>
-              <button 
-                className="btn btn-outline flex-1" 
-                onClick={() => navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`)}
-              >
-                Se connecter
-              </button>
-              <button 
-                className="btn btn-primary flex-1 btn-premium-hover" 
-                onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
-              >
-                Créer mon compte et payer 29€
-              </button>
-            </div>
-          ) : (
-            <>
-              <button className="btn btn-primary btn-premium-hover" onClick={handleAction}>
-                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
-                  ? "Accéder au bilan complet (Admin)" 
-                  : (user 
-                      ? (profile?.analysis_credits > 0 
-                          ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
-                          : (profile?.is_paid ? LABELS.PAYMENT_RENEW : LABELS.PAYMENT_REQUIRED))
-                      : "Se connecter ou créer mon compte pour débloquer (29€)")}
-                <ChevronRight size={20} />
-              </button>
-              <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Lock size={12} /> {LABELS.PAYMENT_SECURE}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="flex flex-col items-center gap-4 mt-8 mb-12">
-          <a 
-            href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-premium-hover"
-          >
-            {LABELS.CTA_CONSULTATION_CALL}
-          </a>
+          <button className="btn btn-primary" style={{ fontSize: '1.125rem', padding: '1rem 2rem' }} onClick={handlePayment}>
+            Accéder au Bilan Détaillé pour 29€
+            <ChevronRight size={20} />
+          </button>
+          <div className="text-xs text-muted mt-4" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Lock size={12} /> Paiement 100% sécurisé via Stripe
+          </div>
         </div>
 
       </div>

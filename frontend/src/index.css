@@ -49,20 +49,6 @@
   --text-main: hsl(210, 40%, 98%);
   --text-muted: hsl(215, 20%, 65%);
   --secondary: hsl(222, 47%, 15%);
-  --success-bg: rgba(22, 163, 74, 0.15);
-  --warning-bg: rgba(234, 179, 8, 0.15);
-  --error-bg: rgba(220, 38, 38, 0.15);
-}
-
-.dark .brand-logo {
-  /* Supprime l'effet d'encadrement artificiel */
-}
-
-.brand-logo {
-  border-radius: 50%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  background-color: white; /* Assure que le fond interne reste blanc parfait */
 }
 
 .dark .card { border-color: rgba(255, 255, 255, 0.1); }
@@ -174,30 +160,50 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 3.5rem;
-  padding: 0 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 1.125rem;
+  font-weight: 500;
+  font-size: 1rem;
   cursor: pointer;
   transition: all var(--transition-fast);
   border: none;
-  gap: 0.75rem;
-  text-align: center;
-  white-space: nowrap;
+  gap: 0.5rem;
 }
 
-.btn-primary, .btn-secondary, .btn-outline {
+.btn-primary {
   background-color: var(--primary);
   color: var(--text-inverse);
   box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover, .btn-secondary:hover, .btn-outline:hover {
+.btn-primary:hover {
   background-color: var(--primary-hover);
-  color: var(--text-inverse) !important;
   box-shadow: var(--shadow-glow);
   transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--text-main);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-card-hover);
+  border-color: rgba(0,0,0,0.1);
+}
+
+
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary);
+  color: var(--text-inverse);
 }
 
 /* Animations */
@@ -221,25 +227,6 @@ a:hover {
 .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
 .animate-pulse { animation: pulse 2s infinite; }
 
-/* Animations Premium CTA */
-@keyframes ctaPulseZoom {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-@keyframes ctaShimmer {
-  0% { opacity: 1; }
-  50% { opacity: 0.96; }
-  100% { opacity: 1; }
-}
-
-.btn-premium-hover:hover {
-  animation: ctaPulseZoom 2.5s ease-in-out infinite, ctaShimmer 3s ease-in-out infinite;
-  color: var(--text-inverse) !important;
-  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
-}
-
 /* Status Badges */
 .badge {
   display: inline-flex;
@@ -255,19 +242,3 @@ a:hover {
 .badge-error { background-color: var(--error-bg); color: var(--error); }
 .badge-warning { background-color: var(--warning-bg); color: var(--warning); }
 .badge-success { background-color: var(--success-bg); color: var(--success); }
-
-/* Responsive Utilities */
-.hidden { display: none !important; }
-
-@media (min-width: 768px) {
-  .md\:flex { display: flex !important; }
-  .md\:hidden { display: none !important; }
-}
-
-@media (max-width: 767px) {
-  /* Smaller text on mobile for header */
-  .mobile-text-xs { font-size: 0.75rem !important; }
-  .mobile-text-sm { font-size: 0.875rem !important; }
-  .mobile-text-base { font-size: 1rem !important; }
-  .mobile-text-lg { font-size: 1.125rem !important; }
-}

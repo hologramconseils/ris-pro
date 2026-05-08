@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { LABELS } from '../config/labels'
 
 export default function Footer() {
   return (
@@ -8,18 +7,18 @@ export default function Footer() {
       <div className="container flex flex-col items-center gap-6 text-center">
         
         <p className="text-base text-muted font-medium">
-          {LABELS.TAGLINE}
+          L'outil d'analyse expert pour votre relevé de carrière.
         </p>
 
         <div className="flex gap-6 flex-wrap justify-center text-sm text-muted font-medium">
-          <Link to="/mentions-legales" className="hover:text-main">{LABELS.LEGAL_MENTIONS}</Link>
-          <Link to="/cgv" className="hover:text-main">{LABELS.CGV}</Link>
-          <Link to="/politique-confidentialite" className="hover:text-main">{LABELS.PRIVACY_POLICY}</Link>
-          <Link to="/securite" className="hover:text-main">{LABELS.DATA_SECURITY}</Link>
+          <Link to="/mentions-legales" className="hover:text-main">Mentions Légales</Link>
+          <Link to="/cgv" className="hover:text-main">CGV</Link>
+          <Link to="/politique-confidentialite" className="hover:text-main">Politique de Confidentialité</Link>
+          <Link to="/securite" className="hover:text-main">Sécurité des données</Link>
         </div>
         
         <div className="text-sm text-muted">
-          <p>{LABELS.COPYRIGHT}</p>
+          <p>© 2026 Hologram Conseils. Tous droits réservés.</p>
         </div>
 
       </div>
