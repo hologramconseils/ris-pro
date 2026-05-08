@@ -76,14 +76,18 @@ export default async function handler(req, res) {
           {
             "year": "YYYY",
             "employer": "Nom de l'employeur",
-            "salary": "Montant",
+            "title": "Titre court de l'anomalie (ex: Trimestres manquants)",
+            "description": "Explication détaillée pour le diagnostic gratuit",
+            "reason": "Explication technique détaillée pour le bilan premium",
+            "solution": "Action corrective à entreprendre (ex: Contacter la CNAV)",
+            "docs": ["Document 1", "Document 2"],
+            "salary": "Montant ou nature des revenus",
             "trimesters": "X/4",
             "points": "X.XX",
-            "reason": "Explication de l'anomalie",
             "severity": "high/medium"
           }
         ],
-        "summary": "Résumé de l'audit"
+        "summary": "Résumé global de l'audit"
       }
     `;
 

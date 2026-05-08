@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { ShieldCheck, Sun, Moon, Monitor } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
+import { useAuth } from '../AuthContext'
+import { supabase } from '../lib/supabase'
+import { LABELS } from '../config/labels'
 
 function ThemeToggle() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system')
@@ -34,23 +37,87 @@ function ThemeToggle() {
 }
 
 export default function Header() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="glass" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
-        <Link to="/" className="flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
-          <div style={{ background: 'var(--primary)', color: 'white', padding: '0.5rem', borderRadius: '0.5rem' }}>
-            <ShieldCheck size={24} />
-          </div>
-          <span className="font-bold text-xl tracking-tight">RIS Pro</span>
+        <Link to="/" className="flex items-center gap-3" style={{ color: 'var(--text-main)' }}>
+          <img src="/logo.png" alt={LABELS.BRAND_NAME} className="brand-logo" style={{ height: '44px', width: 'auto' }} />
+          <span className="font-bold text-2xl tracking-tight mobile-text-xl">{LABELS.APP_NAME}</span>
         </Link>
-        <nav className="flex gap-4 items-center">
-          <Link to="/" className="text-sm font-medium text-muted hover:text-main">Accueil</Link>
-          <a href="https://hologramconseils.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted hover:text-main">
-            Hologram Conseils
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-4 items-center">
+          <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">Accueil</Link>
+          <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:text-primary transition-colors">
+            {LABELS.BRAND_NAME}
           </a>
+          <div className="h-4 w-px bg-border mx-1" />
+          
+          {user ? (
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={handleLogout}
+            >
+              {LABELS.CTA_LOGOUT}
+            </button>
+          ) : (
+            <Link to="/login" className="btn btn-primary btn-sm animate-pulse-subtle" style={{ padding: '0.6rem 1.5rem', height: 'auto' }}>
+              {LABELS.CTA_LOGIN}
+            </Link>
+          )}
+
           <ThemeToggle />
         </nav>
+
+        {/* Mobile Toggle Button */}
+        <div className="md:hidden flex items-center gap-3">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-main" aria-label="Menu">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-[70px] left-0 w-full bg-page border-b border-border shadow-lg p-6 flex flex-col gap-6 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider">Navigation</span>
+            <ThemeToggle />
+          </div>
+          
+          <div className="flex flex-col gap-4">
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium p-2 hover:bg-secondary rounded-md">Accueil</Link>
+            <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} className="text-base font-medium p-2 hover:bg-secondary rounded-md">
+              {LABELS.BRAND_NAME}
+            </a>
+          </div>
+
+          <div className="h-px w-full bg-border" />
+          
+          {user ? (
+            <button 
+              className="btn btn-secondary w-full"
+              onClick={handleLogout}
+            >
+              {LABELS.CTA_LOGOUT}
+            </button>
+          ) : (
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full animate-pulse-subtle">
+              Se connecter
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   )
 }
