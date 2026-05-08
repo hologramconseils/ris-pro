@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
     // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles)
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro"];
     let analysisResults = null;
     let lastError = null;
 
@@ -138,15 +138,61 @@ export default async function handler(req, res) {
     const cleanNir = (analysisResults.nir || "").replace(/\s/g, '') || "000000000000000";
     const nirHash = crypto.createHash('sha256').update(cleanNir + nirSalt).digest('hex');
 
-    // 4. Mettre à jour la base de données
+    // 4. Logique de Crédits et Unicité d'Identité (PRD Compliance)
+    if (userId) {
+      // Vérifier si cette identité a déjà été analysée par cet utilisateur
+      const { data: existingAnalysis } = await supabase
+        .from('analyses')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('nir_hash', nirHash)
+        .eq('status', 'completed')
+        .limit(1);
+
+      const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
+
+      if (isNewIdentity) {
+        // Récupérer le profil pour vérifier les crédits
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('analysis_credits, role')
+          .eq('id', userId)
+          .single();
+
+        const currentCredits = profile?.analysis_credits || 0;
+        const isAdmin = profile?.role === 'admin';
+
+        if (currentCredits <= 0 && !isAdmin) {
+          analysisResults.is_restricted = true;
+          console.log(`[Credits] Accès restreint pour ${userId} (0 crédits)`);
+        } else if (!isAdmin) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ analysis_credits: currentCredits - 1 })
+            .eq('id', userId);
+          
+          if (updateError) {
+            console.error("[Credits] Erreur décrémentation:", updateError.message);
+          } else {
+            console.log(`[Credits] -1 pour ${userId}. Restant: ${currentCredits - 1}`);
+          }
+        }
+      } else {
+        console.log(`[Credits] Identité déjà analysée pour ${userId}, pas de décompte.`);
+      }
+    }
+
+    // 5. Mettre à jour la base de données
+    const updateData = { 
+      status: 'completed',
+      results: analysisResults,
+      nir_hash: nirHash
+    };
+    if (userId) updateData.user_id = userId;
+
     await supabase
       .from('analyses')
-      .update({ 
-        status: 'completed',
-        results: analysisResults,
-        nir_hash: nirHash,
-        user_id: userId
-      })
+      .update(updateData)
       .eq('file_path', filePath);
 
     return res.status(200).json(analysisResults);
