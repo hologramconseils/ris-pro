@@ -53,8 +53,8 @@ export default async function handler(req, res) {
     const arrayBuffer = await fileData.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-    // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles)
-    const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-1.5-pro-latest"];
+    // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles 2026)
+    const modelsToTry = ["gemini-3.1-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
     let analysisResults = null;
     let lastError = null;
 
