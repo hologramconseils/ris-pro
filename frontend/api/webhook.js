@@ -42,21 +42,10 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-      const { data: currentProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('analysis_credits')
-        .eq('id', userId)
-        .single();
-
-      const newCredits = (currentProfile?.analysis_credits || 0) + 4;
-
-      const { error } = await supabaseAdmin
-        .from('profiles')
-        .update({ 
-          is_paid: true,
-          analysis_credits: newCredits 
-        })
-        .eq('id', userId);
+      const { error } = await supabaseAdmin.rpc('increment_credits', { 
+        target_user_id: userId,
+        qty: 4 
+      });
 
       if (error) {
         console.error("[Webhook] Erreur mise à jour profil :", error.message);

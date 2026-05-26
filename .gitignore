@@ -5,6 +5,8 @@ __pycache__/
 venv/
 test_env/
 .env
+.env.production
+.env.vercel.production
 *.db
 *.md
 !README.md

@@ -39,9 +39,15 @@ export default function Diagnostic() {
   const performAnalysis = async (path) => {
     try {
       setLoading(true)
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      
       const response = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({ filePath: path, userId: user?.id })
       })
 

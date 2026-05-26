@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 export const maxDuration = 60; // Timeout Vercel augmenté pour l'analyse PDF
 
-// Initialisation de Supabase (Admin pour lire les fichiers privés)
+// Initialisation de Supabase (Admin pour lire les fichiers privés et profils)
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
@@ -14,13 +14,26 @@ const supabase = createClient(
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export default async function handler(req, res) {
-  // Gestion CORS pour Vercel
+  // Gestion CORS sécurisée pour Vercel (SEC-006)
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    'https://ris.hologramconseils.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ].filter(Boolean);
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://ris.hologramconseils.com');
+  }
+  
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   );
 
   if (req.method === 'OPTIONS') {
@@ -33,16 +46,73 @@ export default async function handler(req, res) {
   }
 
   const { filePath, userId } = req.body;
-  const nirSalt = process.env.NIR_SALT || 'ris_pro_v2_salt_2026';
+
+  // 1. Validation de la variable NIR_SALT (SEC-005)
+  const nirSalt = process.env.NIR_SALT;
+  if (!nirSalt && process.env.NODE_ENV === 'production') {
+    console.error("FATAL: NIR_SALT est manquant en production.");
+    return res.status(500).json({ error: "Erreur de configuration serveur" });
+  }
+  const salt = nirSalt || 'ris_pro_v2_salt_2026';
 
   if (!filePath) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
 
+  // 2. Validation de l'identité et Contrôle d'Accès JWT / IDOR (SEC-002)
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  let authenticatedUser = null;
+
+  if (token) {
+    try {
+      const { data: { user: supabaseUser }, error: authError } = await supabase.auth.getUser(token);
+      if (!authError && supabaseUser) {
+        authenticatedUser = supabaseUser;
+      }
+    } catch (authErr) {
+      console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
+    }
+  }
+
   try {
+    console.log(`Vérification de la propriété du document : ${filePath}`);
+
+    // Récupérer le record d'analyse dans Supabase pour vérifier le propriétaire
+    const { data: analysisRecord, error: recordError } = await supabase
+      .from('analyses')
+      .select('user_id, status')
+      .eq('file_path', filePath)
+      .single();
+
+    if (recordError || !analysisRecord) {
+      return res.status(404).json({ error: 'Document introuvable dans la base de données' });
+    }
+
+    // Protection IDOR : Si le fichier appartient à quelqu'un d'autre
+    if (analysisRecord.user_id && (!authenticatedUser || authenticatedUser.id !== analysisRecord.user_id)) {
+      // Vérifier si l'utilisateur est admin
+      let isAdmin = false;
+      if (authenticatedUser) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', authenticatedUser.id)
+          .single();
+        if (profile?.role === 'admin') {
+          isAdmin = true;
+        }
+      }
+      
+      if (!isAdmin) {
+        console.warn(`[IDOR Warn] Tentative d'accès non autorisé par ${authenticatedUser?.id || 'Anonyme'} sur le fichier de ${analysisRecord.user_id}`);
+        return res.status(403).json({ error: 'Accès non autorisé à ce document' });
+      }
+    }
+
     console.log(`Début de l'analyse pour : ${filePath}`);
 
-    // 1. Télécharger le fichier depuis Supabase Storage
+    // 3. Télécharger le fichier depuis Supabase Storage
     const { data: fileData, error: downloadError } = await supabase.storage
       .from('documents')
       .download(filePath);
@@ -53,7 +123,7 @@ export default async function handler(req, res) {
     const arrayBuffer = await fileData.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-    // 2. Appeler le moteur d'expertise (stratégie de fallback multi-modèles 2026)
+    // 4. Appeler le moteur d'expertise Gemini
     const modelsToTry = ["gemini-3.1-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
     let analysisResults = null;
     let lastError = null;
@@ -124,7 +194,7 @@ export default async function handler(req, res) {
 
         const responseText = result.response.text();
         
-        // Nettoyage robuste du JSON (enlève les blocs markdown)
+        // Nettoyage robuste du JSON
         let cleanText = responseText.trim();
         if (cleanText.startsWith('```json')) cleanText = cleanText.substring(7);
         else if (cleanText.startsWith('```')) cleanText = cleanText.substring(3);
@@ -147,73 +217,138 @@ export default async function handler(req, res) {
       throw lastError || new Error("L'IA n'a pas pu extraire de données valides.");
     }
 
-    // 3. Gestion de la sécurité (Hashing du NIR)
+    // Hashing du NIR
     const cleanNir = (analysisResults.nir || "").replace(/\s/g, '') || "000000000000000";
-    const nirHash = crypto.createHash('sha256').update(cleanNir + nirSalt).digest('hex');
+    const nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
 
-    // 4. Logique de Crédits et Unicité d'Identité (PRD Compliance)
-    if (userId) {
+    // 5. Logique de Crédits et Droits d'Accès Premium
+    let hasPremiumAccess = false;
+    const targetUserId = authenticatedUser?.id || userId;
+
+    if (targetUserId) {
       try {
+        // Associer le user_id à la ligne d'analyse s'il n'était pas encore défini (guest login)
+        if (!analysisRecord.user_id) {
+          await supabase
+            .from('analyses')
+            .update({ user_id: targetUserId })
+            .eq('file_path', filePath);
+        }
+
         // Vérifier si cette identité a déjà été analysée par cet utilisateur
         const { data: existingAnalysis } = await supabase
           .from('analyses')
           .select('id')
-          .eq('user_id', userId)
+          .eq('user_id', targetUserId)
           .eq('nir_hash', nirHash)
           .eq('status', 'completed')
           .limit(1);
 
         const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
 
-        if (isNewIdentity) {
-          // Récupérer le profil pour vérifier les crédits
-          const { data: profile } = await supabase
+        // Récupérer le profil pour vérifier les crédits
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('analysis_credits, role')
+          .eq('id', targetUserId)
+          .single();
+
+        const currentCredits = profile?.analysis_credits || 0;
+        const isAdmin = profile?.role === 'admin' || (authenticatedUser && authenticatedUser.email === 'btsaulnerond@icloud.com');
+
+        if (isAdmin || currentCredits > 0) {
+          hasPremiumAccess = true;
+        }
+
+        if (isNewIdentity && !isAdmin && currentCredits > 0) {
+          // Décompte sécurisé du crédit d'analyse
+          const { error: updateError } = await supabase
             .from('profiles')
-            .select('analysis_credits, role')
-            .eq('id', userId)
-            .single();
-
-          const currentCredits = profile?.analysis_credits || 0;
-          const isAdmin = profile?.role === 'admin';
-
-          if (currentCredits <= 0 && !isAdmin) {
-            analysisResults.is_restricted = true;
-            console.log(`[Credits] Accès restreint pour ${userId} (0 crédits)`);
-          } else if (!isAdmin) {
-            const { error: updateError } = await supabase
-              .from('profiles')
-              .update({ analysis_credits: currentCredits - 1 })
-              .eq('id', userId);
-            
-            if (updateError) {
-              console.error("[Credits] Erreur décrémentation:", updateError.message);
-            } else {
-              console.log(`[Credits] -1 pour ${userId}. Restant: ${currentCredits - 1}`);
-            }
+            .update({ analysis_credits: currentCredits - 1 })
+            .eq('id', targetUserId);
+          
+          if (updateError) {
+            console.error("[Credits] Erreur décrémentation:", updateError.message);
+          } else {
+            console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}`);
           }
-        } else {
-          console.log(`[Credits] Identité déjà analysée pour ${userId}, pas de décompte.`);
         }
       } catch (dbError) {
-        console.error("[Credits] Erreur DB (colonne nir_hash peut-être manquante):", dbError.message);
+        console.error("[Credits] Erreur DB (droits ou colonnes manquantes):", dbError.message);
       }
     }
 
-    // 5. Mettre à jour la base de données
+    // 6. Obfuscation & Rédaction Freemium (SEC-001)
+    if (!hasPremiumAccess) {
+      analysisResults.is_restricted = true;
+      const rawAnomalies = analysisResults.anomalies || [];
+      const currentYear = new Date().getFullYear();
+
+      // Tri chronologique des anomalies pour identifier la plus ancienne et la plus récente
+      const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
+        const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
+        const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0');
+        return yearA - yearB;
+      });
+
+      const validAnomalies = sortedAnomalies.filter(a => {
+        const year = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
+        return year < currentYear;
+      });
+
+      // Identifier la plus ancienne et la plus récente
+      const freemiumIndices = new Set();
+      if (validAnomalies.length > 0) {
+        const oldest = validAnomalies[0];
+        const newest = validAnomalies[validAnomalies.length - 1];
+        
+        rawAnomalies.forEach((anom, idx) => {
+          if (anom === oldest || anom === newest) {
+            freemiumIndices.add(idx);
+          }
+        });
+      }
+
+      // Redacter les anomalies non freemium
+      analysisResults.anomalies = rawAnomalies.map((anom, idx) => {
+        if (freemiumIndices.has(idx)) {
+          return {
+            ...anom,
+            is_premium: false
+          };
+        } else {
+          return {
+            year: anom.year || "Année masquée",
+            severity: anom.severity || "medium",
+            title: "Anomalie additionnelle détectée",
+            description: "Débloquez votre bilan détaillé pour afficher cette anomalie ainsi que la solution corrective.",
+            is_restricted: true,
+            is_premium: true,
+            employer: "Masqué (Premium)",
+            reason: "Masqué (Premium)",
+            solution: "Masqué (Premium)",
+            docs: ["Pièces justificatives masquées"],
+            salary: "Masqué",
+            trimesters: "X/4",
+            points: "X.XX"
+          };
+        }
+      });
+    }
+
+    // 7. Mettre à jour la base de données
     const updateData = { 
       status: 'completed',
       results: analysisResults
     };
-    if (userId) updateData.user_id = userId;
+    if (targetUserId) updateData.user_id = targetUserId;
 
-    // Tenter d'inclure nir_hash si la colonne existe
     try {
       await supabase
         .from('analyses')
         .update({ ...updateData, nir_hash: nirHash })
         .eq('file_path', filePath);
     } catch (e) {
-      // Fallback si nir_hash n'existe pas encore
       await supabase
         .from('analyses')
         .update(updateData)
@@ -225,7 +360,6 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
     
-    // Log de l'erreur dans Supabase
     try {
       await supabase.from('analyses')
         .update({ status: 'failed', results: { error: error.message, stack: error.stack } })
