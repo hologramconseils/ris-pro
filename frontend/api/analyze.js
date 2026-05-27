@@ -123,98 +123,106 @@ export default async function handler(req, res) {
     const arrayBuffer = await fileData.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-    // 4. Appeler le moteur d'expertise Gemini
-    const modelsToTry = ["gemini-3.1-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
+    // 4. Appeler le moteur d'expertise Gemini (ou restaurer depuis la source brute)
     let analysisResults = null;
     let lastError = null;
 
-    const prompt = `
-      Tu es l'expert retraite de RIS Pro spécialisé dans l'audit des relevés de carrière (RIS / EIG).
-      Ton analyse doit suivre STRICTEMENT les règles métier suivantes pour détecter les anomalies :
+    // Règle 4 : Reconstruire dataset complet depuis DB si l'analyse existe déjà
+    if (analysisRecord && analysisRecord.status === 'completed' && analysisRecord.results && !analysisRecord.results.is_restricted) {
+      console.log(`[Cache DB] Données brutes restaurées depuis la DB pour : ${filePath}`);
+      analysisResults = analysisRecord.results;
+    } else {
+      // Sinon, on lance l'analyse IA
+      const modelsToTry = ["gemini-3.1-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
 
-      RÈGLES DE DÉTECTION DES ANOMALIES :
-      Une année est une ANOMALIE si elle remplit l'une des conditions suivantes :
-      - CAS 1 : Moins de 4 trimestres validés.
-      - CAS 2 : Nombre de points égal à 0.
-      - CAS 3 : 4 trimestres validés MAIS avec 0 point.
-      - CAS 4 : Toute combinaison où (trimestres < 4) OU (points <= 0).
-      - CAS 5 : Année totalement ABSENTE du relevé alors qu'elle se situe entre le début et la fin de la carrière (trou de carrière).
+      const prompt = `
+        Tu es l'expert retraite de RIS Pro spécialisé dans l'audit des relevés de carrière (RIS / EIG).
+        Ton analyse doit suivre STRICTEMENT les règles métier suivantes pour détecter les anomalies :
 
-      ANALYSE DE CONTINUITÉ OBLIGATOIRE :
-      1. Identifie l'année la plus ancienne et l'année la plus récente du relevé.
-      2. Vérifie chaque année dans cet intervalle.
-      3. Si une année est manquante, ajoute-la aux anomalies avec le titre "Année absente du relevé".
+        RÈGLES DE DÉTECTION DES ANOMALIES :
+        Une année est une ANOMALIE si elle remplit l'une des conditions suivantes :
+        - CAS 1 : Moins de 4 trimestres validés.
+        - CAS 2 : Nombre de points égal à 0.
+        - CAS 3 : 4 trimestres validés MAIS avec 0 point.
+        - CAS 4 : Toute combinaison où (trimestres < 4) OU (points <= 0).
+        - CAS 5 : Année totalement ABSENTE du relevé alors qu'elle se situe entre le début et la fin de la carrière (trou de carrière).
 
-      DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
-      Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
-      NE JAMAIS inclure d'année normale dans la liste des anomalies.
+        ANALYSE DE CONTINUITÉ OBLIGATOIRE :
+        1. Identifie l'année la plus ancienne et l'année la plus récente du relevé.
+        2. Vérifie chaque année dans cet intervalle.
+        3. Si une année est manquante, ajoute-la aux anomalies avec le titre "Année absente du relevé".
 
-      EXCLUSION SYSTÉMATIQUE :
-      - Exclure l'année en cours (2026) car non consolidée.
+        DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
+        Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
+        NE JAMAIS inclure d'année normale dans la liste des anomalies.
 
-      STRUCTURE JSON ATTENDUE :
-      {
-        "nir": "XXXXXXXXXXXXXXX",
-        "anomalies": [
-          {
-            "year": "YYYY",
-            "employer": "Nom de l'employeur",
-            "title": "Titre court de l'anomalie",
-            "description": "Explication pour le diagnostic gratuit",
-            "reason": "Explication technique pour le bilan premium",
-            "solution": "Action corrective à entreprendre",
-            "docs": ["Document 1", "Document 2"],
-            "salary": "Montant ou nature des revenus",
-            "trimesters": "X/4",
-            "points": "X.XX",
-            "severity": "high/medium"
-          }
-        ],
-        "summary": "Résumé global de l'audit"
-      }
-    `;
+        EXCLUSION SYSTÉMATIQUE :
+        - Exclure l'année en cours (2026) car non consolidée.
 
-    for (const modelName of modelsToTry) {
-      try {
-        console.log(`Tentative avec ${modelName}...`);
-        const model = genAI.getGenerativeModel({ 
-          model: modelName,
-          generationConfig: { responseMimeType: "application/json" }
-        });
-
-        const result = await model.generateContent([
-          {
-            inlineData: {
-              data: base64Data,
-              mimeType: "application/pdf"
+        STRUCTURE JSON ATTENDUE :
+        {
+          "nir": "XXXXXXXXXXXXXXX",
+          "anomalies": [
+            {
+              "year": "YYYY",
+              "employer": "Nom de l'employeur",
+              "title": "Titre court de l'anomalie",
+              "description": "Explication pour le diagnostic gratuit",
+              "reason": "Explication technique pour le bilan premium",
+              "solution": "Action corrective à entreprendre",
+              "docs": ["Document 1", "Document 2"],
+              "salary": "Montant ou nature des revenus",
+              "trimesters": "X/4",
+              "points": "X.XX",
+              "severity": "high/medium"
             }
-          },
-          { text: prompt }
-        ]);
-
-        const responseText = result.response.text();
-        
-        // Nettoyage robuste du JSON
-        let cleanText = responseText.trim();
-        if (cleanText.startsWith('```json')) cleanText = cleanText.substring(7);
-        else if (cleanText.startsWith('```')) cleanText = cleanText.substring(3);
-        if (cleanText.endsWith('```')) cleanText = cleanText.substring(0, cleanText.length - 3);
-        cleanText = cleanText.trim();
-
-        const parsed = JSON.parse(cleanText);
-        if (parsed.anomalies || parsed.nir) {
-          analysisResults = parsed;
-          console.log(`Analyse réussie avec ${modelName}`);
-          break;
+          ],
+          "summary": "Résumé global de l'audit"
         }
-      } catch (err) {
-        console.error(`Échec avec ${modelName}:`, err.message);
-        lastError = err;
-      }
-    }
+      `;
 
-    if (!analysisResults) {
-      throw lastError || new Error("L'IA n'a pas pu extraire de données valides.");
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`Tentative avec ${modelName}...`);
+          const model = genAI.getGenerativeModel({ 
+            model: modelName,
+            generationConfig: { responseMimeType: "application/json" }
+          });
+
+          const result = await model.generateContent([
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType: "application/pdf"
+              }
+            },
+            { text: prompt }
+          ]);
+
+          const responseText = result.response.text();
+          
+          // Nettoyage robuste du JSON
+          let cleanText = responseText.trim();
+          if (cleanText.startsWith('```json')) cleanText = cleanText.substring(7);
+          else if (cleanText.startsWith('```')) cleanText = cleanText.substring(3);
+          if (cleanText.endsWith('```')) cleanText = cleanText.substring(0, cleanText.length - 3);
+          cleanText = cleanText.trim();
+
+          const parsed = JSON.parse(cleanText);
+          if (parsed.anomalies || parsed.nir) {
+            analysisResults = parsed;
+            console.log(`Analyse réussie avec ${modelName}`);
+            break;
+          }
+        } catch (err) {
+          console.error(`Échec avec ${modelName}:`, err.message);
+          lastError = err;
+        }
+      }
+
+      if (!analysisResults) {
+        throw lastError || new Error("L'IA n'a pas pu extraire de données valides.");
+      }
     }
 
     // Hashing du NIR

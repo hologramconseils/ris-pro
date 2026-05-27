@@ -90,6 +90,9 @@ export default function Login() {
         if (signUpError) throw signUpError
       }
 
+      // Règle absolue 1 : Invalider toute analyse existante au login pour forcer le rechargement brut
+      sessionStorage.clear()
+
       navigate(redirect)
     } catch (err) {
       console.error(err)
