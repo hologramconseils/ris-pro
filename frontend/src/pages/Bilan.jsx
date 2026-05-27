@@ -37,20 +37,34 @@ export default function Bilan() {
 
       const cached = sessionStorage.getItem(`ris_pro_analysis_${path}`);
       if (cached) {
-        setResults(JSON.parse(cached));
-        setLoading(false);
-        return;
+        const parsedCache = JSON.parse(cached);
+        // Règle métier : Ne jamais réutiliser un résultat Freemium (is_restricted) en Premium
+        if (!parsedCache.is_restricted) {
+          setResults(parsedCache);
+          setLoading(false);
+          return;
+        }
+        // Si le cache est restreint, on le purge et on force le rechargement depuis la DB
+        sessionStorage.removeItem(`ris_pro_analysis_${path}`);
       }
 
       const { data, error: dbError } = await supabase
         .from('analyses')
-        .select('results')
+        .select('results, user_id')
         .eq('file_path', path)
         .order('created_at', { ascending: false })
         .limit(1)
 
       if (dbError) throw dbError
       if (data && data.length > 0 && data[0].results) {
+        // Associer l'analyse au compte utilisateur s'il était déconnecté lors de la soumission
+        if (!data[0].user_id && user?.id) {
+          try {
+            await supabase.from('analyses').update({ user_id: user.id }).eq('file_path', path);
+          } catch (e) {
+            console.error("Erreur lors de l'association de l'analyse au compte:", e);
+          }
+        }
         setResults(data[0].results)
       } else {
         throw new Error("Aucun résultat trouvé pour ce document.")

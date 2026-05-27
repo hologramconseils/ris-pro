@@ -300,7 +300,10 @@ export default function Diagnostic() {
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-2xl mx-auto" style={{ marginTop: '1rem' }}>
               <button 
                 className="btn btn-outline flex-1" 
-                onClick={() => navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`)}
+                onClick={() => {
+                  if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
+                  navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
+                }}
               >
                 Se connecter
               </button>

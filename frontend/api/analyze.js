@@ -279,9 +279,12 @@ export default async function handler(req, res) {
     }
 
     // 6. Obfuscation & Rédaction Freemium (SEC-001)
+    let clientResponse = analysisResults;
+
     if (!hasPremiumAccess) {
-      analysisResults.is_restricted = true;
-      const rawAnomalies = analysisResults.anomalies || [];
+      clientResponse = JSON.parse(JSON.stringify(analysisResults));
+      clientResponse.is_restricted = true;
+      const rawAnomalies = clientResponse.anomalies || [];
       const currentYear = new Date().getFullYear();
 
       // Tri chronologique des anomalies pour identifier la plus ancienne et la plus récente
@@ -310,7 +313,7 @@ export default async function handler(req, res) {
       }
 
       // Redacter les anomalies non freemium
-      analysisResults.anomalies = rawAnomalies.map((anom, idx) => {
+      clientResponse.anomalies = rawAnomalies.map((anom, idx) => {
         if (freemiumIndices.has(idx)) {
           return {
             ...anom,
@@ -355,7 +358,7 @@ export default async function handler(req, res) {
         .eq('file_path', filePath);
     }
 
-    return res.status(200).json(analysisResults);
+    return res.status(200).json(clientResponse);
 
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
