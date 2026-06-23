@@ -224,15 +224,15 @@ export default function Diagnostic() {
           </h2>
           
           {freemiumAnomalies.map((anom, idx) => (
-            <div key={idx} className="card" style={{ padding: '1.5rem', borderLeft: `4px solid ${anom.severity === 'high' ? 'var(--danger)' : 'var(--warning)'}` }}>
-              <div className="flex justify-between items-start" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+            <div key={idx} className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} style={{ padding: '1.5rem' }}>
+              <div className="anomaly-header">
                 <div>
                   <h3 className="font-bold text-lg flex items-center gap-2">
                     <Calendar size={18} className="text-muted" /> {anom.year || "Année non spécifiée"}
                   </h3>
                 </div>
                 
-                <div className="flex gap-4 flex-wrap">
+                <div className="flex gap-4">
                   <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
                     <div className="text-[10px] text-muted uppercase tracking-wider">Sévérité</div>
                     <div className="font-bold uppercase text-xs" style={{ color: anom.severity === 'high' ? 'var(--danger)' : 'var(--warning)' }}>
@@ -266,7 +266,7 @@ export default function Diagnostic() {
           
           {showSignup ? (
             <form onSubmit={handleSignupAndPay} className="flex flex-col gap-4 text-left w-full max-w-md bg-page p-6 rounded-xl border" style={{ borderColor: 'var(--border)' }}>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex flex-col gap-1 w-full">
                   <label className="text-sm font-semibold">Prénom</label>
                   <input type="text" className="input" placeholder="Jean" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />

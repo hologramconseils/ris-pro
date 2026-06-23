@@ -168,7 +168,7 @@ export default function Bilan() {
         </div>
 
         {/* Synthesis Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+        <div className="synthesis-grid">
           <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <div className="text-sm text-muted uppercase tracking-wide font-bold">Total Anomalies</div>
             <div className="text-3xl font-bold text-error">{anomalies.length}</div>
@@ -209,7 +209,7 @@ export default function Bilan() {
               </div>
               
               <div style={{ padding: '1.5rem' }} className="flex flex-col gap-6">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', background: 'var(--bg-page)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                <div className="details-grid">
                   <div>
                     <div className="text-xs text-muted">Salaire Brut (ou nature)</div>
                     <div className="font-semibold">{anom.salary}</div>

@@ -136,14 +136,7 @@ export default function Home() {
           </div>
         ) : (
           <div 
-            className={`card ${isDragging ? 'glass' : ''}`}
-            style={{ 
-              width: '100%', 
-              padding: '4rem 2rem', 
-              border: `2px dashed ${isDragging ? 'var(--primary)' : 'rgba(0,0,0,0.1)'}`,
-              cursor: 'pointer',
-              transition: 'all var(--transition-fast)'
-            }}
+            className={`upload-dropzone card ${isDragging ? 'glass dragging' : ''}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -166,23 +159,23 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex flex-col items-center gap-8" style={{ marginTop: '3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <div className="flex gap-8 flex-wrap justify-center">
-            <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="reassurance-container">
+          <div className="reassurance-items">
+            <div className="reassurance-item">
               <CheckCircle2 size={18} className="text-success" />
               <span>95% de précision</span>
             </div>
-            <div className="flex items-center gap-2 text-sm font-medium">
+            <div className="reassurance-item">
               <CheckCircle2 size={18} className="text-success" />
               <span>100% Confidentiel</span>
             </div>
-            <div className="flex items-center gap-2 text-sm font-medium">
+            <div className="reassurance-item">
               <CheckCircle2 size={18} className="text-success" />
               <span>Support Régimes de Base & Complémentaires</span>
             </div>
           </div>
 
-          <div style={{ marginTop: '2rem' }}>
+          <div style={{ marginTop: '1rem' }}>
             <a 
               href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
               target="_blank" 
