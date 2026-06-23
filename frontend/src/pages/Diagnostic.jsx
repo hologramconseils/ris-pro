@@ -17,12 +17,16 @@ export default function Diagnostic() {
 
   const [showSignup, setShowSignup] = useState(false)
   const [showAuthChoice, setShowAuthChoice] = useState(false)
+  const [showGuestCheckout, setShowGuestCheckout] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState('')
+  const [checkoutEmail, setCheckoutEmail] = useState('')
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [checkoutError, setCheckoutError] = useState('')
 
   useEffect(() => {
     if (filePath) {
@@ -106,6 +110,41 @@ export default function Diagnostic() {
     } catch (err) {
       console.error("Erreur Checkout:", err)
       setError("Le service de paiement est indisponible.");
+    }
+  }
+
+  const handleGuestCheckout = async (e) => {
+    e.preventDefault()
+    if (!checkoutEmail || !checkoutEmail.includes('@')) {
+      setCheckoutError('Veuillez entrer une adresse email valide.')
+      return
+    }
+    setCheckoutLoading(true)
+    setCheckoutError('')
+    try {
+      if (results) {
+        sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
+      }
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: null,
+          userEmail: checkoutEmail,
+          filePath: filePath
+        })
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError("Erreur d'initialisation du paiement. Veuillez réessayer.");
+      }
+    } catch (err) {
+      console.error('Erreur Guest Checkout:', err)
+      setCheckoutError('Le service de paiement est indisponible.')
+    } finally {
+      setCheckoutLoading(false)
     }
   }
 
@@ -297,22 +336,76 @@ export default function Diagnostic() {
               </button>
             </form>
           ) : showAuthChoice ? (
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-2xl mx-auto" style={{ marginTop: '1rem' }}>
-              <button 
-                className="btn btn-outline flex-1" 
-                onClick={() => {
-                  if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-                  navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
-                }}
-              >
-                Se connecter
-              </button>
-              <button 
-                className="btn btn-primary flex-1 btn-cta-premium" 
-                onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
-              >
-                <span>Créer mon compte et payer 29€</span>
-              </button>
+            <div className="auth-choice-container" style={{ marginTop: '1rem' }}>
+              {/* CTA principal : achat direct sans compte */}
+              <div className="guest-checkout-section">
+                {!showGuestCheckout ? (
+                  <button
+                    className="btn btn-primary btn-cta-premium w-full"
+                    onClick={() => { setShowGuestCheckout(true); }}
+                  >
+                    <span>Accédez à l'analyse détaillée pour 29 €</span>
+                    <ChevronRight size={18} />
+                  </button>
+                ) : (
+                  <form onSubmit={handleGuestCheckout} className="guest-checkout-form">
+                    <p className="guest-checkout-label">Entrez votre email pour recevoir votre accès :</p>
+                    <div className="guest-checkout-fields">
+                      <input
+                        type="email"
+                        className="input"
+                        placeholder="votre@email.com"
+                        value={checkoutEmail}
+                        onChange={(e) => setCheckoutEmail(e.target.value)}
+                        required
+                        autoFocus
+                      />
+                      {checkoutError && (
+                        <div className="flex items-center gap-2 text-error text-sm p-3 bg-error-bg rounded-lg">
+                          <ShieldAlert size={16} />
+                          {checkoutError}
+                        </div>
+                      )}
+                      <button type="submit" className="btn btn-primary btn-cta-premium w-full" disabled={checkoutLoading}>
+                        {checkoutLoading ? <Loader2 className="animate-spin" size={18} /> : <span>Payer 29 € et accéder à l'analyse</span>}
+                      </button>
+                      <button type="button" className="btn btn-ghost text-sm" onClick={() => setShowGuestCheckout(false)}>
+                        ← Retour
+                      </button>
+                    </div>
+                  </form>
+                )}
+                <div className="text-xs text-muted text-center mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                  <Lock size={11} /> Paiement sécurisé • Accès immédiat après paiement
+                </div>
+              </div>
+
+              {/* Séparateur */}
+              <div className="auth-divider">
+                <span>ou</span>
+              </div>
+
+              {/* Options compte */}
+              <div className="auth-account-options">
+                <p className="auth-account-label">Vous avez déjà un compte ?</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    className="btn btn-outline flex-1"
+                    onClick={() => {
+                      if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
+                      navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
+                    }}
+                  >
+                    Se connecter
+                  </button>
+                  <button
+                    className="btn btn-secondary flex-1"
+                    onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
+                  >
+                    Créer un compte
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <>
