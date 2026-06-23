@@ -257,7 +257,6 @@ export default function Bilan() {
             target="_blank" 
             rel="noopener noreferrer"
             className="btn btn-secondary btn-cta-premium"
-            style={{ padding: '1rem 2rem' }}
           >
             <span>{LABELS.CTA_CALL}</span>
           </a>

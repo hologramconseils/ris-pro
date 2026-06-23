@@ -188,7 +188,6 @@ export default function Home() {
               target="_blank" 
               rel="noopener noreferrer"
               className="btn btn-secondary btn-cta-premium"
-              style={{ padding: '1rem 2rem', borderRadius: 'var(--radius-lg)' }}
             >
               <span>{LABELS.CTA_CALL}</span>
             </a>
