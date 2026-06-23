@@ -388,23 +388,21 @@ export default function Diagnostic() {
               {/* Options compte */}
               <div className="auth-account-options">
                 <p className="auth-account-label">Vous avez déjà un compte ?</p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    className="btn btn-outline flex-1"
-                    onClick={() => {
-                      if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-                      navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
-                    }}
-                  >
-                    Se connecter
-                  </button>
-                  <button
-                    className="btn btn-secondary flex-1"
-                    onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
-                  >
-                    Créer un compte
-                  </button>
-                </div>
+                <button
+                  className="btn-link-bold"
+                  onClick={() => {
+                    if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
+                    navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
+                  }}
+                >
+                  Se connecter
+                </button>
+                <button
+                  className="btn btn-primary btn-cta-premium w-full"
+                  onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
+                >
+                  <span>Créer un compte</span>
+                </button>
               </div>
             </div>
           ) : (
