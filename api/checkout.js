@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       ],
       mode: 'payment',
       customer_email: userEmail,
-      client_reference_id: userId,
+      ...(userId && { client_reference_id: userId }),
       metadata: {
         filePath: filePath
       },

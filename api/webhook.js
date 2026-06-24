@@ -49,24 +49,49 @@ export default async function handler(req, res) {
       // Si pas de userId, on cherche ou crée l'utilisateur par email
       if (!finalUserId) {
         try {
-          // 1. Chercher si l'utilisateur existe déjà par son email (requête sur auth.users en mode admin)
-          const supabaseAdminAuthSchema = createClient(
-            process.env.VITE_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            { db: { schema: 'auth' } }
-          );
+          console.log(`[Webhook] Recherche de l'utilisateur pour l'email: ${userEmail}`);
+          
+          // 1. Tenter la recherche par RPC get_user_id_by_email (rapide & performant)
+          let existingUserId = null;
+          try {
+            const { data: rpcUserId, error: rpcError } = await supabaseAdmin.rpc('get_user_id_by_email', {
+              email_to_search: userEmail
+            });
+            if (!rpcError && rpcUserId) {
+              existingUserId = rpcUserId;
+              console.log(`[Webhook] Utilisateur trouvé via RPC pour ${userEmail} : ${existingUserId}`);
+            } else if (rpcError) {
+              console.log(`[Webhook] RPC get_user_id_by_email non disponible ou en erreur :`, rpcError.message);
+            }
+          } catch (rpcErr) {
+            console.log(`[Webhook] Échec de l'appel RPC (fonction SQL peut-être manquante) :`, rpcErr.message);
+          }
 
-          const { data: existingUser, error: searchError } = await supabaseAdminAuthSchema
-            .from('users')
-            .select('id')
-            .eq('email', userEmail)
-            .maybeSingle();
+          // 2. Si RPC a échoué/indisponible, tenter via listUsers (fallback d'administration sécurisé)
+          if (!existingUserId) {
+            try {
+              const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+                perPage: 1000,
+                page: 1
+              });
+              if (!listError && listData?.users) {
+                const foundUser = listData.users.find(u => u.email?.toLowerCase() === userEmail.toLowerCase());
+                if (foundUser) {
+                  existingUserId = foundUser.id;
+                  console.log(`[Webhook] Utilisateur trouvé via fallback listUsers pour ${userEmail} : ${existingUserId}`);
+                }
+              } else if (listError) {
+                console.error("[Webhook] Erreur fallback listUsers :", listError.message);
+              }
+            } catch (listErr) {
+              console.error("[Webhook] Échec critique du fallback listUsers :", listErr.message);
+            }
+          }
 
-          if (existingUser) {
-            finalUserId = existingUser.id;
-            console.log(`[Webhook] Utilisateur existant trouvé pour l'email ${userEmail} : ${finalUserId}`);
+          if (existingUserId) {
+            finalUserId = existingUserId;
           } else {
-            // 2. Créer un nouvel utilisateur
+            // 3. Créer un nouvel utilisateur s'il n'existe nulle part
             isNewUser = true;
             const tempPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
             
