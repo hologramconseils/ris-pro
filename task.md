@@ -1,8 +1,16 @@
-# Liste des tâches - Optimisations de Performance
+# Liste des tâches - Stabilisation, Performance & Sécurité
 
-- [x] Optimiser les modèles d'analyse IA dans `frontend/api/analyze.js` (Action 1)
-- [x] Optimiser le chargement de la police Inter dans `frontend/index.html` et `frontend/src/index.css` (Action 2)
-- [x] Mettre en place le Lazy Loading des routes React dans `frontend/src/App.jsx` (Action 3)
-- [x] Configurer la région de déploiement Vercel dans `vercel.json` (Action 4)
+## Performance
+- [x] Optimiser les modèles d'analyse IA dans `frontend/api/analyze.js`
+- [x] Optimiser le chargement de la police Inter dans `frontend/index.html` et `frontend/src/index.css`
+- [x] Mettre en place le Lazy Loading des routes React dans `frontend/src/App.jsx`
+- [x] Configurer la région de déploiement Vercel dans `vercel.json`
 - [x] Valider la compilation du projet avec `npm run build`
-- [ ] Déployer en production sur GitHub / Vercel et vérifier
+- [x] Déployer en production sur GitHub / Vercel et vérifier
+
+## Sécurité & Robustesse Backend
+- [ ] Résoudre SEC-004 : Utiliser l'appel RPC Supabase `increment_credits` dans `frontend/api/webhook.js` au lieu de la lecture/écriture non atomique
+- [ ] Résoudre SEC-003 : Retirer les fichiers `.env.production`, `.env.vercel` et `.env.vercel.production` du suivi de Git (`git rm --cached`)
+- [ ] Mettre à jour `supabase_migration.sql` pour redéfinir `increment_credits` de manière résiliente avec `ON CONFLICT`
+- [ ] Valider la compilation locale (`npm run build`)
+- [ ] Commiter, pousser sur GitHub/Vercel et finaliser le walkthrough

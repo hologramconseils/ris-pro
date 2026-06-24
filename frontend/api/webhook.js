@@ -118,22 +118,11 @@ export default async function handler(req, res) {
       if (finalUserId) {
         console.log(`[Webhook] Activation pour userId: ${finalUserId}`);
 
-        const { data: currentProfile } = await supabaseAdmin
-          .from('profiles')
-          .select('analysis_credits')
-          .eq('id', finalUserId)
-          .single();
-
-        const newCredits = (currentProfile?.analysis_credits || 0) + 4;
-
-        // Upsert robuste (gère la création du profil s'il n'existe pas encore)
-        const { error: profileError } = await supabaseAdmin
-          .from('profiles')
-          .upsert({ 
-            id: finalUserId,
-            is_paid: true,
-            analysis_credits: newCredits 
-          });
+        // Appel RPC atomique pour incrémenter les crédits et marquer le profil comme payant (SEC-004)
+        const { error: profileError } = await supabaseAdmin.rpc('increment_credits', {
+          target_user_id: finalUserId,
+          qty: 4
+        });
 
         if (profileError) {
           console.error("[Webhook] Erreur mise à jour profil :", profileError.message);

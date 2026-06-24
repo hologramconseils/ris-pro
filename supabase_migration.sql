@@ -4,11 +4,12 @@
 CREATE OR REPLACE FUNCTION public.increment_credits(target_user_id UUID, qty INT)
 RETURNS VOID AS $$
 BEGIN
-  UPDATE public.profiles
+  INSERT INTO public.profiles (id, analysis_credits, is_paid)
+  VALUES (target_user_id, qty, true)
+  ON CONFLICT (id) DO UPDATE
   SET 
-    analysis_credits = COALESCE(analysis_credits, 0) + qty,
-    is_paid = true
-  WHERE id = target_user_id;
+    analysis_credits = COALESCE(public.profiles.analysis_credits, 0) + qty,
+    is_paid = true;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

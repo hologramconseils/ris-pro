@@ -6,6 +6,7 @@ venv/
 test_env/
 .env
 .env.production
+.env.vercel
 .env.vercel.production
 *.db
 *.md
