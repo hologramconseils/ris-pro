@@ -3,6 +3,7 @@
   --primary: hsl(221, 83%, 53%);
   --primary-hover: hsl(221, 83%, 45%);
   --secondary: hsl(210, 20%, 96%);
+  --border: hsl(214, 32%, 91%);
   
   /* Text Colors */
   --text-main: hsl(222, 47%, 11%);
@@ -47,6 +48,7 @@
   --text-main: hsl(210, 40%, 98%);
   --text-muted: hsl(215, 20%, 65%);
   --secondary: hsl(222, 47%, 15%);
+  --border: hsl(222, 47%, 15%);
   --success-bg: rgba(22, 163, 74, 0.15);
   --warning-bg: rgba(234, 179, 8, 0.15);
   --error-bg: rgba(220, 38, 38, 0.15);
@@ -230,6 +232,40 @@ a:hover {
   background-color: transparent;
   box-shadow: none;
   transform: none;
+}
+
+/* --- Premium & Touch-Friendly Input Styling --- */
+.input {
+  width: 100%;
+  height: 3.25rem;
+  padding: 0 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.dark .input {
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(15, 23, 42, 0.3);
+}
+
+.dark .input:focus {
+  border-color: var(--primary);
 }
 
 /* --- Auth Choice Container (double CTA) --- */
@@ -565,6 +601,16 @@ a:hover {
   .details-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .bilan-header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem !important;
+  }
+
+  .bilan-header-actions .btn {
+    width: 100%;
   }
 }
 

@@ -79,3 +79,31 @@ J'ai mené à bien la correction et la remédiation des failles de sécurité id
 - **Fichiers modifiés** : [index de Git] & [.gitignore](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/.gitignore)
 - **Modification** : Retrait des fichiers d'environnement `.env.production`, `.env.vercel` et `.env.vercel.production` du suivi de version Git via la commande `git rm --cached`. Ajout explicite du filtre d'exclusion `.env.vercel` dans le fichier `.gitignore`.
 - **Résultat** : Vos jetons de déploiement et clés d'API sensibles sont désormais en sécurité et ne seront plus jamais poussés sur votre dépôt GitHub, tout en restant actifs localement pour votre propre usage.
+
+---
+
+# Walkthrough - Optimisation Ergonomique Mobile et Tablette (mobile-design)
+
+J'ai optimisé l'ergonomie, l'accessibilité tactile et l'affichage responsive de l'application sur smartphone et tablette en suivant les directives de design tactile.
+
+## Détails des optimisations mobiles appliquées
+
+### 1. Agrandissement des cibles tactiles (Fitts' Law / Touch Targets >= 44px)
+- **Fichier modifié** : [Header.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/components/Header.jsx)
+- **Modification** : Le bouton de theme (`ThemeToggle`) et le bouton d'activation du menu mobile ont été redimensionnés pour avoir des dimensions physiques minimales de `44px` par `44px`.
+- **Bénéfice** : Sélection au doigt plus précise et accessible pour tous les utilisateurs sur écran tactile.
+
+### 2. Adaptation responsive de la zone de dépôt (Home.jsx)
+- **Fichier modifié** : [Home.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/pages/Home.jsx)
+- **Modification** : La mention d'aide au glisser-déposer de fichier ("Glissez-déposez") est désormais automatiquement masquée sur les mobiles et tablettes (grâce aux classes CSS `.hidden md:inline`). Elle est remplacée par une invite d'action de clic simplifiée : "cliquez pour parcourir et analyser votre relevé."
+- **Bénéfice** : Supprime l'anti-pattern de vocabulaire bureau/desktop sur les terminaux uniquement tactiles.
+
+### 3. Stacking vertical des boutons principaux
+- **Fichiers modifiés** : [Bilan.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/pages/Bilan.jsx) et [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
+- **Modification** : Ajout de la classe `.bilan-header-actions` qui empile verticalement en `flex-direction: column` les boutons d'action du bilan et les étend à 100% de la largeur sur les écrans mobiles (< 768px).
+- **Bénéfice** : Évite le chevauchement ou le rétrécissement des boutons, améliorant grandement le confort tactile.
+
+### 4. Résolution de la variable CSS `--border` manquante
+- **Fichier modifié** : [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
+- **Modification** : Ajout explicite de la variable `--border` dans les sélecteurs `:root` et `.dark`.
+- **Bénéfice** : Rétablit l'affichage correct des séparateurs et bordures de champs dans l'ensemble de l'interface (thème clair et sombre).

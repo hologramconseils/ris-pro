@@ -28,7 +28,7 @@ function ThemeToggle() {
   }
 
   return (
-    <button onClick={cycleTheme} className="btn-secondary" style={{ padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={`Thème: ${theme}`}>
+    <button onClick={cycleTheme} className="btn-secondary" style={{ width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title={`Thème: ${theme}`}>
       {theme === 'light' && <Sun size={18} />}
       {theme === 'dark' && <Moon size={18} />}
       {theme === 'system' && <Monitor size={18} />}
@@ -81,7 +81,12 @@ export default function Header() {
 
         {/* Mobile Toggle Button */}
         <div className="md:hidden flex items-center gap-3">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-main" aria-label="Menu">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            className="text-main" 
+            style={{ width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer' }} 
+            aria-label="Menu"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>

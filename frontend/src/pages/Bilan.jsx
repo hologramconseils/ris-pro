@@ -101,14 +101,14 @@ export default function Bilan() {
         <p className="text-muted max-w-lg">
           Vous devez avoir débloqué l'accès pour consulter le bilan détaillé.
         </p>
-        <div className="flex gap-4">
-          <button className="btn btn-primary" onClick={() => refreshProfile()}>
-            {LABELS.CTA_REFRESH_STATUS}
-          </button>
-          <button className="btn btn-primary" onClick={() => navigate('/')}>
-            {LABELS.CTA_START_ANALYSIS}
-          </button>
-        </div>
+          <div className="flex gap-4 bilan-header-actions">
+            <button className="btn btn-secondary" onClick={() => refreshProfile()}>
+              {LABELS.CTA_REFRESH_STATUS}
+            </button>
+            <button className="btn btn-primary" onClick={() => navigate('/')}>
+              {LABELS.CTA_START_ANALYSIS}
+            </button>
+          </div>
       </div>
     )
   }

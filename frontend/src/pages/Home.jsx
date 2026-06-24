@@ -148,7 +148,10 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Uploader mon relevé de carrière</h3>
-                <p className="text-sm text-muted">Glissez-déposez votre RIS / EIG au format PDF ou cliquez pour parcourir.</p>
+                <p className="text-sm text-muted">
+                  <span className="hidden md:inline">Glissez-déposez votre RIS / EIG au format PDF ou </span>
+                  <span>cliquez pour parcourir et analyser votre relevé.</span>
+                </p>
               </div>
               <label className="btn btn-primary" style={{ cursor: 'pointer' }} onClick={(e) => e.stopPropagation()}>
                 <FileText size={18} />
