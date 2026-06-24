@@ -354,16 +354,17 @@ export default function Diagnostic() {
               </div>
 
               {/* Options compte */}
-              <div className="auth-account-options">
+              <div className="auth-account-options" style={{ width: '100%' }}>
                 <p className="auth-account-label">Vous avez déjà un compte ?</p>
                 <button
-                  className="btn-link-bold"
+                  className="btn btn-primary btn-cta-premium w-full"
                   onClick={() => {
                     if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
                     navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
                   }}
                 >
-                  Se connecter
+                  <span>Se connecter</span>
+                  <ChevronRight size={18} />
                 </button>
               </div>
             </div>
