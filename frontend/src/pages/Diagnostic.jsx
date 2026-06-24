@@ -16,17 +16,12 @@ export default function Diagnostic() {
   const [error, setError] = useState(null)
 
   const [showSignup, setShowSignup] = useState(false)
-  const [showAuthChoice, setShowAuthChoice] = useState(false)
-  const [showGuestCheckout, setShowGuestCheckout] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState('')
-  const [checkoutEmail, setCheckoutEmail] = useState('')
-  const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const [checkoutError, setCheckoutError] = useState('')
 
   useEffect(() => {
     if (filePath) {
@@ -75,10 +70,7 @@ export default function Diagnostic() {
       sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
     }
 
-    if (!user) {
-      setShowAuthChoice(true)
-      return
-    }
+    if (!user) return
 
     // Si admin ou a déjà payé (legacy) ou a des crédits
     const hasCredits = profile?.analysis_credits > 0;
@@ -110,41 +102,6 @@ export default function Diagnostic() {
     } catch (err) {
       console.error("Erreur Checkout:", err)
       setError("Le service de paiement est indisponible.");
-    }
-  }
-
-  const handleGuestCheckout = async (e) => {
-    e.preventDefault()
-    if (!checkoutEmail || !checkoutEmail.includes('@')) {
-      setCheckoutError('Veuillez entrer une adresse email valide.')
-      return
-    }
-    setCheckoutLoading(true)
-    setCheckoutError('')
-    try {
-      if (results) {
-        sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-      }
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: null,
-          userEmail: checkoutEmail,
-          filePath: filePath
-        })
-      });
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setCheckoutError("Erreur d'initialisation du paiement. Veuillez réessayer.");
-      }
-    } catch (err) {
-      console.error('Erreur Guest Checkout:', err)
-      setCheckoutError('Le service de paiement est indisponible.')
-    } finally {
-      setCheckoutLoading(false)
     }
   }
 
@@ -303,7 +260,25 @@ export default function Diagnostic() {
             Débloquer l’analyse complète et détaillée pour voir l’intégralité des anomalies détectées en quelques minutes ainsi que la liste (non exhaustive) des pièces justificatives requises pour demander la correction de votre carrière.
           </p>
           
-          {showSignup ? (
+          {user ? (
+            <>
+              <button className="btn btn-primary btn-cta-premium" onClick={handleAction} style={{ padding: '1.2rem 2.5rem' }}>
+                <span>
+                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
+                  ? "Accéder au bilan complet (Admin)" 
+                  : (profile?.analysis_credits > 0 
+                      ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
+                      : (profile?.is_paid 
+                          ? LABELS.PAYMENT_RENEW 
+                          : LABELS.PAYMENT_REQUIRED))}
+                </span>
+                <ChevronRight size={20} />
+              </button>
+              <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Lock size={12} /> {LABELS.PAYMENT_SECURE}
+              </div>
+            </>
+          ) : showSignup ? (
             <form onSubmit={handleSignupAndPay} className="flex flex-col gap-4 text-left w-full max-w-md bg-page p-6 rounded-xl border" style={{ borderColor: 'var(--border)' }}>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex flex-col gap-1 w-full">
@@ -334,47 +309,21 @@ export default function Diagnostic() {
               <button type="submit" className="btn btn-primary btn-cta-premium mt-2 w-full" disabled={authLoading}>
                 <span>{authLoading ? <Loader2 className="animate-spin" /> : `Créer mon compte et ${LABELS.CTA_PAY || 'Payer 29€'}`}</span>
               </button>
+              <button type="button" className="btn btn-ghost text-sm w-full mt-1" onClick={() => setShowSignup(false)}>
+                ← Retour
+              </button>
             </form>
-          ) : showAuthChoice ? (
-            <div className="auth-choice-container" style={{ marginTop: '1rem' }}>
-              {/* CTA principal : achat direct sans compte */}
-              <div className="guest-checkout-section">
-                {!showGuestCheckout ? (
-                  <button
-                    className="btn btn-primary btn-cta-premium w-full"
-                    onClick={() => { setShowGuestCheckout(true); }}
-                  >
-                    <span>Accédez à l'analyse détaillée pour 29 €</span>
-                    <ChevronRight size={18} />
-                  </button>
-                ) : (
-                  <form onSubmit={handleGuestCheckout} className="guest-checkout-form">
-                    <p className="guest-checkout-label">Entrez votre email pour recevoir votre accès :</p>
-                    <div className="guest-checkout-fields">
-                      <input
-                        type="email"
-                        className="input"
-                        placeholder="votre@email.com"
-                        value={checkoutEmail}
-                        onChange={(e) => setCheckoutEmail(e.target.value)}
-                        required
-                        autoFocus
-                      />
-                      {checkoutError && (
-                        <div className="flex items-center gap-2 text-error text-sm p-3 bg-error-bg rounded-lg">
-                          <ShieldAlert size={16} />
-                          {checkoutError}
-                        </div>
-                      )}
-                      <button type="submit" className="btn btn-primary btn-cta-premium w-full" disabled={checkoutLoading}>
-                        {checkoutLoading ? <Loader2 className="animate-spin" size={18} /> : <span>Payer 29 € et accéder à l'analyse</span>}
-                      </button>
-                      <button type="button" className="btn btn-ghost text-sm" onClick={() => setShowGuestCheckout(false)}>
-                        ← Retour
-                      </button>
-                    </div>
-                  </form>
-                )}
+          ) : (
+            <div className="auth-choice-container w-full" style={{ marginTop: '1rem' }}>
+              {/* CTA principal : Achat direct via création de compte */}
+              <div className="guest-checkout-section w-full">
+                <button
+                  className="btn btn-primary btn-cta-premium w-full"
+                  onClick={() => { setShowSignup(true); }}
+                >
+                  <span>Accédez à l'analyse détaillée pour 29 €</span>
+                  <ChevronRight size={18} />
+                </button>
                 <div className="text-xs text-muted text-center mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
                   <Lock size={11} /> Paiement sécurisé • Accès immédiat après paiement
                 </div>
@@ -399,32 +348,12 @@ export default function Diagnostic() {
                 </button>
                 <button
                   className="btn btn-primary btn-cta-premium w-full"
-                  onClick={() => { setShowSignup(true); setShowAuthChoice(false); }}
+                  onClick={() => { setShowSignup(true); }}
                 >
                   <span>Créer un compte</span>
                 </button>
               </div>
             </div>
-          ) : (
-            <>
-              <button className="btn btn-primary btn-cta-premium" onClick={handleAction} style={{ padding: '1.2rem 2.5rem' }}>
-                <span>
-                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
-                  ? "Accéder au bilan complet (Admin)" 
-                  : (user 
-                      ? (profile?.analysis_credits > 0 
-                          ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
-                          : (profile?.is_paid 
-                              ? LABELS.PAYMENT_RENEW 
-                              : LABELS.PAYMENT_REQUIRED))
-                      : LABELS.PAYMENT_REQUIRED)}
-                </span>
-                <ChevronRight size={20} />
-              </button>
-              <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Lock size={12} /> {LABELS.PAYMENT_SECURE}
-              </div>
-            </>
           )}
         </div>
 

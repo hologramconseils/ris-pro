@@ -244,32 +244,13 @@ a:hover {
   margin: 0 auto;
 }
 
-/* Section achat invité */
+/* Section achat invité (main wrapper) */
 .guest-checkout-section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.guest-checkout-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  animation: slideUp 0.25s ease-out;
-}
-
-.guest-checkout-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-main);
-  margin-bottom: 0.25rem;
-}
-
-.guest-checkout-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
 
 /* Séparateur "ou" */
 .auth-divider {
