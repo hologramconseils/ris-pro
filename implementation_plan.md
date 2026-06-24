@@ -1,38 +1,70 @@
-# Plan d'implémentation - Double point d'entrée et Achat avec Création de Compte (RIS Pro)
+# Plan d'implémentation - Suppression de la création de compte gratuite & Tunnel d'achat direct (RIS Pro)
 
-Ce plan détaille les ajustements apportés à l'écran de Diagnostic pour les utilisateurs non connectés afin de proposer le double point d'entrée (connexion et achat via création de compte) directement sur la page, tout en garantissant zéro régression technique avec Supabase et Stripe.
+Ce plan décrit la suppression de la création de compte gratuite et l'intégration du flux d'achat direct (Pack 4 analyses à 29 €) qui déclenchera automatiquement la création de compte utilisateur et l'attribution des accès après validation du paiement.
 
-## Changements Proposés
+## Modifications proposées
 
-### 1. Simplification du Flux d'Authentification et d'Achat ([Diagnostic.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Diagnostic.jsx))
-* **Affichage Direct** : Si l'utilisateur n'est pas connecté (`!user`), la double entrée d'authentification et d'achat s'affiche directement en bas de l'analyse, sans étape intermédiaire.
-* **Bouton B (CTA Principal - Achat & Inscription)** : 
-  - Bouton bleu plein "Accédez à l'analyse détaillée pour 29 €".
-  - Au clic, il affiche le formulaire d'inscription complet (Prénom, Nom, Email, Mot de passe).
-* **Bouton A (Connexion existante)** :
-  - Lien texte gras "Se connecter" redirigeant vers la page de connexion.
-* **Bouton d'Inscription secondaire** :
-  - Bouton bleu plein "Créer un compte" qui affiche également le formulaire d'inscription.
-* **Formulaire d'Inscription** :
-  - Ajout d'un bouton "← Retour" sous le formulaire pour permettre de revenir à l'écran de choix initial si besoin.
-  - Soumettre le formulaire crée le compte de l'utilisateur dans Supabase et le redirige immédiatement vers la session de paiement Stripe personnalisée avec son identifiant (`userId`) et email.
-* **Nettoyage du parcours invité (sans compte)** :
-  - Suppression de la saisie d'email invité temporaire et de la redirection Stripe sans `userId`, car cela provoquait des régressions fonctionnelles avec le webhook Stripe (qui nécessite `client_reference_id` / `userId` pour créditer le compte).
+### 1. Écran de Diagnostic (`frontend/src/pages/Diagnostic.jsx`)
+- **Suppression définitive** du bouton/lien "Créer un compte" dans le panneau d'authentification pour les utilisateurs non connectés.
+- Conservation de deux options principales et claires :
+  1. **CTA Principal (Achat direct)** : "Accédez à l'analyse détaillée pour 29 €".
+     - Au clic, affiche le formulaire de saisie de l'email pour le paiement sécurisé.
+     - Une fois l'email validé, redirige l'utilisateur vers Stripe Checkout.
+  2. **Option Client Existant (Lien)** : "Se connecter".
+     - Ouvre le formulaire d'authentification standard pour les utilisateurs ayant déjà un compte.
 
-### 2. Ajustements des Styles CSS ([index.css](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/index.css))
-* Nettoyage des styles liés au guest checkout.
-* Optimisation de l'affichage du formulaire et des boutons secondaires.
+### 2. Écran de Connexion (`frontend/src/pages/Login.jsx`)
+- **Suppression définitive** de l'option d'inscription gratuite ("S'inscrire" / "Créer un compte") en bas de la page.
+- La page `/login` ne servira plus qu'à la connexion et à la récupération de mot de passe.
+
+### 3. Webhook Stripe (`api/webhook.js`)
+Enrichissement du webhook Stripe pour gérer de manière transparente la création de compte automatique des nouveaux clients sans impacter le flux actuel des clients existants connectés au moment du paiement :
+- **Si `client_reference_id` (userId) est présent** :
+  - Comportement inchangé à 100% (mise à jour des crédits du profil existant + email de confirmation).
+- **Si `client_reference_id` est absent (nouveau client / achat direct)** :
+  - Utilise l'adresse email de facturation Stripe (`customer_details.email` ou `customer_email`).
+  - Vérifie si un compte Supabase Auth existe déjà avec cet email :
+    - S'il n'existe pas : crée automatiquement le compte utilisateur dans Supabase Auth (avec confirmation d'email automatique et mot de passe temporaire aléatoire).
+    - Récupère l'ID du nouvel utilisateur (ou de l'utilisateur existant).
+  - Effectue un `upsert` dans la table `profiles` pour cet ID afin de définir `is_paid = true` and `analysis_credits = 4`.
+  - Génère un lien de connexion/récupération automatique (magic link / password recovery link) de Supabase pour permettre au client de se connecter directement et de définir son mot de passe en toute simplicité.
+  - Envoie un email de bienvenue enrichi via Resend contenant le lien de connexion directe et ses instructions d'accès.
 
 ---
 
-## Plan de Vérification
+## Proposed Changes
 
-### Compilation du projet
-* S'assurer que le projet compile parfaitement sans erreurs :
-  ```bash
-  npm run build
-  ```
+### [Frontend Page Pages]
 
-### Vérification Fonctionnelle
-* S'assurer que le flux d'inscription + paiement Stripe transmet correctement le `userId` et l'email à Stripe.
-* Vérifier le comportement visuel sur mobile et tablette.
+#### [MODIFY] [Diagnostic.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Diagnostic.jsx)
+- Retrait du bouton "Créer un compte".
+- Ajustement du layout d'authentification pour proposer uniquement le CTA Achat et le lien de Connexion.
+
+#### [MODIFY] [Login.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Login.jsx)
+- Retrait du lien d'inscription en bas de formulaire.
+- Blocage du mode "inscription".
+
+### [API Serverless Functions]
+
+#### [MODIFY] [webhook.js](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/api/webhook.js)
+- Ajout de la logique de création de compte et d'upsert du profil en cas de paiement invité (`client_reference_id` null).
+- Intégration de la génération du lien magique et envoi de l'email d'accès.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- Lancement de la compilation pour s'assurer qu'aucun bug de syntaxe n'est introduit :
+  - `npm run build`
+
+### Manual Verification
+1. **Flux Client existant** :
+   - Démarrer une analyse sans être connecté.
+   - Cliquer sur "Se connecter", s'authentifier avec un compte existant.
+   - S'assurer que le tableau de bord et le bilan fonctionnent normalement.
+2. **Flux Nouveau client (Achat direct)** :
+   - Démarrer une analyse sans être connecté.
+   - Cliquer sur "Accédez à l'analyse détaillée pour 29 €", saisir un nouvel email.
+   - Simuler le paiement Stripe (ou utiliser l'environnement de test Stripe).
+   - Valider la création automatique du compte Supabase, l'upsert du profil avec 4 crédits, et la bonne réception de l'email Resend contenant le lien d'accès direct.

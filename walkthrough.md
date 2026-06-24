@@ -1,28 +1,38 @@
-# Walkthrough - Double point d'entrée et Achat avec Création de Compte
+# Walkthrough - Optimisation du tunnel de conversion (Achat direct)
 
-J'ai finalisé l'intégration du double point d'entrée pour les utilisateurs non connectés sur la page de Diagnostic.
+J'ai finalisé les modifications d'optimisation du tunnel de conversion consistant à supprimer l'accès direct à la création de compte gratuite et à automatiser la création de compte utilisateur et l'attribution des accès après validation d'un paiement de 29 €.
 
 ## Résumé des modifications
 
-### 1. Affichage Direct du Double Point d'Entrée
-* Auparavant, l'utilisateur non connecté devait cliquer sur un bouton intermédiaire avant de voir les options de connexion/inscription.
-* Désormais, si l'utilisateur n'est pas connecté (`!user`), la structure à double entrée s'affiche **directement et automatiquement** en bas de la restitution de l'analyse freemium :
-  1. **CTA Principal (Bouton B)** : "Accédez à l'analyse détaillée pour 29 €" (bouton bleu plein).
-  2. **Indicateurs de réassurance** : "Paiement sécurisé • Accès immédiat après paiement".
-  3. **Séparateur visuel** : "ou" entouré de lignes horizontales fines.
-  4. **Section Compte** : 
-     - Label : "Vous avez déjà un compte ?"
-     - **Bouton A (Connexion existante)** : Lien textuel en gras "Se connecter" (bouton discret sans cadre).
-     - **Bouton d'inscription secondaire** : Bouton bleu plein "Créer un compte".
+### 1. Suppression de la création de compte gratuite
+- **Dans Diagnostic (`Diagnostic.jsx`)** :
+  - Retrait du bouton "Créer un compte".
+  - Les utilisateurs non connectés ont uniquement deux options :
+    1. **CTA Principal (Achat direct)** : "Accédez à l'analyse détaillée pour 29 €" (qui affiche le formulaire pour saisir son email et payer).
+    2. **Connexion client existant** : "Se connecter" (lien/bouton en style épuré).
+- **Dans Connexion (`Login.jsx`)** :
+  - Retrait définitif du bloc d'inscription en bas de formulaire (le lien "S'inscrire" n'est plus disponible).
+  - La page ne sert désormais plus qu'à la connexion et à la récupération de mot de passe.
 
-### 2. Achat via Création de Compte Intégré (Zéro Régression Stripe/Supabase)
-* Pour éviter toute régression fonctionnelle avec le webhook Stripe (qui nécessite impérativement un `userId` pour mettre à jour la table Supabase `profiles`), le flux d'achat invité sans compte a été retiré.
-* Cliquer sur **"Accédez à l'analyse détaillée pour 29 €"** ou sur **"Créer un compte"** ouvre instantanément le formulaire de création de compte :
-  - Formulaire demandant le Prénom, Nom, Email et Mot de passe.
-  - Ajout d'un bouton **"← Retour"** pour permettre à l'utilisateur de revenir facilement à l'écran de sélection initial.
-  - Lors de la soumission, le compte est créé dans Supabase, puis l'utilisateur est redirigé vers Stripe Checkout avec ses informations de compte (`userId` et `userEmail`).
+### 2. Automatisation et création de compte après achat
+- **Dans Stripe Checkout (`api/checkout.js`)** :
+  - Transmission du chemin du fichier d'analyse (`filePath`) dans les métadonnées de la session Stripe (`metadata.filePath`).
+- **Dans le Webhook Stripe (`api/webhook.js`)** :
+  - **Flux existant** : Si un `client_reference_id` (userId) est présent, le comportement reste 100% identique (mise à jour directe du profil).
+  - **Nouveau flux (Achat direct)** : Si `client_reference_id` est absent (nouveau client), le webhook :
+    1. Récupère l'adresse email de l'acheteur depuis Stripe.
+    2. Vérifie sur le schéma `auth` de Supabase si un compte existe déjà pour cet email.
+    3. S'il n'existe pas, crée un nouvel utilisateur Supabase Auth (confirmation automatique de l'adresse email, génération d'un mot de passe fort).
+    4. Récupère l'identifiant de l'utilisateur (existant ou nouveau).
+    5. Utilise un `upsert` robuste pour insérer/mettre à jour la ligne dans `profiles` pour cet ID afin de lui affecter l'accès payé et d'incrémenter ses crédits d'analyse (+4).
+    6. Associe l'analyse freemium stockée temporairement dans `analyses` en lui assignant l'ID utilisateur.
+    7. Si c'est un nouvel utilisateur, génère un lien sécurisé de connexion directe (magic link) via l'API d'administration Supabase GoTrue.
+    8. Envoie l'email de bienvenue Resend avec le lien direct de connexion vers son bilan premium.
 
-### 3. Nettoyage du Code et Validation
-* Suppression des variables d'états temporaires (`showGuestCheckout`, `checkoutEmail`, `checkoutLoading`, `checkoutError`).
-* Nettoyage du CSS inutilisé dans `index.css`.
-* Compilation réussie : `npm run build` ✅.
+---
+
+## Code de validation
+Le projet a été compilé avec succès sans aucune erreur de syntaxe ou de packaging :
+- `npm run build` : ✅ OK
+
+Les fichiers modifiés ont été poussés sur la branche principale du dépôt GitHub.
