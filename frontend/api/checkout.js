@@ -27,7 +27,10 @@ export default async function handler(req, res) {
       ],
       mode: 'payment',
       customer_email: userEmail,
-      client_reference_id: userId,
+      ...(userId && { client_reference_id: userId }),
+      metadata: {
+        filePath: filePath
+      },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://' + req.headers.host}/bilan?success=true&file=${encodeURIComponent(filePath)}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://' + req.headers.host}/diagnostic?file=${encodeURIComponent(filePath)}`,
     });
