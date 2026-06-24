@@ -1,7 +1,8 @@
-# Liste des tâches - Optimisation du tunnel de conversion (Achat direct)
+# Liste des tâches - Optimisations de Performance
 
-- [x] Supprimer l'option "Créer un compte" de `Diagnostic.jsx` et ajuster le layout d'authentification
-- [x] Supprimer l'option d'inscription gratuite de `Login.jsx`
-- [x] Enrichir le webhook Stripe (`api/webhook.js`) pour la création de compte automatique des nouveaux clients sans régression
-- [x] Valider la compilation avec `npm run build`
-- [x] Rédiger le walkthrough final et pousser les modifications sur GitHub
+- [x] Optimiser les modèles d'analyse IA dans `frontend/api/analyze.js` (Action 1)
+- [x] Optimiser le chargement de la police Inter dans `frontend/index.html` et `frontend/src/index.css` (Action 2)
+- [x] Mettre en place le Lazy Loading des routes React dans `frontend/src/App.jsx` (Action 3)
+- [x] Configurer la région de déploiement Vercel dans `vercel.json` (Action 4)
+- [x] Valider la compilation du projet avec `npm run build`
+- [ ] Déployer en production sur GitHub / Vercel et vérifier
