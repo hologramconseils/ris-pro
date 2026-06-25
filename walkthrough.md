@@ -136,3 +136,9 @@ J'ai implémenté les améliorations d'ergonomie, de navigation et d'authentific
 - **Modification** : Ajout d'un état local `filter` et d'une barre de boutons ("Toutes", "Critiques 🔴", "Moyennes 🟡") pour filtrer dynamiquement les cartes d'anomalies affichées. Les boutons de styles `.btn-secondary` ont été découplés dans `index.css` pour offrir un design cohérent et élégant.
 - **Bénéfice** : Réduction de la charge cognitive sur les relevés de carrière volumineux.
 
+### 5. Correction de contraste du bouton d'appel Calendly
+- **Fichier modifié** : [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
+- **Modification** : Surcharge de la couleur du texte et du comportement au survol de `.btn-secondary.btn-cta-premium` pour utiliser `var(--text-main)` (sombre en mode jour, clair en mode nuit) à la place de forcer la couleur blanche `#FFFFFF`.
+- **Bénéfice** : Rétablit une lisibilité parfaite (100% accessible) du texte "Si vous hésitez, je vous explique dans un appel gratuit de 15 minutes" sur fond gris clair en mode jour.
+
+
