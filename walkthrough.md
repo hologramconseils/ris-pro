@@ -107,3 +107,32 @@ J'ai optimisé l'ergonomie, l'accessibilité tactile et l'affichage responsive d
 - **Fichier modifié** : [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
 - **Modification** : Ajout explicite de la variable `--border` dans les sélecteurs `:root` et `.dark`.
 - **Bénéfice** : Rétablit l'affichage correct des séparateurs et bordures de champs dans l'ensemble de l'interface (thème clair et sombre).
+
+---
+
+# Walkthrough - Résolution des Problèmes UX (ux-audit)
+
+J'ai implémenté les améliorations d'ergonomie, de navigation et d'authentification recommandées dans l'audit UX (`ux_audit.md`).
+
+## Détails des améliorations UX appliquées
+
+### 1. Véritable export PDF paginé et propre (UX-001)
+- **Fichiers modifiés** : [Bilan.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/pages/Bilan.jsx) et [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
+- **Modification** : Remplacement de l'alerte fictive par un bouton "Exporter le Bilan (PDF)" déclenchant `window.print()`. Ajout d'une feuille de style CSS d'impression (`@media print`) masquant le Header, le Footer et les boutons d'actions tout en améliorant le rendu des cartes d'anomalies pour un rendu PDF/impression papier parfait.
+- **Bénéfice** : L'utilisateur dispose désormais d'un document exportable réel et professionnel qu'il peut sauvegarder ou imprimer.
+
+### 2. Suppression de la friction de reconnexion post-achat (UX-002)
+- **Fichier modifié** : [webhook.js](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/frontend/api/webhook.js)
+- **Modification** : Génération systématique du lien magique de connexion temporaire de Supabase Auth pour tous les acheteurs (nouveaux et existants). L'email de confirmation intègre le bouton "Consulter mon Bilan Premium" pour tous, éliminant la nécessité pour les clients existants de ressaisir leur mot de passe s'ils se sont déconnectés.
+- **Bénéfice** : Un tunnel post-achat fluide sans rupture d'authentification.
+
+### 3. Navigation retour circulaire fluide (UX-003)
+- **Fichier modifié** : [Bilan.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/pages/Bilan.jsx)
+- **Modification** : Ajout d'un bouton d'action secondaire "Analyser un autre document" dans le Header du bilan, redirigeant directement vers la page d'accueil (`/`).
+- **Bénéfice** : Fluidité accrue sur mobile sans avoir à utiliser les boutons physiques ou l'entête global.
+
+### 4. Filtrage dynamique des anomalies par sévérité (UX-004)
+- **Fichiers modifiés** : [Bilan.jsx](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/pages/Bilan.jsx) et [index.css](file:///Users/hologramconseils/Desktop/RIS%20Pro%20V2/ris-pro-web/src/index.css)
+- **Modification** : Ajout d'un état local `filter` et d'une barre de boutons ("Toutes", "Critiques 🔴", "Moyennes 🟡") pour filtrer dynamiquement les cartes d'anomalies affichées. Les boutons de styles `.btn-secondary` ont été découplés dans `index.css` pour offrir un design cohérent et élégant.
+- **Bénéfice** : Réduction de la charge cognitive sur les relevés de carrière volumineux.
+

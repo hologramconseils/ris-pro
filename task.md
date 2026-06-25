@@ -1,24 +1,20 @@
-# Liste des tâches - Stabilisation, Performance & Sécurité
+# Liste des tâches - Résolution des Problèmes UX (ux-audit)
 
-## Performance
-- [x] Optimiser les modèles d'analyse IA dans `frontend/api/analyze.js`
-- [x] Optimiser le chargement de la police Inter dans `frontend/index.html` et `frontend/src/index.css`
-- [x] Mettre en place le Lazy Loading des routes React dans `frontend/src/App.jsx`
-- [x] Configurer la région de déploiement Vercel dans `vercel.json`
-- [x] Valider la compilation du projet avec `npm run build`
-- [x] Déployer en production sur GitHub / Vercel et vérifier
+## 1. Modifications API (Authentification)
+- [x] Modifier `frontend/api/webhook.js` pour générer un lien magique pour tous les acheteurs (nouveaux et existants) et l'inclure dans l'email Resend.
 
-## Sécurité & Robustesse Backend
-- [x] Résoudre SEC-004 : Utiliser l'appel RPC Supabase `increment_credits` dans `frontend/api/webhook.js` au lieu de la lecture/écriture non atomique
-- [x] Résoudre SEC-003 : Retirer les fichiers `.env.production`, `.env.vercel` et `.env.vercel.production` du suivi de Git (`git rm --cached`)
-- [x] Mettre à jour `supabase_migration.sql` pour redéfinir `increment_credits` de manière résiliente avec `ON CONFLICT`
-- [x] Valider la compilation locale (`npm run build`)
-- [x] Commiter, pousser sur GitHub/Vercel et finaliser le walkthrough
+## 2. Modifications Frontend (Composants et Pages)
+- [x] Mettre à jour `frontend/src/pages/Bilan.jsx` :
+  - [x] Ajouter un bouton d'action principal "Exporter le Bilan (PDF)" qui appelle `window.print()`.
+  - [x] Ajouter un bouton secondaire "Analyser un autre document" redirigeant vers `/`.
+  - [x] Ajouter l'état React pour filtrer les anomalies par sévérité (all, high, medium) et concevoir la barre de filtres.
+  - [x] Filtrer la liste des anomalies affichées.
 
-## Ergonomie & Optimisation Mobile (mobile-design)
-- [x] Agrandir les zones tactiles des boutons (ThemeToggle et Menu hamburger) à 44px (Header.jsx)
-- [x] Adapter textuellement l'instruction d'upload sur mobile (Home.jsx)
-- [x] Rendre les boutons du bilan empilables sur mobile (Bilan.jsx et index.css)
-- [x] Ajouter la variable de bordure `--border` manquante dans index.css
-- [x] Valider la compilation locale avec `npm run build`
-- [ ] Commiter, pousser sur GitHub/Vercel et vérifier
+## 3. Styles et Mise en page (CSS)
+- [x] Ajouter les styles d'impression `@media print` dans `frontend/src/index.css` pour masquer les boutons d'action, le Header et le Footer, et nettoyer le style de la page pour une impression papier/PDF propre.
+- [x] Ajouter les styles CSS pour les filtres d'anomalies dans `frontend/src/index.css`.
+
+## 4. Validation et Déploiement
+- [x] Valider la compilation locale avec `npm run build` dans le dossier frontend.
+- [x] Synchroniser toutes les modifications avec le dossier Desktop (`/Users/hologramconseils/Desktop/RIS Pro V2` et `/Users/hologramconseils/Desktop/RIS Pro V2/ris-pro-web/`).
+- [x] Commiter les changements et pousser vers la branche principale.

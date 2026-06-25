@@ -137,38 +137,36 @@ export default async function handler(req, res) {
               .eq('file_path', filePath);
           }
 
-          // Générer le lien de connexion directe si c'est un nouvel utilisateur
-          if (isNewUser) {
-            try {
-              const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.host}`;
-              const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-                type: 'magiclink',
-                email: userEmail,
-                options: {
-                  redirectTo: `${siteUrl}/bilan?success=true&file=${encodeURIComponent(filePath || '')}`
-                }
-              });
-
-              if (!linkError && linkData?.properties?.action_link) {
-                magicLink = linkData.properties.action_link;
-                console.log("[Webhook] Lien de connexion généré avec succès.");
-              } else if (linkError) {
-                console.error("[Webhook] Erreur generateLink :", linkError.message);
+          // Générer le lien de connexion directe pour tous les utilisateurs (nouveaux et existants)
+          try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.host}`;
+            const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+              type: 'magiclink',
+              email: userEmail,
+              options: {
+                redirectTo: `${siteUrl}/bilan?success=true&file=${encodeURIComponent(filePath || '')}`
               }
-            } catch (err) {
-              console.error("[Webhook] Erreur génération lien magique :", err);
+            });
+
+            if (!linkError && linkData?.properties?.action_link) {
+              magicLink = linkData.properties.action_link;
+              console.log("[Webhook] Lien de connexion généré avec succès.");
+            } else if (linkError) {
+              console.error("[Webhook] Erreur generateLink :", linkError.message);
             }
+          } catch (err) {
+            console.error("[Webhook] Erreur génération lien magique :", err);
           }
 
           // Envoi email de bienvenue (Contenu mis à jour selon instructions)
           if (process.env.RESEND_API_KEY) {
             try {
               let emailHtml = '';
-              if (isNewUser && magicLink) {
+              if (magicLink) {
                 emailHtml = `
                   <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
                     <h1 style="color: #1a56db;">Merci pour votre confiance !</h1>
-                    <p>Votre paiement de <strong>29 €</strong> a bien été validé et votre compte <strong>RIS Pro</strong> a été créé automatiquement.</p>
+                    <p>Votre paiement de <strong>29 €</strong> a bien été validé et votre accès <strong>RIS Pro</strong> est actif.</p>
                     <p>Vous disposez désormais de :</p>
                     <ul style="background: #f3f4f6; padding: 1.5rem 2.5rem; border-radius: 8px; list-style: none;">
                       <li>✅ <strong>4 analyses détaillées</strong> de relevés de carrière</li>
@@ -177,7 +175,11 @@ export default async function handler(req, res) {
                     <p style="text-align: center; margin: 2rem 0;">
                       <a href="${magicLink}" style="background-color: #1a56db; color: white; padding: 0.8rem 1.8rem; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block;">Consulter mon Bilan Premium</a>
                     </p>
-                    <p style="font-size: 0.9rem; color: #666;">Ce lien est à usage unique et sécurisé. Lors de vos prochaines visites, vous pourrez utiliser la fonction "Mot de passe oublié" avec votre email pour définir un mot de passe permanent.</p>
+                    <p style="font-size: 0.9rem; color: #666;">Ce lien est à usage unique et sécurisé. ${
+                      isNewUser 
+                        ? 'Lors de vos prochaines visites, vous pourrez utiliser la fonction "Mot de passe oublié" avec votre email pour définir un mot de passe permanent.' 
+                        : 'Vous pouvez également utiliser votre mot de passe habituel pour vous connecter.'
+                    }</p>
                     <br/>
                     <p>L'équipe Hologram Conseils</p>
                   </div>

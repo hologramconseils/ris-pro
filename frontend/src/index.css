@@ -187,16 +187,30 @@ a:hover {
   white-space: nowrap;
 }
 
-.btn-primary, .btn-secondary, .btn-outline {
+.btn-primary, .btn-outline {
   background-color: var(--primary);
   color: var(--text-inverse);
   box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover, .btn-secondary:hover, .btn-outline:hover {
+.btn-primary:hover, .btn-outline:hover {
   background-color: var(--primary-hover);
   color: var(--text-inverse) !important;
   box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-main) !important;
+  border-color: var(--primary);
   transform: translateY(-1px);
 }
 
@@ -627,5 +641,67 @@ a:hover {
     max-width: 480px;
     margin-left: auto;
     margin-right: auto;
+  }
+}
+
+/* Print Stylesheet for PDF Export */
+@media print {
+  /* Hiding UI elements */
+  header, footer, nav, .print-hidden, button, a.btn, .btn, .auth-choice-container, .badge-primary {
+    display: none !important;
+  }
+
+  /* Page setup */
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Keep background colors for cards but make them printer friendly */
+  .card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem !important;
+    padding: 1.25rem !important;
+  }
+
+  .details-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Color adjustments for print */
+  .text-primary {
+    color: #1d4ed8 !important;
+  }
+  
+  .text-error, .text-danger {
+    color: #dc2626 !important;
+  }
+
+  .badge {
+    border: 1px solid #cbd5e1 !important;
+    color: #000000 !important;
+    background: #f1f5f9 !important;
+  }
+
+  /* Ensure background colors print correctly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

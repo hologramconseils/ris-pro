@@ -16,6 +16,7 @@ export default function Bilan() {
   const [loading, setLoading] = useState(!!filePath)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
+  const [filter, setFilter] = useState('all')
 
   useEffect(() => {
     if (filePath) {
@@ -155,6 +156,13 @@ export default function Bilan() {
         })
     : []
 
+  const filteredAnomalies = anomalies.filter(anom => {
+    if (filter === 'all') return true
+    if (filter === 'high') return anom.severity === 'high'
+    if (filter === 'medium') return anom.severity !== 'high'
+    return true
+  })
+
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col gap-8" style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -164,6 +172,24 @@ export default function Bilan() {
             <div className="badge badge-primary" style={{ marginBottom: '1rem', background: 'var(--primary)', color: 'white' }}>Bilan Détaillé Premium</div>
             <h1 className="text-3xl font-bold">Audit Complet de votre Carrière</h1>
             <p className="text-muted mt-2">Document analysé le {new Date().toLocaleDateString('fr-FR')}</p>
+          </div>
+          <div className="flex gap-3 bilan-header-actions print-hidden">
+            <button 
+              onClick={() => navigate('/')} 
+              className="btn btn-secondary flex items-center gap-2"
+              style={{ padding: '0.6rem 1.2rem', minHeight: '44px', height: 'auto' }}
+            >
+              <FileSearch size={18} />
+              <span>Analyser un autre document</span>
+            </button>
+            <button 
+              onClick={() => window.print()} 
+              className="btn btn-primary flex items-center gap-2"
+              style={{ padding: '0.6rem 1.2rem', minHeight: '44px', height: 'auto' }}
+            >
+              <Download size={18} />
+              <span>Exporter le Bilan (PDF)</span>
+            </button>
           </div>
         </div>
 
@@ -194,64 +220,103 @@ export default function Bilan() {
             Détail des anomalies
           </h2>
 
-          {anomalies.map((anom, idx) => (
-            <div key={idx} className="card" style={{ padding: '0', overflow: 'hidden', marginBottom: '2rem' }}>
-              <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="flex justify-between items-center flex-wrap gap-4">
-                <div className="flex items-center gap-4">
-                  <div style={{ background: 'var(--error-bg)', color: 'var(--error)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Année {anom.year} - {anom.employer}</h3>
-                  </div>
-                </div>
-                <div className="badge badge-error">Anomalie confirmée</div>
-              </div>
-              
-              <div style={{ padding: '1.5rem' }} className="flex flex-col gap-6">
-                <div className="details-grid">
-                  <div>
-                    <div className="text-xs text-muted">Salaire Brut (ou nature)</div>
-                    <div className="font-semibold">{anom.salary}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted">Trimestres validés</div>
-                    <div className="font-semibold">{anom.trimesters}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted">Points Validés</div>
-                    <div className="font-semibold">{anom.points}</div>
-                  </div>
-                </div>
+          {/* Quick Filters */}
+          <div className="flex gap-2 flex-wrap mb-2 print-hidden">
+            <button
+              onClick={() => setFilter('all')}
+              className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem' }}
+            >
+              Toutes ({anomalies.length})
+            </button>
+            <button
+              onClick={() => setFilter('high')}
+              className={`btn btn-sm ${filter === 'high' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></span>
+              Critiques ({anomalies.filter(a => a.severity === 'high').length})
+            </button>
+            <button
+              onClick={() => setFilter('medium')}
+              className={`btn btn-sm ${filter === 'medium' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}></span>
+              Moyennes ({anomalies.filter(a => a.severity !== 'high').length})
+            </button>
+          </div>
 
-                <div>
-                  <h4 className="font-semibold flex items-center gap-2 text-error mb-2">
-                    <AlertTriangle size={16} /> Explication de l'erreur
-                  </h4>
-                  <p className="text-muted">{anom.reason}</p>
+          {filteredAnomalies.length === 0 ? (
+            <div className="card text-center p-8 text-muted">
+              Aucune anomalie de cette catégorie n'a été détectée.
+            </div>
+          ) : (
+            filteredAnomalies.map((anom, idx) => (
+              <div key={idx} className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} style={{ padding: '0', overflow: 'hidden', marginBottom: '2rem' }}>
+                <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="flex justify-between items-center flex-wrap gap-4">
+                  <div className="flex items-center gap-4">
+                    <div style={{ background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)', color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">Année {anom.year} - {anom.employer}</h3>
+                    </div>
+                  </div>
+                  <div className={`badge ${anom.severity === 'high' ? 'badge-error' : 'badge-warning'}`} style={{
+                    background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)',
+                    color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)',
+                    borderColor: 'transparent'
+                  }}>
+                    {anom.severity === 'high' ? 'Anomalie critique' : 'Anomalie moyenne'}
+                  </div>
                 </div>
                 
-                <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
-                  <h4 className="font-semibold flex items-center gap-2 text-success mb-2">
-                    <CheckCircle2 size={16} /> Action requise
-                  </h4>
-                  <p className="text-sm font-medium mb-4">{anom.solution}</p>
+                <div style={{ padding: '1.5rem' }} className="flex flex-col gap-6">
+                  <div className="details-grid">
+                    <div>
+                      <div className="text-xs text-muted">Salaire Brut (ou nature)</div>
+                      <div className="font-semibold">{anom.salary}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Trimestres validés</div>
+                      <div className="font-semibold">{anom.trimesters}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted">Points Validés</div>
+                      <div className="font-semibold">{anom.points}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold flex items-center gap-2 text-error mb-2">
+                      <AlertTriangle size={16} /> Explication de l'erreur
+                    </h4>
+                    <p className="text-muted">{anom.reason}</p>
+                  </div>
                   
-                  <div className="text-sm font-bold uppercase tracking-wider text-success mb-2" style={{ opacity: 0.8 }}>Pièces justificatives à fournir :</div>
-                  <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                    {Array.isArray(anom.docs) ? anom.docs.map((doc, docIdx) => (
-                      <li key={docIdx} style={{ marginBottom: '0.25rem' }}>{doc}</li>
-                    )) : (
-                      <li style={{ marginBottom: '0.25rem' }}>{anom.docs || "Aucun document spécifique requis"}</li>
-                    )}
-                  </ul>
+                  <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+                    <h4 className="font-semibold flex items-center gap-2 text-success mb-2">
+                      <CheckCircle2 size={16} /> Action requise
+                    </h4>
+                    <p className="text-sm font-medium mb-4">{anom.solution}</p>
+                    
+                    <div className="text-sm font-bold uppercase tracking-wider text-success mb-2" style={{ opacity: 0.8 }}>Pièces justificatives à fournir :</div>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                      {Array.isArray(anom.docs) ? anom.docs.map((doc, docIdx) => (
+                        <li key={docIdx} style={{ marginBottom: '0.25rem' }}>{doc}</li>
+                      )) : (
+                        <li style={{ marginBottom: '0.25rem' }}>{anom.docs || "Aucun document spécifique requis"}</li>
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        <div className="flex flex-col items-center gap-4 mt-8 mb-12">
+        <div className="flex flex-col items-center gap-4 mt-8 mb-12 print-hidden">
           <a 
             href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
             target="_blank" 
