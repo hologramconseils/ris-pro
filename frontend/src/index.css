@@ -417,6 +417,15 @@ a:hover {
   box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.4);
 }
 
+.btn-secondary.btn-cta-premium {
+  color: var(--text-main) !important;
+}
+
+.btn-secondary.btn-cta-premium:hover {
+  color: var(--text-main) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
 /* Scintillement du texte */
 .btn-cta-premium span {
   position: relative;
