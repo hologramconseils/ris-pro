@@ -37,9 +37,15 @@ export default function Bilan() {
   const triggerAgentAnalysis = async (path) => {
     try {
       setAgentLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      
       const response = await fetch('/api/analyse-patrimoniale', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({ filePath: path })
       });
       if (response.ok) {

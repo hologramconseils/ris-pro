@@ -3,7 +3,7 @@ import tempfile
 import httpx
 import json
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from google.antigravity import Agent, LocalAgentConfig
@@ -166,12 +166,82 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
     except Exception as fallback_err:
         raise Exception(f"Le fallback de secours direct a échoué: {str(fallback_err)}")
 
+async def get_supabase_user(token: str) -> dict:
+    """Valide le token JWT en interrogeant l'API d'authentification Supabase."""
+    supabase_url = os.environ.get("VITE_SUPABASE_URL")
+    if not supabase_url:
+        raise ValueError("VITE_SUPABASE_URL manquant.")
+    url = f"{supabase_url}/auth/v1/user"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "apikey": os.environ.get("VITE_SUPABASE_ANON_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    }
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        return None
+
+async def verifier_est_admin(user_id: str) -> bool:
+    """Vérifie si l'utilisateur possède le rôle d'administrateur dans la table des profils."""
+    supabase_url = os.environ.get("VITE_SUPABASE_URL")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
+    url = f"{supabase_url}/rest/v1/profiles?id=eq.{user_id}&select=role"
+    headers = {
+        "Authorization": f"Bearer {supabase_key}",
+        "apikey": supabase_key
+    }
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code == 200:
+            records = response.json()
+            if records and records[0].get("role") == "admin":
+                return True
+        return False
+
+async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
+    """Vérifie que l'utilisateur est le propriétaire légitime du document ou est admin."""
+    supabase_url = os.environ.get("VITE_SUPABASE_URL")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
+    url = f"{supabase_url}/rest/v1/analyses?file_path=eq.{file_path}&select=user_id"
+    headers = {
+        "Authorization": f"Bearer {supabase_key}",
+        "apikey": supabase_key
+    }
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code == 200:
+            records = response.json()
+            if records:
+                record_user_id = records[0].get("user_id")
+                # Si le document est lié à un utilisateur et que ce n'est pas le demandeur
+                if record_user_id and record_user_id != user_id:
+                    # Vérifier si le demandeur est admin
+                    return await verifier_est_admin(user_id)
+                return True
+        return False
+
 @app.post("/api/analyse-patrimoniale")
-async def api_analyse_patrimoniale(data: dict):
+async def api_analyse_patrimoniale(data: dict, authorization: str = Header(None)):
     """Génère un conseil patrimonial personnalisé. Tente l'agent Antigravity, sinon utilise le fallback Gemini."""
+    # 0. Sécurisation : Validation du Token JWT & IDOR (SEC-002)
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Token d'authentification manquant")
+        
+    token = authorization.replace("Bearer ", "").strip()
+    user_info = await get_supabase_user(token)
+    if not user_info:
+        raise HTTPException(status_code=401, detail="Session expirée ou invalide")
+        
+    user_id = user_info.get("id")
     file_path_param = data.get("filePath") or data.get("filename")
     if not file_path_param:
         raise HTTPException(status_code=400, detail="Missing filePath or filename parameter")
+
+    # Vérification IDOR de la propriété
+    est_proprietaire = await verifier_propriete_document(file_path_param, user_id)
+    if not est_proprietaire:
+        raise HTTPException(status_code=403, detail="Accès non autorisé à ce document")
 
     # 1. Télécharger le fichier depuis Supabase
     try:
