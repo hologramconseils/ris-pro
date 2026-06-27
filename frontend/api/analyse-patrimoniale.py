@@ -197,10 +197,11 @@ async def verifier_est_admin(user_id: str) -> bool:
     }
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code == 200:
-            records = response.json()
-            if records and records[0].get("role") == "admin":
-                return True
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Erreur d'infrastructure Supabase (Profils: {response.status_code})")
+        records = response.json()
+        if records and records[0].get("role") == "admin":
+            return True
         return False
 
 async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
@@ -218,15 +219,16 @@ async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
     }
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code == 200:
-            records = response.json()
-            if records:
-                record_user_id = records[0].get("user_id")
-                # Si le document est lié à un utilisateur et que ce n'est pas le demandeur
-                if record_user_id and record_user_id != user_id:
-                    # Vérifier si le demandeur est admin
-                    return await verifier_est_admin(user_id)
-                return True
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Erreur d'infrastructure Supabase (Analyses: {response.status_code})")
+        records = response.json()
+        if records:
+            record_user_id = records[0].get("user_id")
+            # Si le document est lié à un utilisateur et que ce n'est pas le demandeur
+            if record_user_id and record_user_id != user_id:
+                # Vérifier si le demandeur est admin
+                return await verifier_est_admin(user_id)
+            return True
         return False
 
 @app.post("/api/analyse-patrimoniale")
