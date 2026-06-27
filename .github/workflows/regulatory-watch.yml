@@ -1,0 +1,69 @@
+name: Veille Réglementaire Automatique
+
+on:
+  schedule:
+    # Tous les lundis à 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Permet de déclencher manuellement depuis l'interface GitHub
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install google-genai python-dotenv pydantic httpx
+
+    - name: Run Regulatory Watch Agent
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        python backend/regulatory_watch_agent.py
+
+    - name: Check for changes & Open Pull Request
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Vérifier s'il y a des modifications sur les fichiers Markdown
+        if [ -n "$(git status --porcelain *.md)" ]; then
+          echo "Des modifications réglementaires ont été détectées."
+          
+          # Configurer l'utilisateur Git
+          git config --global user.name "RIS Pro Compliance Bot"
+          git config --global user.email "compliance-bot@hologramconseils.com"
+          
+          # Créer un nom de branche unique
+          BRANCH_NAME="regulatory-update-$(date +'%Y%m%d')"
+          
+          # Créer la branche et committer
+          git checkout -b "$BRANCH_NAME"
+          git add *.md
+          git commit -m "chore(compliance): mise à jour automatique de la réglementation retraite"
+          
+          # Pousser la branche sur le dépôt
+          git push origin "$BRANCH_NAME"
+          
+          # Créer la Pull Request via la CLI GitHub
+          gh pr create \
+            --title "Veille Réglementaire : Mise à jour des règles de retraite" \
+            --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro. Elle intègre les modifications légales et réglementaires détectées via Google Search. Veuillez valider le contenu avant fusion." \
+            --base main \
+            --head "$BRANCH_NAME"
+            
+          echo "Pull Request créée avec succès."
+        else
+          echo "Aucun changement réglementaire détecté. Fin du workflow."
+        fi
