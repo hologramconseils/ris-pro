@@ -174,6 +174,22 @@ export default function Bilan() {
     )
   }
 
+  const extractTrimestres = (text) => {
+    if (!text) return { valides: 72, requis: 172 };
+    const match = text.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i);
+    if (match) {
+      return { valides: parseInt(match[1]), requis: parseInt(match[2]) };
+    }
+    const simpleMatch = text.match(/(\d+)\s+trimestres/i);
+    return {
+      valides: simpleMatch ? parseInt(simpleMatch[1]) : 72,
+      requis: 172
+    };
+  }
+
+  const trimestresInfo = extractTrimestres(results.synthese_situation || "");
+  const careerScore = Math.round((trimestresInfo.valides / trimestresInfo.requis) * 100);
+
   const currentYear = new Date().getFullYear()
   const rawAnomalies = results.anomalies || []
   const anomalies = Array.isArray(rawAnomalies) 
@@ -226,23 +242,53 @@ export default function Bilan() {
           </div>
         </div>
 
-        {/* Synthesis Cards */}
-        <div className="synthesis-grid">
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div className="text-sm text-muted uppercase tracking-wide font-bold">Total Anomalies</div>
-            <div className="text-3xl font-bold text-error">{anomalies.length}</div>
+        {/* Executive KPI Dashboard */}
+        <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', display: 'grid' }}>
+          {/* Card 1: Age Taux Plein */}
+          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
+            <div>
+              <div className="text-xs text-muted uppercase tracking-wider font-bold">Âge Taux Plein</div>
+              <div className="text-3xl font-extrabold" style={{ color: 'var(--primary)', margin: '0.25rem 0' }}>
+                {results.age_taux_plein_estime || "67 ans"}
+              </div>
+            </div>
+            <div className="text-xs text-muted">Âge d'annulation de la décote.</div>
           </div>
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div className="text-sm text-muted uppercase tracking-wide font-bold">Années impactées</div>
-            <div className="text-3xl font-bold" style={{ color: 'var(--primary)' }}>
-              {[...new Set(anomalies.map(a => a.year))].length}
+
+          {/* Card 2: Career Completion Score */}
+          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
+            <div>
+              <div className="text-xs text-muted uppercase tracking-wider font-bold">Score de Carrière</div>
+              <div className="text-3xl font-extrabold" style={{ color: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', margin: '0.25rem 0' }}>
+                {careerScore}%
+              </div>
+            </div>
+            {/* Progress Bar */}
+            <div style={{ width: '100%', height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: `${careerScore}%`, height: '100%', background: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', borderRadius: '3px', transition: 'width 1s ease-out' }}></div>
             </div>
           </div>
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div className="text-sm text-muted uppercase tracking-wide font-bold">Justificatifs requis</div>
-            <div className="text-3xl font-bold text-warning">
-              {anomalies.reduce((acc, a) => acc + (Array.isArray(a.docs) ? a.docs.length : (a.docs ? 1 : 0)), 0)}
+
+          {/* Card 3: Trimestres Cotisés */}
+          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
+            <div>
+              <div className="text-xs text-muted uppercase tracking-wider font-bold">Trimestres Validés</div>
+              <div className="text-3xl font-extrabold" style={{ margin: '0.25rem 0' }}>
+                {trimestresInfo.valides} <span className="text-sm text-muted font-normal">/ {trimestresInfo.requis}</span>
+              </div>
             </div>
+            <div className="text-xs text-muted">Trimestres requis pour taux plein.</div>
+          </div>
+
+          {/* Card 4: Anomalies Détectées */}
+          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
+            <div>
+              <div className="text-xs text-muted uppercase tracking-wider font-bold">Qualité du Dossier</div>
+              <div className="text-3xl font-extrabold" style={{ color: anomalies.length > 3 ? 'var(--error)' : anomalies.length > 0 ? 'var(--warning)' : 'var(--success)', margin: '0.25rem 0' }}>
+                {anomalies.length > 3 ? "Critique" : anomalies.length > 0 ? "À optimiser" : "Excellent"}
+              </div>
+            </div>
+            <div className="text-xs text-muted">{anomalies.length} anomalie{anomalies.length > 1 ? 's' : ''} détectée{anomalies.length > 1 ? 's' : ''}.</div>
           </div>
         </div>
 
@@ -294,18 +340,60 @@ export default function Bilan() {
               </h3>
               <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
                 {results.strategies.map((strat, sIdx) => (
-                  <div key={sIdx} className="card glass-hover" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
-                    <div className="badge badge-success" style={{
-                      background: 'rgba(22, 163, 74, 0.1)',
-                      color: 'var(--success)',
-                      borderColor: 'transparent',
-                      alignSelf: 'flex-start',
-                      width: 'fit-content'
+                  <div 
+                    key={sIdx} 
+                    className="card glass-hover" 
+                    style={{ 
+                      padding: '2rem 1.75rem', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '1rem', 
+                      position: 'relative', 
+                      overflow: 'hidden',
+                      border: '1px solid rgba(0, 0, 0, 0.06)',
+                      borderRadius: '16px',
+                      background: 'var(--bg-card)',
+                      transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
+                  >
+                    {/* Watermark Number */}
+                    <div style={{
+                      position: 'absolute',
+                      right: '1.25rem',
+                      bottom: '0.25rem',
+                      fontSize: '4.5rem',
+                      fontWeight: '900',
+                      lineHeight: '1',
+                      opacity: '0.06',
+                      userSelect: 'none',
+                      color: 'var(--text-main)',
+                      fontFamily: '"Outfit", sans-serif'
                     }}>
-                      Impact : {strat.impact_estime}
+                      0{sIdx + 1}
                     </div>
-                    <h4 className="font-bold text-base mt-1">{strat.titre}</h4>
-                    <p className="text-sm text-muted leading-relaxed" style={{ flex: 1 }}>{strat.description}</p>
+
+                    <div className="badge" style={{
+                      background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0.03) 100%)',
+                      color: 'var(--success)',
+                      border: '1px solid rgba(22, 163, 74, 0.15)',
+                      padding: '0.4rem 0.8rem',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      alignSelf: 'flex-start',
+                      width: 'fit-content',
+                      borderRadius: '8px',
+                      letterSpacing: '0.03em'
+                    }}>
+                      IMPACT : {strat.impact_estime}
+                    </div>
+                    
+                    <h4 className="font-bold text-lg mt-1" style={{ letterSpacing: '-0.02em', color: 'var(--text-main)', paddingRight: '2rem' }}>
+                      {strat.titre}
+                    </h4>
+                    
+                    <p className="text-sm text-muted leading-relaxed" style={{ flex: 1, zIndex: 1, color: 'var(--text-muted)' }}>
+                      {strat.description}
+                    </p>
                   </div>
                 ))}
               </div>

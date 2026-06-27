@@ -263,27 +263,63 @@ export default function Diagnostic() {
           </h2>
           
           {freemiumAnomalies.map((anom, idx) => (
-            <div key={idx} className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} style={{ padding: '1.5rem' }}>
-              <div className="anomaly-header">
+            <div 
+              key={idx} 
+              className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} 
+              style={{ 
+                padding: '2rem 1.75rem', 
+                position: 'relative', 
+                overflow: 'hidden',
+                borderLeft: anom.severity === 'high' ? '5px solid var(--error)' : '5px solid var(--warning)',
+                borderRadius: '12px',
+                background: 'var(--bg-card)',
+                boxShadow: 'var(--shadow-sm)',
+                marginBottom: '1.5rem',
+                borderTop: '1px solid rgba(0, 0, 0, 0.04)',
+                borderRight: '1px solid rgba(0, 0, 0, 0.04)',
+                borderBottom: '1px solid rgba(0, 0, 0, 0.04)'
+              }}
+            >
+              {/* Number watermark */}
+              <div style={{
+                position: 'absolute',
+                right: '1.5rem',
+                bottom: '0.25rem',
+                fontSize: '4.5rem',
+                fontWeight: '900',
+                opacity: '0.04',
+                color: 'var(--text-main)',
+                fontFamily: '"Outfit", sans-serif',
+                userSelect: 'none'
+              }}>
+                0{idx + 1}
+              </div>
+
+              <div className="anomaly-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '1rem' }}>
                 <div>
-                  <h3 className="font-bold text-lg flex items-center gap-2">
-                    <Calendar size={18} className="text-muted" /> {anom.year || "Année non spécifiée"}
+                  <h3 className="font-bold text-lg flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
+                    <Calendar size={18} className="text-primary" /> Année {anom.year || "Non spécifiée"}
                   </h3>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div style={{ background: 'var(--bg-page)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)' }}>
-                    <div className="text-[10px] text-muted uppercase tracking-wider">Sévérité</div>
-                    <div className="font-bold uppercase text-xs" style={{ color: anom.severity === 'high' ? 'var(--danger)' : 'var(--warning)' }}>
-                      {anom.severity === 'high' ? 'Critique' : 'Moyenne'}
-                    </div>
+                <div>
+                  <div className="badge" style={{
+                    background: anom.severity === 'high' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
+                    color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)',
+                    border: '1px solid transparent',
+                    padding: '0.35rem 0.75rem',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    borderRadius: '8px'
+                  }}>
+                    {anom.severity === 'high' ? 'ANOMALIE CRITIQUE' : 'ANOMALIE MOYENNE'}
                   </div>
                 </div>
               </div>
               
-              <div style={{ marginTop: '1rem' }}>
-                <h4 className="font-bold text-base mb-1">{anom.title}</h4>
-                <p className="text-muted text-sm leading-relaxed">
+              <div style={{ marginTop: '1.25rem', zIndex: 1, position: 'relative' }}>
+                <h4 className="font-bold text-base mb-2" style={{ color: 'var(--text-main)' }}>{anom.title}</h4>
+                <p className="text-muted text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                   {anom.description}
                 </p>
               </div>
@@ -292,33 +328,53 @@ export default function Diagnostic() {
         </div>
 
         {/* Upgrade Card / Signup Form */}
-        <div className="card glass flex flex-col items-center text-center" style={{ background: 'linear-gradient(to right bottom, var(--bg-card), var(--bg-page))', border: '1px solid var(--primary)', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'var(--primary)', opacity: 0.05, borderRadius: '50%', filter: 'blur(40px)' }} />
+        <div 
+          className="card glass flex flex-col items-center text-center" 
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)', 
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '2px solid transparent',
+            backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, var(--primary) 0%, #d4af37 100%)',
+            backgroundOrigin: 'border-box',
+            backgroundClip: 'padding-box, border-box',
+            position: 'relative', 
+            overflow: 'hidden',
+            padding: '3rem 2rem',
+            borderRadius: '24px',
+            boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.08)'
+          }}
+        >
+          <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'var(--primary)', opacity: 0.03, borderRadius: '50%', filter: 'blur(40px)', pointerEvents: 'none' }} />
           
-          <Lock size={32} className="text-primary" style={{ marginBottom: '1rem' }} />
-          <h2 className="text-2xl font-bold" style={{ marginBottom: '0.5rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #d4af37 100%)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', boxShadow: '0 8px 16px -4px rgba(212, 175, 55, 0.3)' }}>
+            <Lock size={28} className="text-white" />
+          </div>
+          
+          <h2 className="text-2xl font-extrabold" style={{ marginBottom: '0.75rem', letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
             {hasMore ? `Votre audit révèle ${sortedAnomalies.length - freemiumAnomalies.length} autres anomalies` : "Accédez à votre bilan détaillé"}
           </h2>
-          <p className="text-muted" style={{ maxWidth: '500px', marginBottom: '2rem' }}>
-            Débloquer l’analyse complète et détaillée pour voir l’intégralité des anomalies détectées en quelques minutes ainsi que la liste (non exhaustive) des pièces justificatives requises pour demander la correction de votre carrière.
+          <p className="text-muted text-sm leading-relaxed" style={{ maxWidth: '540px', marginBottom: '2.5rem', color: 'var(--text-muted)' }}>
+            Débloquez l’analyse complète et détaillée pour voir l’intégralité des anomalies détectées en quelques minutes ainsi que la liste (non exhaustive) des pièces justificatives requises pour demander la correction de votre carrière.
           </p>
           
           {showAuthChoice ? (
-            <div className="auth-choice-container" style={{ marginTop: '1rem' }}>
+            <div className="auth-choice-container" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* CTA principal : achat direct sans compte */}
-              <div className="guest-checkout-section">
+              <div className="guest-checkout-section" style={{ width: '100%' }}>
                 {!showGuestCheckout ? (
                   <button
                     className="btn btn-primary btn-cta-premium w-full"
                     onClick={() => { setShowGuestCheckout(true); }}
+                    style={{ padding: '0.8rem 1.5rem', minHeight: '48px', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                   >
                     <span>Accédez à l'analyse détaillée pour 29 €</span>
                     <ChevronRight size={18} />
                   </button>
                 ) : (
-                  <form onSubmit={handleGuestCheckout} className="guest-checkout-form">
-                    <p className="guest-checkout-label">Entrez votre email pour recevoir votre accès :</p>
-                    <div className="guest-checkout-fields">
+                  <form onSubmit={handleGuestCheckout} className="guest-checkout-form" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+                    <p className="guest-checkout-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Entrez votre email pour recevoir votre accès :</p>
+                    <div className="guest-checkout-fields" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <input
                         type="email"
                         className="input"
@@ -327,6 +383,7 @@ export default function Diagnostic() {
                         onChange={(e) => setCheckoutEmail(e.target.value)}
                         required
                         autoFocus
+                        style={{ width: '100%', minHeight: '44px', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)' }}
                       />
                       {checkoutError && (
                         <div className="flex items-center gap-2 text-error text-sm p-3 bg-error-bg rounded-lg">
@@ -334,34 +391,37 @@ export default function Diagnostic() {
                           {checkoutError}
                         </div>
                       )}
-                      <button type="submit" className="btn btn-primary btn-cta-premium w-full" disabled={checkoutLoading}>
+                      <button type="submit" className="btn btn-primary btn-cta-premium w-full" disabled={checkoutLoading} style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {checkoutLoading ? <Loader2 className="animate-spin" size={18} /> : <span>Payer 29 € et accéder à l'analyse</span>}
                       </button>
-                      <button type="button" className="btn btn-ghost text-sm" onClick={() => setShowGuestCheckout(false)}>
+                      <button type="button" className="btn btn-ghost text-sm" onClick={() => setShowGuestCheckout(false)} style={{ minHeight: '36px' }}>
                         ← Retour
                       </button>
                     </div>
                   </form>
                 )}
-                <div className="text-xs text-muted text-center mt-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                  <Lock size={11} /> Paiement sécurisé • Accès immédiat après paiement
+                <div className="text-xs text-muted text-center mt-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', color: 'var(--text-muted)' }}>
+                  <Lock size={11} className="text-success" /> Paiement sécurisé • Accès immédiat après paiement
                 </div>
               </div>
 
               {/* Séparateur */}
-              <div className="auth-divider">
-                <span>ou</span>
+              <div className="auth-divider" style={{ display: 'flex', alignItems: 'center', width: '100%', margin: '0.5rem 0' }}>
+                <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.08)' }}></div>
+                <span style={{ padding: '0 1rem', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.05em' }}>ou</span>
+                <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.08)' }}></div>
               </div>
 
               {/* Options compte */}
               <div className="auth-account-options" style={{ width: '100%' }}>
-                <p className="auth-account-label">Vous avez déjà un compte ?</p>
+                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Vous avez déjà un compte ?</p>
                 <button
-                  className="btn btn-primary btn-cta-premium w-full"
+                  className="btn btn-secondary w-full"
                   onClick={() => {
                     if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
                     navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
                   }}
+                  style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', borderRadius: '10px' }}
                 >
                   <span>Se connecter</span>
                   <ChevronRight size={18} />
@@ -370,7 +430,22 @@ export default function Diagnostic() {
             </div>
           ) : (
             <>
-              <button className="btn btn-primary btn-cta-premium" onClick={handleAction} style={{ padding: '1.2rem 2.5rem' }}>
+              <button 
+                className="btn btn-primary btn-cta-premium" 
+                onClick={handleAction} 
+                style={{ 
+                  padding: '1rem 2.5rem', 
+                  minHeight: '54px', 
+                  height: 'auto',
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '0.75rem',
+                  fontSize: '1rem',
+                  fontWeight: '700',
+                  boxShadow: '0 10px 20px -6px rgba(var(--primary-rgb), 0.2)'
+                }}
+              >
                 <span>
                 {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
                   ? "Accéder au bilan complet (Admin)" 
@@ -384,8 +459,8 @@ export default function Diagnostic() {
                 </span>
                 <ChevronRight size={20} />
               </button>
-              <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Lock size={12} /> {LABELS.PAYMENT_SECURE}
+              <div className="text-xs text-muted mt-4" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)' }}>
+                <Lock size={12} className="text-success" /> {LABELS.PAYMENT_SECURE}
               </div>
             </>
           )}

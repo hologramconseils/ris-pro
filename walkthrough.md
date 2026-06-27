@@ -1,6 +1,6 @@
-# Walkthrough - Intégration de l'Agent Autonome Google Antigravity SDK
+# Walkthrough - Intégration de l'Agent Autonome Google Antigravity SDK & Interface Premium
 
-Ce document résume les actions menées pour intégrer un agent IA autonome de conseil patrimonial et d'audit de relevé de carrière dans le backend Python de RIS Pro.
+Ce document résume les actions menées pour intégrer un agent IA autonome de conseil patrimonial et d'audit de relevé de carrière dans le backend Python de RIS Pro, ainsi que son intégration visuelle dans le frontend React.
 
 ---
 
@@ -19,31 +19,36 @@ Création du module [wealth_advisor_agent.py](file:///Users/hologramconseils/.ge
 
 ---
 
-## 3. Exposition de l'API FastAPI
-Modification de [main.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/main.py) pour y ajouter la route POST `/api/analyse-patrimoniale` :
-*   Reçoit un nom de fichier relevé PDF.
-*   Instancie et exécute l'agent autonome asynchrone.
-*   Renvoie la réponse structurée JSON au format attendu.
+## 3. Exposition de l'API FastAPI & Fallback Vercel Serverless
+Modification de [main.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/main.py) et création de l'API Vercel Serverless [analyse-patrimoniale.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/api/analyse-patrimoniale.py) :
+*   **Fallback Résilient Direct** : Pour contourner l'incompatibilité de la version GLIBC du binaire `localharness` d'Antigravity sur Amazon Linux 2 (Vercel Serverless), l'endpoint tente d'exécuter l'agent autonome. En cas de défaillance binaire, il bascule de manière transparente sur un appel direct à l'API Gemini standard (`google-genai`) tout en respectant strictement le même schéma Pydantic et en injectant les règles métier de retraite locales.
+*   **Téléchargement Supabase** : L'API télécharge de manière sécurisée les fichiers RIS PDF directement depuis le bucket de stockage Supabase de l'application.
 
 ---
 
-## 4. Outil de Test & Validation
-Création du script [test_agent.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/test_agent.py) permettant de simuler localement l'exécution de l'agent sur le fichier test `mock_ris.pdf`.
-
-> [!NOTE]
-> Pour exécuter le script localement avec succès, copiez votre clé d'API dans `backend/.env` :
-> ```text
-> GEMINI_API_KEY="VOTRE_CLE_API"
-> ```
-> Puis lancez la commande :
-> ```bash
-> cd backend
-> ./venv/bin/python test_agent.py
-> ```
+## 4. Rendu de l'Interface Utilisateur (React)
+Modification de la page du [Bilan Premium (Bilan.jsx)](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Bilan.jsx) :
+*   **Déclenchement Automatique** : Si l'utilisateur est Premium et consulte son bilan, l'interface appelle l'API `/api/analyse-patrimoniale` en tâche de fond pour générer les conseils. Un état de chargement élégant est affiché pendant ce temps.
+*   **Design & Esthétique Premium** :
+    *   **Encadré Synthèse & Âge de Taux Plein** : Widgets avec typographies élégantes et bordures colorées.
+    *   **Grille Responsive de Stratégies** : Cartes présentant le titre, la description et un badge vert pour l'impact estimé de chaque opportunité.
+    *   **Commentaire CGP** : Bloc de recommandation générale stylisé sous forme de citation haut de gamme avec une bordure dorée.
+*   **Persistance** : Les résultats enrichis sont stockés en session storage et mis à jour dans Supabase pour des chargements instantanés lors des visites suivantes.
 
 ---
 
-## 5. Synchronisation
-Tous les fichiers modifiés et nouveaux ont été synchronisés dans les dossiers de sauvegarde Desktop :
-*   `/Users/hologramconseils/Desktop/RIS Pro V2`
-*   `/Users/hologramconseils/Desktop/RIS Pro V2/ris-pro-web`
+## 5. Déploiement en Production
+*   Toutes les modifications de code ont été synchronisées dans le projet local et les répertoires de sauvegarde Desktop.
+*   Le projet a été buildé localement sans aucune erreur.
+*   Les commits ont été poussés sur la branche `main` et déployés automatiquement sur **Vercel** (`https://ris.hologramconseils.com`).
+
+---
+
+## 6. Tableaux de Bord de Performance (KPIs) & Design Frontend
+*   **Tableau de Bord Exécutif (Bilan.jsx)** :
+    *   Remplacement des cartes de synthèse basiques par une grille de 4 KPIs stratégiques (Âge Taux Plein, Score de Carrière, Trimestres Validés, Qualité du Dossier).
+    *   Intégration d'une barre de progression de carrière dynamique colorée selon des seuils critiques, avec des transitions fluides.
+    *   Optimisation des briques de stratégies avec des indicateurs de numéro en filigrane discret (`01`, `02`, etc.) de style éditorial moderne.
+*   **Affichage Freemium (Diagnostic.jsx)** :
+    *   Mise en valeur des anomalies freemium avec des bordures d'avertissement de couleur gauche distinctes basées sur la sévérité (critique vs moyenne).
+    *   Création d'une boîte de verrouillage d'upgrade premium en verre dépoli (`backdropFilter`), avec un contour lumineux dégradé de couleur or et bleu roi, des champs de saisie élégants, et une clarté d'action absolue.
