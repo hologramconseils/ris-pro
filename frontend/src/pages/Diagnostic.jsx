@@ -503,7 +503,6 @@ export default function Diagnostic() {
                         value={checkoutEmail}
                         onChange={(e) => setCheckoutEmail(e.target.value)}
                         required
-                        autoFocus
                         style={{ width: '100%', minHeight: '44px', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)' }}
                       />
                       {checkoutError && (

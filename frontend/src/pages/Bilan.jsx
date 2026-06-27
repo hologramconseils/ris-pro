@@ -25,12 +25,17 @@ export default function Bilan() {
       fetchAnalysis(filePath)
     }
 
-    // Si on vient de payer mais que le profil n'est pas encore à jour (latence Webhook)
+    // Polling automatique pour gérer la latence du webhook de paiement
     if (isSuccess && user && profile && profile.analysis_credits === 0) {
-      const timer = setTimeout(() => {
-        refreshProfile()
-      }, 3000)
-      return () => clearTimeout(timer)
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts += 1;
+        refreshProfile();
+        if (attempts >= 6) {
+          clearInterval(interval);
+        }
+      }, 2000);
+      return () => clearInterval(interval);
     }
   }, [filePath, isSuccess, user, profile?.analysis_credits])
 
@@ -146,6 +151,21 @@ export default function Bilan() {
   // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Accès payé legacy) OU (Crédits > 0) OU (Retour immédiat de paiement réussi)
   const isAuthorized = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess
 
+  // Polling / attente intermédiaire si retour de paiement réussi mais profil non mis à jour
+  const waitingForPayment = isSuccess && profile && profile.analysis_credits === 0 && !isMock && profile?.role !== 'admin'
+
+  if (waitingForPayment) {
+    return (
+      <div className="container flex flex-col items-center justify-center gap-6" style={{ minHeight: '60vh', padding: '4rem 1.5rem', textAlign: 'center' }}>
+        <Loader2 className="animate-spin text-primary mx-auto mb-4" size={48} />
+        <h1 className="text-2xl font-bold">Validation de votre paiement...</h1>
+        <p className="text-muted max-w-lg">
+          Nous préparons votre espace Premium. Cette opération prend généralement quelques secondes.
+        </p>
+      </div>
+    )
+  }
+
   if (!isAuthorized) {
     return (
       <div className="container flex flex-col items-center justify-center gap-6" style={{ flex: 1, padding: '4rem 1.5rem', textAlign: 'center' }}>
@@ -218,6 +238,7 @@ export default function Bilan() {
 
   const trimestresInfo = extractTrimestres(results.synthese_situation || "");
   const careerScore = Math.round((trimestresInfo.valides / trimestresInfo.requis) * 100);
+  const agentFailed = hasAttemptedAgent && !agentLoading && (!results || !results.strategies || results.strategies.length === 0);
 
   const currentYear = new Date().getFullYear()
   const rawAnomalies = results.anomalies || []
@@ -340,7 +361,7 @@ export default function Bilan() {
         )}
 
         {/* Rapport de Conseil Patrimonial Premium */}
-        {(results.strategies || agentLoading) && (
+        {(results.strategies || agentLoading || agentFailed) && (
           <div className="flex flex-col gap-6" style={{ 
             borderBottom: '2px solid rgba(0,0,0,0.05)', 
             paddingBottom: '3rem',
@@ -352,125 +373,146 @@ export default function Bilan() {
               Bilan Retraite
             </h2>
  
-            {/* Synthèse de Situation */}
-            <div className="card" style={{ 
-              padding: '2rem', 
-              borderLeft: '4px solid var(--primary)', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '1rem',
-              background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.02) 100%)'
-            }}>
-              <h3 className="text-base font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--primary)' }}>
-                <Sparkles size={18} />
-                Synthèse Globale de Situation
-              </h3>
-              <p className="text-sm text-muted leading-relaxed" style={{ fontSize: '0.95rem', lineHeight: '1.75' }}>
-                {agentLoading 
-                  ? "🔍 L'expert RIS Pro croise vos données pour identifier les anomalies de votre historique de carrière..." 
-                  : results.synthese_situation}
-              </p>
-            </div>
- 
-            {/* Stratégies recommandées */}
-            <div className="mt-4">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <TrendingUp size={18} className="text-success" />
-                Stratégies d'Optimisation Préconisées
-              </h3>
-              
-              {agentLoading ? (
-                <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-                  {[1, 2, 3].map((idx) => (
-                    <div key={idx} className="card glass animate-pulse" style={{ padding: '2rem 1.75rem', minHeight: '160px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(0, 0, 0, 0.06)', borderRadius: '16px', background: 'var(--bg-card)' }}>
-                      <div style={{ width: '40%', height: '16px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                      <div style={{ width: '70%', height: '20px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                      <div style={{ width: '100%', height: '14px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                    </div>
-                  ))}
+            {agentFailed ? (
+              <div className="card text-center p-8" style={{ border: '1px solid rgba(239, 68, 68, 0.2)', background: 'rgba(239, 68, 68, 0.02)', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', borderRadius: '16px' }}>
+                <AlertTriangle size={48} className="text-error" style={{ color: 'var(--error)' }} />
+                <div>
+                  <h3 className="font-bold text-lg mb-1">Échec de la génération des conseils</h3>
+                  <p className="text-sm text-muted">Nous n'avons pas pu charger l'analyse personnalisée de l'IA (le service est peut-être temporairement surchargé).</p>
                 </div>
-              ) : (
-                <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-                  {results.strategies && results.strategies.map((strat, sIdx) => (
-                    <div 
-                      key={sIdx} 
-                      className="card glass-hover" 
-                      style={{ 
-                        padding: '2rem 1.75rem', 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '1rem', 
-                        position: 'relative', 
-                        overflow: 'hidden',
-                        border: '1px solid rgba(0, 0, 0, 0.06)',
-                        borderRadius: '16px',
-                        background: 'var(--bg-card)',
-                        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-                      }}
-                    >
-                      {/* Watermark Number */}
-                      <div style={{
-                        position: 'absolute',
-                        right: '1.25rem',
-                        bottom: '0.25rem',
-                        fontSize: '4.5rem',
-                        fontWeight: '900',
-                        lineHeight: '1',
-                        opacity: '0.06',
-                        userSelect: 'none',
-                        color: 'var(--text-main)',
-                        fontFamily: '"Outfit", sans-serif'
-                      }}>
-                        0{sIdx + 1}
-                      </div>
- 
-                      <div className="badge" style={{
-                        background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0.03) 100%)',
-                        color: 'var(--success)',
-                        border: '1px solid rgba(22, 163, 74, 0.15)',
-                        padding: '0.4rem 0.8rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '700',
-                        alignSelf: 'flex-start',
-                        width: 'fit-content',
-                        borderRadius: '8px',
-                        letterSpacing: '0.03em'
-                      }}>
-                        IMPACT : {strat.impact_estime}
-                      </div>
-                      
-                      <h4 className="font-bold text-lg mt-1" style={{ letterSpacing: '-0.02em', color: 'var(--text-main)', paddingRight: '2rem' }}>
-                        {strat.titre}
-                      </h4>
-                      
-                      <p className="text-sm text-muted leading-relaxed" style={{ flex: 1, zIndex: 1, color: 'var(--text-muted)' }}>
-                        {strat.description}
-                      </p>
-                    </div>
-                  ))}
+                <button 
+                  onClick={() => {
+                    setHasAttemptedAgent(false);
+                  }} 
+                  className="btn btn-primary"
+                  style={{ minHeight: '44px', padding: '0.6rem 1.5rem' }}
+                >
+                  Générer à nouveau mes préconisations
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Synthèse de Situation */}
+                <div className="card" style={{ 
+                  padding: '2rem', 
+                  borderLeft: '4px solid var(--primary)', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '1rem',
+                  background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                }}>
+                  <h3 className="text-base font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--primary)' }}>
+                    <Sparkles size={18} />
+                    Synthèse Globale de Situation
+                  </h3>
+                  <p className="text-sm text-muted leading-relaxed" style={{ fontSize: '0.95rem', lineHeight: '1.75' }}>
+                    {agentLoading 
+                      ? "🔍 L'expert RIS Pro croise vos données pour identifier les anomalies de votre historique de carrière..." 
+                      : results.synthese_situation}
+                  </p>
                 </div>
-              )}
-            </div>
- 
-            {/* Commentaire de conseil CGP */}
-            <div className="mt-4 cgp-recommendation" style={{
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%)',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              borderLeft: '5px solid #d4af37',
-              padding: '2rem',
-              borderRadius: 'var(--radius-md)',
-              boxShadow: 'var(--shadow-sm)'
-            }}>
-              <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: '#b89218' }}>
-                <Award size={18} />
-                Recommandation Globale du Conseiller Retraite
-              </h3>
-              <p className="text-sm font-medium leading-relaxed italic text-muted">
-                {agentLoading 
-                  ? "Rédigé de manière bienveillante et professionnelle par le conseiller expert..."
-                  : `"${results.commentaire_conseil}"`}
-              </p>
-            </div>
+     
+                {/* Stratégies recommandées */}
+                <div className="mt-4">
+                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                    <TrendingUp size={18} className="text-success" />
+                    Stratégies d'Optimisation Préconisées
+                  </h3>
+                  
+                  {agentLoading ? (
+                    <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
+                      {[1, 2, 3].map((idx) => (
+                        <div key={idx} className="card glass animate-pulse" style={{ padding: '2rem 1.75rem', minHeight: '160px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(0, 0, 0, 0.06)', borderRadius: '16px', background: 'var(--bg-card)' }}>
+                          <div style={{ width: '40%', height: '16px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
+                          <div style={{ width: '70%', height: '20px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
+                          <div style={{ width: '100%', height: '14px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
+                      {results.strategies && results.strategies.map((strat, sIdx) => (
+                        <div 
+                          key={sIdx} 
+                          className="card glass-hover" 
+                          style={{ 
+                            padding: '2rem 1.75rem', 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '1rem', 
+                            position: 'relative', 
+                            overflow: 'hidden',
+                            border: '1px solid rgba(0, 0, 0, 0.06)',
+                            borderRadius: '16px',
+                            background: 'var(--bg-card)',
+                            transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                          }}
+                        >
+                          {/* Watermark Number */}
+                          <div style={{
+                            position: 'absolute',
+                            right: '1.25rem',
+                            bottom: '0.25rem',
+                            fontSize: '4.5rem',
+                            fontWeight: '900',
+                            lineHeight: '1',
+                            opacity: '0.06',
+                            userSelect: 'none',
+                            color: 'var(--text-main)',
+                            fontFamily: '"Outfit", sans-serif'
+                          }}>
+                            0{sIdx + 1}
+                          </div>
+     
+                          <div className="badge" style={{
+                            background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0.03) 100%)',
+                            color: 'var(--success)',
+                            border: '1px solid rgba(22, 163, 74, 0.15)',
+                            padding: '0.4rem 0.8rem',
+                            fontSize: '0.75rem',
+                            fontWeight: '700',
+                            alignSelf: 'flex-start',
+                            width: 'fit-content',
+                            borderRadius: '8px',
+                            letterSpacing: '0.03em'
+                          }}>
+                            IMPACT : {strat.impact_estime}
+                          </div>
+                          
+                          <h4 className="font-bold text-lg mt-1" style={{ letterSpacing: '-0.02em', color: 'var(--text-main)', paddingRight: '2rem' }}>
+                            {strat.titre}
+                          </h4>
+                          
+                          <p className="text-sm text-muted leading-relaxed" style={{ flex: 1, zIndex: 1, color: 'var(--text-muted)' }}>
+                            {strat.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+     
+                {/* Commentaire de conseil CGP */}
+                <div className="mt-4 cgp-recommendation" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  borderLeft: '5px solid #d4af37',
+                  padding: '2rem',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-sm)'
+                }}>
+                  <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: '#b89218' }}>
+                    <Award size={18} />
+                    Recommandation Globale du Conseiller Retraite
+                  </h3>
+                  <p className="text-sm font-medium leading-relaxed italic text-muted">
+                    {agentLoading 
+                      ? "Rédigé de manière bienveillante et professionnelle par le conseiller expert..."
+                      : `"${results.commentaire_conseil}"`}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
