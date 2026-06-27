@@ -2,10 +2,14 @@ import os
 import shutil
 import stripe
 import httpx
-from fastapi import FastAPI, File, UploadFile, HTTPException
+import uuid
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from limiter import limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 async def telecharger_fichier_supabase(file_path: str) -> bytes:
     """Télécharge un document depuis le bucket Supabase pour l'analyser localement."""
@@ -31,6 +35,8 @@ except ImportError:
 load_dotenv()
 
 app = FastAPI(title="RIS Pro API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure CORS
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5175")
@@ -49,19 +55,28 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...)):
-    """Receives a PDF file and saves it asynchronously."""
+@limiter.limit("5/minute")
+async def upload_file(request: Request, file: UploadFile = File(...)):
+    """Receives a PDF file securely and saves it asynchronously."""
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
     
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    # Valider la signature PDF (%PDF-) pour éviter les faux fichiers PDF (ex: exécutables masqués)
+    header = await file.read(5)
+    await file.seek(0)
+    if header != b"%PDF-":
+        raise HTTPException(status_code=400, detail="Invalid PDF file format")
+        
+    # Générer un nom sécurisé pour éviter l'injection de chemin et l'écrasement de fichiers
+    safe_filename = f"{uuid.uuid4()}_{os.path.basename(file.filename)}"
+    file_path = os.path.join(UPLOAD_DIR, safe_filename)
     
     # Lecture/Ecriture asynchrone non-bloquante (FastAPI Pro pattern)
     content = await file.read()
     with open(file_path, "wb") as buffer:
         buffer.write(content)
         
-    return {"message": "File uploaded successfully", "filename": file.filename}
+    return {"message": "File uploaded successfully", "filename": safe_filename}
 
 @app.post("/api/create-checkout-session")
 async def create_checkout_session(data: dict):

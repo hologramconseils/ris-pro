@@ -15,6 +15,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Explication : SECURITY DEFINER permet à la fonction de s'exécuter avec les privilèges de l'administrateur de la base de données.
 -- Cela permet d'outrepasser les règles RLS de manière contrôlée uniquement pour cette action métier critique.
+-- SÉCURISATION INDISPENSABLE : Révoquer l'exécution de la fonction par le public, anon, et authenticated.
+REVOKE EXECUTE ON FUNCTION public.increment_credits(UUID, INT) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.increment_credits(UUID, INT) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.increment_credits(UUID, INT) FROM authenticated;
 
 -- Nouvelle fonction pour récupérer l'ID de l'utilisateur par son email (sécurisé via SECURITY DEFINER)
 CREATE OR REPLACE FUNCTION public.get_user_id_by_email(email_to_search TEXT)
@@ -26,4 +30,9 @@ BEGIN
   RETURN user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- SÉCURISATION INDISPENSABLE : Révoquer l'exécution de la fonction par le public, anon, et authenticated.
+REVOKE EXECUTE ON FUNCTION public.get_user_id_by_email(TEXT) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_id_by_email(TEXT) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.get_user_id_by_email(TEXT) FROM authenticated;
 
