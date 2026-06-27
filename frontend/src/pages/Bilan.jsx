@@ -18,6 +18,7 @@ export default function Bilan() {
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState('all')
+  const [hasAttemptedAgent, setHasAttemptedAgent] = useState(false)
 
   useEffect(() => {
     if (filePath) {
@@ -35,8 +36,10 @@ export default function Bilan() {
 
   // Déclencher l'analyse de l'agent patrimonial IA si nécessaire
   const triggerAgentAnalysis = async (path) => {
+    if (hasAttemptedAgent || agentLoading) return;
     try {
       setAgentLoading(true);
+      setHasAttemptedAgent(true);
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       
@@ -64,6 +67,8 @@ export default function Bilan() {
 
           return enriched;
         });
+      } else {
+        console.error("L'API d'analyse patrimoniale a renvoyé une erreur:", response.status);
       }
     } catch (err) {
       console.error("Erreur de l'agent patrimonial:", err);
@@ -74,11 +79,12 @@ export default function Bilan() {
 
   // Activer l'agent si on a accès premium et que les stratégies ne sont pas encore calculées, ou s'il manque les champs de cohérence de trimestres
   useEffect(() => {
+    if (authLoading) return;
     const isPremium = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess;
-    if (results && isPremium && (!results.strategies || typeof results.trimestres_valides !== 'number') && !agentLoading && filePath) {
+    if (results && isPremium && (!results.strategies || typeof results.trimestres_valides !== 'number') && !agentLoading && !hasAttemptedAgent && filePath) {
       triggerAgentAnalysis(filePath);
     }
-  }, [results, profile, isSuccess, filePath, agentLoading])
+  }, [results, profile, isSuccess, filePath, agentLoading, hasAttemptedAgent, authLoading])
 
   const fetchAnalysis = async (path) => {
     try {

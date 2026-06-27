@@ -186,13 +186,17 @@ async def verifier_est_admin(user_id: str) -> bool:
     """Vérifie si l'utilisateur possède le rôle d'administrateur dans la table des profils."""
     supabase_url = os.environ.get("VITE_SUPABASE_URL")
     supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
-    url = f"{supabase_url}/rest/v1/profiles?id=eq.{user_id}&select=role"
+    url = f"{supabase_url}/rest/v1/profiles"
     headers = {
         "Authorization": f"Bearer {supabase_key}",
         "apikey": supabase_key
     }
+    params = {
+        "id": f"eq.{user_id}",
+        "select": "role"
+    }
     async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers, params=params)
         if response.status_code == 200:
             records = response.json()
             if records and records[0].get("role") == "admin":
@@ -203,13 +207,17 @@ async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
     """Vérifie que l'utilisateur est le propriétaire légitime du document ou est admin."""
     supabase_url = os.environ.get("VITE_SUPABASE_URL")
     supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
-    url = f"{supabase_url}/rest/v1/analyses?file_path=eq.{file_path}&select=user_id"
+    url = f"{supabase_url}/rest/v1/analyses"
     headers = {
         "Authorization": f"Bearer {supabase_key}",
         "apikey": supabase_key
     }
+    params = {
+        "file_path": f"eq.{file_path}",
+        "select": "user_id"
+    }
     async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers, params=params)
         if response.status_code == 200:
             records = response.json()
             if records:
