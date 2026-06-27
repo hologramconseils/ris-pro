@@ -1,4 +1,6 @@
 import os
+import tempfile
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,33 +67,43 @@ def recuperer_regles_retraite(type_regle: str) -> str:
                 return f"Erreur de lecture du fichier {path}: {str(e)}"
     return f"Aucune règle trouvée pour '{type_regle}'."
 
+async def telecharger_fichier_supabase(file_path: str) -> bytes:
+    """Télécharge le fichier PDF depuis Supabase Storage."""
+    supabase_url = os.environ.get("VITE_SUPABASE_URL")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
+    
+    if not supabase_url or not supabase_key:
+        raise ValueError("Supabase configuration is missing in environment variables.")
+        
+    url = f"{supabase_url}/storage/v1/object/authenticated/documents/{file_path}"
+    headers = {
+        "Authorization": f"Bearer {supabase_key}",
+        "apikey": supabase_key
+    }
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.content
+        raise Exception(f"Failed to download file from Supabase storage (status {response.status_code}): {response.text}")
+
 @app.post("/api/analyse-patrimoniale")
 async def api_analyse_patrimoniale(data: dict):
     """Génère un conseil patrimonial personnalisé de manière dynamique à partir d'un relevé PDF."""
-    file_name = data.get("filename")
-    if not file_name:
-        raise HTTPException(status_code=400, detail="Missing filename parameter")
-    
-    # Résoudre le chemin du fichier (gérer l'environnement local et Vercel)
-    file_path = os.path.join("backend", "uploads", file_name)
-    if not os.path.exists(file_path):
-        paths = [
-            os.path.join("uploads", file_name),
-            file_name,
-            os.path.join(os.path.dirname(__file__), "..", "backend", "uploads", file_name),
-            os.path.join(os.path.dirname(__file__), "..", "..", "backend", "uploads", file_name),
-            os.path.join(os.path.dirname(__file__), "..", "..", "uploads", file_name)
-        ]
-        found = False
-        for p in paths:
-            if os.path.exists(p):
-                file_path = p
-                found = True
-                break
-        if not found:
-            raise HTTPException(status_code=404, detail=f"File {file_name} not found")
+    file_path_param = data.get("filePath") or data.get("filename")
+    if not file_path_param:
+        raise HTTPException(status_code=400, detail="Missing filePath or filename parameter")
 
+    temp_file_path = None
     try:
+        # Télécharger le fichier depuis Supabase
+        file_bytes = await telecharger_fichier_supabase(file_path_param)
+        
+        # Sauvegarder dans un fichier temporaire
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(file_bytes)
+            temp_file_path = temp_file.name
+
         config = LocalAgentConfig(
             system_instructions=(
                 "Vous êtes un conseiller en gestion de patrimoine (CGP) d'élite, expert en optimisation de la retraite. "
@@ -108,7 +120,7 @@ async def api_analyse_patrimoniale(data: dict):
         )
 
         async with Agent(config=config) as agent:
-            pdf_document = Document.from_file(file_path)
+            pdf_document = Document.from_file(temp_file_path)
             prompt = (
                 "Veuillez lire ce relevé de carrière PDF, analyser les anomalies potentielles, "
                 "et formuler des recommandations stratégiques de conseil patrimonial."
@@ -116,5 +128,13 @@ async def api_analyse_patrimoniale(data: dict):
             response = await agent.chat([prompt, pdf_document])
             result = await response.structured_output()
             return result
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # S'assurer de nettoyer le fichier temporaire
+        if temp_file_path and os.path.exists(temp_file_path):
+            try:
+                os.remove(temp_file_path)
+            except Exception as clean_err:
+                print(f"Failed to remove temp file {temp_file_path}: {clean_err}")
