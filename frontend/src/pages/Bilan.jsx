@@ -337,7 +337,7 @@ export default function Bilan() {
           }}>
             <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
               <Award className="text-primary" />
-              Bilan Retraite & Conseils d'Optimisation
+              Bilan Retraite
             </h2>
  
             {/* Synthèse de Situation */}
