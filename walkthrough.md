@@ -52,3 +52,14 @@ Modification de la page du [Bilan Premium (Bilan.jsx)](file:///Users/hologramcon
 *   **Affichage Freemium (Diagnostic.jsx)** :
     *   Mise en valeur des anomalies freemium avec des bordures d'avertissement de couleur gauche distinctes basées sur la sévérité (critique vs moyenne).
     *   Création d'une boîte de verrouillage d'upgrade premium en verre dépoli (`backdropFilter`), avec un contour lumineux dégradé de couleur or et bleu roi, des champs de saisie élégants, et une clarté d'action absolue.
+
+---
+
+## 7. Veille Réglementaire Automatisée & Conformité par PR
+*   **Agent de Veille (`regulatory_watch_agent.py`)** :
+    *   Script autonome interrogeant l'API Gemini 2.5 Flash avec l'outil officiel Google Search.
+    *   Il compare les fichiers de réglementation locaux (`regles_depart_anticipe_2023.md`, etc.) avec l'actualité législative sur Internet.
+    *   Si des décrets ou réformes sont détectés, il met à jour le fichier concerné et documente la source.
+*   **Workflow GitHub Actions (`regulatory-watch.yml`)** :
+    *   S'exécute automatiquement chaque semaine (et manuellement).
+    *   Détecte les modifications de fichiers opérées par l'agent, crée une branche dédiée (ex: `regulatory-update-YYYYMMDD`), pousse la branche et ouvre automatiquement une **Pull Request** sur GitHub pour votre validation humaine avant le déploiement en production.
