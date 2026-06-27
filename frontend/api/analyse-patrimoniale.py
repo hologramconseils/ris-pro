@@ -126,6 +126,7 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
                 prompt
             ],
             config=types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
                 response_mime_type="application/json",
                 response_schema=ConseilPatrimonial,
             ),
