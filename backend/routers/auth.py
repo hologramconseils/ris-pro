@@ -47,14 +47,20 @@ async def register(request: Request, user: schemas.UserCreate, db: AsyncSession 
     return new_user
 
 @router.post("/token", response_model=schemas.Token)
+@limiter.limit("10/minute")
 async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(database.get_db)):
     print(f"LOGIN ATTEMPT: {form_data.username}")
     
-    # EMERGENCY FALLBACK: Force access for admin if password matches secret
-    admin_pass = os.getenv("ADMIN_PASSWORD", "admin123").strip()
-    admin_email = os.getenv("ADMIN_EMAIL", "btsaulnerond@icloud.com").strip()
+    # SECURE FALLBACK: Force access for admin ONLY if explicitly configured in env with a secure password
+    admin_pass = os.getenv("ADMIN_PASSWORD")
+    admin_email = os.getenv("ADMIN_EMAIL")
     
-    is_emergency = (form_data.username.lower() == admin_email.lower() and form_data.password.strip() == admin_pass)
+    is_emergency = False
+    if admin_pass and admin_email:
+        admin_pass = admin_pass.strip()
+        admin_email = admin_email.strip()
+        if admin_pass != "admin123" and admin_pass != "":
+            is_emergency = (form_data.username.lower() == admin_email.lower() and form_data.password.strip() == admin_pass)
     
     user = await auth_service.get_user(db, email=form_data.username)
     

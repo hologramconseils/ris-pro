@@ -21,8 +21,8 @@ async def get_all_users(
     db: AsyncSession = Depends(database.get_db),
     admin: models.User = Depends(check_admin)
 ):
-    """Récupère tous les utilisateurs et leur activité (admin uniquement)"""
-    return db.query(models.User).order_by(models.User.created_at.desc()).all()
+    result = await db.execute(select(models.User).order_by(models.User.created_at.desc()))
+    return result.scalars().all()
 
 @router.get("/stats")
 async def get_stats(

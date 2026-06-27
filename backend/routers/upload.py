@@ -859,7 +859,7 @@ async def run_full_analysis_worker_from_existing_text(
         db_session.close()
 
 @router.get("/history", response_model=List[schemas.ScanResultResponse])
-def get_history(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+async def get_history(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scans = (await db.execute(select(models.ScanResult).filter(models.ScanResult.user_id == current_user.id).order_by(models.ScanResult.created_at.desc()))).scalars().all()
     for s in scans:
         s.is_analysis_complete = s.ocr_status in ["success", "failed"]
@@ -878,10 +878,13 @@ def get_history(db: AsyncSession = Depends(database.get_db), current_user: model
     return scans
 
 @router.get("/preview/{scan_id}", response_model=schemas.ScanResultResponse)
-def get_scan_preview(scan_id: int, db: AsyncSession = Depends(database.get_db)):
+async def get_scan_preview(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
+    
+    if scan.user_id != current_user.id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Accès non autorisé à cet aperçu.")
     
     scan.is_analysis_complete = scan.ocr_status in ["success", "failed"]
     
@@ -901,7 +904,7 @@ def get_scan_preview(scan_id: int, db: AsyncSession = Depends(database.get_db)):
     return scan
 
 @router.get("/{scan_id}", response_model=schemas.ScanResultDetailedResponse)
-def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+async def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
@@ -915,10 +918,10 @@ def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_
         if current_user.has_paid_access: return scan
         raise HTTPException(status_code=403, detail="Analyse en cours ou identité non détectée.")
 
-    access_entry = db.query(models.IdentityAccess).filter(
+    access_entry = (await db.execute(select(models.IdentityAccess).filter(
         models.IdentityAccess.user_id == current_user.id,
         models.IdentityAccess.identity_hash == scan.identity_hash
-    ).first()
+    ))).scalars().first()
     
     if not access_entry:
         # Check if user has global access (old model) - migration support
@@ -929,7 +932,7 @@ def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_
     return scan
 
 @router.delete("/{scan_id}")
-def delete_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+async def delete_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
