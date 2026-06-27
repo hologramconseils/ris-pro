@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert } from 'lucide-react'
+import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
@@ -317,11 +317,44 @@ export default function Diagnostic() {
                 </div>
               </div>
               
-              <div style={{ marginTop: '1.25rem', zIndex: 1, position: 'relative' }}>
-                <h4 className="font-bold text-base mb-2" style={{ color: 'var(--text-main)' }}>{anom.title}</h4>
-                <p className="text-muted text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  {anom.description}
-                </p>
+              <div style={{ marginTop: '1.25rem', zIndex: 1, position: 'relative', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <h4 className="font-bold text-base mb-2" style={{ color: 'var(--text-main)' }}>{anom.title}</h4>
+                  <p className="text-muted text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {anom.description}
+                  </p>
+                </div>
+
+                {anom.reason && anom.reason !== "Masqué (Premium)" && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <h4 className="font-semibold flex items-center gap-2 text-error text-sm mb-1">
+                      <AlertTriangle size={15} /> Explication de l'erreur
+                    </h4>
+                    <p className="text-sm text-muted">{anom.reason}</p>
+                  </div>
+                )}
+
+                {anom.solution && anom.solution !== "Masqué (Premium)" && (
+                  <div style={{ background: 'var(--success-bg)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)', marginTop: '0.5rem' }}>
+                    <h4 className="font-semibold flex items-center gap-2 text-success text-sm mb-1.5">
+                      <CheckCircle2 size={15} /> Action requise
+                    </h4>
+                    <p className="text-sm font-medium mb-3">{anom.solution}</p>
+                    
+                    {anom.docs && anom.docs.length > 0 && anom.docs[0] !== "Pièces justificatives masquées" && (
+                      <>
+                        <div className="text-xs font-bold uppercase tracking-wider text-success mb-1" style={{ opacity: 0.8 }}>Pièces justificatives à fournir :</div>
+                        <ul style={{ listStyleType: 'disc', paddingLeft: '1.25rem', fontSize: '0.85rem', color: 'var(--text-main)' }}>
+                          {Array.isArray(anom.docs) ? anom.docs.map((doc, docIdx) => (
+                            <li key={docIdx} style={{ marginBottom: '0.15rem' }}>{doc}</li>
+                          )) : (
+                            <li style={{ marginBottom: '0.15rem' }}>{anom.docs}</li>
+                          )}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
