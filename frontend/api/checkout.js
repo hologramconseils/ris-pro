@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   const { userId, userEmail, filePath } = req.body;
 
   try {
+    const idempotencyKey = `checkout_${userId || 'guest'}_${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -33,6 +34,8 @@ export default async function handler(req, res) {
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://' + req.headers.host}/bilan?success=true&file=${encodeURIComponent(filePath)}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://' + req.headers.host}/diagnostic?file=${encodeURIComponent(filePath)}`,
+    }, {
+      idempotencyKey: idempotencyKey
     });
 
     return res.status(200).json({ url: session.url });

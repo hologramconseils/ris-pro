@@ -56,6 +56,10 @@ async def create_checkout_session(data: dict):
             # Fallback for testing without real keys
             return {"url": f"{FRONTEND_URL}/bilan?success=true&file={file_path}"}
 
+        import re
+        clean_path = re.sub(r'[^a-zA-Z0-9]', '_', file_path)
+        idempotency_key = f"checkout_{data.get('userId', 'guest')}_{clean_path}"
+
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
@@ -72,6 +76,7 @@ async def create_checkout_session(data: dict):
             mode='payment',
             success_url=f"{FRONTEND_URL}/bilan?success=true&file={file_path}",
             cancel_url=f"{FRONTEND_URL}/diagnostic?canceled=true&file={file_path}",
+            idempotency_key=idempotency_key
         )
         return {"url": session.url}
     except Exception as e:

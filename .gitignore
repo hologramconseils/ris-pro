@@ -26,3 +26,6 @@ Thumbs.db
 uploads/
 !uploads/.gitkeep
 .env*
+
+# CommitShow Audit Artifacts
+.commitshow/
