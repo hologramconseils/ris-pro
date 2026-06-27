@@ -47,6 +47,15 @@ export default function Bilan() {
         setResults(prev => {
           const enriched = { ...prev, ...agentData };
           sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(enriched));
+          
+          // Sauvegarder les résultats enrichis dans la base de données
+          supabase.from('analyses')
+            .update({ results: enriched })
+            .eq('file_path', path)
+            .then(({ error }) => {
+              if (error) console.error("Erreur mise à jour DB:", error.message);
+            });
+
           return enriched;
         });
       }
@@ -57,10 +66,10 @@ export default function Bilan() {
     }
   }
 
-  // Activer l'agent si on a accès premium et que les stratégies ne sont pas encore calculées
+  // Activer l'agent si on a accès premium et que les stratégies ne sont pas encore calculées, ou s'il manque les champs de cohérence de trimestres
   useEffect(() => {
     const isPremium = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess;
-    if (results && isPremium && !results.strategies && !agentLoading && filePath) {
+    if (results && isPremium && (!results.strategies || typeof results.trimestres_valides !== 'number') && !agentLoading && filePath) {
       triggerAgentAnalysis(filePath);
     }
   }, [results, profile, isSuccess, filePath, agentLoading])
