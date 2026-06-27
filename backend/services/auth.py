@@ -3,7 +3,8 @@ from typing import Optional
 import os
 import bcrypt
 from jose import jwt
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from dotenv import load_dotenv
 import models, schemas
 
@@ -20,10 +21,11 @@ def get_password_hash(password: str) -> str:
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
-def get_user(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+async def get_user(db: AsyncSession, email: str):
+    result = await db.execute(select(models.User).filter(models.User.email == email))
+    return result.scalars().first()
 
-def create_user(db: Session, user: schemas.UserCreate):
+async def create_user(db: AsyncSession, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password) if user.password else None
     db_user = models.User(
         email=user.email,
@@ -32,8 +34,8 @@ def create_user(db: Session, user: schemas.UserCreate):
         hashed_password=hashed_password
     )
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    await db.commit()
+    await db.refresh(db_user)
     return db_user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -61,10 +63,10 @@ def verify_reset_token(token: str) -> Optional[str]:
     except:
         return None
 
-def update_password(db: Session, user: models.User, new_password: str):
+async def update_password(db: AsyncSession, user: models.User, new_password: str):
     user.hashed_password = get_password_hash(new_password)
     user.reset_token = None
     user.reset_token_expires = None
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
     return user

@@ -1,5 +1,5 @@
-from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 import datetime
 import hashlib
 from database import Base
@@ -7,57 +7,56 @@ from database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    first_name = Column(String)
-    last_name = Column(String, nullable=True)
-    hashed_password = Column(String, nullable=True)
-    is_admin = Column(Boolean, default=False)
-    has_paid_access = Column(Boolean, default=False)
-    reset_token = Column(String, nullable=True)
-    reset_token_expires = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    first_name: Mapped[str] = mapped_column()
+    last_name: Mapped[str | None] = mapped_column(nullable=True)
+    hashed_password: Mapped[str | None] = mapped_column(nullable=True)
+    is_admin: Mapped[bool] = mapped_column(default=False)
+    has_paid_access: Mapped[bool] = mapped_column(default=False)
+    reset_token: Mapped[str | None] = mapped_column(nullable=True)
+    reset_token_expires: Mapped[datetime.datetime | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow)
 
     scans = relationship("ScanResult", back_populates="user")
-
 
 class ScanResult(Base):
     __tablename__ = "scan_results"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    filename = Column(String)
-    has_anomalies = Column(Boolean, default=False)
-    is_scanned = Column(Boolean, default=False)
-    is_valid_ris = Column(Boolean, default=False)
-    ocr_status = Column(String, default="none") # none, pending, processing, success, failed
-    ocr_error = Column(Text, nullable=True)
-    raw_text = Column(Text, nullable=True)
-    detailed_report = Column(Text, nullable=True) 
-    ai_analysis = Column(Text, nullable=True)
-    identity_hash = Column(String, index=True, nullable=True) # Hash of Name + BirthDate
-    identity_name = Column(String, nullable=True)
-    identity_birth_date = Column(String, nullable=True)
-    reliability_score = Column(Integer, default=100)
-    career_data = Column(Text, nullable=True) # JSON of granular year data
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    filename: Mapped[str] = mapped_column()
+    has_anomalies: Mapped[bool] = mapped_column(default=False)
+    is_scanned: Mapped[bool] = mapped_column(default=False)
+    is_valid_ris: Mapped[bool] = mapped_column(default=False)
+    ocr_status: Mapped[str] = mapped_column(default="none") # none, pending, processing, success, failed
+    ocr_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    raw_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    detailed_report: Mapped[str | None] = mapped_column(Text, nullable=True) 
+    ai_analysis: Mapped[str | None] = mapped_column(Text, nullable=True)
+    identity_hash: Mapped[str | None] = mapped_column(index=True, nullable=True) # Hash of Name + BirthDate
+    identity_name: Mapped[str | None] = mapped_column(nullable=True)
+    identity_birth_date: Mapped[str | None] = mapped_column(nullable=True)
+    reliability_score: Mapped[int] = mapped_column(default=100)
+    career_data: Mapped[str | None] = mapped_column(Text, nullable=True) # JSON of granular year data
+    created_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow, index=True)
 
     user = relationship("User", back_populates="scans")
 
 class IdentityAccess(Base):
     __tablename__ = "identity_access"
     
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    identity_hash = Column(String, index=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    identity_hash: Mapped[str] = mapped_column(index=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow)
 
 class Transaction(Base):
     __tablename__ = "transactions"
     
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    scan_id = Column(Integer, ForeignKey("scan_results.id"), nullable=True)
-    stripe_session_id = Column(String, unique=True, index=True)
-    status = Column(String) # "pending", "completed"
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    scan_id: Mapped[int | None] = mapped_column(ForeignKey("scan_results.id"), nullable=True)
+    stripe_session_id: Mapped[str] = mapped_column(unique=True, index=True)
+    status: Mapped[str] = mapped_column() # "pending", "completed"
+    created_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow)

@@ -34,14 +34,16 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
-    """Receives a PDF file and saves it temporarily."""
+    """Receives a PDF file and saves it asynchronously."""
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
     
     file_path = os.path.join(UPLOAD_DIR, file.filename)
     
+    # Lecture/Ecriture asynchrone non-bloquante (FastAPI Pro pattern)
+    content = await file.read()
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        buffer.write(content)
         
     return {"message": "File uploaded successfully", "filename": file.filename}
 

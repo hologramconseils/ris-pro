@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import List
 import database, models, schemas
@@ -15,22 +17,22 @@ def check_admin(user: models.User = Depends(get_current_user)):
     return user
 
 @router.get("/users", response_model=List[schemas.UserResponse])
-def get_all_users(
-    db: Session = Depends(database.get_db),
+async def get_all_users(
+    db: AsyncSession = Depends(database.get_db),
     admin: models.User = Depends(check_admin)
 ):
     """Récupère tous les utilisateurs et leur activité (admin uniquement)"""
     return db.query(models.User).order_by(models.User.created_at.desc()).all()
 
 @router.get("/stats")
-def get_stats(
-    db: Session = Depends(database.get_db),
+async def get_stats(
+    db: AsyncSession = Depends(database.get_db),
     admin: models.User = Depends(check_admin)
 ):
     """Statistiques globales pour le dashboard"""
-    total_users = db.query(models.User).count()
-    paid_users = db.query(models.User).filter(models.User.has_paid_access == True).count()
-    total_scans = db.query(models.ScanResult).count()
+    total_users = (await db.execute(select(models.User))).scalars().all()
+    paid_users = (await db.execute(select(models.User).filter(models.User.has_paid_access == True))).scalars().all()
+    total_scans = (await db.execute(select(models.ScanResult))).scalars().all()
     
     return {
         "total_users": total_users,

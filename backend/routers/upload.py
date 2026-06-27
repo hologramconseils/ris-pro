@@ -8,6 +8,8 @@ import re
 from datetime import datetime
 from typing import Optional, List
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header, Request, BackgroundTasks
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import database
@@ -26,7 +28,7 @@ UPLOAD_DIR = "/tmp/ris_uploads"
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def get_optional_user(authorization: Optional[str] = Header(None), db: Session = Depends(database.get_db)) -> Optional[models.User]:
+def get_optional_user(authorization: Optional[str] = Header(None), db: AsyncSession = Depends(database.get_db)) -> Optional[models.User]:
     if not authorization or not authorization.startswith("Bearer "):
         return None
     token = authorization.split(" ")[1]
@@ -35,7 +37,7 @@ def get_optional_user(authorization: Optional[str] = Header(None), db: Session =
         email = payload.get("sub")
         if not email:
             return None
-        user = db.query(models.User).filter(models.User.email == email).first()
+        user = (await db.execute(select(models.User).filter(models.User.email == email))).scalars().first()
         return user
     except JWTError:
         return None
@@ -46,7 +48,7 @@ async def upload_file(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    db: Session = Depends(database.get_db),
+    db: AsyncSession = Depends(database.get_db),
     user: Optional[models.User] = Depends(get_optional_user)
 ):
     if file.content_type not in ["application/pdf"]:
@@ -82,8 +84,8 @@ async def upload_file(
             created_at=datetime.utcnow()
         )
         db.add(new_scan)
-        db.commit()
-        db.refresh(new_scan)
+        await db.commit()
+        await db.refresh(new_scan)
 
         # 3. Background the ENTIRE analysis pipeline
         background_tasks.add_task(
@@ -116,16 +118,17 @@ async def run_full_analysis_worker(
     file_path: str
 ):
     """Worker function to handle parsing + AI audit in background."""
-    from database import SessionLocal
-    db_session = SessionLocal()
+    from database import AsyncSessionLocal
+    from sqlalchemy import select
+    async with AsyncSessionLocal() as db_session:
     db_scan = None
     try:
-        db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+        db_scan = (await db_session.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
         if not db_scan:
             return
 
         db_scan.ocr_status = "processing"
-        db_session.commit()
+        await db_session.commit()
 
         # Step 1: Initial Parsing (Fast)
         parser_res = ris_parser.parse_ris_file(file_path)
@@ -154,7 +157,7 @@ async def run_full_analysis_worker(
         db_scan.reliability_score = reliability_score
         db_scan.career_data = json.dumps(technical_audit) # Enriched data
         
-        db_session.commit()
+        await db_session.commit()
 
         # Step 3: Expensive AI Audit (Slow)
         if db_scan.is_valid_ris or db_scan.is_scanned:
@@ -485,14 +488,14 @@ async def run_full_analysis_worker(
 
         # Final update
         db_scan.ocr_status = "success"
-        db_session.commit()
+        await db_session.commit()
 
     except Exception as e:
         print(f"CRITICAL WORKER ERROR for scan {scan_id}: {str(e)}")
         if db_scan:
             db_scan.ocr_status = "failed"
             db_scan.ocr_error = str(e)
-            db_session.commit()
+            await db_session.commit()
     finally:
         if os.path.exists(file_path):
             try: os.remove(file_path)
@@ -503,10 +506,10 @@ async def run_full_analysis_worker(
 async def retry_scan_analysis(
     scan_id: int,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(database.get_db),
+    db: AsyncSession = Depends(database.get_db),
     user: models.User = Depends(get_current_user)
 ):
-    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+    scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     
@@ -516,7 +519,7 @@ async def retry_scan_analysis(
     scan.ocr_status = "pending"
     scan.ocr_error = None
     scan.ai_analysis = None
-    db.commit()
+    await db.commit()
 
     background_tasks.add_task(
         run_full_analysis_worker_from_existing_text,
@@ -540,11 +543,11 @@ async def run_full_analysis_worker_from_existing_text(
     """
     db_scan = None
     try:
-        db_scan = db_session.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+        db_scan = (await db_session.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
         if not db_scan: return
         
         db_scan.ocr_status = "processing"
-        db_session.commit()
+        await db_session.commit()
 
         # Reconstruct career data from existing DB field
         career_raw = []
@@ -845,19 +848,19 @@ async def run_full_analysis_worker_from_existing_text(
             print(f"Retry data merging error: {final_err}")
 
         db_scan.ocr_status = "success"
-        db_session.commit()
+        await db_session.commit()
     except Exception as e:
         print(f"CRITICAL RETRY WORKER ERROR for scan {scan_id}: {str(e)}")
         if db_scan:
             db_scan.ocr_status = "failed"
             db_scan.ocr_error = str(e)
-            db_session.commit()
+            await db_session.commit()
     finally:
         db_session.close()
 
 @router.get("/history", response_model=List[schemas.ScanResultResponse])
-def get_history(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
-    scans = db.query(models.ScanResult).filter(models.ScanResult.user_id == current_user.id).order_by(models.ScanResult.created_at.desc()).all()
+def get_history(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    scans = (await db.execute(select(models.ScanResult).filter(models.ScanResult.user_id == current_user.id).order_by(models.ScanResult.created_at.desc()))).scalars().all()
     for s in scans:
         s.is_analysis_complete = s.ocr_status in ["success", "failed"]
         if s.detailed_report:
@@ -875,8 +878,8 @@ def get_history(db: Session = Depends(database.get_db), current_user: models.Use
     return scans
 
 @router.get("/preview/{scan_id}", response_model=schemas.ScanResultResponse)
-def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
-    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+def get_scan_preview(scan_id: int, db: AsyncSession = Depends(database.get_db)):
+    scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     
@@ -898,8 +901,8 @@ def get_scan_preview(scan_id: int, db: Session = Depends(database.get_db)):
     return scan
 
 @router.get("/{scan_id}", response_model=schemas.ScanResultDetailedResponse)
-def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
-    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     # Admin bypass
@@ -926,13 +929,13 @@ def get_scan(scan_id: int, db: Session = Depends(database.get_db), current_user:
     return scan
 
 @router.delete("/{scan_id}")
-def delete_scan(scan_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
-    scan = db.query(models.ScanResult).filter(models.ScanResult.id == scan_id).first()
+def delete_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    scan = (await db.execute(select(models.ScanResult).filter(models.ScanResult.id == scan_id))).scalars().first()
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     if scan.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à supprimer cette analyse.")
     
     db.delete(scan)
-    db.commit()
+    await db.commit()
     return {"message": "Analyse supprimée avec succès."}

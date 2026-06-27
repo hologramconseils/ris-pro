@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -16,8 +16,7 @@ class UserResponse(UserBase):
     has_paid_access: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ScanResultBase(BaseModel):
     filename: str
@@ -42,9 +41,7 @@ class ScanResultResponse(ScanResultBase):
     career_data: Optional[str] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-        populate_by_name = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class ScanResultDetailedResponse(ScanResultResponse):
     detailed_report: Optional[str] = None

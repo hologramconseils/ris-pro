@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
 import database, schemas, models
 from services import auth as auth_service, mail as mail_service
@@ -11,7 +11,7 @@ from limiter import limiter
 router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(database.get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Session invalide, veuillez vous reconnecter.",
@@ -24,19 +24,19 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = auth_service.get_user(db, email=email)
+    user = await auth_service.get_user(db, email=email)
     if user is None:
         raise credentials_exception
     return user
 
 @router.post("/register", response_model=schemas.UserResponse)
 @limiter.limit("5/minute")
-def register(request: Request, user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = auth_service.get_user(db, email=user.email)
+async def register(request: Request, user: schemas.UserCreate, db: AsyncSession = Depends(database.get_db)):
+    db_user = await auth_service.get_user(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Un compte avec cet email existe déjà.")
     
-    new_user = auth_service.create_user(db=db, user=user)
+    new_user = await auth_service.create_user(db=db, user=user)
     
     # Send welcome email
     try:
@@ -47,7 +47,7 @@ def register(request: Request, user: schemas.UserCreate, db: Session = Depends(d
     return new_user
 
 @router.post("/token", response_model=schemas.Token)
-def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(database.get_db)):
     print(f"LOGIN ATTEMPT: {form_data.username}")
     
     # EMERGENCY FALLBACK: Force access for admin if password matches secret
@@ -56,7 +56,7 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
     
     is_emergency = (form_data.username.lower() == admin_email.lower() and form_data.password.strip() == admin_pass)
     
-    user = auth_service.get_user(db, email=form_data.username)
+    user = await auth_service.get_user(db, email=form_data.username)
     
     if is_emergency:
         if not user:
@@ -70,8 +70,8 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
                 hashed_password=auth_service.get_password_hash(admin_pass)
             )
             db.add(user)
-            db.commit()
-            db.refresh(user)
+            await db.commit()
+            await db.refresh(user)
             print(f"EMERGENCY: Created admin user {admin_email}")
         password_correct = True
     else:
@@ -94,14 +94,11 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
         )
     
     # Auto-promote to admin if email matches ADMIN_EMAIL env var
-    admin_email = os.getenv("ADMIN_EMAIL")
-    if admin_email and user.email.lower() == admin_email.lower() and not user.is_admin:
+    admin_email_env = os.getenv("ADMIN_EMAIL")
+    if admin_email_env and user.email.lower() == admin_email_env.lower() and not user.is_admin:
         user.is_admin = True
-        db.commit()
-        db.refresh(user)
-
-    db.commit()
-    db.refresh(user)
+        await db.commit()
+        await db.refresh(user)
 
     access_token_expires = timedelta(minutes=auth_service.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth_service.create_access_token(
@@ -114,19 +111,17 @@ def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestFor
     }
 
 @router.post("/forgot-password")
-def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(database.get_db)):
-    user = auth_service.get_user(db, email=request.email)
+async def forgot_password(request: schemas.ForgotPasswordRequest, db: AsyncSession = Depends(database.get_db)):
+    user = await auth_service.get_user(db, email=request.email)
     if not user:
         # We return 200 even if user doesn't exist for security
         return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé."}
     
     token = auth_service.create_reset_token(user.email)
-    # Actually I used create_reset_token in auth service.
-    token = auth_service.create_reset_token(user.email)
     
-    # Save token for verification (optional if using JWT, but good for one-time use)
+    # Save token for verification
     user.reset_token = token
-    db.commit()
+    await db.commit()
     
     try:
         mail_service.send_reset_password_email(user.email, user.first_name, token)
@@ -136,18 +131,18 @@ def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depend
     return {"message": "Instructions envoyées par email."}
 
 @router.post("/reset-password")
-def reset_password(request: schemas.PasswordReset, db: Session = Depends(database.get_db)):
+async def reset_password(request: schemas.PasswordReset, db: AsyncSession = Depends(database.get_db)):
     email = auth_service.verify_reset_token(request.token)
     if not email:
         raise HTTPException(status_code=400, detail="Lien de réinitialisation invalide ou expiré.")
     
-    user = auth_service.get_user(db, email=email)
+    user = await auth_service.get_user(db, email=email)
     if not user or user.reset_token != request.token:
         raise HTTPException(status_code=400, detail="Lien déjà utilisé ou invalide.")
     
-    auth_service.update_password(db, user, request.new_password)
+    await auth_service.update_password(db, user, request.new_password)
     return {"message": "Mot de passe mis à jour avec succès."}
 
 @router.get("/me", response_model=schemas.UserResponse)
-def read_users_me(current_user: models.User = Depends(get_current_user)):
+async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
