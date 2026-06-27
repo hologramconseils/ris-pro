@@ -1,5 +1,4 @@
-- [x] Créer le script de veille réglementaire `backend/regulatory_watch_agent.py`
-- [x] Configurer le workflow GitHub Actions `.github/workflows/regulatory-watch.yml`
-- [/] Tester le script localement pour valider le comportement de recherche et d'écriture
-- [ ] Pousser le code sur le dépôt pour activer l'automatisation en production
-- [ ] Rédiger le document de walkthrough final
+- [x] Mettre à jour le script local `backend/wealth_advisor_agent.py` avec l'orchestration multi-agents et les politiques de sécurité
+- [x] Mettre à jour l'API serverless `frontend/api/analyse-patrimoniale.py` avec la même logique multi-agents et de sécurité
+- [/] Valider localement et pousser sur le dépôt Git
+- [ ] Mettre à jour le walkthrough final

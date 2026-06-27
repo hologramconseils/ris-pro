@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from google.antigravity import Agent, LocalAgentConfig
+from google.antigravity.hooks import policy
 from google.antigravity.types import Document
 
 # Charger les variables d'environnement
@@ -178,18 +179,29 @@ async def api_analyse_patrimoniale(data: dict):
             temp_file.write(file_bytes)
             temp_file_path = temp_file.name
 
+        # Garde-fous et politiques de sécurité
+        policies = [
+            policy.deny_all(),
+            policy.allow("recuperer_regles_retraite")
+        ]
+
         config = LocalAgentConfig(
             system_instructions=(
-                "Vous êtes un conseiller en gestion de patrimoine (CGP) d'élite, expert en optimisation de la retraite. "
-                "Votre mission est d'analyser le relevé de carrière (RIS/EIG) fourni en format PDF et de rédiger un rapport "
+                "Vous êtes le Superviseur d'une équipe d'agents d'élite en gestion de patrimoine.\n"
+                "Votre mission est d'analyser le relevé de carrière (RIS/EIG) fourni en format PDF et de générer un rapport "
                 "de conseil patrimonial personnalisé de haute qualité.\n\n"
-                "Pour formuler vos conseils, vous devez obligatoirement :\n"
-                "1. Interroger l'outil 'recuperer_regles_retraite' pour vous baser sur la réglementation exacte (départ anticipé, gestion, optimisation).\n"
-                "2. Analyser les périodes d'activité et estimer l'âge idéal du taux plein.\n"
-                "3. Rédiger un commentaire bienveillant, clair et incitatif.\n\n"
+                "Pour accomplir cette mission, vous devez déléguer de la manière suivante :\n"
+                "1. Déléguez la tâche d'extraction brute des anomalies et de détection des années d'inactivité à un sous-agent spécialisé nommé 'RIS Audit Agent'.\n"
+                "2. Transmettez ensuite les anomalies de l'auditeur à un sous-agent spécialisé nommé 'Wealth Strategy Agent' pour formuler des stratégies d'optimisation.\n"
+                "3. L'agent 'Wealth Strategy Agent' doit interroger l'outil 'recuperer_regles_retraite' pour s'appuyer sur la réglementation légale officielle.\n"
+                "4. Synthétisez et compilez les réponses de vos sous-agents pour former le rapport de conseil patrimonial final.\n\n"
                 "Votre réponse doit être strictement structurée selon le schéma response_schema."
             ),
             tools=[recuperer_regles_retraite],
+            capabilities=types.CapabilitiesConfig(
+                enable_subagents=True  # Activation de l'orchestration multi-agents
+            ),
+            policies=policies,
             response_schema=ConseilPatrimonial
         )
 

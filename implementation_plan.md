@@ -1,45 +1,52 @@
-# Plan d'implémentation : Veille Réglementaire Automatisée & Conformité par PR
+# Plan d'implémentation : Multi-Agents Spécialisés & Garde-fous de Sécurité
 
-Ce plan détaille la mise en place d'un agent autonome de veille réglementaire. Cet agent vérifiera périodiquement la législation sur les retraites en France en comparant nos fichiers locaux avec des recherches Internet en direct, puis soumettra automatiquement une Pull Request (demande de fusion) sur GitHub si une mise à jour est requise.
+Ce plan détaille la refonte de l'agent de conseil patrimonial RIS Pro. Nous divisons son fonctionnement en deux agents spécialisés collaboratifs et mettons en place des politiques de sécurité strictes pour encadrer ses actions.
 
 ---
 
-## 1. Architecture du Flux de Conformité
-```mermaid
-graph TD
-    A[Déclencheur : GitHub Action hebdomadaire] --> B[Script : regulatory_watch_agent.py]
-    B --> C{Recherche Google en direct & Comparaison avec règles locales}
-    C -- Pas de changement --> D[Fin du processus]
-    C -- Décret ou réforme détectée --> E[Mise à jour des fichiers Markdown locaux]
-    E --> F[Création d'une branche Git regulatory-update-YYYYMMDD]
-    F --> G[Soumission d'une Pull Request via GitHub CLI]
-    G --> H[Validation humaine & Fusion finale en Production]
+## 1. Nouvelle Architecture Multi-Agents
+Nous remplaçons l'agent unique par une structure de supervision avec délégation :
+
+```
+             ┌─────────────────────────────┐
+             │    SUPERVISEUR PATRIMONIAL  │
+             └──────────────┬──────────────┘
+                            │
+            ┌───────────────┴───────────────┐
+            ▼                               ▼
+┌───────────────────────┐       ┌────────────────────────┐
+│   AGENT AUDITEUR      │       │    AGENT CONSEILLER    │
+│  (Détecte anomalies)  │       │ (Stratégies & Conseils)│
+└───────────────────────┘       └────────────────────────┘
 ```
 
----
-
-## 2. Modifications proposées
-
-### Backend
-
-#### [NEW] [regulatory_watch_agent.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/regulatory_watch_agent.py)
-*   Script Python indépendant utilisant le client `google-genai` avec l'outil de recherche Google activé.
-*   Compare les fichiers `regles_depart_anticipe_2023.md`, `regles_gestion_retraite_2023.md` et `regles_optimisation_retraite_2023.md` avec l'actualité légale.
-*   Enregistre les modifications détectées directement dans ces fichiers.
-
-### CI-CD / GitHub Actions
-
-#### [NEW] [regulatory-watch.yml](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/.github/workflows/regulatory-watch.yml)
-*   Workflow GitHub Actions s'exécutant tous les lundis à 8h (ou déclenchable manuellement).
-*   Installe Python, lance le script de veille.
-*   Crée une branche et soumet la Pull Request si des modifications de fichiers sont constatées.
+1.  **Agent Auditeur (RIS Audit Agent)** : Spécialiste de la lecture de relevés de carrière (RIS/EIG). Il se concentre uniquement sur le comptage des trimestres et la détection d'erreurs (salaires, employeurs, trimestres manquants).
+2.  **Agent Conseiller (Wealth Strategy Agent)** : Spécialiste patrimonial. Il prend les anomalies détectées par l'auditeur, consulte la documentation locale et effectue la recherche en direct pour proposer les meilleures stratégies d'optimisation (VPLR, cumul, etc.).
+3.  **Superviseur (Main Advisor Agent)** : Il orchestre les deux sous-agents et assemble le rapport final.
 
 ---
 
-## 3. Plan de vérification
+## 2. Politiques de Sécurité et Garde-fous
+Pour garantir la conformité et éviter toute action malveillante ou imprévue en production, nous mettons en place les garde-fous suivants via `google.antigravity.hooks.policy` :
+*   **Fermeture par défaut** : Utilisation de `policy.deny_all()` pour interdire tout outil par défaut (pas d'écriture de fichiers, pas d'exécution système).
+*   **Autorisations sélectives** :
+    *   Autoriser uniquement la lecture des fichiers réglementaires de référence (`recuperer_regles_retraite`).
+    *   Autoriser la recherche Google.
+*   **Vérification des arguments (Predicates)** : Empêcher l'agent d'accéder à des données sensibles de l'utilisateur.
 
-### Tests automatisés
-*   Exécuter le script localement avec des variables d'environnement simulées pour vérifier qu'il effectue la recherche et ne modifie pas les fichiers si aucun décret majeur n'a changé aujourd'hui.
+---
 
-### Vérification manuelle
-*   Simuler une modification dans les fichiers locaux et vérifier que le script détecte la différence de conformité.
+## 3. Fichiers impactés
+
+### [MODIFY] [wealth_advisor_agent.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/wealth_advisor_agent.py)
+*   Refonte du script pour configurer les rôles de l'agent principal et des sous-agents.
+*   Ajout de la configuration des politiques de sécurité (`policies`).
+
+### [MODIFY] [analyse-patrimoniale.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/api/analyse-patrimoniale.py)
+*   Mise à jour des instructions et du fonctionnement de l'agent Antigravity pour refléter la structure multi-agents et la sécurité.
+
+---
+
+## 4. Plan de vérification
+*   Valider que le rapport final est correctement structuré et cohérent.
+*   S'assurer qu'aucun outil système (comme run_command) n'est accessible par l'agent.
