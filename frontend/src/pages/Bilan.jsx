@@ -326,27 +326,22 @@ export default function Bilan() {
               Bilan Retraite & Conseils d'Optimisation
             </h2>
 
-            {/* Synthese & Age d'or */}
-            <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-              <div className="card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--primary)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Sparkles size={16} className="text-primary" />
-                  Âge Estimé Taux Plein
-                </h3>
-                <div className="text-4xl font-extrabold text-primary" style={{ margin: '0.5rem 0' }}>
-                  {results.age_taux_plein_estime || "64 ans"}
-                </div>
-                <p className="text-xs text-muted">Estimation basée sur les trimestres validés et la réglementation 2023.</p>
-              </div>
-
-              <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2">
-                  Synthèse de Situation
-                </h3>
-                <p className="text-sm text-muted leading-relaxed">
-                  {results.synthese_situation}
-                </p>
-              </div>
+            {/* Synthèse de Situation */}
+            <div className="card" style={{ 
+              padding: '2rem', 
+              borderLeft: '4px solid var(--primary)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '1rem',
+              background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.02) 100%)'
+            }}>
+              <h3 className="text-base font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--primary)' }}>
+                <Sparkles size={18} />
+                Synthèse Globale de Situation
+              </h3>
+              <p className="text-sm text-muted leading-relaxed" style={{ fontSize: '0.95rem', lineHeight: '1.75' }}>
+                {results.synthese_situation}
+              </p>
             </div>
 
             {/* Stratégies recommandées */}
