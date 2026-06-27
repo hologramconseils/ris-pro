@@ -21,7 +21,7 @@
     "micro": "^10.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "7.13.1",
+    "react-router-dom": "^7.18.0",
     "resend": "^4.1.2",
     "stripe": "^17.7.0"
   },
