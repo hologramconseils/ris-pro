@@ -103,6 +103,14 @@ export default function Home() {
     }
   }
 
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`)
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`)
+  }
+
   return (
     <div className="container" style={{ padding: '4rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
@@ -150,6 +158,7 @@ export default function Home() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={handleClickUpload}
+            onMouseMove={handleMouseMove}
           >
             <div className="flex flex-col items-center gap-4">
               <div style={{ padding: '1rem', background: 'var(--success-bg)', borderRadius: '50%', color: 'var(--success)' }}>
