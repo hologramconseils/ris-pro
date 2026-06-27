@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Navigate } from 'react-router-dom'
-import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle, Loader2, Lock } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle, Loader2, Lock, Award, Sparkles, TrendingUp } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
@@ -14,6 +14,7 @@ export default function Bilan() {
   const isMock = searchParams.get('mock') === 'true'
   
   const [loading, setLoading] = useState(!!filePath)
+  const [agentLoading, setAgentLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState('all')
@@ -31,6 +32,38 @@ export default function Bilan() {
       return () => clearTimeout(timer)
     }
   }, [filePath, isSuccess, user, profile?.analysis_credits])
+
+  // Déclencher l'analyse de l'agent patrimonial IA si nécessaire
+  const triggerAgentAnalysis = async (path) => {
+    try {
+      setAgentLoading(true);
+      const response = await fetch('/api/analyse-patrimoniale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath: path })
+      });
+      if (response.ok) {
+        const agentData = await response.json();
+        setResults(prev => {
+          const enriched = { ...prev, ...agentData };
+          sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(enriched));
+          return enriched;
+        });
+      }
+    } catch (err) {
+      console.error("Erreur de l'agent patrimonial:", err);
+    } finally {
+      setAgentLoading(false);
+    }
+  }
+
+  // Activer l'agent si on a accès premium et que les stratégies ne sont pas encore calculées
+  useEffect(() => {
+    const isPremium = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess;
+    if (results && isPremium && !results.strategies && !agentLoading && filePath) {
+      triggerAgentAnalysis(filePath);
+    }
+  }, [results, profile, isSuccess, filePath, agentLoading])
 
   const fetchAnalysis = async (path) => {
     try {
@@ -212,6 +245,91 @@ export default function Bilan() {
             </div>
           </div>
         </div>
+
+        {/* En-tête de chargement de l'agent si en cours */}
+        {agentLoading && (
+          <div className="card glass animate-pulse" style={{ padding: '2rem', textAlign: 'center', border: '1px dashed var(--primary)' }}>
+            <Loader2 size={36} className="animate-spin text-primary mx-auto mb-4" />
+            <h3 className="font-bold text-lg mb-1">Génération de votre Bilan Patrimonial...</h3>
+            <p className="text-sm text-muted">Notre agent IA analyse vos opportunités réglementaires et rédige vos conseils.</p>
+          </div>
+        )}
+
+        {/* Rapport de Conseil Patrimonial Premium */}
+        {results.strategies && (
+          <div className="flex flex-col gap-6" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '3rem' }}>
+            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+              <Award className="text-primary" />
+              Bilan Patrimonial & Conseils d'Optimisation
+            </h2>
+
+            {/* Synthese & Age d'or */}
+            <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', display: 'grid' }}>
+              <div className="card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--primary)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <Sparkles size={16} className="text-primary" />
+                  Âge Estimé Taux Plein
+                </h3>
+                <div className="text-4xl font-extrabold text-primary" style={{ margin: '0.5rem 0' }}>
+                  {results.age_taux_plein_estime || "64 ans"}
+                </div>
+                <p className="text-xs text-muted">Estimation basée sur les trimestres validés et la réglementation 2023.</p>
+              </div>
+
+              <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2">
+                  Synthèse de Situation
+                </h3>
+                <p className="text-sm text-muted leading-relaxed">
+                  {results.synthese_situation}
+                </p>
+              </div>
+            </div>
+
+            {/* Stratégies recommandées */}
+            <div className="mt-4">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <TrendingUp size={18} className="text-success" />
+                Stratégies d'Optimisation Préconisées
+              </h3>
+              <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
+                {results.strategies.map((strat, sIdx) => (
+                  <div key={sIdx} className="card glass-hover" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
+                    <div className="badge badge-success" style={{
+                      background: 'rgba(22, 163, 74, 0.1)',
+                      color: 'var(--success)',
+                      borderColor: 'transparent',
+                      alignSelf: 'flex-start',
+                      width: 'fit-content'
+                    }}>
+                      Impact : {strat.impact_estime}
+                    </div>
+                    <h4 className="font-bold text-base mt-1">{strat.titre}</h4>
+                    <p className="text-sm text-muted leading-relaxed" style={{ flex: 1 }}>{strat.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Commentaire de conseil CGP */}
+            <div className="mt-4" style={{
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              borderLeft: '5px solid #d4af37',
+              padding: '2rem',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: '#b89218' }}>
+                <Award size={18} />
+                Recommandation Globale du Conseiller Retraite
+              </h3>
+              <p className="text-sm font-medium leading-relaxed italic text-muted">
+                "{results.commentaire_conseil}"
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Anomalies Details */}
         <div className="flex flex-col gap-6 mt-4">
