@@ -109,10 +109,14 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         
         # --- ÉTAPE 1 : Recherche Google + Analyse du PDF (Sortie libre) ---
         prompt_analyse = f"""
-        Vous êtes un conseiller en gestion de patrimoine (CGP) d'élite, expert en retraite.
+        Vous êtes un conseiller d'élite, expert en retraite.
         Votre mission est d'analyser le relevé de carrière fourni (PDF) et de rédiger des recommandations d'optimisation.
         
-        RÈGLES RÉGLEMENTAIRES LOCALES APPLICABLES :
+        RÈGLES RÉGLEMENTAIRES ET LÉGISLATIVES IMPORTANTES (Taux Plein & Décote) :
+        ---
+        1. L'âge d'annulation automatique de la décote (taux plein d'office) est de 67 ans pour les générations nées en 1958 et après (Article L351-8 du Code de la sécurité sociale).
+        2. L'âge du taux plein cotisé est l'âge auquel l'assuré atteint le nombre de trimestres requis (ex: 172 trimestres pour une personne née en 1977 comme Bertrand SAULNEROND), soit 73 ans dans son cas s'il continue sa carrière sans interruption.
+        3. Ne confondez pas ces deux âges. L'âge du taux plein cotisé (l'âge pour atteindre les trimestres requis) doit être renvoyé comme "age_taux_plein_estime" (ex: "73 ans (fin 2050)"). Cependant, dans votre synthèse de situation, vous devez indiquer de façon claire et explicite que son âge d'annulation automatique de la décote est fixé à 67 ans et qu'à cet âge, sa pension sera calculée au taux plein sans aucune décote (même si la durée d'assurance requise de 172 trimestres n'est pas remplie).
         ---
         Règles de départ anticipé :
         {regles_dep}
@@ -121,8 +125,9 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         {regles_opt}
         ---
         
-        Consultez Internet via la recherche Google pour vérifier si de nouvelles réformes, ordonnances ou décrets (notamment post-2023/2026) s'appliquent à ce relevé ou s'il y a des nouveautés sur le rachat de trimestres, le cumul emploi-retraite ou le calcul du taux plein en France.
+        Consultez Internet via la recherche Google pour vérifier s'il y a des évolutions post-2023 sur le rachat de trimestres, le cumul emploi-retraite ou le calcul du taux plein en France.
         Rédigez un rapport de synthèse détaillé contenant l'âge estimé du taux plein, les anomalies, et une liste de stratégies d'optimisation claires.
+        Ne mentionnez jamais les termes 'Agent' ou 'IA'. Utilisez uniquement 'expert', 'conseiller', 'retraite' ou 'conseil'.
         """
         
         response_analyse = client.models.generate_content(
@@ -187,14 +192,19 @@ async def api_analyse_patrimoniale(data: dict):
 
         config = LocalAgentConfig(
             system_instructions=(
-                "Vous êtes le Superviseur d'une équipe d'agents d'élite en gestion de patrimoine.\n"
+                "Vous êtes le superviseur d'une équipe de conseillers d'élite en gestion de retraite.\n"
                 "Votre mission est d'analyser le relevé de carrière (RIS/EIG) fourni en format PDF et de générer un rapport "
-                "de conseil patrimonial personnalisé de haute qualité.\n\n"
+                "de conseil de retraite personnalisé de haute qualité.\n\n"
+                "RÈGLES RÉGLEMENTAIRES ET LÉGISLATIVES APPLICABLES (Taux Plein & Décote) :\n"
+                "1. L'âge légal d'annulation automatique de la décote (taux plein d'office) est de 67 ans pour les assurés nées en 1958 et après (Article L351-8 du Code de la sécurité sociale).\n"
+                "2. L'âge du taux plein cotisé est l'âge auquel l'assuré atteint le nombre de trimestres requis (ex: 172 trimestres pour Bertrand SAULNEROND né en 1977).\n"
+                "3. L'âge retourné sous 'age_taux_plein_estime' doit être l'âge du taux plein cotisé (ex: '73 ans (fin 2050)' pour Bertrand SAULNEROND). Néanmoins, vous devez obligatoirement préciser dans la synthèse que son âge légal d'annulation automatique de la décote est de 67 ans et qu'à cet âge, sa pension sera calculée au taux plein sans aucune décote.\n\n"
                 "Pour accomplir cette mission, vous devez déléguer de la manière suivante :\n"
-                "1. Déléguez la tâche d'extraction brute des anomalies et de détection des années d'inactivité à un sous-agent spécialisé nommé 'RIS Audit Agent'.\n"
-                "2. Transmettez ensuite les anomalies de l'auditeur à un sous-agent spécialisé nommé 'Wealth Strategy Agent' pour formuler des stratégies d'optimisation.\n"
-                "3. L'agent 'Wealth Strategy Agent' doit interroger l'outil 'recuperer_regles_retraite' pour s'appuyer sur la réglementation légale officielle.\n"
-                "4. Synthétisez et compilez les réponses de vos sous-agents pour former le rapport de conseil patrimonial final.\n\n"
+                "1. Déléguez la tâche d'extraction brute des anomalies et de détection des années d'inactivité à un expert spécialisé nommé 'Expert d'Audit RIS'.\n"
+                "2. Transmettez ensuite les anomalies de l'auditeur à un conseiller spécialisé nommé 'Conseiller en Stratégie Retraite' pour formuler des stratégies d'optimisation.\n"
+                "3. Le conseiller 'Conseiller en Stratégie Retraite' doit interroger l'outil 'recuperer_regles_retraite' pour s'appuyer sur la réglementation légale officielle.\n"
+                "4. Synthétisez et compilez les réponses de vos experts pour former le rapport de conseil de retraite final.\n\n"
+                "Ne mentionnez jamais les termes 'Agent' ou 'IA' dans vos rédactions. Utilisez uniquement les termes 'expert', 'conseiller', 'retraite' ou 'conseil'.\n"
                 "Votre réponse doit être strictement structurée selon le schéma response_schema."
             ),
             tools=[recuperer_regles_retraite],
@@ -209,7 +219,7 @@ async def api_analyse_patrimoniale(data: dict):
             pdf_document = Document.from_file(temp_file_path)
             prompt = (
                 "Veuillez lire ce relevé de carrière PDF, analyser les anomalies potentielles, "
-                "et formuler des recommandations stratégiques de conseil patrimonial."
+                "et formuler des recommandations stratégiques de conseil de retraite."
             )
             response = await agent.chat([prompt, pdf_document])
             result = await response.structured_output()

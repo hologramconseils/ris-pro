@@ -244,15 +244,15 @@ export default function Bilan() {
 
         {/* Executive KPI Dashboard */}
         <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-          {/* Card 1: Age Taux Plein */}
+          {/* Card 1: Annulation Décote */}
           <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
             <div>
-              <div className="text-xs text-muted uppercase tracking-wider font-bold">Âge Taux Plein</div>
+              <div className="text-xs text-muted uppercase tracking-wider font-bold">Annulation Décote</div>
               <div className="text-3xl font-extrabold" style={{ color: 'var(--primary)', margin: '0.25rem 0' }}>
-                {results.age_taux_plein_estime || "67 ans"}
+                67 ans
               </div>
             </div>
-            <div className="text-xs text-muted">Âge d'annulation de la décote.</div>
+            <div className="text-xs text-muted">Taux plein automatique sans décote.</div>
           </div>
 
           {/* Card 2: Career Completion Score */}
@@ -296,8 +296,8 @@ export default function Bilan() {
         {agentLoading && (
           <div className="card glass animate-pulse" style={{ padding: '2rem', textAlign: 'center', border: '1px dashed var(--primary)' }}>
             <Loader2 size={36} className="animate-spin text-primary mx-auto mb-4" />
-            <h3 className="font-bold text-lg mb-1">Génération de votre Bilan Patrimonial...</h3>
-            <p className="text-sm text-muted">Notre agent IA analyse vos opportunités réglementaires et rédige vos conseils.</p>
+            <h3 className="font-bold text-lg mb-1">Génération de votre Bilan Retraite...</h3>
+            <p className="text-sm text-muted">Notre conseiller expert analyse vos opportunités réglementaires et rédige votre bilan.</p>
           </div>
         )}
 
@@ -306,7 +306,7 @@ export default function Bilan() {
           <div className="flex flex-col gap-6" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '3rem' }}>
             <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
               <Award className="text-primary" />
-              Bilan Patrimonial & Conseils d'Optimisation
+              Bilan Retraite & Conseils d'Optimisation
             </h2>
 
             {/* Synthese & Age d'or */}
