@@ -133,7 +133,7 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         """
         
         response_analyse = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-2.5-pro',
             contents=[
                 types.Part.from_bytes(data=file_bytes, mime_type="application/pdf"),
                 prompt_analyse
@@ -154,7 +154,7 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         """
         
         response_struct = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-2.5-pro',
             contents=prompt_structuration,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -197,6 +197,10 @@ async def api_analyse_patrimoniale(data: dict):
                 "Vous êtes le superviseur d'une équipe de conseillers d'élite en gestion de retraite.\n"
                 "Votre mission est d'analyser le relevé de carrière (RIS/EIG) fourni en format PDF et de générer un rapport "
                 "de conseil de retraite personnalisé de haute qualité.\n\n"
+                "PROTOCOLE DE PARSING DYNAMIQUE ET DE DOUBLE-ENTRÉE :\n"
+                "1. Recherche dynamique : Ne cherchez pas le nombre de trimestres à un emplacement fixe. Effectuez un balayage sémantique pour trouver les mots-clés du grand total de trimestres ('Trimestres validés', 'Total de vos droits', 'Régime Général', 'Total Régime').\n"
+                "2. Validation croisée : Pour chaque document, extrayez le Grand Total Général affiché dans les encadrés de synthèse, puis calculez séparément la Somme Mathématique Cumulée des trimestres ligne par ligne (année par année). Comparez ces deux valeurs. Si elles diffèrent, effectuez une relecture critique des lignes et éliminez les doublons de régimes multiples ou ajoutez les trimestres assimilés pour garantir que la valeur finale de 'trimestres_valides' est 100% cohérente avec les données réelles du relevé.\n"
+                "3. La valeur finale de 'trimestres_valides' que vous retournez doit être le miroir exact de la situation réelle détectée et doit correspondre à 100% à la valeur mentionnée dans vos synthèses de textes.\n\n"
                 "RÈGLES RÉGLEMENTAIRES ET LÉGISLATIVES APPLICABLES (Taux Plein & Décote) :\n"
                 "1. L'âge légal d'annulation automatique de la décote (taux plein d'office) est de 67 ans pour les assurés nées en 1958 et après (Article L351-8 du Code de la sécurité sociale).\n"
                 "2. L'âge du taux plein cotisé est l'âge auquel l'assuré atteint le nombre de trimestres requis (ex: 172 trimestres pour Bertrand SAULNEROND né en 1977).\n"

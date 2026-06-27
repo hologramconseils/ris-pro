@@ -133,7 +133,7 @@ export default async function handler(req, res) {
       analysisResults = analysisRecord.results;
     } else {
       // Sinon, on lance l'analyse IA
-      const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"];
+      const modelsToTry = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-flash"];
 
       const prompt = `
         Tu es le conseiller expert en retraite de RIS Pro spécialisé dans l'audit des relevés de carrière (RIS / EIG).
