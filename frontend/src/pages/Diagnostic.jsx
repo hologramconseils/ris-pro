@@ -14,6 +14,48 @@ export default function Diagnostic() {
   const [loading, setLoading] = useState(!!filePath)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
+  const [progress, setProgress] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const steps = [
+    { label: "Numérisation et lecture OCR du relevé", duration: 3000 },
+    { label: "Extraction des salaires et trimestres par année", duration: 3500 },
+    { label: "Vérification de la conformité réglementaire (Lois Retraite)", duration: 3000 },
+    { label: "Génération des conseils d'optimisation personnalisés", duration: 4000 }
+  ]
+
+  useEffect(() => {
+    if (!loading) return;
+    setProgress(0);
+    setCurrentStep(0);
+    
+    // Simuler une progression fluide jusqu'à 99%
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev < 99) {
+          const increment = Math.max(1, Math.floor((100 - prev) / 12));
+          return prev + increment;
+        }
+        return prev;
+      });
+    }, 450);
+
+    // Simuler le passage dynamique des étapes de l'audit
+    let stepTimer = setTimeout(function advance() {
+      setCurrentStep(prev => {
+        if (prev < steps.length - 1) {
+          stepTimer = setTimeout(advance, steps[prev + 1].duration);
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, steps[0].duration);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(stepTimer);
+    };
+  }, [loading]);
 
   const [showSignup, setShowSignup] = useState(false)
   const [showAuthChoice, setShowAuthChoice] = useState(false)
@@ -193,11 +235,57 @@ export default function Diagnostic() {
 
   if (loading) {
     return (
-      <div className="container flex flex-col items-center justify-center" style={{ minHeight: '60vh', gap: '2rem' }}>
-        <Loader2 size={48} className="animate-spin text-primary" />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Analyse intelligente en cours...</h2>
-          <p className="text-muted">Le moteur d'expertise examine votre relevé de carrière (RIS / EIG)</p>
+      <div className="container flex flex-col items-center justify-center animate-fade-in" style={{ minHeight: '80vh', padding: '2rem 1.5rem' }}>
+        <div className="card glass text-center" style={{ maxWidth: '520px', width: '100%', padding: '3rem 2rem', borderRadius: '24px', boxShadow: 'var(--shadow-lg), var(--shadow-glow)' }}>
+          {/* Cercle de progression SVG */}
+          <div style={{ position: 'relative', width: '130px', height: '130px', margin: '0 auto 2.5rem' }}>
+            <svg width="130" height="130" viewBox="0 0 130 130" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="65" cy="65" r="58" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+              <circle cx="65" cy="65" r="58" fill="none" stroke="var(--primary)" strokeWidth="6"
+                      strokeDasharray="364.42" strokeDashoffset={364.42 - (364.42 * progress) / 100}
+                      style={{ transition: 'stroke-dashoffset 0.3s ease-out' }} />
+            </svg>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontFamily: '"Outfit", sans-serif', fontWeight: '900', fontSize: '2rem', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+              {progress}%
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em' }}>
+            Analyse intelligente en cours...
+          </h2>
+          <p className="text-muted text-sm mb-8">
+            Le conseiller expert décrypte les données de votre historique.
+          </p>
+
+          {/* Liste des étapes de l'audit */}
+          <div className="flex flex-col gap-4 text-left" style={{ borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '2rem' }}>
+            {steps.map((step, idx) => {
+              const isCompleted = currentStep > idx;
+              const isActive = currentStep === idx;
+              return (
+                <div key={idx} className="flex items-center gap-3.5" style={{ 
+                  opacity: isCompleted || isActive ? 1 : 0.4,
+                  transition: 'opacity 0.4s ease'
+                }}>
+                  {isCompleted ? (
+                    <CheckCircle2 size={20} className="text-success" style={{ flexShrink: 0 }} />
+                  ) : isActive ? (
+                    <Loader2 size={20} className="animate-spin text-primary" style={{ flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid rgba(0,0,0,0.1)', flexShrink: 0 }} />
+                  )}
+                  <span style={{ 
+                    fontSize: '0.9rem', 
+                    fontWeight: isActive ? '700' : '500', 
+                    color: isActive ? 'var(--primary)' : 'var(--text-main)',
+                    transition: 'color 0.4s ease'
+                  }}>
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     )
