@@ -1,6 +1,7 @@
 import os
 import tempfile
 import httpx
+import json
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,19 +88,69 @@ async def telecharger_fichier_supabase(file_path: str) -> bytes:
             return response.content
         raise Exception(f"Failed to download file from Supabase storage (status {response.status_code}): {response.text}")
 
+async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dict:
+    """Fallback résilient utilisant le client Google GenAI standard (sans binaires locaux)."""
+    try:
+        from google import genai
+        from google.genai import types
+        
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("No API Key found for Gemini fallback.")
+            
+        client = genai.Client(api_key=api_key)
+        
+        regles_dep = recuperer_regles_retraite("depart_anticipe")
+        regles_opt = recuperer_regles_retraite("optimisation")
+        
+        prompt = f"""
+        Vous êtes un conseiller en gestion de patrimoine (CGP) d'élite, expert en retraite.
+        Analysez le relevé de carrière fourni en format PDF et rédigez un rapport structuré.
+        
+        RÈGLES RÉGLEMENTAIRES APPLICABLES :
+        ---
+        Règles de départ anticipé :
+        {regles_dep}
+        
+        Règles d'optimisation :
+        {regles_opt}
+        ---
+        
+        Votre réponse doit impérativement respecter le schéma structuré demandé (JSON).
+        """
+        
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[
+                types.Part.from_bytes(data=file_bytes, mime_type="application/pdf"),
+                prompt
+            ],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ConseilPatrimonial,
+            ),
+        )
+        
+        return json.loads(response.text)
+    except Exception as fallback_err:
+        raise Exception(f"Le fallback de secours direct a échoué: {str(fallback_err)}")
+
 @app.post("/api/analyse-patrimoniale")
 async def api_analyse_patrimoniale(data: dict):
-    """Génère un conseil patrimonial personnalisé de manière dynamique à partir d'un relevé PDF."""
+    """Génère un conseil patrimonial personnalisé. Tente l'agent Antigravity, sinon utilise le fallback Gemini."""
     file_path_param = data.get("filePath") or data.get("filename")
     if not file_path_param:
         raise HTTPException(status_code=400, detail="Missing filePath or filename parameter")
 
+    # 1. Télécharger le fichier depuis Supabase
+    try:
+        file_bytes = await telecharger_fichier_supabase(file_path_param)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur Supabase: {str(e)}")
+
+    # 2. Tenter l'analyse via l'agent Google Antigravity
     temp_file_path = None
     try:
-        # Télécharger le fichier depuis Supabase
-        file_bytes = await telecharger_fichier_supabase(file_path_param)
-        
-        # Sauvegarder dans un fichier temporaire
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
             temp_file.write(file_bytes)
             temp_file_path = temp_file.name
@@ -129,8 +180,17 @@ async def api_analyse_patrimoniale(data: dict):
             result = await response.structured_output()
             return result
             
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as agent_err:
+        # En cas d'erreur de compatibilité binaire (comme GLIBC sur Vercel serverless)
+        # on exécute le fallback résilient direct sur Gemini
+        print(f"[Warning] L'agent Antigravity a échoué (erreur de compatibilité binaire attendue sur Vercel) : {str(agent_err)}")
+        print("[Info] Lancement du fallback de secours résilient via le client GenAI direct...")
+        try:
+            fallback_result = await fallback_direct_gemini(file_bytes, file_path_param)
+            return fallback_result
+        except Exception as err:
+            raise HTTPException(status_code=500, detail=str(err))
+            
     finally:
         # S'assurer de nettoyer le fichier temporaire
         if temp_file_path and os.path.exists(temp_file_path):
