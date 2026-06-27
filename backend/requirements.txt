@@ -17,3 +17,5 @@ resend>=0.8.4
 slowapi
 limits
 bcrypt
+google-antigravity>=0.1.0
+pydantic>=2.0.0

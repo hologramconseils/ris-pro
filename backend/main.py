@@ -6,6 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+try:
+    from wealth_advisor_agent import analyser_releve_carriere
+except ImportError:
+    from backend.wealth_advisor_agent import analyser_releve_carriere
+
 # Load environment variables
 load_dotenv()
 
@@ -67,5 +72,30 @@ async def create_checkout_session(data: dict):
             cancel_url=f"{FRONTEND_URL}/diagnostic?canceled=true&file={file_path}",
         )
         return {"url": session.url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyse-patrimoniale")
+async def api_analyse_patrimoniale(data: dict):
+    """Génère un conseil patrimonial personnalisé de manière dynamique à partir d'un relevé PDF."""
+    file_name = data.get("filename")
+    if not file_name:
+        raise HTTPException(status_code=400, detail="Missing filename parameter")
+    
+    file_path = os.path.join(UPLOAD_DIR, file_name)
+    if not os.path.exists(file_path):
+        paths = [file_path, file_name, os.path.join("backend", UPLOAD_DIR, file_name)]
+        found = False
+        for p in paths:
+            if os.path.exists(p):
+                file_path = p
+                found = True
+                break
+        if not found:
+            raise HTTPException(status_code=404, detail=f"File {file_name} not found")
+
+    try:
+        result = await analyser_releve_carriere(file_path)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

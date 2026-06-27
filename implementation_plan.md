@@ -1,54 +1,53 @@
-# Plan d'implémentation - Résolution des Problèmes UX (ux-audit)
+# Plan d'implémentation - Déploiement de l'Agent IA Patrimonial sur Vercel
 
-Ce plan décrit les modifications à apporter à l'application **RIS Pro** afin de résoudre les problèmes d'utilisabilité identifiés lors de l'audit UX (Rapport `ux_audit.md`).
+Ce plan décrit les étapes nécessaires pour déployer l'agent autonome Python en production sur `https://ris.hologramconseils.com` via Vercel.
 
-## Objectifs
-1. **UX-001 (Export PDF)** : Remplacer l'alerte fictive par une vraie fonctionnalité d'export PDF via `window.print()` et une feuille de style d'impression (`@media print`) soignée.
-2. **UX-002 (Authentification post-achat)** : Générer un lien de connexion magique à usage unique pour tous les acheteurs (nouveaux et existants) pour supprimer la friction de connexion après paiement.
-3. **UX-003 (Navigation circulaire)** : Ajouter un bouton "Analyser un autre document" dans le bilan premium pour fluidifier le retour à l'accueil.
-4. **UX-004 (Filtres d'anomalies)** : Ajouter un système de filtre par sévérité (Toutes, Critiques, Moyennes) pour réduire la charge cognitive sur les bilans volumineux.
+## Diagnostic & Contrainte Technique
+
+> [!IMPORTANT]
+> Actuellement, le déploiement Vercel est uniquement configuré pour compiler et exécuter du **Node.js** dans `frontend/api/`.
+> Pour exécuter l'agent Python sur Vercel, nous devons configurer le builder `@vercel/python` pour notre nouvel endpoint.
 
 ---
 
 ## Proposed Changes
 
-### [CSS Stylesheets]
+### [Vercel Configuration]
 
-#### [MODIFY] [index.css](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/index.css)
-* Ajouter les règles CSS d'impression (`@media print`) :
-  - Masquer l'entête global, le pied de page global, et tous les boutons d'action (boutons de retour, impression, calendrier).
-  - Ajuster les marges et supprimer les ombres/effets glassmorphismes sur les cartes pour un rendu propre en noir et blanc ou couleurs d'encre standard.
-  - S'assurer que le contenu s'étale sur 100% de la largeur disponible et forcer les sauts de page propres si nécessaire.
-* Ajouter des styles pour la barre de filtres des anomalies dans le thème clair et sombre.
+#### [MODIFY] [vercel.json](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/vercel.json)
+* Ajouter le support de la compilation Python pour l'endpoint de l'agent :
+  ```json
+      {
+        "src": "frontend/api/analyse-patrimoniale.py",
+        "use": "@vercel/python"
+      }
+  ```
 
-### [Frontend Components]
+### [Python Serverless Function]
 
-#### [MODIFY] [Bilan.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Bilan.jsx)
-* Ajouter des boutons d'actions en haut de page (sous le titre) :
-  - Un bouton principal "Exporter le Bilan (PDF)" avec l'icône `Download` qui déclenche `window.print()`.
-  - Un bouton secondaire "Analyser un autre document" qui redirige vers `/`.
-* Ajouter un état React `filter` (`'all' | 'high' | 'medium'`) et la barre de boutons de filtres au-dessus de la liste des anomalies.
-* Mettre à jour le filtrage de la liste d'anomalies affichée pour prendre en compte le filtre actif.
+#### [NEW] [requirements.txt](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/api/requirements.txt)
+* Définir les dépendances nécessaires pour la fonction serverless Python sur Vercel :
+  ```text
+  google-antigravity>=0.1.0
+  pydantic>=2.0.0
+  fastapi>=0.110.0
+  ```
 
-### [API Handlers]
-
-#### [MODIFY] [webhook.js](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/api/webhook.js)
-* Supprimer la condition restrictive `if (isNewUser)` pour la génération du lien magique de connexion via l'API d'administration de Supabase.
-* Mettre à jour l'email envoyé par Resend :
-  - Si un lien magique est généré, l'intégrer sous forme de bouton "Consulter mon Bilan Premium" pour TOUS les utilisateurs.
-  - Personnaliser les explications textuelles selon que l'utilisateur est nouveau ou existant.
+#### [NEW] [analyse-patrimoniale.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/api/analyse-patrimoniale.py)
+* Créer la fonction serverless Python exposant l'API via FastAPI pour Vercel.
+* Ce fichier importera la logique de `wealth_advisor_agent.py` pour analyser le PDF et renvoyer la réponse structurée.
 
 ---
 
-## Verification Plan
+## Verification & Deployment Plan
 
-### Automated Tests
-* Vérifier le bon formatage et la compilation locale :
+### Automated Verification
+* Tester le déploiement local via Vercel CLI :
   ```bash
-  npm run build
+  vercel dev
   ```
 
-### Manual Verification
-* Tester le processus d'impression dans le navigateur (Ctrl+P / Cmd+P ou clic sur "Exporter le Bilan (PDF)") pour valider le rendu du PDF sans les éléments superflus de l'UI.
-* Vérifier la réactivité du filtrage par sévérité dans le bilan.
-* Simuler la réception d'un événement webhook Stripe et vérifier la bonne génération du lien magique de connexion.
+### Deployment Steps
+1. Commiter les modifications sur Git.
+2. Synchroniser les fichiers avec le dossier Desktop (`/Users/hologramconseils/Desktop/RIS Pro V2`).
+3. Lancer un `git push origin main` pour déclencher le déploiement automatique en production sur Vercel.
