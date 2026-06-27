@@ -126,6 +126,41 @@ export default function Bilan() {
           }
         }
         setResults(data[0].results)
+      } else if (isMock) {
+        // Fallback mock pour les tests E2E locaux
+        const mockBaseResults = {
+          file_path: path,
+          status: 'completed',
+          trimestres_valides: 136,
+          trimestres_requis: 172,
+          anomalies: [
+            {
+              id: 'anom_1',
+              year: '2005',
+              employer: 'ACME Corp',
+              severity: 'high',
+              salary: '12 400 €',
+              trimesters: 0,
+              points: 0,
+              reason: 'Aucun trimestre validé sur cette année de transition.',
+              solution: "Demander une régularisation de vos trimestres auprès de l'assurance retraite.",
+              docs: ['Fiches de paie 2005', 'Contrat de travail']
+            },
+            {
+              id: 'anom_2',
+              year: '2012',
+              employer: 'Sarkozy & Cie',
+              severity: 'medium',
+              salary: '24 500 €',
+              trimesters: 2,
+              points: 45,
+              reason: 'Le salaire reporté est inférieur au salaire réel de vos fiches de paie.',
+              solution: 'Fournir vos fiches de paie de 2012 pour mettre à jour le salaire annuel moyen.',
+              docs: ['Fiches de paie de l\'année 2012 complète']
+            }
+          ]
+        };
+        setResults(mockBaseResults);
       } else {
         throw new Error("Aucun résultat trouvé pour ce document.")
       }
@@ -557,7 +592,7 @@ export default function Bilan() {
           ) : (
             filteredAnomalies.map((anom, idx) => (
               <div key={idx} className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} style={{ padding: '0', overflow: 'hidden', marginBottom: '2rem' }}>
-                <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="flex justify-between items-center flex-wrap gap-4">
+                <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="anomaly-card-header flex justify-between items-center flex-wrap gap-4">
                   <div className="flex items-center gap-4">
                     <div style={{ background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)', color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                       {idx + 1}
@@ -598,14 +633,14 @@ export default function Bilan() {
                     <p className="text-muted">{anom.reason}</p>
                   </div>
                   
-                  <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+                  <div className="anomaly-action-box" style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
                     <h4 className="font-semibold flex items-center gap-2 text-success mb-2">
                       <CheckCircle2 size={16} /> Action requise
                     </h4>
                     <p className="text-sm font-medium mb-4">{anom.solution}</p>
                     
                     <div className="text-sm font-bold uppercase tracking-wider text-success mb-2" style={{ opacity: 0.8 }}>Pièces justificatives à fournir :</div>
-                    <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                    <ul className="anomaly-docs-list" style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.9rem' }}>
                       {Array.isArray(anom.docs) ? anom.docs.map((doc, docIdx) => (
                         <li key={docIdx} style={{ marginBottom: '0.25rem' }}>{doc}</li>
                       )) : (

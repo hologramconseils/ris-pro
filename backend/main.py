@@ -1,10 +1,26 @@
 import os
 import shutil
 import stripe
+import httpx
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+
+async def telecharger_fichier_supabase(file_path: str) -> bytes:
+    """Télécharge un document depuis le bucket Supabase pour l'analyser localement."""
+    supabase_url = os.environ.get("VITE_SUPABASE_URL")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
+    url = f"{supabase_url}/storage/v1/object/authenticated/documents/{file_path}"
+    headers = {
+        "Authorization": f"Bearer {supabase_key}",
+        "apikey": supabase_key
+    }
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.content
+        raise Exception(f"Failed to download file from Supabase storage: {response.text}")
 
 try:
     from wealth_advisor_agent import analyser_releve_carriere
@@ -82,16 +98,35 @@ async def create_checkout_session(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/checkout")
+async def api_checkout(data: dict):
+    """Alias for create_checkout_session to match frontend requirements."""
+    return await create_checkout_session(data)
+
+@app.post("/api/analyze")
+async def api_analyze(data: dict):
+    """Alias for /api/analyse-patrimoniale to match frontend '/api/analyze' call."""
+    file_path = data.get("filePath")
+    if not file_path:
+        raise HTTPException(status_code=400, detail="Missing filePath parameter")
+    filename = os.path.basename(file_path)
+    data_for_agent = {"filename": filename}
+    return await api_analyse_patrimoniale(data_for_agent)
+
 @app.post("/api/analyse-patrimoniale")
 async def api_analyse_patrimoniale(data: dict):
     """Génère un conseil patrimonial personnalisé de manière dynamique à partir d'un relevé PDF."""
-    file_name = data.get("filename")
+    file_name = data.get("filename") or data.get("filePath")
     if not file_name:
-        raise HTTPException(status_code=400, detail="Missing filename parameter")
+        raise HTTPException(status_code=400, detail="Missing filename or filePath parameter")
     
-    file_path = os.path.join(UPLOAD_DIR, file_name)
+    # Conserver le chemin complet pour Supabase, mais utiliser le nom de base localement
+    supabase_path = file_name
+    base_name = os.path.basename(file_name)
+    file_path = os.path.join(UPLOAD_DIR, base_name)
+    
     if not os.path.exists(file_path):
-        paths = [file_path, file_name, os.path.join("backend", UPLOAD_DIR, file_name)]
+        paths = [file_path, base_name, os.path.join("backend", UPLOAD_DIR, base_name)]
         found = False
         for p in paths:
             if os.path.exists(p):
@@ -99,7 +134,16 @@ async def api_analyse_patrimoniale(data: dict):
                 found = True
                 break
         if not found:
-            raise HTTPException(status_code=404, detail=f"File {file_name} not found")
+            # Essayer de télécharger le fichier depuis Supabase
+            try:
+                if not supabase_path.startswith("uploads/"):
+                    supabase_path = f"uploads/{supabase_path}"
+                content = await telecharger_fichier_supabase(supabase_path)
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                with open(file_path, "wb") as f:
+                    f.write(content)
+            except Exception as e:
+                raise HTTPException(status_code=404, detail=f"File {file_name} not found locally or on Supabase: {str(e)}")
 
     try:
         result = await analyser_releve_carriere(file_path)

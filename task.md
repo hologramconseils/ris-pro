@@ -1,4 +1,4 @@
 - [x] Mettre à jour le script local `backend/wealth_advisor_agent.py` avec l'orchestration multi-agents et les politiques de sécurité
 - [x] Mettre à jour l'API serverless `frontend/api/analyse-patrimoniale.py` avec la même logique multi-agents et de sécurité
-- [/] Valider localement et pousser sur le dépôt Git
-- [ ] Mettre à jour le walkthrough final
+- [x] Valider localement et pousser sur le dépôt Git
+- [x] Mettre à jour le walkthrough final

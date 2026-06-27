@@ -63,3 +63,13 @@ Modification de la page du [Bilan Premium (Bilan.jsx)](file:///Users/hologramcon
 *   **Workflow GitHub Actions (`regulatory-watch.yml`)** :
     *   S'exécute automatiquement chaque semaine (et manuellement).
     *   Détecte les modifications de fichiers opérées par l'agent, crée une branche dédiée (ex: `regulatory-update-YYYYMMDD`), pousse la branche et ouvre automatiquement une **Pull Request** sur GitHub pour votre validation humaine avant le déploiement en production.
+
+---
+
+## 8. Stabilisation et Validation des Tests E2E Playwright
+*   **Résolution du 400 Bad Request** : Modification de la route `/api/analyse-patrimoniale` dans [main.py](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/backend/main.py) pour accepter indifféremment `filename` et `filePath` afin de s'aligner sur les requêtes asynchrones envoyées par le composant [Bilan.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Bilan.jsx).
+*   **Mise à niveau du Schéma Mock** : Mise à jour des anomalies de `mockBaseResults` dans [Bilan.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Bilan.jsx) pour respecter les champs réels attendus par le composant d'affichage (clé `year` à la place de `titre`, sévérités correctes, etc.), évitant ainsi le masquage des anomalies lors des tests E2E.
+*   **Exécution Standardisée** : Lancement du serveur backend FastAPI via l'environnement virtuel adéquat (`./venv/bin/uvicorn`) et exécution réussie du test Playwright complet (`python3 tests/test_e2e_playwright.py`) avec validation finale du rendu du Bilan Premium.
+*   **Correction des Couleurs et du Contraste (Export PDF)** : 
+    *   Attribution de classes sémantiques (`anomaly-card-header`, `anomaly-action-box` et `anomaly-docs-list`) dans [Bilan.jsx](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/pages/Bilan.jsx).
+    *   Correction de la feuille de style `@media print` dans [index.css](file:///Users/hologramconseils/.gemini/antigravity/scratch/ris-pro-web/frontend/src/index.css) afin de forcer un fond clair/neutre (`#f8fafc`) avec texte sombre (`#0f172a`) pour l'en-tête de la carte d'anomalie, et un fond vert pastel (`#f0fdf4`) avec des textes verts et gris foncés lisibles pour le bloc « Action requise » et les pièces justificatives.

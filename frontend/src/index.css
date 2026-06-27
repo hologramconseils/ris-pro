@@ -848,6 +848,35 @@ a:hover {
     border-left-color: #d97706 !important;
   }
 
+  .anomaly-card-header {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  .anomaly-card-header h3 {
+    color: #0f172a !important;
+  }
+
+  .anomaly-action-box {
+    background: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    color: #1e293b !important;
+  }
+
+  .anomaly-action-box h4 {
+    color: #16a34a !important;
+  }
+
+  .anomaly-action-box p,
+  .anomaly-docs-list,
+  .anomaly-docs-list li {
+    color: #334155 !important;
+  }
+
+  .text-success {
+    color: #16a34a !important;
+  }
+
   .details-grid {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
