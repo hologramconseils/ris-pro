@@ -13,6 +13,15 @@ export default function Home() {
   const [error, setError] = useState(null)
   const fileInputRef = useRef(null)
 
+  // Réinitialisation stricte des sessions de données de carrière
+  React.useEffect(() => {
+    Object.keys(sessionStorage).forEach(key => {
+      if (key.startsWith('ris_pro_analysis_')) {
+        sessionStorage.removeItem(key)
+      }
+    })
+  }, [])
+
   const handleDragOver = (e) => {
     e.preventDefault()
     setIsDragging(true)

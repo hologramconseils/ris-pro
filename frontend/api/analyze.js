@@ -158,12 +158,14 @@ export default async function handler(req, res) {
         DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
         Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
         NE JAMAIS inclure d'année normale dans la liste des anomalies.
+        Vérifie rigoureusement si le document fourni est bien un relevé de situation individuelle (RIS), un relevé de carrière, ou un relevé de retraite (EIG). S'il s'agit d'un document totalement différent (ex: facture, pièce d'identité, CV, etc.), tu dois obligatoirement mettre le champ 'is_valid_document' à false.
 
         EXCLUSION SYSTÉMATIQUE :
         - Exclure l'année en cours (2026) car non consolidée.
 
         STRUCTURE JSON ATTENDUE :
         {
+          "is_valid_document": true,
           "nir": "XXXXXXXXXXXXXXX",
           "anomalies": [
             {
@@ -212,6 +214,9 @@ export default async function handler(req, res) {
           cleanText = cleanText.trim();
 
           const parsed = JSON.parse(cleanText);
+          if (parsed.is_valid_document === false) {
+             throw new Error("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+          }
           if (parsed.anomalies || parsed.nir) {
             analysisResults = parsed;
             console.log(`Analyse réussie avec ${modelName}`);

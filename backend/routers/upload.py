@@ -53,6 +53,16 @@ async def upload_file(
         raise HTTPException(status_code=400, detail="Seuls les fichiers PDF sont acceptés.")
 
     try:
+        # Purger physiquement les anciens fichiers temporaires
+        if os.path.exists(UPLOAD_DIR):
+            for old_file in os.listdir(UPLOAD_DIR):
+                old_path = os.path.join(UPLOAD_DIR, old_file)
+                try:
+                    if os.path.isfile(old_path):
+                        os.remove(old_path)
+                except Exception as clean_err:
+                    print(f"Error purging old file {old_path}: {clean_err}")
+
         # 1. Save file temporarily
         safe_filename = f"{uuid.uuid4()}_{file.filename}"
         file_path = os.path.join(UPLOAD_DIR, safe_filename)
