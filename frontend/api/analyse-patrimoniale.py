@@ -89,7 +89,10 @@ async def telecharger_fichier_supabase(file_path: str) -> bytes:
         raise Exception(f"Failed to download file from Supabase storage (status {response.status_code}): {response.text}")
 
 async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dict:
-    """Fallback résilient utilisant le client Google GenAI standard (sans binaires locaux)."""
+    """Fallback résilient utilisant un workflow en deux étapes :
+    Étape 1 : Analyse du PDF avec Recherche Google en temps réel pour obtenir les données à jour.
+    Étape 2 : Structuration des résultats au format JSON attendu par Pydantic.
+    """
     try:
         from google import genai
         from google.genai import types
@@ -103,11 +106,12 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         regles_dep = recuperer_regles_retraite("depart_anticipe")
         regles_opt = recuperer_regles_retraite("optimisation")
         
-        prompt = f"""
+        # --- ÉTAPE 1 : Recherche Google + Analyse du PDF (Sortie libre) ---
+        prompt_analyse = f"""
         Vous êtes un conseiller en gestion de patrimoine (CGP) d'élite, expert en retraite.
-        Analysez le relevé de carrière fourni en format PDF et rédigez un rapport structuré.
+        Votre mission est d'analyser le relevé de carrière fourni (PDF) et de rédiger des recommandations d'optimisation.
         
-        RÈGLES RÉGLEMENTAIRES APPLICABLES :
+        RÈGLES RÉGLEMENTAIRES LOCALES APPLICABLES :
         ---
         Règles de départ anticipé :
         {regles_dep}
@@ -116,23 +120,41 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         {regles_opt}
         ---
         
-        Votre réponse doit impérativement respecter le schéma structuré demandé (JSON).
+        Consultez Internet via la recherche Google pour vérifier si de nouvelles réformes, ordonnances ou décrets (notamment post-2023/2026) s'appliquent à ce relevé ou s'il y a des nouveautés sur le rachat de trimestres, le cumul emploi-retraite ou le calcul du taux plein en France.
+        Rédigez un rapport de synthèse détaillé contenant l'âge estimé du taux plein, les anomalies, et une liste de stratégies d'optimisation claires.
         """
         
-        response = client.models.generate_content(
+        response_analyse = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=[
                 types.Part.from_bytes(data=file_bytes, mime_type="application/pdf"),
-                prompt
+                prompt_analyse
             ],
             config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                response_mime_type="application/json",
-                response_schema=ConseilPatrimonial,
+                tools=[types.Tool(google_search=types.GoogleSearch())], # Recherche en temps réel autorisée ici
             ),
         )
         
-        return json.loads(response.text)
+        analyse_texte = response_analyse.text
+        
+        # --- ÉTAPE 2 : Structuration JSON stricte (Sans outils de recherche) ---
+        prompt_structuration = f"""
+        Prenez le rapport d'analyse de carrière ci-dessous et structurez-le au format JSON strict en respectant le schéma demandé.
+        
+        RAPPORT D'ANALYSE :
+        {analyse_texte}
+        """
+        
+        response_struct = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt_structuration,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ConseilPatrimonial, # Structuration Pydantic garantie ici
+            ),
+        )
+        
+        return json.loads(response_struct.text)
     except Exception as fallback_err:
         raise Exception(f"Le fallback de secours direct a échoué: {str(fallback_err)}")
 
