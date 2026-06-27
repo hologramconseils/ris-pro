@@ -37,6 +37,8 @@ class StrategieOptimisation(BaseModel):
 class ConseilPatrimonial(BaseModel):
     synthese_situation: str = Field(description="Synthèse globale de la situation de carrière analysée")
     age_taux_plein_estime: str = Field(description="Âge estimé d'obtention du taux plein (ex: '64 ans et 3 mois')")
+    trimestres_valides: int = Field(description="Nombre total exact de trimestres validés extrait du relevé de carrière (ex: 72). Doit être 100% cohérent avec les données du document.")
+    trimestres_requis: int = Field(description="Nombre de trimestres requis pour obtenir le taux plein pour cette génération (ex: 172).")
     anomalies_detectees_count: int = Field(description="Nombre d'anomalies détectées sur le relevé de carrière")
     strategies: list[StrategieOptimisation] = Field(description="Liste des stratégies de conseil patrimonial personnalisées et actionnables")
     commentaire_conseil: str = Field(description="Commentaire rédigé de manière bienveillante et professionnelle à l'attention du client")

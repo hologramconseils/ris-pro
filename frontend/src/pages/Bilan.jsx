@@ -175,16 +175,24 @@ export default function Bilan() {
   }
 
   const extractTrimestres = (text) => {
-    if (!text) return { valides: 72, requis: 172 };
-    const match = text.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i);
-    if (match) {
-      return { valides: parseInt(match[1]), requis: parseInt(match[2]) };
+    if (typeof results.trimestres_valides === 'number') {
+      return {
+        valides: results.trimestres_valides,
+        requis: typeof results.trimestres_requis === 'number' ? results.trimestres_requis : 172
+      };
     }
-    const simpleMatch = text.match(/(\d+)\s+trimestres/i);
-    return {
-      valides: simpleMatch ? parseInt(simpleMatch[1]) : 72,
-      requis: 172
-    };
+    if (!text) return { valides: 72, requis: 172 };
+    // Détection regex améliorée pour les rapports historiques
+    const match = text.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i) ||
+                  text.match(/(\d+)\s+trimestres?\s+validés/i) ||
+                  text.match(/trimestres?\s+validés?\s*\((\d+)/i) ||
+                  text.match(/(\d+)\s+trimestres/i);
+    if (match) {
+      const val = parseInt(match[1] || match[2]);
+      const req = match[2] && match[1] !== match[2] ? parseInt(match[2]) : 172;
+      return { valides: val, requis: req };
+    }
+    return { valides: 72, requis: 172 };
   }
 
   const trimestresInfo = extractTrimestres(results.synthese_situation || "");
