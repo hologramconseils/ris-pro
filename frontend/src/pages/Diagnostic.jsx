@@ -253,8 +253,8 @@ export default function Diagnostic() {
           <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: '"Outfit", sans-serif', letterSpacing: '-0.02em' }}>
             Analyse intelligente en cours...
           </h2>
-          <p className="text-muted text-sm mb-8">
-            Le conseiller expert décrypte les données de votre historique.
+          <p className="text-muted text-sm mb-8" style={{ minHeight: '20px' }}>
+            {steps[currentStep] ? `${steps[currentStep].label} en cours...` : "Traitement en cours..."}
           </p>
 
           {/* Liste des étapes de l'audit */}
