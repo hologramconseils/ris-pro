@@ -400,7 +400,7 @@ export default function Bilan() {
             </div>
 
             {/* Commentaire de conseil CGP */}
-            <div className="mt-4" style={{
+            <div className="mt-4 cgp-recommendation" style={{
               background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%)',
               border: '1px solid rgba(212, 175, 55, 0.3)',
               borderLeft: '5px solid #d4af37',
@@ -420,7 +420,7 @@ export default function Bilan() {
         )}
 
         {/* Anomalies Details */}
-        <div className="flex flex-col gap-6 mt-4">
+        <div className="flex flex-col gap-6 mt-4 anomaly-section">
           <h2 className="text-2xl font-bold flex items-center gap-2" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '1rem' }}>
             <FileSearch className="text-primary" />
             Détail des anomalies

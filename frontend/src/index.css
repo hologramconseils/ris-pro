@@ -685,19 +685,27 @@ a:hover {
   }
 }
 
-/* Print Stylesheet for PDF Export */
+/* Print Stylesheet for PDF Export (Luxury Private Office Style) */
 @media print {
   /* Hiding UI elements */
-  header, footer, nav, .print-hidden, button, a.btn, .btn, .auth-choice-container, .badge-primary {
+  header, footer, nav, .print-hidden, button, a.btn, .btn, .auth-choice-container, .badge-primary, .print-hidden * {
     display: none !important;
   }
 
-  /* Page setup */
+  /* Page setup - suppresses default browser URL, date and title */
+  @page {
+    size: A4 portrait;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+
   body {
     background-color: #ffffff !important;
-    color: #000000 !important;
-    font-size: 12pt;
+    color: #0f172a !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-size: 11pt;
     line-height: 1.5;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .container {
@@ -706,43 +714,123 @@ a:hover {
     margin: 0 !important;
   }
 
-  /* Keep background colors for cards but make them printer friendly */
+  /* Typography for report */
+  h1 {
+    font-size: 24pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin-bottom: 0.5rem !important;
+    letter-spacing: -0.03em !important;
+  }
+
+  h2 {
+    font-size: 15pt !important;
+    font-weight: 700 !important;
+    color: #1e3a8a !important;
+    margin-top: 2rem !important;
+    margin-bottom: 1.25rem !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding-bottom: 0.5rem !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Force grid columns to print nicely */
+  .synthesis-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  /* Clean up cards for A4 paper */
   .card {
     background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
     transform: none !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 1.25rem !important;
+    padding: 1.25rem 1.5rem !important;
+    border-radius: 12px !important;
+  }
+
+  /* Specific styling for anomalies section and cards */
+  .anomaly-section {
+    page-break-before: always !important;
+    break-before: always !important;
+  }
+
+  .anomaly-card {
+    border: 1px solid #e2e8f0 !important;
+    border-left: 5px solid #dc2626 !important;
+    border-radius: 12px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
     margin-bottom: 1.5rem !important;
-    padding: 1.25rem !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .anomaly-card.high-severity {
+    border-left-color: #dc2626 !important;
+  }
+
+  .anomaly-card:not(.high-severity) {
+    border-left-color: #d97706 !important;
   }
 
   .details-grid {
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
   }
 
-  /* Color adjustments for print */
-  .text-primary {
-    color: #1d4ed8 !important;
+  /* CGP Advice block styling in print */
+  .cgp-recommendation {
+    background: #fffdf5 !important;
+    border: 1px solid #fef08a !important;
+    border-left: 6px solid #d4af37 !important;
+    padding: 1.5rem !important;
+    margin-top: 1.5rem !important;
+    border-radius: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
-  
-  .text-error, .text-danger {
-    color: #dc2626 !important;
-  }
+
+  /* Colors and badges */
+  .text-primary { color: #1e3a8a !important; }
+  .text-error, .text-danger { color: #dc2626 !important; }
+  .text-warning { color: #d97706 !important; }
+  .text-muted { color: #475569 !important; }
 
   .badge {
     border: 1px solid #cbd5e1 !important;
-    color: #000000 !important;
+    color: #0f172a !important;
     background: #f1f5f9 !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 6px !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
   }
 
-  /* Ensure background colors print correctly */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  /* Prevent elements from breaking mid-content */
+  .synthesis-grid > div,
+  .details-grid > div,
+  p, li, blockquote {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
