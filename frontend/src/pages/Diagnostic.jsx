@@ -9,7 +9,9 @@ export default function Diagnostic() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
   const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 1
-  const remainingCredits = Math.max(0, totalCredits - (profile?.analysis_count || 0))
+  const analysisCount = profile?.analysis_count || 0
+  const availableCredits = Math.max(0, totalCredits - Math.max(0, analysisCount - 1))
+  const hasCredits = availableCredits > 0
   const [searchParams] = useSearchParams()
   const filePath = searchParams.get('file')
   
@@ -125,7 +127,6 @@ export default function Diagnostic() {
     }
 
     // Si admin ou a déjà payé (legacy) ou a des crédits restants
-    const hasCredits = remainingCredits > 0;
     const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
 
     if (isAdmin || hasCredits) {
@@ -569,15 +570,15 @@ export default function Diagnostic() {
                 }}
               >
                 <span>
-                 {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
-                   ? "Accéder au bilan complet (Admin)" 
-                   : (user 
-                       ? (remainingCredits > 0 
-                           ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${remainingCredits})`
-                           : (profile?.is_paid 
-                               ? LABELS.PAYMENT_RENEW 
-                               : LABELS.PAYMENT_REQUIRED))
-                       : LABELS.PAYMENT_REQUIRED)}
+                  {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
+                    ? "Accéder au bilan complet (Admin)" 
+                    : (user 
+                        ? (hasCredits 
+                            ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${availableCredits})`
+                            : (profile?.is_paid 
+                                ? LABELS.PAYMENT_RENEW 
+                                : LABELS.PAYMENT_REQUIRED))
+                        : LABELS.PAYMENT_REQUIRED)}
                 </span>
                 <ChevronRight size={20} />
               </button>
