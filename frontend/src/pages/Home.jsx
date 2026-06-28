@@ -8,7 +8,7 @@ import { LABELS } from '../config/labels'
 export default function Home() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
-  const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 1
+  const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 0
   const remainingCredits = Math.max(0, totalCredits - (profile?.analysis_count || 0))
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
