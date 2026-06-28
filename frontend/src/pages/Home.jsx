@@ -140,7 +140,26 @@ export default function Home() {
           </div>
         )}
 
-        {isUploading ? (
+        {!user ? (
+          <div className="card glass flex flex-col items-center justify-center text-center" style={{ width: '100%', padding: '4rem 2rem', gap: '1.5rem', borderRadius: '24px' }}>
+            <div style={{ padding: '1rem', background: 'var(--primary-bg)', borderRadius: '50%', color: 'var(--primary)' }}>
+              <ShieldCheck size={48} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-2">Connectez-vous pour commencer l'analyse</h3>
+              <p className="text-muted max-w-md mx-auto">
+                Afin de garantir la sécurité et la confidentialité de vos données, une identification est requise avant tout traitement de votre relevé de carrière.
+              </p>
+            </div>
+            <button 
+              className="btn btn-primary btn-cta-premium mt-2" 
+              onClick={() => navigate('/login')}
+              style={{ padding: '1rem 2.5rem', fontSize: '1rem' }}
+            >
+              S'identifier ou Créer un compte
+            </button>
+          </div>
+        ) : isUploading ? (
           <div className="card glass flex flex-col items-center justify-center animate-pulse" style={{ width: '100%', padding: '4rem 2rem', gap: '1.5rem' }}>
             <div style={{ position: 'relative' }}>
               <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '4px solid var(--primary)', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />

@@ -207,6 +207,19 @@ export default function Login() {
           >
             {loading ? <Loader2 className="animate-spin" /> : (isResetting ? 'Mettre à jour le mot de passe' : (isLogin ? 'Se connecter' : 'Créer mon compte'))}
           </button>
+          
+          {!isResetting && (
+            <div className="text-center mt-4">
+              <button 
+                type="button"
+                className="text-sm font-medium"
+                style={{ color: 'var(--primary)', cursor: 'pointer' }}
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin ? "Pas encore de compte ? Cliquez ici pour en créer un." : "Déjà un compte ? Cliquez ici pour vous connecter."}
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>
