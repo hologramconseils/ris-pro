@@ -77,7 +77,7 @@ export default function Login() {
         })
         if (signInError) throw signInError
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -88,6 +88,13 @@ export default function Login() {
           }
         })
         if (signUpError) throw signUpError
+        
+        // Si la confirmation d'email est activée sur Supabase, la session sera nulle
+        if (data && !data.session) {
+          setMessage('Inscription réussie ! Un e-mail de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.')
+          setLoading(false)
+          return
+        }
       }
 
       // Règle absolue 1 : Invalider toute analyse existante au login pour forcer le rechargement brut
@@ -98,7 +105,10 @@ export default function Login() {
       console.error(err)
       setError(err.message || 'Une erreur est survenue.')
     } finally {
-      setLoading(false)
+      // Ne pas passer loading à false si on a mis un message persistant
+      if (!message) {
+        setLoading(false)
+      }
     }
   }
 
