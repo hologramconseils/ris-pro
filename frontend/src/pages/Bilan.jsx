@@ -65,7 +65,7 @@ export default function Bilan() {
           // Sauvegarder les résultats enrichis dans la base de données
           supabase.from('analyses')
             .update({ results: enriched })
-            .eq('file_path', path)
+            .ilike('file_path', path)
             .then(({ error }) => {
               if (error) console.error("Erreur mise à jour DB:", error.message);
             });
@@ -111,7 +111,7 @@ export default function Bilan() {
       const { data, error: dbError } = await supabase
         .from('analyses')
         .select('results, user_id')
-        .eq('file_path', path)
+        .ilike('file_path', path)
         .order('created_at', { ascending: false })
         .limit(1)
 
@@ -120,7 +120,7 @@ export default function Bilan() {
         // Associer l'analyse au compte utilisateur s'il était déconnecté lors de la soumission
         if (!data[0].user_id && user?.id) {
           try {
-            await supabase.from('analyses').update({ user_id: user.id }).eq('file_path', path);
+            await supabase.from('analyses').update({ user_id: user.id }).ilike('file_path', path);
           } catch (e) {
             console.error("Erreur lors de l'association de l'analyse au compte:", e);
           }

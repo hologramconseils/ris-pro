@@ -81,9 +81,11 @@ export default async function handler(req, res) {
     // Récupérer le record d'analyse dans Supabase pour vérifier le propriétaire
     const { data: analysisRecord, error: recordError } = await supabase
       .from('analyses')
-      .select('user_id, status')
-      .eq('file_path', filePath)
+      .select('user_id, status, file_path')
+      .ilike('file_path', filePath)
       .single();
+
+    const dbFilePath = analysisRecord?.file_path || filePath;
 
     if (recordError || !analysisRecord) {
       return res.status(404).json({ error: 'Document introuvable dans la base de données' });
@@ -110,12 +112,12 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log(`Début de l'analyse pour : ${filePath}`);
+    console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
     // 3. Télécharger le fichier depuis Supabase Storage
     const { data: fileData, error: downloadError } = await supabase.storage
       .from('documents')
-      .download(filePath);
+      .download(dbFilePath);
 
     if (downloadError) throw new Error(`Erreur Supabase Download: ${downloadError.message}`);
 
@@ -248,7 +250,7 @@ export default async function handler(req, res) {
           await supabase
             .from('analyses')
             .update({ user_id: targetUserId })
-            .eq('file_path', filePath);
+            .eq('file_path', dbFilePath);
         }
 
         // Vérifier si cette identité a déjà été analysée par cet utilisateur
@@ -366,12 +368,12 @@ export default async function handler(req, res) {
       await supabase
         .from('analyses')
         .update({ ...updateData, nir_hash: nirHash })
-        .eq('file_path', filePath);
+        .eq('file_path', dbFilePath);
     } catch (e) {
       await supabase
         .from('analyses')
         .update(updateData)
-        .eq('file_path', filePath);
+        .eq('file_path', dbFilePath);
     }
 
     return res.status(200).json(clientResponse);
@@ -382,7 +384,7 @@ export default async function handler(req, res) {
     try {
       await supabase.from('analyses')
         .update({ status: 'failed', results: { error: error.message, stack: error.stack } })
-        .eq('file_path', filePath);
+        .eq('file_path', dbFilePath);
     } catch (e) {
       console.error("Failed to log error to Supabase:", e.message);
     }

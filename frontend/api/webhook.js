@@ -134,7 +134,7 @@ export default async function handler(req, res) {
             await supabaseAdmin
               .from('analyses')
               .update({ user_id: finalUserId })
-              .eq('file_path', filePath);
+              .ilike('file_path', filePath);
           }
 
           // Générer le lien de connexion directe pour tous les utilisateurs (nouveaux et existants)
