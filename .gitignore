@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
+venv_old/
+backend/venv/
+backend/venv_old/
 test_env/
 .env
 .env.production
