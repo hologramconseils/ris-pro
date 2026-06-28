@@ -77,8 +77,14 @@ export default function Diagnostic() {
     if (filePath) {
       const cached = sessionStorage.getItem(`ris_pro_analysis_${filePath}`)
       if (cached) {
-        setResults(JSON.parse(cached))
-        setLoading(false)
+        const parsed = JSON.parse(cached)
+        if (parsed?.is_restricted && user) {
+          sessionStorage.removeItem(`ris_pro_analysis_${filePath}`)
+          performAnalysis(filePath)
+        } else {
+          setResults(parsed)
+          setLoading(false)
+        }
       } else {
         performAnalysis(filePath)
       }
@@ -535,15 +541,29 @@ export default function Diagnostic() {
               </div>
 
               {/* Options compte */}
-              <div className="auth-account-options" style={{ width: '100%' }}>
-                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Vous avez déjà un compte ?</p>
+              <div className="auth-account-options" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Vous souhaitez utiliser votre crédit gratuit ?</p>
                 <button
                   className="btn btn-secondary w-full"
                   onClick={() => {
                     if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
+                    navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}&signup=true`);
+                  }}
+                  style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', color: 'rgb(37, 99, 235)' }}
+                >
+                  <UserPlus size={18} />
+                  <span style={{ marginLeft: '0.25rem' }}>Créer un compte (1 crédit gratuit)</span>
+                  <ChevronRight size={18} />
+                </button>
+                
+                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)', marginTop: '0.5rem', marginBottom: '0.25rem' }}>Déjà inscrit ?</p>
+                <button
+                  className="btn btn-ghost w-full"
+                  onClick={() => {
+                    if (results) sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
                     navigate(`/login?redirect=${encodeURIComponent('/diagnostic?file=' + (filePath || ''))}`);
                   }}
-                  style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', borderRadius: '10px' }}
+                  style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.1)' }}
                 >
                   <span>Se connecter</span>
                   <ChevronRight size={18} />

@@ -5,7 +5,9 @@ import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
 
 export default function Login() {
-  const [isLogin, setIsLogin] = useState(true)
+  const [searchParams] = useSearchParams()
+  const redirect = searchParams.get('redirect') || '/'
+  const [isLogin, setIsLogin] = useState(searchParams.get('signup') !== 'true')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
@@ -16,8 +18,6 @@ export default function Login() {
   const [isResetting, setIsResetting] = useState(window.location.hash.includes('type=recovery'))
   
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/'
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault()
