@@ -14,9 +14,9 @@ export const LABELS = {
   CTA_CALL: "Si vous hésitez, je vous explique dans un appel gratuit de 15 minutes",
   
   // Payment related
-  PAYMENT_REQUIRED: "Accédez à l’analyse détaillée pour 29€",
+  PAYMENT_REQUIRED: "Accédez à l’analyse détaillée pour 39€",
   PAYMENT_SUCCESS: "Accédez à votre bilan détaillé",
-  PAYMENT_RENEW: "Vous avez utilisé vos 4 analyses. Renouvelez pour 4 nouvelles analyses (29€)",
+  PAYMENT_RENEW: "Vous avez utilisé vos analyses, renouvelez pour 39 €",
   PAYMENT_SECURE: "Paiement 100% sécurisé via Stripe",
   
   // Status messages

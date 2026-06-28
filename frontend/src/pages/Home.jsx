@@ -8,6 +8,8 @@ import { LABELS } from '../config/labels'
 export default function Home() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
+  const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 1
+  const remainingCredits = Math.max(0, totalCredits - (profile?.analysis_count || 0))
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -27,30 +29,35 @@ export default function Home() {
     setIsDragging(true)
   }
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
+  const handleDragLeave = () => {
     setIsDragging(false)
   }
 
   const handleDrop = (e) => {
     e.preventDefault()
     setIsDragging(false)
-    const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile && droppedFile.type === 'application/pdf') {
+    const files = e.dataTransfer.files
+    if (files.length > 0 && files[0].type === 'application/pdf') {
       setError(null)
-      handleFileUpload(droppedFile)
+      handleFileUpload(files[0])
     } else {
       setError(LABELS.ERROR_INVALID_PDF)
     }
   }
 
+  const handleClickUpload = () => {
+    fileInputRef.current?.click()
+  }
+
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
-    if (selectedFile && selectedFile.type === 'application/pdf') {
-      setError(null)
-      handleFileUpload(selectedFile)
-    } else {
-      setError(LABELS.ERROR_INVALID_PDF)
+    const files = e.target.files
+    if (files.length > 0) {
+      if (files[0].type === 'application/pdf') {
+        setError(null)
+        handleFileUpload(files[0])
+      } else {
+        setError(LABELS.ERROR_INVALID_PDF)
+      }
     }
   }
 
@@ -97,12 +104,6 @@ export default function Home() {
     }
   }
 
-  const handleClickUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
-
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -123,28 +124,26 @@ export default function Home() {
         <h1 className="text-4xl font-bold" style={{ letterSpacing: '-0.02em' }}>
           {user && profile && (
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
-                {((profile?.analysis_count || 0) < 4) || (profile?.analysis_credits > 0) 
+                {remainingCredits > 0 
                   ? (
                     <div className="bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm">
                       <p className="text-white font-medium flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        {profile?.analysis_credits > 0 
-                          ? `Analyse détaillée (crédits restants : ${profile.analysis_credits})`
-                          : `Diagnostic Freemium (analyses restantes : ${4 - (profile?.analysis_count || 0)}/4)`}
+                        Analyse détaillée (crédits restants : {remainingCredits})
                       </p>
                     </div>
                   )
                   : (
                     <div className="bg-white/10 px-6 py-3 rounded-xl border border-white/20 backdrop-blur-sm max-w-md">
                       <p className="text-white text-center mb-3">
-                        <span className="font-bold text-red-400">Quota atteint.</span> Vous avez utilisé vos 4 analyses gratuites.
+                        <span className="font-bold text-red-400">Quota atteint.</span> Vous avez utilisé vos analyses, renouvelez pour 39 €
                       </p>
                       <button 
                         onClick={handleBuyCredits}
                         className="w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
                       >
                         <CreditCard className="w-5 h-5" />
-                        Renouveler pour 4 nouvelles analyses (29€)
+                        Renouveler pour 4 nouvelles analyses (39€)
                       </button>
                     </div>
                   )}
@@ -195,8 +194,6 @@ export default function Home() {
               <p className="text-sm text-muted">Vérification de 145 règles métiers et chiffrement du document</p>
             </div>
           </div>
-        ) : (((profile?.analysis_count || 0) >= 4) && !(profile?.analysis_credits > 0)) ? (
-          null
         ) : (
           <div 
             className={`upload-dropzone card ${isDragging ? 'glass dragging' : ''}`}

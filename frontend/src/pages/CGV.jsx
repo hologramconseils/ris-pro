@@ -19,8 +19,8 @@ export default function CGV() {
           <h2 className="text-xl font-semibold mb-2">2. Prix et Paiement</h2>
           <div className="text-muted flex flex-col gap-2">
             <p>
-              Le prix du pack (4 analyses) est fixé à <strong>29€ TTC</strong>. Le paiement s'effectue via la plateforme sécurisée Stripe. 
-              Le tarif de 29 euros pour 4 analyses est réservé aux particuliers.
+              Le prix du pack (4 analyses) est fixé à <strong>39€ TTC</strong>. Le paiement s'effectue via la plateforme sécurisée Stripe. 
+              Le tarif de 39 euros pour 4 analyses est réservé aux particuliers.
             </p>
             <p>
               Les professionnels souhaitant utiliser le service doivent se rapprocher de {LABELS.BRAND_NAME} afin de bénéficier d’une offre adaptée à leurs besoins.

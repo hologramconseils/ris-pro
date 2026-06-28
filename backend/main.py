@@ -109,7 +109,7 @@ async def create_checkout_session(data: dict):
                         'name': 'Bilan Détaillé RIS Pro',
                         'description': 'Audit complet de votre relevé de carrière, avec génération de courriers.',
                     },
-                    'unit_amount': 2900, # 29.00 EUR
+                    'unit_amount': 3900, # 39.00 EUR
                 },
                 'quantity': 1,
             }],

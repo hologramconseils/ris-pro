@@ -45,9 +45,16 @@ export const AuthProvider = ({ children }) => {
         .eq('user_id', userId)
       
       if (!error && data) {
+        const userAnalysisCount = countError ? 0 : (count || 0);
+        // Fallback sécurisé : si les crédits sont à 0/null et aucune analyse consommée, on attribue 1 crédit de départ
+        const credits = (data.analysis_credits === null || data.analysis_credits === 0) && userAnalysisCount === 0
+          ? 1
+          : (data.analysis_credits || 0);
+
         setProfile({
           ...data,
-          analysis_count: countError ? 0 : (count || 0)
+          analysis_credits: credits,
+          analysis_count: userAnalysisCount
         })
       }
     } catch (err) {

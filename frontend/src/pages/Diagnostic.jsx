@@ -8,6 +8,8 @@ import { LABELS } from '../config/labels'
 export default function Diagnostic() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
+  const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 1
+  const remainingCredits = Math.max(0, totalCredits - (profile?.analysis_count || 0))
   const [searchParams] = useSearchParams()
   const filePath = searchParams.get('file')
   
@@ -122,8 +124,8 @@ export default function Diagnostic() {
       return
     }
 
-    // Si admin ou a déjà payé (legacy) ou a des crédits
-    const hasCredits = profile?.analysis_credits > 0;
+    // Si admin ou a déjà payé (legacy) ou a des crédits restants
+    const hasCredits = remainingCredits > 0;
     const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
 
     if (isAdmin || hasCredits) {
@@ -489,7 +491,7 @@ export default function Diagnostic() {
                     onClick={() => { setShowGuestCheckout(true); }}
                     style={{ padding: '0.8rem 1.5rem', minHeight: '48px', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                   >
-                    <span>Accédez à l'analyse détaillée pour 29 €</span>
+                    <span>Accédez à l'analyse détaillée pour 39 €</span>
                     <ChevronRight size={18} />
                   </button>
                 ) : (
@@ -512,7 +514,7 @@ export default function Diagnostic() {
                         </div>
                       )}
                       <button type="submit" className="btn btn-primary btn-cta-premium w-full" disabled={checkoutLoading} style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {checkoutLoading ? <Loader2 className="animate-spin" size={18} /> : <span>Payer 29 € et accéder à l'analyse</span>}
+                        {checkoutLoading ? <Loader2 className="animate-spin" size={18} /> : <span>Payer 39 € et accéder à l'analyse</span>}
                       </button>
                       <button type="button" className="btn btn-ghost text-sm" onClick={() => setShowGuestCheckout(false)} style={{ minHeight: '36px' }}>
                         ← Retour
@@ -567,15 +569,15 @@ export default function Diagnostic() {
                 }}
               >
                 <span>
-                {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
-                  ? "Accéder au bilan complet (Admin)" 
-                  : (user 
-                      ? (profile?.analysis_credits > 0 
-                          ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${profile.analysis_credits}/4)`
-                          : (profile?.is_paid 
-                              ? LABELS.PAYMENT_RENEW 
-                              : LABELS.PAYMENT_REQUIRED))
-                      : LABELS.PAYMENT_REQUIRED)}
+                 {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
+                   ? "Accéder au bilan complet (Admin)" 
+                   : (user 
+                       ? (remainingCredits > 0 
+                           ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${remainingCredits})`
+                           : (profile?.is_paid 
+                               ? LABELS.PAYMENT_RENEW 
+                               : LABELS.PAYMENT_REQUIRED))
+                       : LABELS.PAYMENT_REQUIRED)}
                 </span>
                 <ChevronRight size={20} />
               </button>
