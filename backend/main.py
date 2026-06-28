@@ -36,7 +36,14 @@ load_dotenv()
 
 app = FastAPI(title="RIS Pro API")
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    from services.monitoring import log_security_event
+    client_ip = request.client.host if request.client else "unknown"
+    log_security_event("WARNING", f"Rate limit exceeded for IP {client_ip} on path {request.url.path}", trigger_email_alert=False)
+    return _rate_limit_exceeded_handler(request, exc)
+
+app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
 # Configure CORS
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5175")
@@ -65,6 +72,8 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     header = await file.read(5)
     await file.seek(0)
     if header != b"%PDF-":
+        from services.monitoring import log_security_event
+        log_security_event("WARNING", f"Malicious upload attempt: File {file.filename} failed magic bytes signature verification", trigger_email_alert=True)
         raise HTTPException(status_code=400, detail="Invalid PDF file format")
         
     # Générer un nom sécurisé pour éviter l'injection de chemin et l'écrasement de fichiers

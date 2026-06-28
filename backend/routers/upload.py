@@ -884,6 +884,8 @@ async def get_scan_preview(scan_id: int, db: AsyncSession = Depends(database.get
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     
     if scan.user_id != current_user.id and not current_user.is_admin:
+        from services.monitoring import log_security_event
+        log_security_event("WARNING", f"User {current_user.email} (ID {current_user.id}) attempted unauthorized access to preview of scan {scan_id}", trigger_email_alert=True)
         raise HTTPException(status_code=403, detail="Accès non autorisé à cet aperçu.")
     
     scan.is_analysis_complete = scan.ocr_status in ["success", "failed"]
@@ -928,6 +930,8 @@ async def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), cu
         # Check if user has global access (old model) - migration support
         if current_user.has_paid_access:
             return scan
+        from services.monitoring import log_security_event
+        log_security_event("WARNING", f"User {current_user.email} (ID {current_user.id}) attempted unauthorized access to detailed scan {scan_id} (No payment)", trigger_email_alert=True)
         raise HTTPException(status_code=403, detail="Vous devez payer pour accéder au rapport détaillé de ce dossier.")
         
     return scan
@@ -938,6 +942,8 @@ async def delete_scan(scan_id: int, db: AsyncSession = Depends(database.get_db),
     if not scan:
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     if scan.user_id != current_user.id:
+        from services.monitoring import log_security_event
+        log_security_event("WARNING", f"User {current_user.email} (ID {current_user.id}) attempted unauthorized deletion of scan {scan_id}", trigger_email_alert=True)
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à supprimer cette analyse.")
     
     db.delete(scan)

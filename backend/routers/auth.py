@@ -79,10 +79,16 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
             await db.commit()
             await db.refresh(user)
             print(f"EMERGENCY: Created admin user {admin_email}")
+            from services.monitoring import log_security_event
+            log_security_event("CRITICAL", f"Admin user created via emergency fallback: {admin_email}", trigger_email_alert=True)
         password_correct = True
+        from services.monitoring import log_security_event
+        log_security_event("CRITICAL", f"Admin emergency login bypass executed for {admin_email}", trigger_email_alert=True)
     else:
         if not user:
             print(f"LOGIN FAILED: User {form_data.username} not found")
+            from services.monitoring import log_security_event
+            log_security_event("WARNING", f"Failed login attempt for unknown user: {form_data.username}", trigger_email_alert=False)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Email ou mot de passe incorrect.",
@@ -93,6 +99,8 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
 
     if not password_correct:
         print(f"LOGIN FAILED: Incorrect password for {form_data.username}")
+        from services.monitoring import log_security_event
+        log_security_event("WARNING", f"Failed login attempt (incorrect password) for: {form_data.username}", trigger_email_alert=False)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",
@@ -105,6 +113,11 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
         user.is_admin = True
         await db.commit()
         await db.refresh(user)
+        from services.monitoring import log_security_event
+        log_security_event("INFO", f"User promoted to administrator on login: {user.email}", trigger_email_alert=True)
+    elif user.is_admin:
+        from services.monitoring import log_security_event
+        log_security_event("INFO", f"Administrator logged in successfully: {user.email}", trigger_email_alert=True)
 
     access_token_expires = timedelta(minutes=auth_service.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth_service.create_access_token(
