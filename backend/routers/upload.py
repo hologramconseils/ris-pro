@@ -910,7 +910,8 @@ async def get_scan(scan_id: int, db: AsyncSession = Depends(database.get_db), cu
         raise HTTPException(status_code=404, detail="Analyse non trouvée.")
     # Admin bypass
     if current_user.is_admin and os.getenv("ENABLE_ADMIN_BYPASS", "true").lower() == "true":
-        return scan
+        from services.anonymizer import anonymize_scan_result
+        return anonymize_scan_result(scan)
         
     # Folder-based access: check if user has paid for this identity_hash
     if not scan.identity_hash:

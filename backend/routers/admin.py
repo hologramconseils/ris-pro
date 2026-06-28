@@ -34,6 +34,11 @@ async def get_stats(
     paid_users = (await db.execute(select(models.User).filter(models.User.has_paid_access == True))).scalars().all()
     total_scans = (await db.execute(select(models.ScanResult))).scalars().all()
     
+    # Anonymiser les scans pour l'affichage de l'administration
+    from services.anonymizer import anonymize_scan_result
+    for scan in total_scans:
+        anonymize_scan_result(scan)
+    
     return {
         "total_users": total_users,
         "paid_users": paid_users,
