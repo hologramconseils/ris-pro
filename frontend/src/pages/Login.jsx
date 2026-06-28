@@ -178,7 +178,7 @@ export default function Login() {
               <button 
                 type="button" 
                 className="text-xs text-right mt-1" 
-                style={{ color: 'var(--primary)', opacity: 0.8 }}
+                style={{ color: 'var(--primary)', opacity: 0.8, background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', display: 'block', marginLeft: 'auto' }}
                 onClick={handleForgotPassword}
               >
                 Mot de passe oublié ?
@@ -213,7 +213,7 @@ export default function Login() {
               <button 
                 type="button"
                 className="text-sm font-medium"
-                style={{ color: 'var(--primary)', cursor: 'pointer' }}
+                style={{ color: 'var(--primary)', cursor: 'pointer', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
                 onClick={() => setIsLogin(!isLogin)}
               >
                 {isLogin ? "Pas encore de compte ? Cliquez ici pour en créer un." : "Déjà un compte ? Cliquez ici pour vous connecter."}
