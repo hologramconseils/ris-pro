@@ -129,7 +129,7 @@ export default function Home() {
                     <div className="bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm">
                       <p className="text-white font-medium flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Analyse détaillée (crédits restants : {remainingCredits})
+                        Analyse détaillée
                       </p>
                     </div>
                   )

@@ -593,7 +593,7 @@ export default function Diagnostic() {
                     ? "Accéder au bilan complet (Admin)" 
                     : (user 
                         ? (hasCredits 
-                            ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${displayCredits})`
+                            ? LABELS.CTA_CONTINUE_ANALYSIS
                             : (profile?.is_paid 
                                 ? LABELS.PAYMENT_RENEW 
                                 : LABELS.PAYMENT_REQUIRED))
