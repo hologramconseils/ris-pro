@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert } from 'lucide-react'
+import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert, CreditCard } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
@@ -111,18 +111,43 @@ export default function Home() {
     e.currentTarget.style.setProperty('--mouse-y', `${y}px`)
   }
 
+  const handleBuyCredits = () => {
+    // Logic to navigate to payment/subscription
+    navigate('/subscription')
+  }
+
   return (
     <div className="container" style={{ padding: '4rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
         <h1 className="text-4xl font-bold" style={{ letterSpacing: '-0.02em' }}>
           {user && profile && (
-            <div className="flex justify-center mb-6">
-              <div className="badge badge-primary animate-fade-in" style={{ padding: '0.8rem 1.2rem', fontSize: '0.9rem', fontWeight: 'bold', background: 'var(--primary)', color: 'white' }}>
-                {profile.analysis_credits > 0 
-                  ? `Analyse détaillée (crédits restants : ${profile.analysis_credits}/4)`
-                  : "Vous avez utilisé vos 4 analyses. Renouvelez pour 29€"}
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
+                {((profile?.analysis_count || 0) < 4) || (profile?.analysis_credits > 0) 
+                  ? (
+                    <div className="bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm">
+                      <p className="text-white font-medium flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        {profile?.analysis_credits > 0 
+                          ? `Analyse détaillée (crédits restants : ${profile.analysis_credits})`
+                          : `Diagnostic Freemium (analyses restantes : ${4 - (profile?.analysis_count || 0)}/4)`}
+                      </p>
+                    </div>
+                  )
+                  : (
+                    <div className="bg-white/10 px-6 py-3 rounded-xl border border-white/20 backdrop-blur-sm max-w-md">
+                      <p className="text-white text-center mb-3">
+                        <span className="font-bold text-red-400">Quota atteint.</span> Vous avez utilisé vos 4 analyses gratuites.
+                      </p>
+                      <button 
+                        onClick={handleBuyCredits}
+                        className="w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
+                      >
+                        <CreditCard className="w-5 h-5" />
+                        Renouveler pour 4 nouvelles analyses (29€)
+                      </button>
+                    </div>
+                  )}
             </div>
           )}
           Auditez votre relevé de carrière en <span style={{ color: 'var(--primary)' }}>quelques secondes.</span>
@@ -170,6 +195,8 @@ export default function Home() {
               <p className="text-sm text-muted">Vérification de 145 règles métiers et chiffrement du document</p>
             </div>
           </div>
+        ) : (((profile?.analysis_count || 0) >= 4) && !(profile?.analysis_credits > 0)) ? (
+          null
         ) : (
           <div 
             className={`upload-dropzone card ${isDragging ? 'glass dragging' : ''}`}

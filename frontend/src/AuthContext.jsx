@@ -39,8 +39,16 @@ export const AuthProvider = ({ children }) => {
         .eq('id', userId)
         .single()
       
+      const { count, error: countError } = await supabase
+        .from('analyses')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+      
       if (!error && data) {
-        setProfile(data)
+        setProfile({
+          ...data,
+          analysis_count: countError ? 0 : (count || 0)
+        })
       }
     } catch (err) {
       console.error("Erreur profile:", err)
