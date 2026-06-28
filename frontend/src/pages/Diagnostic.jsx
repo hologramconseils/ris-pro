@@ -8,15 +8,14 @@ import { LABELS } from '../config/labels'
 export default function Diagnostic() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
-  const totalCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 1
-  const analysisCount = profile?.analysis_count || 0
-  const availableCredits = Math.max(0, totalCredits - Math.max(0, analysisCount - 1))
-  const hasCredits = availableCredits > 0
   const [searchParams] = useSearchParams()
   const filePath = searchParams.get('file')
-  
   const [loading, setLoading] = useState(!!filePath)
   const [results, setResults] = useState(null)
+  
+  const hasCredits = results ? !results.is_restricted : ((profile?.analysis_credits || 0) > 0)
+  const displayCredits = profile?.analysis_credits !== undefined && profile?.analysis_credits !== null ? profile.analysis_credits : 0
+
   const [error, setError] = useState(null)
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState(0)
@@ -574,7 +573,7 @@ export default function Diagnostic() {
                     ? "Accéder au bilan complet (Admin)" 
                     : (user 
                         ? (hasCredits 
-                            ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${availableCredits})`
+                            ? `${LABELS.CTA_CONTINUE_ANALYSIS} (crédits restants : ${displayCredits})`
                             : (profile?.is_paid 
                                 ? LABELS.PAYMENT_RENEW 
                                 : LABELS.PAYMENT_REQUIRED))

@@ -183,8 +183,8 @@ export default function Bilan() {
     )
   }
 
-  // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Accès payé legacy) OU (Crédits > 0) OU (Retour immédiat de paiement réussi)
-  const isAuthorized = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess
+  // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Accès payé legacy) OU (Crédits > 0) OU (Retour immédiat de paiement réussi) OU (Résultats déjà premium/non-restreints)
+  const isAuthorized = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess || (results && !results.is_restricted)
 
   // Polling / attente intermédiaire si retour de paiement réussi mais profil non mis à jour
   const waitingForPayment = isSuccess && profile && profile.analysis_credits === 0 && !isMock && profile?.role !== 'admin'
