@@ -271,7 +271,23 @@ export default async function handler(req, res) {
           .eq('id', targetUserId)
           .single();
 
-        const currentCredits = profile?.analysis_credits || 0;
+        // Récupérer le nombre total d'analyses pour le fallback de bienvenue
+        const { count: userAnalysisCount, error: countError } = await supabase
+          .from('analyses')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', targetUserId);
+
+        const analysisCountVal = countError ? 0 : (userAnalysisCount || 0);
+
+        // Fallback robuste : si les crédits en DB sont à 0/null et qu'il y a au maximum 1 analyse (l'actuelle), on offre 1 crédit
+        let currentCredits = profile?.analysis_credits;
+        if (currentCredits === null || currentCredits === undefined || currentCredits === 0) {
+          if (analysisCountVal <= 1) {
+            currentCredits = 1;
+          } else {
+            currentCredits = 0;
+          }
+        }
         const isAdmin = profile?.role === 'admin' || (authenticatedUser && authenticatedUser.email === 'btsaulnerond@icloud.com');
 
         if (isAdmin || currentCredits > 0) {
