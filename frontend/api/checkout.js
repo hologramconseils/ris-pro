@@ -21,7 +21,7 @@ export default async function handler(req, res) {
               name: 'Pack 4 Analyses RIS Pro',
               description: 'Accès complet pour 4 analyses détaillées de relevés de carrière (RIS / EIG).',
             },
-            unit_amount: 2900,
+            unit_amount: 3900,
           },
           quantity: 1,
         },

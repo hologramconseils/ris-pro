@@ -246,7 +246,7 @@ export default async function handler(req, res) {
     if (targetUserId) {
       try {
         // Associer le user_id à la ligne d'analyse s'il n'était pas encore défini (guest login)
-        if (!analysisRecord.user_id) {
+        if (analysisRecord && !analysisRecord.user_id) {
           await supabase
             .from('analyses')
             .update({ user_id: targetUserId })
@@ -279,15 +279,7 @@ export default async function handler(req, res) {
 
         const analysisCountVal = countError ? 0 : (userAnalysisCount || 0);
 
-        // Fallback robuste : si les crédits en DB sont à 0/null et qu'il y a au maximum 1 analyse (l'actuelle), on offre 1 crédit
-        let currentCredits = profile?.analysis_credits;
-        if (currentCredits === null || currentCredits === undefined || currentCredits === 0) {
-          if (analysisCountVal <= 1) {
-            currentCredits = 1;
-          } else {
-            currentCredits = 0;
-          }
-        }
+        let currentCredits = profile?.analysis_credits || 0;
         const isAdmin = profile?.role === 'admin' || (authenticatedUser && authenticatedUser.email === 'btsaulnerond@icloud.com');
 
         if (isAdmin || currentCredits > 0) {

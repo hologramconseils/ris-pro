@@ -214,7 +214,7 @@ async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
         "apikey": supabase_key
     }
     params = {
-        "file_path": f"eq.{file_path}",
+        "file_path": f"ilike.{file_path}",
         "select": "user_id"
     }
     async with httpx.AsyncClient(timeout=10.0) as client:

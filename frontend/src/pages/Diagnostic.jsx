@@ -542,7 +542,7 @@ export default function Diagnostic() {
 
               {/* Options compte */}
               <div className="auth-account-options" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Vous souhaitez utiliser votre crédit gratuit ?</p>
+                <p className="auth-account-label" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Sauvegardez votre analyse dans votre espace personnel</p>
                 <button
                   className="btn btn-secondary w-full"
                   onClick={() => {
@@ -552,7 +552,7 @@ export default function Diagnostic() {
                   style={{ minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', color: 'rgb(37, 99, 235)' }}
                 >
                   <UserPlus size={18} />
-                  <span style={{ marginLeft: '0.25rem' }}>Créer un compte (1 crédit gratuit)</span>
+                  <span style={{ marginLeft: '0.25rem' }}>Créer un compte</span>
                   <ChevronRight size={18} />
                 </button>
                 

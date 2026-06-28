@@ -1,8 +1,8 @@
 -- Migration SQL pour Supabase
 -- Exécuter ce script dans l'éditeur SQL Supabase (SQL Editor)
 
--- Alter column default for analysis_credits to 1
-ALTER TABLE public.profiles ALTER COLUMN analysis_credits SET DEFAULT 1;
+-- Alter column default for analysis_credits to 0
+ALTER TABLE public.profiles ALTER COLUMN analysis_credits SET DEFAULT 0;
 
 CREATE OR REPLACE FUNCTION public.increment_credits(target_user_id UUID, qty INT)
 RETURNS VOID AS $$
@@ -11,7 +11,7 @@ BEGIN
   VALUES (target_user_id, qty + 1, true)
   ON CONFLICT (id) DO UPDATE
   SET 
-    analysis_credits = COALESCE(NULLIF(public.profiles.analysis_credits, 0), 1) + qty,
+    analysis_credits = COALESCE(public.profiles.analysis_credits, 0) + qty,
     is_paid = true;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -25,7 +25,7 @@ BEGIN
     new.id,
     COALESCE(new.raw_user_meta_data->>'first_name', ''),
     COALESCE(new.raw_user_meta_data->>'last_name', ''),
-    1, -- 1 crédit initial
+    0, -- 0 crédit initial
     false
   );
   RETURN new;
