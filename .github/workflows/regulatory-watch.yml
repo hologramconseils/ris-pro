@@ -1,0 +1,65 @@
+name: Veille Réglementaire Automatique
+
+on:
+  schedule:
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  workflows: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-genai python-dotenv pydantic httpx
+
+      - name: Run Regulatory Watch Agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python backend/regulatory_watch_agent.py
+
+      - name: Check for changes & Open Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain *.md)" ]; then
+            echo "Des modifications réglementaires ont été détectées."
+            
+            git config --global user.name "RIS Pro Compliance Bot"
+            git config --global user.email "compliance-bot@hologramconseils.com"
+            
+            BRANCH_NAME="regulatory-update-$(date +'%Y%m%d')"
+            
+            git checkout -b "$BRANCH_NAME"
+            git add *.md
+            git commit -m "chore(compliance): mise à jour automatique de la réglementation retraite"
+            
+            git push origin "$BRANCH_NAME" --force
+            
+            gh pr create \
+              --title "Veille Réglementaire : Mise à jour des règles de retraite" \
+              --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro." \
+              --base main \
+              --head "$BRANCH_NAME"
+              
+            echo "Pull Request créée avec succès."
+          else
+            echo "Aucun changement réglementaire détecté. Fin du workflow."
+          fi
