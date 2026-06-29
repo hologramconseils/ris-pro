@@ -6,6 +6,11 @@ on:
     - cron: '0 8 * * 1'
   workflow_dispatch: # Permet de déclencher manuellement depuis l'interface GitHub
 
+permissions:
+  contents: write
+  pull-requests: write
+  workflows: write
+  
 jobs:
   watch:
     runs-on: ubuntu-latest
