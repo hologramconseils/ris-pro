@@ -122,33 +122,6 @@ export default function Home() {
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
         <h1 className="text-4xl font-bold" style={{ letterSpacing: '-0.02em' }}>
-          {user && profile && (
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
-                {remainingCredits > 0 
-                  ? (
-                    <div className="bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm">
-                      <p className="text-white font-medium flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Analyse détaillée
-                      </p>
-                    </div>
-                  )
-                  : (
-                    <div className="bg-white/10 px-6 py-3 rounded-xl border border-white/20 backdrop-blur-sm max-w-md">
-                      <p className="text-white text-center mb-3">
-                        <span className="font-bold text-red-400">Quota atteint.</span> Vous avez utilisé vos analyses, renouvelez pour 39 €
-                      </p>
-                      <button 
-                        onClick={handleBuyCredits}
-                        className="w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
-                      >
-                        <CreditCard className="w-5 h-5" />
-                        Renouveler pour 4 nouvelles analyses (39€)
-                      </button>
-                    </div>
-                  )}
-            </div>
-          )}
           Auditez votre relevé de carrière en <span style={{ color: 'var(--primary)' }}>quelques secondes.</span>
         </h1>
         
