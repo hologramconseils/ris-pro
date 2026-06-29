@@ -54,7 +54,7 @@ jobs:
           git commit -m "chore(compliance): mise à jour automatique de la réglementation retraite"
           
           # Pousser la branche sur le dépôt
-          git push origin "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME" --force
           
           # Créer la Pull Request via la CLI GitHub
           gh pr create \
