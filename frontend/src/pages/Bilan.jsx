@@ -5,6 +5,43 @@ import { useAuth } from '../AuthContext'
 import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
 
+const renderMarkdown = (text) => {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('# ')) {
+      return <h1 key={idx} className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem' }}>{trimmed.slice(2)}</h1>;
+    }
+    if (trimmed.startsWith('## ')) {
+      return <h2 key={idx} className="text-xl font-bold mt-6 mb-3 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem' }}>{trimmed.slice(3)}</h2>;
+    }
+    if (trimmed.startsWith('### ')) {
+      return <h3 key={idx} className="text-lg font-bold mt-4 mb-2 text-main print-text-black">{trimmed.slice(4)}</h3>;
+    }
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      return (
+        <div key={idx} className="text-sm text-muted leading-relaxed my-1.5 pl-4 flex items-start gap-2">
+          <span className="text-primary mt-1.5 select-none" style={{ fontSize: '0.5rem' }}>●</span>
+          <span>{trimmed.slice(2)}</span>
+        </div>
+      );
+    }
+    if (trimmed === '') {
+      return <div key={idx} className="h-2" />;
+    }
+    const parts = trimmed.split('**');
+    if (parts.length > 1) {
+      return (
+        <p key={idx} className="text-sm text-muted leading-relaxed my-2">
+          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)' }}>{part}</strong> : part)}
+        </p>
+      );
+    }
+    return <p key={idx} className="text-sm text-muted leading-relaxed my-2">{trimmed}</p>;
+  });
+}
+
 export default function Bilan() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -546,6 +583,42 @@ export default function Bilan() {
                       : `"${results.commentaire_conseil}"`}
                   </p>
                 </div>
+
+                {/* Bilan Rédigé Expert (Premium) */}
+                {results.bilan_redige_expert && (
+                  <div className="mt-6 premium-bilan-report" style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid rgba(var(--primary-rgb), 0.15)',
+                    padding: '2.5rem',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      background: 'linear-gradient(135deg, #d4af37 0%, #b89218 100%)',
+                      color: 'white',
+                      padding: '0.35rem 0.75rem',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      boxShadow: '0 4px 10px rgba(212,175,55,0.2)'
+                    }} className="print-hidden">
+                      <Sparkles size={12} />
+                      <span>Rapport Premium</span>
+                    </div>
+                    
+                    <div className="markdown-body animate-fade-in">
+                      {renderMarkdown(results.bilan_redige_expert)}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

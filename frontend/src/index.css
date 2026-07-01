@@ -922,4 +922,32 @@ a:hover {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
+
+  /* Premium Bilan report printing */
+  .premium-bilan-report {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 2rem !important;
+    margin-top: 2rem !important;
+    border-radius: 12px !important;
+    page-break-before: always !important;
+    break-before: always !important;
+  }
+  
+  .premium-bilan-report h1 {
+    font-size: 20pt !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .premium-bilan-report h2 {
+    font-size: 14pt !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .premium-bilan-report p,
+  .premium-bilan-report li {
+    font-size: 10pt !important;
+    color: #334155 !important;
+  }
 }
