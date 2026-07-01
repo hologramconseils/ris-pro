@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 :root {
   /* Brand Colors */
@@ -744,6 +744,88 @@ a:hover {
     margin-right: auto;
   }
 }
+
+/* Premium Bilan report Screen Styling */
+.premium-bilan-report {
+  background: var(--bg-card) !important;
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  border-top: 4px solid #d4af37 !important;
+  box-shadow: var(--shadow-md) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 3rem !important;
+  margin-top: 3rem !important;
+  position: relative;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.premium-bilan-report .markdown-body {
+  font-family: 'Playfair Display', 'Georgia', serif !important;
+  color: var(--text-main) !important;
+  font-size: 1.125rem !important;
+  line-height: 1.8 !important;
+}
+
+.premium-bilan-report .markdown-body h1 {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+  letter-spacing: -0.03em !important;
+  margin-top: 0 !important;
+  margin-bottom: 2rem !important;
+}
+
+.premium-bilan-report .markdown-body h2 {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--primary) !important;
+  margin-top: 3rem !important;
+  margin-bottom: 1.25rem !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.premium-bilan-report .markdown-body h3 {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  margin-top: 2rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.premium-bilan-report .markdown-body p {
+  margin-top: 0 !important;
+  margin-bottom: 1.75rem !important; /* Espacement aéré des paragraphes */
+  text-align: justify;
+}
+
+.premium-bilan-report .markdown-body strong {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  font-size: 0.95em !important;
+}
+
+@media (max-width: 768px) {
+  .premium-bilan-report {
+    padding: 1.5rem !important;
+    margin-top: 1.5rem !important;
+  }
+  .premium-bilan-report .markdown-body {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+  }
+  .premium-bilan-report .markdown-body h1 {
+    font-size: 1.75rem !important;
+  }
+  .premium-bilan-report .markdown-body h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
 
 /* Print Stylesheet for PDF Export (Luxury Private Office Style) */
 @media print {
