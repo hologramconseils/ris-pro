@@ -750,14 +750,19 @@ export default function Bilan() {
           )}
         </div>
 
-        <div className="flex flex-col items-center gap-4 mt-8 mb-12 print-hidden">
+        <div className="flex flex-col items-center gap-5 mt-12 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '24px', border: '1px solid rgba(212, 175, 55, 0.3)', boxShadow: '0 10px 40px -10px rgba(212, 175, 55, 0.15)' }}>
+          <h3 className="text-2xl font-bold text-center" style={{ color: '#b89218', letterSpacing: '-0.02em' }}>Ne laissez pas l'administration décider de votre pension.</h3>
+          <p className="text-muted text-center" style={{ maxWidth: '650px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+            Les anomalies détectées dans ce rapport prouvent qu'il y a des droits à récupérer. Chaque trimestre manquant ou salaire erroné fait baisser votre rente à vie. <strong>Reprenez le contrôle dès maintenant.</strong>
+          </p>
           <a 
             href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="btn btn-secondary btn-cta-premium"
+            className="btn btn-primary btn-cta-premium mt-4 transition-all duration-300 hover:scale-105"
+            style={{ padding: '1.2rem 3rem', fontSize: '1.1rem', background: 'linear-gradient(135deg, #d4af37 0%, #b89218 100%)', color: 'white', border: 'none', boxShadow: '0 8px 25px -5px rgba(212, 175, 55, 0.4)', borderRadius: '12px' }}
           >
-            <span>{LABELS.CTA_CALL}</span>
+            <span style={{ fontWeight: '600' }}>Réserver mon plan d'action (Appel Offert)</span>
           </a>
         </div>
 

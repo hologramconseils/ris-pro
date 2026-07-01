@@ -1,7 +1,7 @@
 export const LABELS = {
   BRAND_NAME: "Hologram Conseils",
   APP_NAME: "RIS Pro",
-  TAGLINE: "L'outil d'analyse expert pour votre relevé de carrière.",
+  TAGLINE: "Décryptez votre relevé de carrière sans la complexité administrative.",
   
   // CTAs
   CTA_START_ANALYSIS: "Démarrer une analyse",

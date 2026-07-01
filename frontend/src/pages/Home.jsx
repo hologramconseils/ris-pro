@@ -122,7 +122,7 @@ export default function Home() {
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
         <h1 className="text-4xl font-bold" style={{ letterSpacing: '-0.02em' }}>
-          Auditez votre relevé de carrière en <span style={{ color: 'var(--primary)' }}>quelques secondes.</span>
+          Reprenez le contrôle de votre <span style={{ color: 'var(--primary)' }}>retraite.</span>
         </h1>
         
         <p className="text-xl text-muted" style={{ maxWidth: '600px', marginBottom: '2rem' }}>

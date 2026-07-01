@@ -21,10 +21,11 @@ export default function Diagnostic() {
   const [currentStep, setCurrentStep] = useState(0)
 
   const steps = [
+    { label: "Chiffrement et anonymisation des données", duration: 2500 },
     { label: "Numérisation et lecture OCR du relevé", duration: 3000 },
-    { label: "Extraction des salaires et trimestres par année", duration: 3500 },
-    { label: "Vérification de la conformité réglementaire (Lois Retraite)", duration: 3000 },
-    { label: "Génération des conseils d'optimisation personnalisés", duration: 4000 }
+    { label: "Extraction des salaires et identification des trimestres manquants", duration: 3500 },
+    { label: "Analyse croisée avec 145 règles métiers (Lois Retraite)", duration: 3000 },
+    { label: "Génération du rapport et des stratégies d'optimisation", duration: 4000 }
   ]
 
   useEffect(() => {
