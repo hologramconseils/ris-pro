@@ -132,16 +132,31 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         Rédigez un rapport de synthèse détaillé contenant l'âge estimé du taux plein, les anomalies, et une liste de stratégies d'optimisation claires.
         
         Rédigez également une section majeure de rapport d'expert complet appelé 'BILAN RETRAITE PREMIUM'. Ce rapport doit adopter le ton d'un consultant senior de cabinet d'audit privé (Novelvy/Lys Retraite) : formel, précis, humain et haut de gamme.
-        Ce rapport doit être structuré de la manière suivante en Markdown :
+        Ce rapport doit être structuré STRICTEMENT de la manière suivante en Markdown, pour assurer une homogénéité totale de chaque section :
+        
         # BILAN DE RETRAITE PREMIUM - [Nom de l'utilisateur]
+        
         ## 1. Introduction & Analyse Globale de la Carrière
-        (Synthèse chaleureuse mais professionnelle des régimes traversés, de la structure de sa carrière et de sa situation générale).
+        [Rédigez ici une synthèse globale et fluide sur la carrière de l'assuré : régimes traversés, dynamique de carrière, etc. Sous forme de deux ou trois paragraphes rédigés de manière continue.]
+        
         ## 2. Analyse Chronologique et Anomalies Détectées
-        (Pour chaque période ou année problématique, expliquer clairement l'anomalie détectée, son origine probable et son impact sur la future pension).
+        [Pour CHAQUE anomalie ou point de vigilance détecté, utilisez obligatoirement la structure standardisée suivante en sous-sections, sans exception :]
+        ### [Titre court de l'anomalie, ex: Années 2000 et 2003 : Périodes incomplètes]
+        <strong>Situation</strong> : [Description courte de la période concernée]
+        <strong>Anomalie</strong> : [Explication précise de l'anomalie et de son origine probable]
+        <strong>Impact</strong> : [Impact estimé de cette anomalie sur le calcul de la future pension]
+        
         ## 3. Options d'Optimisation & Stratégies Réglementaires
-        (Détailler les opportunités adaptées : rachat de trimestres de scolarité/années incomplètes, cumul emploi-retraite, retraite progressive, départ anticipé).
+        [Pour CHAQUE option ou stratégie d'optimisation préconisée, utilisez obligatoirement la structure standardisée suivante en sous-sections, sans exception :]
+        ### [Titre court de la stratégie, ex: Rachat d'années d'études supérieures]
+        <strong>Description</strong> : [Présentation du dispositif légal et de son intérêt général]
+        <strong>Application</strong> : [Explication concrète de l'application de ce dispositif à la situation de l'assuré]
+        
         ## 4. Plan d'Action & Démarches Administratives
-        (Lister les étapes concrètes à suivre par l'assuré pour faire valoir ses droits ou corriger son relevé de carrière, avec la liste des pièces justificatives à fournir à l'administration).
+        [Pour CHAQUE démarche concrète du plan d'action, utilisez obligatoirement la structure standardisée suivante en sous-sections, sans exception :]
+        ### [Numéro et titre de l'étape, ex: 1. Constituer votre dossier de carrière]
+        <strong>Action</strong> : [Description concise de l'action à mener pour cette étape]
+        <strong>Pièces requises</strong> : [Description claire et rédigée en un paragraphe continu de l'ensemble des justificatifs à rassembler (par exemple : contrats de travail, bulletins de salaire des années 2000 et 2003, diplômes, etc.), séparés par des virgules et sans aucune liste à puces]
         
         Ne mentionnez jamais les termes 'Agent' ou 'IA'. Utilisez uniquement 'expert', 'conseiller', 'retraite' ou 'conseil'.
         
@@ -316,6 +331,12 @@ async def api_analyse_patrimoniale(data: dict, authorization: str = Header(None)
                 "5. Synthétisez et compilez les réponses de vos experts pour former le rapport de conseil de retraite final.\n\n"
                 "Ne mentionnez jamais les termes 'Agent' ou 'IA' dans vos rédactions. Utilisez uniquement les termes 'expert', 'conseiller', 'retraite' ou 'conseil'.\n"
                 "Votre réponse doit être strictement structurée selon le schéma response_schema (le champ bilan_redige_expert doit contenir le rapport rédigé complet en Markdown).\n\n"
+                "STRUCTURE STRICTE ET HOMOGÈNE DU BILAN :\n"
+                "Le rapport dans bilan_redige_expert doit adopter cette structure homogène et répétable, pour un rendu professionnel :\n"
+                "- Titres majeurs : ## 1. Introduction, ## 2. Analyse Chronologique, ## 3. Options d'Optimisation, ## 4. Plan d'Action.\n"
+                "- Dans la section 2 (Anomalies), chaque anomalie doit être introduite par un titre '### [Titre]' suivi de 3 paragraphes préfixés par : <strong>Situation</strong> :, <strong>Anomalie</strong> :, et <strong>Impact</strong> :.\n"
+                "- Dans la section 3 (Stratégies), chaque stratégie doit être introduite par un titre '### [Titre]' suivi de 2 paragraphes préfixés par : <strong>Description</strong> :, et <strong>Application</strong> :.\n"
+                "- Dans la section 4 (Démarches), chaque démarche doit être introduite par un titre '### [Numéro. Titre]' suivi de 2 paragraphes préfixés par : <strong>Action</strong> :, et <strong>Pièces requises</strong> : (les pièces requises doivent être écrites dans un seul paragraphe continu séparé par des virgules, sans retour à la ligne ni liste à puces).\n\n"
                 "CONSIGNES DE STYLE ET DE RÉDACTION ANTI-IA (RÈGLES AVOID-AI-WRITING ET DESIGN HAUT DE GAMME) :\n"
                 "1. BANISSEZ LES EXPRESSIONS CLICHÉS DE L'IA. N'utilisez JAMAIS de termes comme : 'dans le paysage actuel', 'pivotal', 'catalyseur', 'témoignage de', 'en outre', 'de plus', 'tirer parti de', 'fluidifier', 'optimiser à l'extrême', 'robuste', 'le présent rapport'. Utilisez des mots simples et directs.\n"
                 "2. EXCLUSION TOTALE DES PUCES ET ASTÉRISQUES. N'utilisez jamais de listes à puces (pas de tirets, pas d'astérisques). Structurez de manière rédactionnelle classique sous forme de paragraphes bien espacés.\n"
