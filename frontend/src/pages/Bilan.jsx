@@ -10,35 +10,45 @@ const renderMarkdown = (text) => {
   const lines = text.split('\n');
   return lines.map((line, idx) => {
     const trimmed = line.trim();
-    if (trimmed.startsWith('# ')) {
-      return <h1 key={idx} className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem' }}>{trimmed.slice(2)}</h1>;
+    const isBullet = trimmed.startsWith('- ') || trimmed.startsWith('* ');
+    
+    // Nettoyer les balises de mise en valeur
+    let cleanLine = trimmed;
+    cleanLine = cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    cleanLine = cleanLine.replace(/\*/g, ''); // Enlever les astérisques restants
+    
+    if (cleanLine.startsWith('# ')) {
+      return <h1 key={idx} className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(2)}</h1>;
     }
-    if (trimmed.startsWith('## ')) {
-      return <h2 key={idx} className="text-xl font-bold mt-6 mb-3 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem' }}>{trimmed.slice(3)}</h2>;
+    if (cleanLine.startsWith('## ')) {
+      return <h2 key={idx} className="text-xl font-bold mt-8 mb-4 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(3)}</h2>;
     }
-    if (trimmed.startsWith('### ')) {
-      return <h3 key={idx} className="text-lg font-bold mt-4 mb-2 text-main print-text-black">{trimmed.slice(4)}</h3>;
+    if (cleanLine.startsWith('### ')) {
+      return <h3 key={idx} className="text-lg font-bold mt-6 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(4)}</h3>;
     }
-    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+    if (isBullet) {
+      const bulletText = cleanLine.startsWith('- ') ? cleanLine.slice(2) : (cleanLine.startsWith(' ') ? cleanLine.trim() : cleanLine);
+      const parts = bulletText.split(/<\/?strong>/);
       return (
-        <div key={idx} className="text-sm text-muted leading-relaxed my-1.5 pl-4 flex items-start gap-2">
-          <span className="text-primary mt-1.5 select-none" style={{ fontSize: '0.5rem' }}>●</span>
-          <span>{trimmed.slice(2)}</span>
+        <div key={idx} className="text-base my-3 pl-4 border-l-2 border-primary/30" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>
+          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
         </div>
       );
     }
-    if (trimmed === '') {
-      return <div key={idx} className="h-2" />;
+    if (cleanLine === '') {
+      return <div key={idx} className="h-4" />;
     }
-    const parts = trimmed.split('**');
+    
+    // Remplacement des balises <strong> pour le gras
+    const parts = cleanLine.split(/<\/?strong>/);
     if (parts.length > 1) {
       return (
-        <p key={idx} className="text-sm text-muted leading-relaxed my-2">
-          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)' }}>{part}</strong> : part)}
+        <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>
+          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
         </p>
       );
     }
-    return <p key={idx} className="text-sm text-muted leading-relaxed my-2">{trimmed}</p>;
+    return <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>{cleanLine}</p>;
   });
 }
 

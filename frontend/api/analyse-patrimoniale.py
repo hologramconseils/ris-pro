@@ -145,12 +145,13 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
         
         Ne mentionnez jamais les termes 'Agent' ou 'IA'. Utilisez uniquement 'expert', 'conseiller', 'retraite' ou 'conseil'.
         
-        CONSIGNES DE STYLE ET DE RÉDACTION ANTI-IA (RÈGLES AVOID-AI-WRITING) :
+        CONSIGNES DE STYLE ET DE RÉDACTION ANTI-IA (RÈGLES AVOID-AI-WRITING ET DESIGN HAUT DE GAMME) :
         Pour que ce bilan sonne 100% humain et professionnel (digne d'un conseiller senior en gestion de patrimoine et non d'une machine), respectez strictement ces consignes :
         1. BANISSEZ LES EXPRESSIONS CLICHÉS DE L'IA. N'utilisez JAMAIS de termes comme : "dans le paysage actuel", "pivotal", "catalyseur", "témoignage de", "en outre", "de plus", "tirer parti de", "fluidifier", "optimiser à l'extrême", "robuste", "le présent rapport", "il est important de garder à l'esprit". Utilisez des mots simples et directs (ex: "utiliser" au lieu de "tirer parti/leverager", "fiable" au lieu de "robuste").
-        2. ÉVITEZ LA DÉCORATION ET LA SATELLISATION DU TEXTE. Pas d'em-dashes (tirets longs) excessifs, pas d'émojis, pas de titres de section en Title Case. Les titres doivent être sobres et au format standard.
-        3. PAS DE BOLD OVERUSE (SUR-UTILISATION DU GRAS). Ne mettez pas en gras chaque terme clé ou mot important. Le gras doit être réservé uniquement à des éléments de chiffres critiques. Rédigez de vraies phrases réelles et fluides plutôt que des fragments hachés par des mots en gras.
-        4. ÉVITEZ LE TON PROMOTIONNEL OU L'EXAGÉRATION. Évitez les formules de conclusion trop enthousiastes ou pompeuses. Restez factuel, neutre, rigoureux et digne d'un cabinet d'audit privé haut de gamme.
+        2. EXCLUSION TOTALE DES PUCES ET ASTÉRISQUES. N'utilisez JAMAIS de listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*' pour lister). Rédigez le rapport de manière entièrement rédigée, fluide, sous forme de paragraphes bien structurés et aérés ou de sous-sections numérotées. Tout caractère d'astérisque (*) ou de tiret de liste dans le rapport final est proscrit.
+        3. MISE EN VALEUR SÉCURISÉE. N'utilisez jamais d'astérisques (**) pour le gras. Si vous devez absolument mettre en valeur un terme (ex: un âge ou montant crucial), utilisez la balise HTML <strong>terme</strong> à la place, ou écrivez-le simplement en capitales.
+        4. ÉVITEZ LA DÉCORATION ET LA SATELLISATION DU TEXTE. Pas d'em-dashes (tirets longs) excessifs, pas d'émojis, pas de titres de section en Title Case. Les titres doivent être sobres et au format standard.
+        5. ÉVITEZ LE TON PROMOTIONNEL OU L'EXAGÉRATION. Évitez les formules de conclusion trop enthousiastes ou pompeuses. Restez factuel, neutre, rigoureux et digne d'un cabinet d'audit privé haut de gamme.
         """
         
         response_analyse = client.models.generate_content(
@@ -315,10 +316,11 @@ async def api_analyse_patrimoniale(data: dict, authorization: str = Header(None)
                 "5. Synthétisez et compilez les réponses de vos experts pour former le rapport de conseil de retraite final.\n\n"
                 "Ne mentionnez jamais les termes 'Agent' ou 'IA' dans vos rédactions. Utilisez uniquement les termes 'expert', 'conseiller', 'retraite' ou 'conseil'.\n"
                 "Votre réponse doit être strictement structurée selon le schéma response_schema (le champ bilan_redige_expert doit contenir le rapport rédigé complet en Markdown).\n\n"
-                "CONSIGNES DE STYLE ET DE RÉDACTION ANTI-IA (RÈGLES AVOID-AI-WRITING) :\n"
+                "CONSIGNES DE STYLE ET DE RÉDACTION ANTI-IA (RÈGLES AVOID-AI-WRITING ET DESIGN HAUT DE GAMME) :\n"
                 "1. BANISSEZ LES EXPRESSIONS CLICHÉS DE L'IA. N'utilisez JAMAIS de termes comme : 'dans le paysage actuel', 'pivotal', 'catalyseur', 'témoignage de', 'en outre', 'de plus', 'tirer parti de', 'fluidifier', 'optimiser à l'extrême', 'robuste', 'le présent rapport'. Utilisez des mots simples et directs.\n"
-                "2. ÉVITEZ LA SUR-UTILISATION DU GRAS (BOLD OVERUSE). Le gras doit être réservé uniquement aux chiffres critiques. Rédigez des paragraphes réels, pas des phrases morcelées par du gras.\n"
-                "3. ÉVITEZ LE TON PROMOTIONNEL ET L'EXAGÉRATION. Le ton doit être neutre, factuel, calme et rigoureux, semblable au style d'un grand cabinet d'accompagnement privé."
+                "2. EXCLUSION TOTALE DES PUCES ET ASTÉRISQUES. N'utilisez jamais de listes à puces (pas de tirets, pas d'astérisques). Structurez de manière rédactionnelle classique sous forme de paragraphes bien espacés.\n"
+                "3. MISE EN VALEUR SÉCURISÉE. Pour le gras, utilisez exclusivement la balise HTML <strong>terme</strong> au lieu des doubles astérisques Markdown. Le gras doit être réservé uniquement aux chiffres critiques.\n"
+                "4. ÉVITEZ LE TON PROMOTIONNEL ET L'EXAGÉRATION. Le ton doit être neutre, factuel, calme et rigoureux, semblable au style d'un grand cabinet d'accompagnement privé."
             ),
             tools=[recuperer_regles_retraite],
             capabilities=types.CapabilitiesConfig(
