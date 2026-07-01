@@ -26,6 +26,19 @@ const renderMarkdown = (text) => {
     if (cleanLine.startsWith('### ')) {
       return <h3 key={idx} className="text-lg font-bold mt-6 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(4)}</h3>;
     }
+    if (cleanLine.match(/^\d+\.\s+/)) {
+      const numMatch = cleanLine.match(/^\d+\./)[0];
+      const headingText = cleanLine.replace(/^\d+\.\s+/, '');
+      const parts = headingText.split(/<\/?strong>/);
+      return (
+        <h3 key={idx} className="text-lg font-bold mt-8 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)', display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
+          <span className="text-primary font-extrabold">{numMatch}</span>
+          <span>
+            {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)' }}>{part}</strong> : part)}
+          </span>
+        </h3>
+      );
+    }
     if (isBullet) {
       const bulletText = cleanLine.startsWith('- ') ? cleanLine.slice(2) : (cleanLine.startsWith(' ') ? cleanLine.trim() : cleanLine);
       const parts = bulletText.split(/<\/?strong>/);
