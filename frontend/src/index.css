@@ -829,6 +829,23 @@ a:hover {
 
 /* Print Stylesheet for PDF Export (Luxury Private Office Style) */
 @media print {
+  /* Enforce light high-contrast variables for all elements under print */
+  :root, .dark, body {
+    --text-main: #0f172a !important;
+    --text-muted: #475569 !important;
+    --primary: #1e3a8a !important;
+    --border: #cbd5e1 !important;
+    --bg-page: #ffffff !important;
+    --bg-card: #ffffff !important;
+    --bg-card-hover: #f8fafc !important;
+    --success: #15803d !important;
+    --success-bg: #f0fdf4 !important;
+    --warning: #b45309 !important;
+    --warning-bg: #fffdf5 !important;
+    --error: #b91c1c !important;
+    --error-bg: #fdf2f2 !important;
+  }
+
   /* Hiding UI elements */
   header, footer, nav, .print-hidden, button, a.btn, .btn, .auth-choice-container, .badge-primary, .print-hidden * {
     display: none !important;
@@ -1016,15 +1033,40 @@ a:hover {
     break-before: always !important;
   }
   
+  .premium-bilan-report .markdown-body h1,
   .premium-bilan-report h1 {
     font-size: 20pt !important;
     margin-bottom: 1.5rem !important;
+    color: #0f172a !important;
   }
 
+  .premium-bilan-report .markdown-body h2,
   .premium-bilan-report h2 {
     font-size: 14pt !important;
     margin-top: 1.5rem !important;
     margin-bottom: 1rem !important;
+    color: #1e3a8a !important;
+  }
+
+  .premium-bilan-report .markdown-body h3,
+  .premium-bilan-report h3 {
+    font-size: 12pt !important;
+    color: #0f172a !important;
+  }
+
+  .premium-bilan-report .markdown-body strong,
+  .premium-bilan-report strong,
+  .premium-bilan-report b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+
+  /* Specific override for strategies h4, text and cards */
+  .synthesis-grid h4,
+  .synthesis-grid p,
+  .synthesis-grid strong,
+  .synthesis-grid div {
+    color: #0f172a !important;
   }
 
   .premium-bilan-report p,
