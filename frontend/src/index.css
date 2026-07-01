@@ -2,28 +2,28 @@
 
 :root {
   /* Brand Colors */
-  --primary: hsl(221, 83%, 53%);
-  --primary-hover: hsl(221, 83%, 45%);
+  --primary: hsl(220, 25%, 20%);
+  --primary-hover: hsl(220, 25%, 15%);
   --secondary: hsl(210, 20%, 96%);
-  --border: hsl(214, 32%, 91%);
+  --border: hsl(214, 20%, 89%);
   
   /* Text Colors */
-  --text-main: hsl(222, 47%, 11%);
-  --text-muted: hsl(215, 16%, 47%);
+  --text-main: hsl(222, 35%, 12%);
+  --text-muted: hsl(215, 15%, 45%);
   --text-inverse: hsl(0, 0%, 100%);
   
   /* Background Colors */
-  --bg-page: hsl(210, 40%, 98%);
+  --bg-page: hsl(210, 25%, 97%);
   --bg-card: hsl(0, 0%, 100%);
-  --bg-card-hover: hsl(210, 20%, 98%);
+  --bg-card-hover: hsl(210, 15%, 95%);
   
   /* Semantic Colors */
-  --success: hsl(142, 71%, 45%);
-  --success-bg: hsl(143, 85%, 96%);
-  --warning: hsl(38, 92%, 50%);
-  --warning-bg: hsl(48, 96%, 96%);
-  --error: hsl(348, 83%, 47%);
-  --error-bg: hsl(352, 100%, 96%);
+  --success: hsl(155, 30%, 32%);
+  --success-bg: hsl(155, 20%, 95%);
+  --warning: hsl(38, 40%, 40%);
+  --warning-bg: hsl(38, 30%, 96%);
+  --error: hsl(352, 35%, 40%);
+  --error-bg: hsl(352, 25%, 96%);
   
   /* Structural variables */
   --radius-sm: 0.5rem;
