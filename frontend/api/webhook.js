@@ -166,7 +166,7 @@ export default async function handler(req, res) {
                 emailHtml = `
                   <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
                     <h1 style="color: #1a56db;">Merci pour votre confiance !</h1>
-                    <p>Votre paiement de <strong>29 €</strong> a bien été validé et votre accès <strong>RIS Pro</strong> est actif.</p>
+                    <p>Votre paiement de <strong>39 €</strong> a bien été validé et votre accès <strong>RIS Pro</strong> est actif.</p>
                     <p>Vous disposez désormais de :</p>
                     <ul style="background: #f3f4f6; padding: 1.5rem 2.5rem; border-radius: 8px; list-style: none;">
                       <li>✅ <strong>4 analyses détaillées</strong> de relevés de carrière</li>
@@ -188,7 +188,7 @@ export default async function handler(req, res) {
                 emailHtml = `
                   <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
                     <h1 style="color: #1a56db;">Merci pour votre confiance !</h1>
-                    <p>Votre paiement de <strong>29 €</strong> a bien été validé.</p>
+                    <p>Votre paiement de <strong>39 €</strong> a bien été validé.</p>
                     <p>Vous disposez désormais d'un pack de :</p>
                     <ul style="background: #f3f4f6; padding: 1.5rem 2.5rem; border-radius: 8px; list-style: none;">
                       <li>✅ <strong>4 analyses détaillées</strong> de relevés de carrière</li>
