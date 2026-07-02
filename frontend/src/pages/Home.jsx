@@ -164,7 +164,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-semibold">{LABELS.ANALYZING}</h3>
-              <p className="text-sm text-muted">Vérification de 145 règles métiers et chiffrement du document</p>
+              <p className="text-sm text-muted">Analyse et chiffrement de votre document en cours…</p>
             </div>
           </div>
         ) : (

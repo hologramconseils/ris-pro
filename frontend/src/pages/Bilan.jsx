@@ -31,9 +31,9 @@ const renderMarkdown = (text) => {
       const headingText = cleanLine.replace(/^\d+\.\s+/, '');
       const parts = headingText.split(/<\/?strong>/);
       return (
-        <h3 key={idx} className="text-lg font-bold mt-8 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)', display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
-          <span className="text-primary font-extrabold">{numMatch}</span>
-          <span>
+        <h3 key={idx} className="text-lg font-bold mt-8 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)', display: 'flex', gap: '0.6rem', alignItems: 'flex-start', lineHeight: '1.5' }}>
+          <span className="text-primary font-extrabold" style={{ flexShrink: 0, lineHeight: '1.5' }}>{numMatch}</span>
+          <span style={{ flex: 1 }}>
             {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)' }}>{part}</strong> : part)}
           </span>
         </h3>
@@ -43,7 +43,7 @@ const renderMarkdown = (text) => {
       const bulletText = cleanLine.startsWith('- ') ? cleanLine.slice(2) : (cleanLine.startsWith(' ') ? cleanLine.trim() : cleanLine);
       const parts = bulletText.split(/<\/?strong>/);
       return (
-        <div key={idx} className="text-base my-3 pl-4 border-l-2 border-primary/30" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>
+        <div key={idx} className="text-base my-3 pl-4 border-l-2 border-primary/30" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>
           {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
         </div>
       );
@@ -56,12 +56,12 @@ const renderMarkdown = (text) => {
     const parts = cleanLine.split(/<\/?strong>/);
     if (parts.length > 1) {
       return (
-        <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>
+        <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>
           {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
         </p>
       );
     }
-    return <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.7' }}>{cleanLine}</p>;
+    return <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>{cleanLine}</p>;
   });
 }
 
