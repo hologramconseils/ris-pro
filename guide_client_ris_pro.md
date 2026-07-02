@@ -1,12 +1,13 @@
 # 📄 LIVRET D'EXPLICATION & GUIDE CLIENT — RIS PRO
 ### Le Hub Stratégique & Décisionnel d'Audit de Carrière et d'Optimisation Retraite
+**Plateforme Officielle :** [https://ris.hologramconseils.com](https://ris.hologramconseils.com)
 
 ---
 
 ## SECTION 1 : Qu'est-ce que RIS Pro & À Quels Besoins Répond-il ?
 
 ### 1.1 Définition & Raison d'Être
-**RIS Pro** est une plateforme décisionnelle d'audit et d'optimisation de retraite conçue pour transformer la complexité réglementaire française en un plan d'action clair, automatisé et visuellement percutant. 
+**RIS Pro** (disponible sur [https://ris.hologramconseils.com](https://ris.hologramconseils.com)) est la plateforme décisionnelle d'audit et d'optimisation de retraite conçue par **Hologram Conseils**. Elle transforme la complexité réglementaire française en un plan d'action clair, automatisé et visuellement percutant. 
 
 Plutôt que de laisser les épargnants et dirigeants face à des documents opaques de plusieurs dizaines de pages (Relevé de Situation Individuelle - RIS, Entretien d'Information Retraite - EIG), RIS Pro croise instantanément l'historique réel de carrière avec l'ensemble des textes légaux majeurs (Lois Retraite 2023, règles Agirc-Arrco, dispositifs Carrières Longues, majorations enfants, etc.).
 
@@ -89,7 +90,7 @@ Pour des données aussi personnelles et financières qu'un relevé de carrière,
 > **Réponse :** Vous et votre conseiller agréé êtes les seuls habilités à consulter votre dossier. Vos données font l'objet d'un chiffrement renforcé en transit (HTTPS / TLS 1.3) et au repos (AES-256). **Aucune donnée personnelle n'est revendue ni transmise à des tiers.** Le Numéro d'Inscription au Répertoire (NIR / Sécurité Sociale) est systématiquement pseudonymisé à l'aide d'un algorithme de hachage salé (`NIR_SALT`).
 
 #### ❓ 4. Comment les paiements sont-ils sécurisés ?
-> **Réponse :** Les transactions bancaires sont intégralement gérées par **Stripe**, le leader mondial du paiement en ligne sécurisé (certifié PCI-DSS Niveau 1). Vos coordonnées bancaires ne touchent jamais et ne sont jamais conservées sur les serveurs de RIS Pro.
+> **Réponse :** Les transactions bancaires sur [https://ris.hologramconseils.com](https://ris.hologramconseils.com) sont intégralement gérées par **Stripe**, le leader mondial du paiement en ligne sécurisé (certifié PCI-DSS Niveau 1). Vos coordonnées bancaires ne touchent jamais et ne sont jamais conservées sur les serveurs de RIS Pro.
 
 ---
 
@@ -97,4 +98,4 @@ Pour des données aussi personnelles et financières qu'un relevé de carrière,
 
 - ✅ **Transparence Totale :** Calculs certifiés conformes à la réglementation en vigueur.
 - ✅ **Sécurité Maximale :** Protocole de chiffrement bancaire et conformité RGPD stricte.
-- ✅ **Zéro Risque Commercial :** Transaction Stripe 100 % sécurisée avec accès immédiat au rapport.
+- ✅ **Zéro Risque Commercial :** Transaction Stripe 100 % sécurisée avec accès immédiat au rapport sur [https://ris.hologramconseils.com](https://ris.hologramconseils.com).
