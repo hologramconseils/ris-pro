@@ -23,7 +23,7 @@ export default function Diagnostic() {
   const steps = [
     { label: "Chiffrement et anonymisation des données", duration: 2500 },
     { label: "Numérisation et lecture OCR du relevé", duration: 3000 },
-    { label: "Extraction des salaires et identification des trimestres manquants", duration: 3500 },
+    { label: "Extraction des trimestres et salaires manquants", duration: 3500 },
     { label: "Analyse croisée", duration: 3000 },
     { label: "Génération du rapport et des stratégies d'optimisation", duration: 4000 }
   ]
@@ -272,7 +272,7 @@ export default function Diagnostic() {
               const isCompleted = currentStep > idx;
               const isActive = currentStep === idx;
               return (
-                <div key={idx} className="flex items-center gap-3.5" style={{ 
+                <div key={idx} className="flex items-start gap-3.5" style={{ 
                   opacity: isCompleted || isActive ? 1 : 0.4,
                   transition: 'opacity 0.4s ease'
                 }}>
