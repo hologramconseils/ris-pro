@@ -169,22 +169,39 @@ export default async function handler(req, res) {
         {
           "is_valid_document": true,
           "nir": "XXXXXXXXXXXXXXX",
+          "trimestres_valides": 136,
+          "trimestres_requis": 172,
           "anomalies": [
             {
+              "id": "anom_1",
               "year": "YYYY",
               "employer": "Nom de l'employeur",
-              "title": "Titre court de l'anomalie",
-              "description": "Explication pour le diagnostic gratuit",
-              "reason": "Explication technique pour le bilan premium",
-              "solution": "Action corrective à entreprendre",
-              "docs": ["Document 1", "Document 2"],
+              "title": "Titre synthétique du problème",
+              "description": "Description courte (constat uniquement)",
+              "reason": "Explication réglementaire directe",
+              "solution": "Action de correction spécifique",
+              "docs": ["Fiche de paie de MMMM YYYY", "Attestation employeur"],
               "salary": "Montant ou nature des revenus",
               "trimesters": "X/4",
               "points": "X.XX",
-              "severity": "high/medium"
+              "severity": "high/medium/low"
             }
           ],
-          "summary": "Résumé global de l'audit"
+          "summary": "Synthèse exécutive et bilan global de l'audit de carrière",
+          "strategies": [
+            {
+              "title": "Titre de l'optimisation (ex: Régularisation CNAV / Rachat Fillon)",
+              "description": "Opportunité financière et impact estimé sur la pension",
+              "priority": "Haute / Moyenne"
+            }
+          ],
+          "action_plan": [
+            {
+              "step": 1,
+              "title": "Action immédiate",
+              "description": "Procédure pas à pas sans répétition de la description des anomalies"
+            }
+          ]
         }
       `;
 

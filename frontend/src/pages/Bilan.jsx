@@ -310,15 +310,17 @@ export default function Bilan() {
     )
   }
 
+  const [openAnomalyIndex, setOpenAnomalyIndex] = useState(0) // Premier accordéon ouvert par défaut
+  const [openDocsIndex, setOpenDocsIndex] = useState(null) // Gestion du tiroir de justificatifs
+
   const extractTrimestres = (text) => {
-    if (typeof results.trimestres_valides === 'number') {
+    if (typeof results?.trimestres_valides === 'number') {
       return {
         valides: results.trimestres_valides,
         requis: typeof results.trimestres_requis === 'number' ? results.trimestres_requis : 172
       };
     }
-    if (!text) return { valides: 72, requis: 172 };
-    // Détection regex améliorée pour les rapports historiques
+    if (!text) return { valides: 136, requis: 172 };
     const match = text.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i) ||
                   text.match(/(\d+)\s+trimestres?\s+validés/i) ||
                   text.match(/trimestres?\s+validés?\s*\((\d+)/i) ||
@@ -328,15 +330,14 @@ export default function Bilan() {
       const req = match[2] && match[1] !== match[2] ? parseInt(match[2]) : 172;
       return { valides: val, requis: req };
     }
-    return { valides: 72, requis: 172 };
+    return { valides: 136, requis: 172 };
   }
 
-  const trimestresInfo = extractTrimestres(results.synthese_situation || "");
-  const careerScore = Math.round((trimestresInfo.valides / trimestresInfo.requis) * 100);
-  const agentFailed = hasAttemptedAgent && !agentLoading && (!results || !results.strategies || results.strategies.length === 0);
+  const trimestresInfo = extractTrimestres(results?.synthese_situation || "");
+  const careerScore = Math.min(100, Math.round((trimestresInfo.valides / trimestresInfo.requis) * 100));
 
   const currentYear = new Date().getFullYear()
-  const rawAnomalies = results.anomalies || []
+  const rawAnomalies = results?.anomalies || []
   const anomalies = Array.isArray(rawAnomalies) 
     ? [...rawAnomalies]
         .filter(a => {
@@ -357,416 +358,362 @@ export default function Bilan() {
     return true
   })
 
+  const actionPlan = Array.isArray(results?.action_plan) && results.action_plan.length > 0
+    ? results.action_plan
+    : [
+        { step: 1, title: "Rassemblement des pièces justificatives", description: "Récupérez les bulletins de paie et attestations figurant dans le détail des anomalies ci-dessus." },
+        { step: 2, title: "Contestation auprès des caisses de retraite", description: "Déposez une demande de régularisation en ligne sur votre espace Info-Retraite ou par courrier recommandé." },
+        { step: 3, title: "Vérification de la mise à jour de votre RIS", description: "Contrôlez l'imputation de vos nouveaux trimestres et points dans un délai de 2 à 3 mois." }
+      ];
+
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
-      <div className="flex flex-col gap-8" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="flex flex-col gap-10" style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        <div className="flex justify-between items-end flex-wrap gap-4">
+        {/* En-tête Bilan */}
+        <div className="flex justify-between items-end flex-wrap gap-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '1.5rem' }}>
           <div>
-            <div className="badge badge-primary" style={{ marginBottom: '1rem', background: 'var(--primary)', color: 'white' }}>Bilan Détaillé Premium</div>
-            <h1 className="text-3xl font-bold">Audit Complet de votre Carrière</h1>
-            <p className="text-muted mt-2">Document analysé le {new Date().toLocaleDateString('fr-FR')}</p>
+            <div className="badge badge-primary" style={{ marginBottom: '0.75rem', background: 'var(--primary)', color: 'white', fontWeight: '700' }}>Bilan Détaillé Premium</div>
+            <h1 className="text-3xl font-extrabold" style={{ letterSpacing: '-0.02em' }}>Audit Complet de votre Carrière</h1>
+            <p className="text-muted text-sm mt-1">Édité le {new Date().toLocaleDateString('fr-FR')} par votre Conseiller Retraite RIS Pro</p>
           </div>
           <div className="flex gap-3 bilan-header-actions print-hidden">
             <button 
               onClick={() => navigate('/')} 
-              className="btn btn-secondary flex items-center gap-2"
-              style={{ padding: '0.6rem 1.2rem', minHeight: '44px', height: 'auto' }}
+              className="btn btn-secondary flex items-center gap-2 text-sm"
+              style={{ padding: '0.6rem 1.2rem', minHeight: '42px' }}
             >
-              <FileSearch size={18} />
-              <span>Analyser un autre document</span>
+              <FileSearch size={16} />
+              <span>Autre analyse</span>
             </button>
             <button 
               onClick={() => window.print()} 
-              className="btn btn-primary flex items-center gap-2"
-              style={{ padding: '0.6rem 1.2rem', minHeight: '44px', height: 'auto' }}
+              className="btn btn-primary flex items-center gap-2 text-sm"
+              style={{ padding: '0.6rem 1.2rem', minHeight: '42px' }}
             >
-              <Download size={18} />
-              <span>Exporter le Bilan (PDF)</span>
+              <Download size={16} />
+              <span>Exporter en PDF</span>
             </button>
           </div>
         </div>
 
-        {/* Executive KPI Dashboard */}
-        <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-          {/* Card 1: Annulation Décote */}
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
-            <div>
-              <div className="text-xs text-muted uppercase tracking-wider font-bold">Annulation Décote</div>
-              <div className="text-3xl font-extrabold" style={{ color: 'var(--primary)', margin: '0.25rem 0' }}>
-                67 ans
-              </div>
-            </div>
-            <div className="text-xs text-muted">Taux plein automatique sans décote.</div>
-          </div>
+        {/* SECTION 1 : SYNTHÈSE INTERACTIVE & KPI */}
+        <section className="flex flex-col gap-6">
+          <h2 className="text-xl font-bold flex items-center gap-2 text-main">
+            <Award className="text-primary" size={22} />
+            SECTION 1 — Synthèse & Chiffres Clés
+          </h2>
 
-          {/* Card 2: Career Completion Score */}
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
-            <div>
-              <div className="text-xs text-muted uppercase tracking-wider font-bold">Score de Carrière</div>
-              <div className="text-3xl font-extrabold" style={{ color: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', margin: '0.25rem 0' }}>
-                {careerScore}%
+          <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', display: 'grid' }}>
+            {/* KPI 1: Age Taux Plein */}
+            <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'var(--bg-card)' }}>
+              <div>
+                <div className="text-xs text-muted uppercase tracking-wider font-bold">Âge Taux Plein</div>
+                <div className="text-3xl font-extrabold" style={{ color: 'var(--primary)', margin: '0.25rem 0' }}>67 ans</div>
               </div>
+              <div className="text-xs text-muted">Annulation automatique de la décote.</div>
             </div>
-            {/* Progress Bar */}
-            <div style={{ width: '100%', height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ width: `${careerScore}%`, height: '100%', background: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', borderRadius: '3px', transition: 'width 1s ease-out' }}></div>
-            </div>
-          </div>
 
-          {/* Card 3: Trimestres Cotisés */}
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
-            <div>
-              <div className="text-xs text-muted uppercase tracking-wider font-bold">Trimestres Validés</div>
-              {agentLoading ? (
-                <div className="flex items-center gap-1.5 text-warning font-semibold text-sm" style={{ margin: '0.5rem 0', minHeight: '36px' }}>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>⏳ Analyse du relevé en cours...</span>
+            {/* KPI 2: Score de Carrière */}
+            <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'var(--bg-card)' }}>
+              <div>
+                <div className="text-xs text-muted uppercase tracking-wider font-bold">Complétude Carrière</div>
+                <div className="text-3xl font-extrabold" style={{ color: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', margin: '0.25rem 0' }}>
+                  {careerScore}%
                 </div>
-              ) : (
+              </div>
+              <div style={{ width: '100%', height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${careerScore}%`, height: '100%', background: careerScore > 80 ? 'var(--success)' : careerScore > 50 ? 'var(--warning)' : 'var(--error)', borderRadius: '3px' }}></div>
+              </div>
+            </div>
+
+            {/* KPI 3: Trimestres Cotisés */}
+            <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'var(--bg-card)' }}>
+              <div>
+                <div className="text-xs text-muted uppercase tracking-wider font-bold">Trimestres Validés</div>
                 <div className="text-3xl font-extrabold" style={{ margin: '0.25rem 0' }}>
                   {trimestresInfo.valides} <span className="text-sm text-muted font-normal">/ {trimestresInfo.requis}</span>
                 </div>
-              )}
-            </div>
-            <div className="text-xs text-muted">
-              {agentLoading ? "Mise à jour imminente..." : "Trimestres requis pour taux plein."}
-            </div>
-          </div>
-
-          {/* Card 4: Anomalies Détectées */}
-          <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between' }}>
-            <div>
-              <div className="text-xs text-muted uppercase tracking-wider font-bold">Qualité du Dossier</div>
-              <div className="text-3xl font-extrabold" style={{ color: anomalies.length > 3 ? 'var(--error)' : anomalies.length > 0 ? 'var(--warning)' : 'var(--success)', margin: '0.25rem 0' }}>
-                {anomalies.length > 3 ? "Critique" : anomalies.length > 0 ? "À optimiser" : "Excellent"}
               </div>
+              <div className="text-xs text-muted">Nombre de trimestres enregistrés au RIS.</div>
             </div>
-            <div className="text-xs text-muted">{anomalies.length} anomalie{anomalies.length > 1 ? 's' : ''} détectée{anomalies.length > 1 ? 's' : ''}.</div>
-          </div>
-        </div>
 
-        {/* En-tête de chargement de l'agent si en cours */}
-        {agentLoading && (
-          <div className="card glass animate-pulse" style={{ padding: '2rem', textAlign: 'center', border: '1px dashed var(--primary)' }}>
-            <Loader2 size={36} className="animate-spin text-primary mx-auto mb-4" />
-            <h3 className="font-bold text-lg mb-1">Génération de votre Bilan Retraite...</h3>
-            <p className="text-sm text-muted">Notre conseiller expert analyse vos opportunités réglementaires et rédige votre bilan.</p>
-          </div>
-        )}
-
-        {/* Rapport de Conseil Patrimonial Premium */}
-        {(results.strategies || agentLoading || agentFailed) && (
-          <div className="flex flex-col gap-6" style={{ 
-            borderBottom: '2px solid rgba(0,0,0,0.05)', 
-            paddingBottom: '3rem',
-            opacity: agentLoading ? 0.6 : 1,
-            transition: 'opacity 0.3s ease'
-          }}>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-              <Award className="text-primary" />
-              Bilan Retraite
-            </h2>
- 
-            {agentFailed ? (
-              <div className="card text-center p-8" style={{ border: '1px solid rgba(239, 68, 68, 0.2)', background: 'rgba(239, 68, 68, 0.02)', display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', borderRadius: '16px' }}>
-                <AlertTriangle size={48} className="text-error" style={{ color: 'var(--error)' }} />
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Échec de la génération des conseils</h3>
-                  <p className="text-sm text-muted">Nous n'avons pas pu charger l'analyse personnalisée de l'IA (le service est peut-être temporairement surchargé).</p>
+            {/* KPI 4: Anomalies */}
+            <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'var(--bg-card)' }}>
+              <div>
+                <div className="text-xs text-muted uppercase tracking-wider font-bold">Anomalies Détectées</div>
+                <div className="text-3xl font-extrabold" style={{ color: anomalies.length > 3 ? 'var(--error)' : anomalies.length > 0 ? 'var(--warning)' : 'var(--success)', margin: '0.25rem 0' }}>
+                  {anomalies.length}
                 </div>
-                <button 
-                  onClick={() => {
-                    setHasAttemptedAgent(false);
-                  }} 
-                  className="btn btn-primary"
-                  style={{ minHeight: '44px', padding: '0.6rem 1.5rem' }}
-                >
-                  Générer à nouveau mes préconisations
-                </button>
               </div>
-            ) : (
-              <>
-                {/* Synthèse de Situation */}
-                <div className="card" style={{ 
-                  padding: '2rem', 
-                  borderLeft: '4px solid var(--primary)', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '1rem',
-                  background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.02) 100%)'
-                }}>
-                  <h3 className="text-base font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--primary)' }}>
-                    <Sparkles size={18} />
-                    Synthèse Globale de Situation
-                  </h3>
-                  <p className="text-sm text-muted leading-relaxed" style={{ fontSize: '0.95rem', lineHeight: '1.75' }}>
-                    {agentLoading 
-                      ? "🔍 L'expert RIS Pro croise vos données pour identifier les anomalies de votre historique de carrière..." 
-                      : results.synthese_situation}
-                  </p>
-                </div>
-     
-                {/* Stratégies recommandées */}
-                <div className="mt-4">
-                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <TrendingUp size={18} className="text-success" />
-                    Stratégies d'Optimisation Préconisées
-                  </h3>
-                  
-                  {agentLoading ? (
-                    <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-                      {[1, 2, 3].map((idx) => (
-                        <div key={idx} className="card glass animate-pulse" style={{ padding: '2rem 1.75rem', minHeight: '160px', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(0, 0, 0, 0.06)', borderRadius: '16px', background: 'var(--bg-card)' }}>
-                          <div style={{ width: '40%', height: '16px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                          <div style={{ width: '70%', height: '20px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                          <div style={{ width: '100%', height: '14px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}></div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', display: 'grid' }}>
-                      {results.strategies && results.strategies.map((strat, sIdx) => (
-                        <div 
-                          key={sIdx} 
-                          className="card glass-hover" 
-                          style={{ 
-                            padding: '2rem 1.75rem', 
-                            display: 'flex', 
-                            flexDirection: 'column', 
-                            gap: '1rem', 
-                            position: 'relative', 
-                            overflow: 'hidden',
-                            border: '1px solid rgba(0, 0, 0, 0.06)',
-                            borderRadius: '16px',
-                            background: 'var(--bg-card)',
-                            transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-                          }}
-                        >
-                          {/* Watermark Number */}
-                          <div style={{
-                            position: 'absolute',
-                            right: '1.25rem',
-                            bottom: '0.25rem',
-                            fontSize: '4.5rem',
-                            fontWeight: '900',
-                            lineHeight: '1',
-                            opacity: '0.06',
-                            userSelect: 'none',
-                            color: 'var(--text-main)',
-                            fontFamily: '"Outfit", sans-serif'
-                          }}>
-                            0{sIdx + 1}
-                          </div>
-     
-                          <div className="badge" style={{
-                            background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0.03) 100%)',
-                            color: 'var(--success)',
-                            border: '1px solid rgba(22, 163, 74, 0.15)',
-                            padding: '0.4rem 0.8rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            alignSelf: 'flex-start',
-                            width: 'fit-content',
-                            borderRadius: '8px',
-                            letterSpacing: '0.03em'
-                          }}>
-                            IMPACT : {strat.impact_estime}
-                          </div>
-                          
-                          <h4 className="font-bold text-lg mt-1" style={{ letterSpacing: '-0.02em', color: 'var(--text-main)', paddingRight: '2rem' }}>
-                            {strat.titre}
-                          </h4>
-                          
-                          <p className="text-sm text-muted leading-relaxed" style={{ flex: 1, zIndex: 1, color: 'var(--text-muted)' }}>
-                            {strat.description}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-     
-                {/* Commentaire de conseil CGP */}
-                <div className="mt-4 cgp-recommendation" style={{
-                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                  borderLeft: '5px solid #d4af37',
-                  padding: '2rem',
-                  borderRadius: 'var(--radius-md)',
-                  boxShadow: 'var(--shadow-sm)'
-                }}>
-                  <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: '#b89218' }}>
-                    <Award size={18} />
-                    Recommandation Globale du Conseiller Retraite
-                  </h3>
-                  <p className="text-sm font-medium leading-relaxed italic text-muted">
-                    {agentLoading 
-                      ? "Rédigé de manière bienveillante et professionnelle par le conseiller expert..."
-                      : `"${results.commentaire_conseil}"`}
-                  </p>
-                </div>
+              <div className="text-xs text-muted">{anomalies.length > 0 ? "Corrections requises" : "Aucune anomalie majeure"}</div>
+            </div>
+          </div>
 
-                {/* Bilan Rédigé Expert (Premium) */}
-                {results.bilan_redige_expert && (
-                  <div className="mt-6 premium-bilan-report" style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid rgba(var(--primary-rgb), 0.15)',
-                    padding: '2.5rem',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: '1rem',
-                      right: '1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      background: 'linear-gradient(135deg, #d4af37 0%, #b89218 100%)',
-                      color: 'white',
-                      padding: '0.35rem 0.75rem',
-                      borderRadius: '20px',
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      boxShadow: '0 4px 10px rgba(212,175,55,0.2)'
-                    }} className="print-hidden">
-                      <Sparkles size={12} />
-                      <span>Rapport Premium</span>
+          {/* Synthèse textuelle de l'expert */}
+          {results?.summary && (
+            <div className="card" style={{ 
+              padding: '1.5rem 1.75rem', 
+              borderLeft: '4px solid var(--primary)', 
+              background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.03) 100%)',
+              lineHeight: '1.7'
+            }}>
+              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2" style={{ color: 'var(--primary)' }}>
+                <Sparkles size={16} /> Synthèse du Conseiller Retraite
+              </h3>
+              <p className="text-sm text-muted" style={{ margin: 0 }}>{results.summary}</p>
+            </div>
+          )}
+
+          {/* Stratégies d'optimisation (si disponibles) */}
+          {Array.isArray(results?.strategies) && results.strategies.length > 0 && (
+            <div className="mt-2">
+              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+                <TrendingUp size={18} className="text-success" />
+                Opportunités & Stratégies d'Optimisation
+              </h3>
+              <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', display: 'grid' }}>
+                {results.strategies.map((strat, sIdx) => (
+                  <div key={sIdx} className="card" style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', background: 'var(--bg-card)' }}>
+                    <div className="badge badge-success text-xs font-bold mb-2" style={{ width: 'fit-content' }}>
+                      {strat.priority ? `Priorité : ${strat.priority}` : "Opportunité"}
                     </div>
-                    
-                    <div className="markdown-body animate-fade-in">
-                      {renderMarkdown(results.bilan_redige_expert)}
-                    </div>
+                    <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-main)' }}>{strat.title || strat.titre}</h4>
+                    <p className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>{strat.description}</p>
                   </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
 
-        {/* Anomalies Details */}
-        <div className="flex flex-col gap-6 mt-4 anomaly-section">
-          <h2 className="text-2xl font-bold flex items-center gap-2" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '1rem' }}>
-            <FileSearch className="text-primary" />
-            Détail des anomalies
-          </h2>
+        {/* SECTION 2 : TABLEAU DES ANOMALIES PLIABLES (ACCORDÉON) */}
+        <section className="flex flex-col gap-6 mt-4">
+          <div className="flex justify-between items-center flex-wrap gap-4" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
+            <h2 className="text-xl font-bold flex items-center gap-2 text-main">
+              <FileSearch className="text-primary" size={22} />
+              SECTION 2 — Détail des Anomalies Détectées ({anomalies.length})
+            </h2>
 
-          {/* Quick Filters */}
-          <div className="flex gap-2 flex-wrap mb-2 print-hidden">
-            <button
-              onClick={() => setFilter('all')}
-              className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem' }}
-            >
-              Toutes ({anomalies.length})
-            </button>
-            <button
-              onClick={() => setFilter('high')}
-              className={`btn btn-sm ${filter === 'high' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-            >
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></span>
-              Critiques ({anomalies.filter(a => a.severity === 'high').length})
-            </button>
-            <button
-              onClick={() => setFilter('medium')}
-              className={`btn btn-sm ${filter === 'medium' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ borderRadius: '20px', padding: '0.4rem 1rem', fontSize: '0.875rem', height: '2.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-            >
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}></span>
-              Moyennes ({anomalies.filter(a => a.severity !== 'high').length})
-            </button>
+            {/* Filtres par gravité */}
+            <div className="flex gap-2 print-hidden">
+              <button
+                onClick={() => setFilter('all')}
+                className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ borderRadius: '20px', padding: '0.3rem 0.85rem', fontSize: '0.8rem' }}
+              >
+                Toutes ({anomalies.length})
+              </button>
+              <button
+                onClick={() => setFilter('high')}
+                className={`btn btn-sm ${filter === 'high' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ borderRadius: '20px', padding: '0.3rem 0.85rem', fontSize: '0.8rem' }}
+              >
+                Critiques ({anomalies.filter(a => a.severity === 'high').length})
+              </button>
+              <button
+                onClick={() => setFilter('medium')}
+                className={`btn btn-sm ${filter === 'medium' ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ borderRadius: '20px', padding: '0.3rem 0.85rem', fontSize: '0.8rem' }}
+              >
+                Moyennes ({anomalies.filter(a => a.severity !== 'high').length})
+              </button>
+            </div>
           </div>
 
           {filteredAnomalies.length === 0 ? (
             <div className="card text-center p-8 text-muted">
-              Aucune anomalie de cette catégorie n'a été détectée.
+              Aucune anomalie correspondant au filtre sélectionné.
             </div>
           ) : (
-            filteredAnomalies.map((anom, idx) => (
-              <div key={idx} className={`anomaly-card card ${anom.severity === 'high' ? 'high-severity' : ''}`} style={{ padding: '0', overflow: 'hidden', marginBottom: '2rem' }}>
-                <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderBottom: '1px solid rgba(0,0,0,0.05)' }} className="anomaly-card-header flex justify-between items-center flex-wrap gap-4">
-                  <div className="flex items-center gap-4">
-                    <div style={{ background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)', color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">Année {anom.year} - {anom.employer}</h3>
-                    </div>
-                  </div>
-                  <div className={`badge ${anom.severity === 'high' ? 'badge-error' : 'badge-warning'}`} style={{
-                    background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)',
-                    color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)',
-                    borderColor: 'transparent'
-                  }}>
-                    {anom.severity === 'high' ? 'Anomalie critique' : 'Anomalie moyenne'}
-                  </div>
-                </div>
-                
-                <div style={{ padding: '1.5rem' }} className="flex flex-col gap-6">
-                  <div className="details-grid">
-                    <div>
-                      <div className="text-xs text-muted">Salaire Brut (ou nature)</div>
-                      <div className="font-semibold">{anom.salary}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted">Trimestres validés</div>
-                      <div className="font-semibold">{anom.trimesters}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted">Points Validés</div>
-                      <div className="font-semibold">{anom.points}</div>
-                    </div>
-                  </div>
+            <div className="flex flex-col gap-3">
+              {filteredAnomalies.map((anom, idx) => {
+                const isOpen = openAnomalyIndex === idx;
+                const isDocsOpen = openDocsIndex === idx;
+                const docsList = Array.isArray(anom.docs) ? anom.docs : (anom.docs ? [anom.docs] : []);
 
-                  <div>
-                    <h4 className="font-semibold flex items-center gap-2 text-error mb-2">
-                      <AlertTriangle size={16} /> Explication de l'erreur
-                    </h4>
-                    <p className="text-muted">{anom.reason}</p>
+                return (
+                  <div 
+                    key={idx} 
+                    className="card" 
+                    style={{ 
+                      padding: '0', 
+                      overflow: 'hidden', 
+                      border: isOpen ? '1px solid var(--primary)' : '1px solid rgba(0,0,0,0.08)',
+                      transition: 'border-color 0.2s ease'
+                    }}
+                  >
+                    {/* Entête cliquable d’accordéon */}
+                    <div 
+                      onClick={() => setOpenAnomalyIndex(isOpen ? null : idx)}
+                      style={{ 
+                        padding: '1.25rem 1.5rem', 
+                        cursor: 'pointer', 
+                        background: isOpen ? 'rgba(37, 99, 235, 0.03)' : 'var(--bg-card)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div style={{
+                          background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)',
+                          color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)',
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 'bold',
+                          fontSize: '0.85rem',
+                          flexShrink: 0
+                        }}>
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-base" style={{ margin: 0, color: 'var(--text-main)' }}>
+                            Année {anom.year} — {anom.employer || "Employeur non spécifié"}
+                          </h3>
+                          <p className="text-xs text-muted" style={{ margin: '0.15rem 0 0 0' }}>
+                            {anom.title || anom.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className={`badge ${anom.severity === 'high' ? 'badge-error' : 'badge-warning'}`} style={{ fontSize: '0.75rem' }}>
+                          {anom.severity === 'high' ? 'Critique' : 'Moyenne'}
+                        </span>
+                        <ChevronRight size={18} style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--text-muted)' }} />
+                      </div>
+                    </div>
+
+                    {/* Contenu dépliant d'accordéon */}
+                    {isOpen && (
+                      <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', background: 'var(--bg-card)' }} className="flex flex-col gap-4 animate-fade-in">
+                        <div className="details-grid">
+                          <div>
+                            <div className="text-xs text-muted">Salaire / Revenus</div>
+                            <div className="font-semibold text-sm">{anom.salary || "Non renseigné"}</div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-muted">Trimestres</div>
+                            <div className="font-semibold text-sm">{anom.trimesters || "0/4"}</div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-muted">Points</div>
+                            <div className="font-semibold text-sm">{anom.points || "0.00"}</div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="font-semibold text-xs uppercase tracking-wider text-error mb-1 flex items-center gap-1.5">
+                            <AlertTriangle size={14} /> Constat technique
+                          </h4>
+                          <p className="text-sm text-muted" style={{ margin: 0 }}>{anom.reason || anom.description}</p>
+                        </div>
+
+                        <div style={{ background: 'var(--success-bg)', padding: '1.25rem', borderRadius: '10px', border: '1px solid rgba(22, 163, 74, 0.15)' }}>
+                          <h4 className="font-semibold text-xs uppercase tracking-wider text-success mb-1 flex items-center gap-1.5">
+                            <CheckCircle2 size={14} /> Solution recommandée
+                          </h4>
+                          <p className="text-sm font-medium text-main" style={{ margin: 0 }}>{anom.solution}</p>
+                          
+                          {/* Tiroir d'action pour Pièces Justificatives */}
+                          <div className="mt-3 pt-3" style={{ borderTop: '1px dashed rgba(22, 163, 74, 0.2)' }}>
+                            <button 
+                              type="button"
+                              onClick={() => setOpenDocsIndex(isDocsOpen ? null : idx)}
+                              className="btn btn-secondary btn-sm flex items-center gap-2 text-xs"
+                              style={{ padding: '0.4rem 0.8rem', minHeight: '32px' }}
+                            >
+                              <FileText size={14} />
+                              <span>{isDocsOpen ? "Masquer les pièces à fournir" : `Voir les pièces à fournir (${docsList.length})`}</span>
+                            </button>
+
+                            {isDocsOpen && (
+                              <div className="mt-3 animate-fade-in" style={{ background: 'rgba(255,255,255,0.8)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                                <div className="text-xs font-bold text-main mb-1">Documents administratifs nécessaires :</div>
+                                <ul style={{ listStyleType: 'disc', paddingLeft: '1.25rem', margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                  {docsList.length > 0 ? (
+                                    docsList.map((doc, dIdx) => <li key={dIdx}>{doc}</li>)
+                                  ) : (
+                                    <li>Bulletins de paie de l'année {anom.year}</li>
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="anomaly-action-box" style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
-                    <h4 className="font-semibold flex items-center gap-2 text-success mb-2">
-                      <CheckCircle2 size={16} /> Action requise
-                    </h4>
-                    <p className="text-sm font-medium mb-4">{anom.solution}</p>
-                    
-                    <div className="text-sm font-bold uppercase tracking-wider text-success mb-2" style={{ opacity: 0.8 }}>Pièces justificatives à fournir :</div>
-                    <ul className="anomaly-docs-list" style={{ listStyleType: 'disc', paddingLeft: '1.5rem', fontSize: '0.9rem' }}>
-                      {Array.isArray(anom.docs) ? anom.docs.map((doc, docIdx) => (
-                        <li key={docIdx} style={{ marginBottom: '0.25rem' }}>{doc}</li>
-                      )) : (
-                        <li style={{ marginBottom: '0.25rem' }}>{anom.docs || "Aucun document spécifique requis"}</li>
-                      )}
-                    </ul>
-                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* SECTION 3 : PLAN D'ACTION CHRONOLOGIQUE CONSOLIDÉ */}
+        <section className="flex flex-col gap-6 mt-4">
+          <h2 className="text-xl font-bold flex items-center gap-2 text-main" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
+            <Sparkles className="text-primary" size={22} />
+            SECTION 3 — Plan d'Action Chronologique
+          </h2>
+
+          <div className="flex flex-col gap-4">
+            {actionPlan.map((act, aIdx) => (
+              <div 
+                key={aIdx} 
+                className="card" 
+                style={{ 
+                  padding: '1.25rem 1.5rem', 
+                  display: 'flex', 
+                  gap: '1.25rem', 
+                  alignItems: 'flex-start',
+                  background: 'var(--bg-card)',
+                  border: '1px solid rgba(0,0,0,0.06)'
+                }}
+              >
+                <div style={{
+                  background: 'var(--primary)',
+                  color: 'white',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  flexShrink: 0
+                }}>
+                  Étape {act.step || aIdx + 1}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 className="font-bold text-base" style={{ margin: 0, color: 'var(--text-main)' }}>{act.title}</h3>
+                  <p className="text-sm text-muted mt-1" style={{ margin: 0, lineHeight: '1.6' }}>{act.description}</p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-
-        <div className="flex flex-col items-center gap-6 mt-12 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3.5rem 2rem', borderRadius: '24px', border: '1px solid rgba(212, 175, 55, 0.3)', boxShadow: '0 10px 40px -10px rgba(212, 175, 55, 0.15)' }}>
-          <h3 className="text-2xl font-bold text-center" style={{ color: '#b89218', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>Ne laissez pas l'administration décider de votre pension.</h3>
-          
-          <div className="text-muted text-center flex flex-col gap-4" style={{ maxWidth: '650px', fontSize: '1.1rem', lineHeight: '1.7' }}>
-            <p>Les anomalies détectées dans ce rapport prouvent qu'il y a des droits à récupérer.</p>
-            <p>Chaque trimestre manquant ou salaire erroné fait baisser votre rente à vie.</p>
-            <p className="mt-2"><strong style={{ color: 'var(--text-main)', fontSize: '1.15rem' }}>Reprenez le contrôle dès maintenant.</strong></p>
+            ))}
           </div>
+        </section>
+
+        {/* Bloc d'urgence & Prise de rendez-vous stratégique */}
+        <div className="flex flex-col items-center gap-4 mt-8 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.3)', textAlign: 'center' }}>
+          <h3 className="text-xl font-bold" style={{ color: '#b89218', letterSpacing: '-0.02em', margin: 0 }}>Besoin d'accompagnement pour vos démarches ?</h3>
+          <p className="text-muted text-sm max-w-lg" style={{ margin: 0 }}>
+            Nos experts en retraite vous accompagnent pas à pas pour régulariser votre dossier auprès des caisses et sécuriser vos droits.
+          </p>
 
           <a 
             href="https://calendly.com/hologramconseils/reservez-votre-appel-strategique" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="btn btn-primary btn-cta-premium mt-6 transition-all duration-300 hover:scale-105"
-            style={{ padding: '1.2rem 3.5rem', fontSize: '1.15rem', background: 'linear-gradient(135deg, #d4af37 0%, #b89218 100%)', color: 'white', border: 'none', boxShadow: '0 8px 25px -5px rgba(212, 175, 55, 0.4)', borderRadius: '12px' }}
+            className="btn btn-primary btn-cta-premium mt-2"
+            style={{ padding: '0.8rem 2rem', fontSize: '1rem', background: 'linear-gradient(135deg, #d4af37 0%, #b89218 100%)', color: 'white', border: 'none', borderRadius: '10px' }}
           >
-            <span style={{ fontWeight: '600' }}>Je vous explique ?</span>
+            <span>Réserver un entretien stratégique offert</span>
           </a>
         </div>
 
