@@ -147,12 +147,20 @@ async def run_global_discovery_watch(client):
             model='gemini-2.5-flash',
             contents=prompt,
             config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                response_mime_type="application/json"
+                tools=[types.Tool(google_search=types.GoogleSearch())]
             ),
         )
         
         result_text = response.text.strip()
+        
+        if result_text.startswith("```json"):
+            result_text = result_text[7:]
+        elif result_text.startswith("```"):
+            result_text = result_text[3:]
+        if result_text.endswith("```"):
+            result_text = result_text[:-3]
+        result_text = result_text.strip()
+        
         data = json.loads(result_text)
         
         if data.get("has_new_topic"):
