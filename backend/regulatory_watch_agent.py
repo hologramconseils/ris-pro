@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -118,6 +119,72 @@ async def run_regulatory_watch():
     else:
         print("\n=== Veille terminée. Aucune mise à jour requise. ===")
 
+async def run_global_discovery_watch(client):
+    print("\n=== Lancement de la Veille Globale de Découverte ===")
+    
+    prompt = f"""
+    Vous êtes un agent de veille réglementaire expert en retraite française.
+    Voici la liste des sujets que nous couvrons déjà dans nos fichiers :
+    {', '.join(FILES_TO_WATCH)}
+    
+    Votre mission : 
+    Recherchez sur le web (lois récentes, JORF, nouveautés retraite) s'il existe une NOUVELLE loi, un nouveau décret ou une réforme récente très importante concernant la retraite en France qui traite d'un sujet TOTALEMENT NOUVEAU, non couvert par les fichiers listés ci-dessus.
+    
+    Si vous ne trouvez aucun sujet majeur nouveau qui mérite d'être documenté, répondez avec 'has_new_topic': false.
+    
+    Si vous trouvez un nouveau sujet important (par exemple un nouveau dispositif de retraite, une nouvelle catégorie socio-professionnelle spécifique, etc.), générez le fichier de règles correspondant.
+    Répondez STRICTEMENT avec un objet JSON valide suivant ce format :
+    {{
+      "has_new_topic": true,
+      "filename": "regles_nom_du_sujet.md",
+      "content": "# Titre du sujet\\n\\nContenu du document Markdown avec les nouvelles règles..."
+    }}
+    Ne rajoutez pas de texte en dehors du JSON.
+    """
+    
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                response_mime_type="application/json"
+            ),
+        )
+        
+        result_text = response.text.strip()
+        data = json.loads(result_text)
+        
+        if data.get("has_new_topic"):
+            filename = data.get("filename")
+            content = data.get("content")
+            
+            if filename and content:
+                print(f"[Success] Nouveau sujet découvert ! Création du fichier : {filename}")
+                file_path = get_file_path(filename)
+                if not file_path:
+                    # Enregistrer à la racine du projet
+                    if os.path.exists("backend"):
+                        file_path = filename
+                    else:
+                        file_path = os.path.join("..", filename)
+                        
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print(f"[Info] Fichier {filename} créé avec succès. N'oubliez pas de l'ajouter manuellement dans wealth_advisor_agent.py et FILES_TO_WATCH si nécessaire.")
+                return True
+        else:
+            print("[Info] Aucun nouveau sujet majeur détecté lors de la veille globale.")
+            
+    except Exception as err:
+        print(f"[Error] Échec lors de la veille globale de découverte : {str(err)}")
+        
+    return False
+
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(run_regulatory_watch())
+    async def main():
+        await run_regulatory_watch()
+        await run_global_discovery_watch(client)
+        
+    asyncio.run(main())
