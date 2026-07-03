@@ -593,7 +593,7 @@ export default function Diagnostic() {
                   {profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com' 
                     ? "Accéder au bilan complet (Admin)" 
                     : (user 
-                        ? (hasCredits 
+                        ? (hasCredits || (results && !results.is_restricted)
                             ? LABELS.CTA_CONTINUE_ANALYSIS
                             : (profile?.is_paid 
                                 ? LABELS.PAYMENT_RENEW 
