@@ -367,7 +367,7 @@ export default function Bilan() {
 
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
-      <div className="flex flex-col gap-16" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="flex flex-col" style={{ gap: '4rem', maxWidth: '1000px', margin: '0 auto' }}>
         
         {/* En-tête Bilan */}
         <div className="flex justify-between items-end flex-wrap gap-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '1.5rem' }}>
@@ -684,7 +684,7 @@ export default function Bilan() {
                     boxShadow: '0 0 0 4px var(--bg-card)',
                     marginTop: '0.2rem'
                   }}>
-                    {act.step || aIdx + 1}
+                    {aIdx + 1}
                   </div>
                   
                   {/* Contenu */}
