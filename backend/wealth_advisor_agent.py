@@ -30,15 +30,30 @@ class ConseilPatrimonial(BaseModel):
 
 # 2. Définition de l'outil pour lire la base de règles locale
 def recuperer_regles_retraite(type_regle: str) -> str:
-    """Permet de récupérer les règles de retraite 2023 officielles locales pour guider le conseil patrimonial.
+    """Permet de récupérer les règles de retraite officielles locales pour guider le conseil patrimonial.
     
     Args:
         type_regle: Le type de règle à récupérer. Doit être l'un des suivants:
                     - 'depart_anticipe' (règles de départ anticipé pour carrières longues, etc.)
                     - 'gestion' (règles de gestion courante de la retraite)
                     - 'optimisation' (règles d'optimisation de la retraite et cumul)
+                    - 'polypensionnes_lura' (LURA et régimes multiples)
+                    - 'pension_reversion' (droits du conjoint survivant)
+                    - 'expatriation_internationale' (règles UE et conventions bilatérales)
+                    - 'independants_fonctionnaires' (TNS, libéraux, SRE, CNRACL)
+                    - 'minima_sociaux_aspa' (MICO, ASPA)
     """
-    filename = f"regles_{type_regle}_2023.md"
+    files_map = {
+        'depart_anticipe': 'regles_depart_anticipe_2023.md',
+        'gestion': 'regles_gestion_retraite_2023.md',
+        'optimisation': 'regles_optimisation_retraite_2023.md',
+        'polypensionnes_lura': 'regles_polypensionnes_lura.md',
+        'pension_reversion': 'regles_pension_reversion_2023.md',
+        'expatriation_internationale': 'regles_expatriation_internationale.md',
+        'independants_fonctionnaires': 'regles_independants_fonctionnaires.md',
+        'minima_sociaux_aspa': 'regles_minima_sociaux_aspa.md'
+    }
+    filename = files_map.get(type_regle, f"regles_{type_regle}_2023.md")
     paths_to_try = [
         filename,
         os.path.join("..", filename),

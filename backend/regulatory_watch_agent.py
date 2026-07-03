@@ -19,7 +19,12 @@ client = genai.Client(api_key=api_key)
 FILES_TO_WATCH = [
     "regles_depart_anticipe_2023.md",
     "regles_gestion_retraite_2023.md",
-    "regles_optimisation_retraite_2023.md"
+    "regles_optimisation_retraite_2023.md",
+    "regles_polypensionnes_lura.md",
+    "regles_pension_reversion_2023.md",
+    "regles_expatriation_internationale.md",
+    "regles_independants_fonctionnaires.md",
+    "regles_minima_sociaux_aspa.md"
 ]
 
 def get_file_path(filename):

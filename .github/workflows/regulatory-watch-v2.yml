@@ -2,7 +2,7 @@ name: Veille Réglementaire Automatique
 
 on:
   schedule:
-    - cron: '0 8 * * 1'
+    - cron: '0 8 * * *' # Tous les jours à 8h00
   workflow_dispatch:
 
 permissions:
