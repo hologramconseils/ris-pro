@@ -449,18 +449,34 @@ export default function Bilan() {
             </div>
           </div>
 
-          {/* Synthèse textuelle de l'expert */}
+          {/* Synthèse textuelle de l'expert - Design Premium Consistant */}
           {results?.summary && (
             <div className="card" style={{ 
-              padding: '1.5rem 1.75rem', 
-              borderLeft: '4px solid var(--primary)', 
-              background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37, 99, 235, 0.03) 100%)',
-              lineHeight: '1.7'
+              padding: '2rem', 
+              borderTop: '4px solid var(--primary)', 
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              boxShadow: '0 10px 30px -10px rgba(0,0,0,0.08)',
+              borderRadius: '16px',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
-              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2" style={{ color: 'var(--primary)' }}>
-                <Sparkles size={16} /> Synthèse du Conseiller Retraite
-              </h3>
-              <p className="text-sm text-muted" style={{ margin: 0 }}>{results.summary}</p>
+              <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05, transform: 'scale(2)' }}>
+                <Award size={120} />
+              </div>
+              <div className="flex items-center gap-3 mb-4" style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ background: 'var(--primary)', color: 'white', padding: '0.6rem', borderRadius: '12px' }}>
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold uppercase tracking-widest" style={{ color: 'var(--primary)', margin: 0 }}>Synthèse de l'Expert</h3>
+                  <p className="text-xs text-muted" style={{ margin: 0 }}>Audit vérifié par un conseiller RIS Pro</p>
+                </div>
+              </div>
+              <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1rem', borderLeft: '2px solid rgba(37, 99, 235, 0.2)' }}>
+                <p className="text-base text-main" style={{ margin: 0, lineHeight: '1.8', fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic', color: '#334155' }}>
+                  "{results.summary}"
+                </p>
+              </div>
             </div>
           )}
 
@@ -527,8 +543,6 @@ export default function Bilan() {
           ) : (
             <div className="flex flex-col gap-3">
               {filteredAnomalies.map((anom, idx) => {
-                const isOpen = openAnomalyIndex === idx;
-                const isDocsOpen = openDocsIndex === idx;
                 const docsList = Array.isArray(anom.docs) ? anom.docs : (anom.docs ? [anom.docs] : []);
 
                 return (
@@ -538,115 +552,100 @@ export default function Bilan() {
                     style={{ 
                       padding: '0', 
                       overflow: 'hidden', 
-                      border: isOpen ? '1px solid var(--primary)' : '1px solid rgba(0,0,0,0.08)',
-                      transition: 'border-color 0.2s ease'
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      borderRadius: '12px',
+                      marginBottom: '1rem',
+                      background: 'var(--bg-card)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
                     }}
                   >
-                    {/* Entête cliquable d’accordéon */}
-                    <div 
-                      onClick={() => setOpenAnomalyIndex(isOpen ? null : idx)}
-                      style={{ 
-                        padding: '1.25rem 1.5rem', 
-                        cursor: 'pointer', 
-                        background: isOpen ? 'rgba(37, 99, 235, 0.03)' : 'var(--bg-card)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
+                    {/* Entête toujours visible */}
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)', background: 'linear-gradient(to right, rgba(37, 99, 235, 0.02), transparent)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div className="flex gap-4">
                         <div style={{
                           background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)',
                           color: anom.severity === 'high' ? 'var(--error)' : 'var(--warning)',
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontWeight: 'bold',
-                          fontSize: '0.85rem',
-                          flexShrink: 0
+                          fontWeight: '900',
+                          fontSize: '1.1rem',
+                          flexShrink: 0,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                         }}>
                           {idx + 1}
                         </div>
                         <div>
-                          <h3 className="font-bold text-base" style={{ margin: 0, color: 'var(--text-main)' }}>
-                            Année {anom.year} — {anom.employer || "Employeur non spécifié"}
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className={`badge ${anom.severity === 'high' ? 'badge-error' : 'badge-warning'}`} style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.05em' }}>
+                              {anom.severity === 'high' ? 'CRITIQUE' : 'MOYENNE'}
+                            </span>
+                            <span className="text-sm font-bold text-muted">Année {anom.year}</span>
+                          </div>
+                          <h3 className="font-bold text-lg" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.3' }}>
+                            {anom.employer || "Employeur non spécifié"}
                           </h3>
-                          <p className="text-xs text-muted" style={{ margin: '0.15rem 0 0 0' }}>
+                          <p className="text-sm text-muted mt-2" style={{ margin: 0, maxWidth: '600px' }}>
                             {anom.title || anom.description}
                           </p>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className={`badge ${anom.severity === 'high' ? 'badge-error' : 'badge-warning'}`} style={{ fontSize: '0.75rem' }}>
-                          {anom.severity === 'high' ? 'Critique' : 'Moyenne'}
-                        </span>
-                        <ChevronRight size={18} style={{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--text-muted)' }} />
-                      </div>
                     </div>
 
-                    {/* Contenu dépliant d'accordéon */}
-                    {isOpen && (
-                      <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', background: 'var(--bg-card)' }} className="flex flex-col gap-4 animate-fade-in">
-                        <div className="details-grid">
-                          <div>
-                            <div className="text-xs text-muted">Salaire / Revenus</div>
-                            <div className="font-semibold text-sm">{anom.salary || "Non renseigné"}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-muted">Trimestres</div>
-                            <div className="font-semibold text-sm">{anom.trimesters || "0/4"}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-muted">Points</div>
-                            <div className="font-semibold text-sm">{anom.points || "0.00"}</div>
-                          </div>
-                        </div>
-
+                    {/* Contenu toujours ouvert (plus d'accordéon) */}
+                    <div style={{ padding: '1.5rem' }} className="flex flex-col gap-5">
+                      <div className="details-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', background: 'rgba(0,0,0,0.02)', padding: '1.25rem', borderRadius: '10px' }}>
                         <div>
-                          <h4 className="font-semibold text-xs uppercase tracking-wider text-error mb-1 flex items-center gap-1.5">
-                            <AlertTriangle size={14} /> Constat technique
-                          </h4>
-                          <p className="text-sm text-muted" style={{ margin: 0 }}>{anom.reason || anom.description}</p>
+                          <div className="text-xs font-bold uppercase tracking-wider text-muted mb-1">Salaire</div>
+                          <div className="font-extrabold text-main text-base">{anom.salary || "Non renseigné"}</div>
                         </div>
-
-                        <div style={{ background: 'var(--success-bg)', padding: '1.25rem', borderRadius: '10px', border: '1px solid rgba(22, 163, 74, 0.15)' }}>
-                          <h4 className="font-semibold text-xs uppercase tracking-wider text-success mb-1 flex items-center gap-1.5">
-                            <CheckCircle2 size={14} /> Solution recommandée
-                          </h4>
-                          <p className="text-sm font-medium text-main" style={{ margin: 0 }}>{anom.solution}</p>
-                          
-                          {/* Tiroir d'action pour Pièces Justificatives */}
-                          <div className="mt-3 pt-3" style={{ borderTop: '1px dashed rgba(22, 163, 74, 0.2)' }}>
-                            <button 
-                              type="button"
-                              onClick={() => setOpenDocsIndex(isDocsOpen ? null : idx)}
-                              className="btn btn-secondary btn-sm flex items-center gap-2 text-xs"
-                              style={{ padding: '0.4rem 0.8rem', minHeight: '32px' }}
-                            >
-                              <FileText size={14} />
-                              <span>{isDocsOpen ? "Masquer les pièces à fournir" : `Voir les pièces à fournir (${docsList.length})`}</span>
-                            </button>
-
-                            {isDocsOpen && (
-                              <div className="mt-3 animate-fade-in" style={{ background: 'rgba(255,255,255,0.8)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                                <div className="text-xs font-bold text-main mb-1">Documents administratifs nécessaires :</div>
-                                <ul style={{ listStyleType: 'disc', paddingLeft: '1.25rem', margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                  {docsList.length > 0 ? (
-                                    docsList.map((doc, dIdx) => <li key={dIdx}>{doc}</li>)
-                                  ) : (
-                                    <li>Bulletins de paie de l'année {anom.year}</li>
-                                  )}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
+                        <div>
+                          <div className="text-xs font-bold uppercase tracking-wider text-muted mb-1">Trimestres</div>
+                          <div className="font-extrabold text-main text-base">{anom.trimesters || "0/4"}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold uppercase tracking-wider text-muted mb-1">Points Retraite</div>
+                          <div className="font-extrabold text-main text-base">{anom.points || "0.00"}</div>
                         </div>
                       </div>
-                    )}
+
+                      <div style={{ padding: '0 0.5rem' }}>
+                        <h4 className="font-bold text-xs uppercase tracking-wider text-error mb-2 flex items-center gap-1.5">
+                          <AlertTriangle size={16} /> Origine du problème
+                        </h4>
+                        <p className="text-sm text-main leading-relaxed" style={{ margin: 0 }}>{anom.reason || anom.description}</p>
+                      </div>
+
+                      <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(22, 163, 74, 0.15)' }}>
+                        <h4 className="font-bold text-xs uppercase tracking-wider text-success mb-2 flex items-center gap-1.5">
+                          <CheckCircle2 size={16} /> Recommandation de l'expert
+                        </h4>
+                        <p className="text-sm font-semibold text-main mb-4" style={{ margin: 0 }}>{anom.solution}</p>
+                        
+                        {/* Pièces Justificatives directement visibles */}
+                        <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
+                          <div className="text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
+                            <FileText size={14} className="text-success" /> Documents à préparer pour correction :
+                          </div>
+                          <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                            {docsList.length > 0 ? (
+                              docsList.map((doc, dIdx) => (
+                                <li key={dIdx} className="text-sm text-muted flex items-start gap-2">
+                                  <span className="text-success mt-0.5">•</span> <span>{doc}</span>
+                                </li>
+                              ))
+                            ) : (
+                              <li className="text-sm text-muted flex items-start gap-2">
+                                <span className="text-success mt-0.5">•</span> <span>Bulletins de paie de l'année {anom.year}</span>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -661,40 +660,52 @@ export default function Bilan() {
             SECTION 3 — Plan d'Action Chronologique
           </h2>
 
-          <div className="flex flex-col gap-4">
-            {actionPlan.map((act, aIdx) => (
-              <div 
-                key={aIdx} 
-                className="card" 
-                style={{ 
-                  padding: '1.25rem 1.5rem', 
-                  display: 'flex', 
-                  gap: '1.25rem', 
-                  alignItems: 'flex-start',
-                  background: 'var(--bg-card)',
-                  border: '1px solid rgba(0,0,0,0.06)'
-                }}
-              >
-                <div style={{
-                  background: 'var(--primary)',
-                  color: 'white',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  flexShrink: 0
-                }}>
-                  Étape {act.step || aIdx + 1}
+          <div className="timeline-container" style={{ position: 'relative', paddingLeft: '1rem', marginTop: '1rem' }}>
+            {/* Ligne verticale */}
+            <div style={{ position: 'absolute', top: '24px', bottom: '24px', left: '33px', width: '2px', background: 'linear-gradient(to bottom, var(--primary) 0%, rgba(37, 99, 235, 0.2) 100%)', zIndex: 0 }} className="print-hidden"></div>
+            
+            <div className="flex flex-col gap-6">
+              {actionPlan.map((act, aIdx) => (
+                <div key={aIdx} style={{ display: 'flex', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
+                  {/* Pastille / Numéro */}
+                  <div style={{
+                    background: 'white',
+                    border: '2px solid var(--primary)',
+                    color: 'var(--primary)',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '900',
+                    fontSize: '1rem',
+                    flexShrink: 0,
+                    boxShadow: '0 0 0 4px var(--bg-card)',
+                    marginTop: '0.2rem'
+                  }}>
+                    {act.step || aIdx + 1}
+                  </div>
+                  
+                  {/* Contenu */}
+                  <div className="card" style={{ 
+                    flex: 1,
+                    padding: '1.5rem', 
+                    background: 'white',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 20px -10px rgba(0,0,0,0.05)',
+                    position: 'relative'
+                  }}>
+                    {/* Petite flèche */}
+                    <div style={{ position: 'absolute', left: '-6px', top: '16px', width: '10px', height: '10px', background: 'white', borderLeft: '1px solid rgba(0,0,0,0.06)', borderBottom: '1px solid rgba(0,0,0,0.06)', transform: 'rotate(45deg)' }} className="print-hidden"></div>
+                    
+                    <h3 className="font-extrabold text-base mb-2" style={{ color: 'var(--text-main)' }}>{act.title}</h3>
+                    <p className="text-sm text-muted leading-relaxed" style={{ margin: 0 }}>{act.description}</p>
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <h3 className="font-bold text-base" style={{ margin: 0, color: 'var(--text-main)' }}>{act.title}</h3>
-                  <p className="text-sm text-muted mt-1" style={{ margin: 0, lineHeight: '1.6' }}>{act.description}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
