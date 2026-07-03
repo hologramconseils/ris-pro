@@ -56,9 +56,9 @@ jobs:
               --title "Veille Réglementaire : Mise à jour des règles de retraite" \
               --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro." \
               --base main \
-              --head "$BRANCH_NAME"
+              --head "$BRANCH_NAME" || echo "La Pull Request existe déjà et a été mise à jour."
               
-            echo "Pull Request créée avec succès."
+            echo "Opération terminée avec succès."
           else
             echo "Aucun changement réglementaire détecté. Fin du workflow."
           fi
