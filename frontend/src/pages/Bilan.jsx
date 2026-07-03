@@ -367,7 +367,7 @@ export default function Bilan() {
 
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
-      <div className="flex flex-col gap-10" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="flex flex-col gap-16" style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
         {/* En-tête Bilan */}
         <div className="flex justify-between items-end flex-wrap gap-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '1.5rem' }}>
@@ -463,8 +463,8 @@ export default function Bilan() {
               <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05, transform: 'scale(2)' }}>
                 <Award size={120} />
               </div>
-              <div className="flex items-center gap-3 mb-5" style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ background: 'var(--primary)', color: 'white', padding: '0.6rem', borderRadius: '12px' }}>
+              <div className="flex items-center gap-4 mb-5" style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ background: 'var(--primary)', color: 'white', padding: '0.6rem', borderRadius: '12px', flexShrink: 0 }}>
                   <Sparkles size={20} />
                 </div>
                 <div>
@@ -503,7 +503,7 @@ export default function Bilan() {
         </section>
 
         {/* SECTION 2 : TABLEAU DES ANOMALIES PLIABLES (ACCORDÉON) */}
-        <section className="flex flex-col gap-6 mt-12">
+        <section className="flex flex-col gap-6">
           <div className="flex justify-between items-center flex-wrap gap-4" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
             <h2 className="text-xl font-bold flex items-center gap-2 text-main">
               <FileSearch className="text-primary" size={22} />
@@ -654,7 +654,7 @@ export default function Bilan() {
         </section>
 
         {/* SECTION 3 : PLAN D'ACTION CHRONOLOGIQUE CONSOLIDÉ */}
-        <section className="flex flex-col gap-6 mt-12">
+        <section className="flex flex-col gap-6">
           <h2 className="text-xl font-bold flex items-center gap-2 text-main" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
             <Sparkles className="text-primary" size={22} />
             SECTION 3 — Plan d'Action Chronologique
@@ -669,7 +669,7 @@ export default function Bilan() {
                 <div key={aIdx} style={{ display: 'flex', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
                   {/* Pastille / Numéro */}
                   <div style={{
-                    background: 'white',
+                    background: 'var(--bg-main)',
                     border: '2px solid var(--primary)',
                     color: 'var(--primary)',
                     width: '38px',
@@ -691,14 +691,14 @@ export default function Bilan() {
                   <div className="card" style={{ 
                     flex: 1,
                     padding: '1.5rem', 
-                    background: 'white',
+                    background: 'var(--bg-card)',
                     border: '1px solid rgba(0,0,0,0.06)',
                     borderRadius: '16px',
                     boxShadow: '0 4px 20px -10px rgba(0,0,0,0.05)',
                     position: 'relative'
                   }}>
                     {/* Petite flèche */}
-                    <div style={{ position: 'absolute', left: '-6px', top: '16px', width: '10px', height: '10px', background: 'white', borderLeft: '1px solid rgba(0,0,0,0.06)', borderBottom: '1px solid rgba(0,0,0,0.06)', transform: 'rotate(45deg)' }} className="print-hidden"></div>
+                    <div style={{ position: 'absolute', left: '-6px', top: '16px', width: '10px', height: '10px', background: 'var(--bg-card)', borderLeft: '1px solid rgba(0,0,0,0.06)', borderBottom: '1px solid rgba(0,0,0,0.06)', transform: 'rotate(45deg)' }} className="print-hidden"></div>
                     
                     <h3 className="font-extrabold text-base mb-2" style={{ color: 'var(--text-main)' }}>{act.title}</h3>
                     <p className="text-sm text-muted leading-relaxed" style={{ margin: 0 }}>{act.description}</p>
@@ -710,7 +710,7 @@ export default function Bilan() {
         </section>
 
         {/* Bloc d'urgence & Prise de rendez-vous stratégique */}
-        <div className="flex flex-col items-center gap-4 mt-16 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.3)', textAlign: 'center' }}>
+        <div className="flex flex-col items-center gap-4 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.3)', textAlign: 'center' }}>
           <h3 className="text-xl font-bold" style={{ color: '#b89218', letterSpacing: '-0.02em', margin: 0 }}>Besoin d'accompagnement pour vos démarches ?</h3>
           <p className="text-muted text-sm max-w-lg" style={{ margin: 0 }}>
             Nos experts en retraite vous accompagnent pas à pas pour régulariser votre dossier auprès des caisses et sécuriser vos droits.
