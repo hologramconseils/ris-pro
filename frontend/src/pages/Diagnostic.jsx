@@ -114,6 +114,11 @@ export default function Diagnostic() {
       
       const data = await response.json()
       setResults(data)
+      
+      // Si l'utilisateur est connecté et que l'analyse est débloquée (non restricted), redirection automatique vers le Bilan complet
+      if (user && data && !data.is_restricted) {
+        navigate(`/bilan?success=true&file=${encodeURIComponent(path)}`, { replace: true })
+      }
     } catch (err) {
       console.error(err)
       setError(err.message || LABELS.ERROR_ANALYSIS)
@@ -132,10 +137,11 @@ export default function Diagnostic() {
       return
     }
 
-    // Si admin ou a déjà payé (legacy) ou a des crédits restants
+    // Si admin ou a déjà payé (legacy) ou a des crédits restants ou analyse débloquée
     const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
+    const isUnlocked = results && !results.is_restricted;
 
-    if (isAdmin || hasCredits) {
+    if (isAdmin || hasCredits || isUnlocked) {
       navigate(`/bilan?success=true&file=${encodeURIComponent(filePath)}`)
       return
     }
