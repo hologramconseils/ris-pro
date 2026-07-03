@@ -81,7 +81,7 @@ export default async function handler(req, res) {
     // Récupérer le record d'analyse dans Supabase pour vérifier le propriétaire
     const { data: analysisRecord, error: recordError } = await supabase
       .from('analyses')
-      .select('user_id, status, file_path')
+      .select('user_id, status, file_path, results')
       .ilike('file_path', filePath)
       .single();
 
@@ -376,9 +376,18 @@ export default async function handler(req, res) {
     }
 
     // 7. Mettre à jour la base de données
+    // On sauvegarde les résultats complets de Gemini + un flag is_restricted pour savoir
+    // si cette analyse a été servie en mode freemium (pour permettre l'upgrade ultérieur)
+    const dbResults = { ...analysisResults };
+    if (!hasPremiumAccess) {
+      dbResults.is_restricted = true;
+    } else {
+      delete dbResults.is_restricted; // S'assurer qu'on retire le flag si l'accès est premium
+    }
+
     const updateData = { 
       status: 'completed',
-      results: analysisResults
+      results: dbResults
     };
     if (targetUserId) updateData.user_id = targetUserId;
 
