@@ -79,6 +79,8 @@ export default function Bilan() {
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState('all')
   const [hasAttemptedAgent, setHasAttemptedAgent] = useState(false)
+  const [openAnomalyIndex, setOpenAnomalyIndex] = useState(0) // Premier accordéon ouvert par défaut
+  const [openDocsIndex, setOpenDocsIndex] = useState(null) // Gestion du tiroir de justificatifs
 
   useEffect(() => {
     if (filePath) {
@@ -309,9 +311,6 @@ export default function Bilan() {
       </div>
     )
   }
-
-  const [openAnomalyIndex, setOpenAnomalyIndex] = useState(0) // Premier accordéon ouvert par défaut
-  const [openDocsIndex, setOpenDocsIndex] = useState(null) // Gestion du tiroir de justificatifs
 
   const extractTrimestres = (text) => {
     if (typeof results?.trimestres_valides === 'number') {
