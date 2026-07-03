@@ -1,32 +1,59 @@
-# Règles d'Optimisation du Montant de la Retraite (2023)
+# Règles d'Optimisation du Montant de la Retraite (2023, mis à jour en 2026)
 
 Conformément à la législation en vigueur, les algorithmes de RIS Pro évaluent proactivement les dispositifs légaux d'amélioration du montant de la pension pour les suggérer aux assurés lorsque leur carrière le justifie.
 
 ## 1. Le Rachat de Trimestres (Versement pour la Retraite)
-Ce dispositif permet d'acheter des semestres manquants pour combler une carrière incomplète, réduisant ou annulant ainsi la décote (minoration). 
+Ce dispositif permet d'acheter des trimestres manquants pour combler une carrière incomplète, réduisant ou annulant ainsi la décote (minoration).
 
 - **Plafond légal :** Au maximum **12 trimestres** peuvent être rachetés tout au long de la carrière.
-- **Motifs d'éligibilité :** 
+- **Motifs d'éligibilité :**
   - Années d'études supérieures validées par un diplôme (ou assimilées).
   - Années civiles incomplètes (au cours desquelles l'assuré n'a pas réuni ses 4 trimestres validés, souvent au début de carrière ou pendant un temps partiel).
-- **Indication Algorithmique (RIS Pro) :** Suggeré automatiquement si `trimestres_requis > trimestres_projetes`.
+  - Dispositif spécifique pour douze professions exercées par des travailleurs indépendants qui n'avaient pas pu être affiliés à un régime de retraite avant le 1er janvier 2018 (décret n° 2024-766 du 8 juillet 2024, applicable via la circulaire CNAV n° 2025-03 du 15 janvier 2025).
+- **Conditions spécifiques post-réforme 2023 :**
+  - Il est possible d'effectuer un rachat de trimestres pour études supérieures à coût réduit jusqu'au 31 décembre de l'année des 40 ans de l'assuré (au lieu du 31 décembre de la 10e année suivant la fin des études).
+  - La demande de versement de cotisations au titre d'un stage en entreprise peut être déposée jusqu'au 31 décembre de l'année des 30 ans de l'assuré (au lieu de la 2e année suivant la fin du stage).
+- **Coût du rachat :** Le barème du rachat de trimestres est revalorisé annuellement par la CNAV et son coût augmente avec l'âge et les revenus de l'assuré. Le barème 2026 a été publié.
+- **Indication Algorithmique (RIS Pro) :** Suggéré automatiquement si `trimestres_requis > trimestres_projetes`.
 
 ## 2. La Surcote (Travailler plus pour gagner plus)
 La surcote est un bonus qui majore le montant de la retraite de base pour les personnes qui poursuivent leur activité alors qu'elles sont déjà éligibles à une retraite à taux plein.
 
-- **Conditions :** 
-  - Avoir atteint l'âge légal (progressif de 62 à 64 ans).
-  - Justifier du nombre requis de trimestres pour son année de naissance (ex: 172 trimestres pour la génération 1965+).
-- **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort).
-- **Indication Algorithmique :** Suggeré automatiquement si l'assuré atteint le taux plein à l'âge légal mais souhaite prolonger.
+- **Conditions :**
+  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023.
+  - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
+  - Continuer à travailler au-delà de ces deux seuils.
+- **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
+- **Surcote parentale (post-réforme 2023) :** Une surcote spécifique a été mise en place pour les parents nés à partir du 1er avril 1965, sous réserve d'avoir acquis au moins un trimestre de majoration au titre de la maternité, de l'éducation, de l'adoption, d'un enfant handicapé ou d'un congé parental.
+- **Indication Algorithmique :** Suggéré automatiquement si l'assuré atteint le taux plein à l'âge légal mais souhaite prolonger.
 
 ## 3. Le Cumul Emploi-Retraite
 Ce mécanisme autorise à cumuler ses pensions de retraite liquidées avec les revenus d'une nouvelle activité professionnelle post-liquidation.
 
 - **Avant la réforme 2023 :** Le cumul était possible, mais ne générait aucun nouveau droit à retraite.
-- **Réforme de 2023 (Nouveaux droits) :** Les retraités en cumul intégral se constituent de **nouveaux droits** qui viendront s'ajouter lors du second départ. Le montant de cette seconde pension est toutefois plafonné par la loi (Max 5% du plafond annuel de la SS).
+- **Réforme de 2023 (Nouveaux droits) :** Les retraités en cumul emploi-retraite intégral se constituent de **nouveaux droits** qui viendront s'ajouter lors du second départ. Ces nouveaux droits concernent les activités exercées depuis le 1er janvier 2023.
+  - Le montant de cette seconde pension est toutefois plafonné par la loi et ne peut dépasser 5 % du plafond annuel de la Sécurité sociale (PASS). En 2026, ce plafond est de 2 403 euros bruts mensuels.
+  - **Conditions du cumul intégral :** L'assuré doit avoir liquidé toutes ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions pour une retraite à taux plein (soit en ayant l'âge du taux plein automatique à 67 ans pour les générations nées en 1955 ou après, soit en ayant à la fois l'âge légal et la durée d'assurance requise).
+  - **Délai de carence :** Si la première retraite prend effet à partir du 1er novembre 2023 et que l'activité salariée est reprise chez le *dernier employeur*, un délai de 6 mois est requis pour acquérir de nouveaux droits. Ce délai ne s'applique pas si l'activité est reprise chez un *nouvel employeur*.
+- **Cumul plafonné :** Si les conditions du cumul intégral ne sont pas remplies (par exemple, retraite avec décote), le cumul est plafonné. Le total des pensions de retraite et des revenus d'activité ne doit pas dépasser le montant le plus élevé entre 160 % du SMIC (soit 2 916,85 € bruts mensuels en 2026) ou la moyenne mensuelle des trois derniers salaires bruts perçus avant la liquidation de la retraite. En cas de dépassement, la pension est réduite.
 
 ## 4. Les Majorations Familiales (Pour Informations)
 La législation française favorise les parents.
-- **Majoration Enfant :** Octroi classique de 8 trimestres par enfant (maternité/éducation partagée).
+
+- **Majoration Enfant :** Octroi classique de 8 trimestres par enfant (4 trimestres au titre de la maternité ou de l'adoption, et 4 trimestres au titre de l'éducation).
+  - **Attribution des trimestres d'éducation (post-réforme 2023) :** Désormais, 2 des 4 trimestres "éducation" acquis pour chaque enfant sont automatiquement attribués à la mère. Les 2 autres peuvent être attribués à la mère ou au père.
 - **Majoration Famille Nombreuse :** Majoration forfaitaire de **10 %** du montant de la pension pour l'assuré (homme ou femme) justifiant avoir élevé au moins **3 enfants**. Ceci s'applique en fin de calcul, sur la retraite de base comme sur les complémentaires Agirc-Arrco.
+  - **Conditions d'éducation :** Les enfants doivent avoir été élevés pendant au moins neuf ans avant leur 16e anniversaire, ou avant l'âge auquel ils ont cessé de donner droit aux prestations familiales.
+  - **Prise en compte des enfants décédés (post-réforme 2023) :** Depuis le 16 avril 2023, l'exemption de la condition d'éducation de 9 ans qui ne concernait que les enfants décédés par faits de guerre est généralisée à l'ensemble des enfants décédés.
+  - **Exclusion de la majoration (post-réforme 2023) :** Les parents privés de l'autorité parentale ou dont l'autorité parentale a été retirée suite à une condamnation pénale prenant effet à partir du 1er septembre 2023 pour certains crimes ou délits commis à l'encontre d'un des enfants ne peuvent plus bénéficier de cette majoration.
+
+### Mises à jour réglementaires
+- **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023 (Réforme des retraites).
+- **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
+- **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
+- **Circulaire CNAV n° 2025-03 du 15 janvier 2025** relative au rachat de trimestres pour certaines professions libérales (en application du décret n° 2024-766 du 8 juillet 2024).
+- **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
+- **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
+- **Circulaire de la CNAV - 05/02/2026** pour le barème 2026 du rachat de trimestres.
+
+Date de mise à jour : 3 juillet 2026.
