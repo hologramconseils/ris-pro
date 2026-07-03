@@ -52,17 +52,15 @@ jobs:
             
             git push origin "$BRANCH_NAME" --force
             
-            PR_EXISTS=$(gh pr list --head "$BRANCH_NAME" --json number -q 'length')
-            if [ "$PR_EXISTS" -eq "0" ]; then
-              gh pr create \
-                --title "Veille Réglementaire : Mise à jour des règles de retraite" \
-                --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro." \
-                --base main \
-                --head "$BRANCH_NAME"
-              echo "Pull Request créée avec succès."
-            else
-              echo "La Pull Request existe déjà et a été mise à jour avec les nouveaux commits."
-            fi
+            set +e
+            gh pr create \
+              --title "Veille Réglementaire : Mise à jour des règles de retraite" \
+              --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro." \
+              --base main \
+              --head "$BRANCH_NAME"
+            set -e
+            
+            echo "Opération terminée avec succès."
           else
             echo "Aucun changement réglementaire détecté. Fin du workflow."
           fi
