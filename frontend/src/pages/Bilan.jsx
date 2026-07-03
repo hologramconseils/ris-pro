@@ -626,7 +626,7 @@ export default function Bilan() {
                         <p className="text-sm font-semibold mb-4" style={{ margin: 0, color: 'var(--text-main)' }}>{anom.solution}</p>
                         
                         {/* Pièces Justificatives directement visibles */}
-                        <div style={{ background: 'var(--bg-main)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
+                        <div style={{ background: 'var(--bg-page)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
                           <div className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--text-main)' }}>
                             <FileText size={14} className="text-success" /> Documents à préparer pour correction :
                           </div>
@@ -669,7 +669,7 @@ export default function Bilan() {
                 <div key={aIdx} style={{ display: 'flex', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
                   {/* Pastille / Numéro */}
                   <div style={{
-                    background: 'var(--bg-main)',
+                    background: 'var(--bg-page)',
                     border: '2px solid var(--primary)',
                     color: 'var(--primary)',
                     width: '38px',
