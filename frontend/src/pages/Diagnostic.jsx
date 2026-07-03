@@ -117,6 +117,7 @@ export default function Diagnostic() {
       
       // Si l'utilisateur est connecté et que l'analyse est débloquée (non restricted), redirection automatique vers le Bilan complet
       if (user && data && !data.is_restricted) {
+        sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(data))
         navigate(`/bilan?success=true&file=${encodeURIComponent(path)}`, { replace: true })
       }
     } catch (err) {

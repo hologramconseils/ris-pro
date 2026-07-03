@@ -254,15 +254,20 @@ export default async function handler(req, res) {
         }
 
         // Vérifier si cette identité a déjà été analysée par cet utilisateur
-        const { data: existingAnalysis } = await supabase
+        // On récupère aussi le champ 'results' pour savoir si l'analyse précédente était restreinte
+        const { data: existingAnalysisList } = await supabase
           .from('analyses')
-          .select('id')
+          .select('id, results')
           .eq('user_id', targetUserId)
           .eq('nir_hash', nirHash)
           .eq('status', 'completed')
           .limit(1);
 
-        const isNewIdentity = !existingAnalysis || existingAnalysis.length === 0;
+        const existingAnalysis = existingAnalysisList && existingAnalysisList.length > 0 ? existingAnalysisList[0] : null;
+        const isNewIdentity = !existingAnalysis;
+        // Cas critique : l'analyse existante était restreinte (freemium)
+        // Si l'utilisateur a maintenant des crédits, on doit la traiter comme une nouvelle identité
+        const wasRestricted = existingAnalysis && existingAnalysis.results && existingAnalysis.results.is_restricted === true;
 
         // Récupérer le profil pour vérifier les crédits
         const { data: profile } = await supabase
@@ -286,7 +291,12 @@ export default async function handler(req, res) {
           hasPremiumAccess = true;
         }
 
-        if (isNewIdentity && !isAdmin && currentCredits > 0) {
+        // Décompter un crédit si :
+        // - C'est une nouvelle identité (premier upload de ce NIR)
+        // - OU si l'analyse existante était restreinte et que l'utilisateur a maintenant des crédits
+        const shouldDeductCredit = !isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted);
+
+        if (shouldDeductCredit) {
           // Décompte sécurisé du crédit d'analyse
           const { error: updateError } = await supabase
             .from('profiles')
@@ -296,7 +306,7 @@ export default async function handler(req, res) {
           if (updateError) {
             console.error("[Credits] Erreur décrémentation:", updateError.message);
           } else {
-            console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}`);
+            console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}. Raison: ${isNewIdentity ? 'nouvelle identité' : 'upgrade restreint->premium'}`);
           }
         }
       } catch (dbError) {
