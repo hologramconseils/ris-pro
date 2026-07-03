@@ -454,7 +454,7 @@ export default function Bilan() {
             <div className="card" style={{ 
               padding: '2rem', 
               borderTop: '4px solid var(--primary)', 
-              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              background: 'var(--bg-card)',
               boxShadow: '0 10px 30px -10px rgba(0,0,0,0.08)',
               borderRadius: '16px',
               position: 'relative',
@@ -463,7 +463,7 @@ export default function Bilan() {
               <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05, transform: 'scale(2)' }}>
                 <Award size={120} />
               </div>
-              <div className="flex items-center gap-3 mb-4" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="flex items-center gap-3 mb-5" style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{ background: 'var(--primary)', color: 'white', padding: '0.6rem', borderRadius: '12px' }}>
                   <Sparkles size={20} />
                 </div>
@@ -472,9 +472,9 @@ export default function Bilan() {
                   <p className="text-xs text-muted" style={{ margin: 0 }}>Audit vérifié par un conseiller RIS Pro</p>
                 </div>
               </div>
-              <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1rem', borderLeft: '2px solid rgba(37, 99, 235, 0.2)' }}>
-                <p className="text-base text-main" style={{ margin: 0, lineHeight: '1.8', fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic', color: '#334155' }}>
-                  "{results.summary}"
+              <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1.25rem', borderLeft: '3px solid rgba(37, 99, 235, 0.4)' }}>
+                <p className="text-base font-medium" style={{ margin: 0, lineHeight: '1.7', color: 'var(--text-main)' }}>
+                  {results.summary}
                 </p>
               </div>
             </div>
@@ -503,7 +503,7 @@ export default function Bilan() {
         </section>
 
         {/* SECTION 2 : TABLEAU DES ANOMALIES PLIABLES (ACCORDÉON) */}
-        <section className="flex flex-col gap-6 mt-4">
+        <section className="flex flex-col gap-6 mt-12">
           <div className="flex justify-between items-center flex-wrap gap-4" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
             <h2 className="text-xl font-bold flex items-center gap-2 text-main">
               <FileSearch className="text-primary" size={22} />
@@ -623,11 +623,11 @@ export default function Bilan() {
                         <h4 className="font-bold text-xs uppercase tracking-wider text-success mb-2 flex items-center gap-1.5">
                           <CheckCircle2 size={16} /> Recommandation de l'expert
                         </h4>
-                        <p className="text-sm font-semibold text-main mb-4" style={{ margin: 0 }}>{anom.solution}</p>
+                        <p className="text-sm font-semibold mb-4" style={{ margin: 0, color: 'var(--text-main)' }}>{anom.solution}</p>
                         
                         {/* Pièces Justificatives directement visibles */}
-                        <div style={{ background: 'rgba(255,255,255,0.7)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
-                          <div className="text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
+                        <div style={{ background: 'var(--bg-main)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
+                          <div className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--text-main)' }}>
                             <FileText size={14} className="text-success" /> Documents à préparer pour correction :
                           </div>
                           <ul style={{ listStyleType: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -654,7 +654,7 @@ export default function Bilan() {
         </section>
 
         {/* SECTION 3 : PLAN D'ACTION CHRONOLOGIQUE CONSOLIDÉ */}
-        <section className="flex flex-col gap-6 mt-4">
+        <section className="flex flex-col gap-6 mt-12">
           <h2 className="text-xl font-bold flex items-center gap-2 text-main" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
             <Sparkles className="text-primary" size={22} />
             SECTION 3 — Plan d'Action Chronologique
@@ -710,7 +710,7 @@ export default function Bilan() {
         </section>
 
         {/* Bloc d'urgence & Prise de rendez-vous stratégique */}
-        <div className="flex flex-col items-center gap-4 mt-8 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.3)', textAlign: 'center' }}>
+        <div className="flex flex-col items-center gap-4 mt-16 mb-16 print-hidden urgency-section" style={{ background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.3)', textAlign: 'center' }}>
           <h3 className="text-xl font-bold" style={{ color: '#b89218', letterSpacing: '-0.02em', margin: 0 }}>Besoin d'accompagnement pour vos démarches ?</h3>
           <p className="text-muted text-sm max-w-lg" style={{ margin: 0 }}>
             Nos experts en retraite vous accompagnent pas à pas pour régulariser votre dossier auprès des caisses et sécuriser vos droits.
