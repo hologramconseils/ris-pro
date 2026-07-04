@@ -18,7 +18,7 @@ L’âge légal de départ augmente progressivement de 62 ans à 64 ans, avec de
 | **1962** | 62 ans et 6 mois |
 | **1963** | 62 ans et 9 mois |
 | **1964** | 62 ans et 9 mois |
-| **Entre le 01/01 et le 30/09/1965** | 62 ans et 9 mois |
+| **Entre le 01/01 et le 30/09/1965** | 62 ans et 3 mois |
 | **Entre le 01/10 et le 31/12/1965** | 62 ans et 6 mois |
 | **1966** | 62 ans et 9 mois |
 | **1967** | 63 ans |
@@ -39,7 +39,7 @@ La durée d'assurance requise pour obtenir une retraite au taux plein a égaleme
 | **1962** | 169 trimestres |
 | **1963** | 170 trimestres |
 | **1964** | 170 trimestres |
-| **Entre le 01/01 et le 30/09/1965** | 170 trimestres |
+| **Entre le 01/01 et le 30/09/1965** | 166 trimestres |
 | **Entre le 01/10 et le 31/12/1965** | 167 trimestres |
 | **1966** | 168 trimestres |
 | **1967** | 169 trimestres |
@@ -59,7 +59,7 @@ La granularité par mois de naissance a été ajoutée à la méthode de project
 Les informations de ce document ont été mises à jour le 04 juillet 2026 pour refléter les modifications apportées par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et ses décrets et circulaires d'application, notamment :
 
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** : Cette loi (n° 2025-1403 du 30 décembre 2025) a introduit une "suspension" partielle de la trajectoire d'allongement de la durée de cotisation et a ralenti le relèvement de l'âge légal pour certaines générations (notamment 1964 à 1970), applicable aux pensions prenant effet à compter du 1er septembre 2026.
-*   **Circulaire Cnav 2026-07 du 1er juillet 2026** : Précise les nouvelles dispositions concernant l'âge légal et la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026, annulant et remplaçant les circulaires précédentes pour cette période. Ce document a été révisé pour intégrer précisément les données de cette circulaire pour l'âge légal et le nombre de trimestres requis.
+*   **Circulaire Cnav 2026-07 du 5 mars 2026** : Précise les nouvelles dispositions concernant l'âge légal et la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026, annulant et remplaçant les circulaires précédentes pour cette période. Ce document a été révisé pour intégrer précisément les données de cette circulaire pour l'âge légal et le nombre de trimestres requis.
 *   **Décret n° 2026-344 du 7 mai 2026 et Décret n° 2026-345 du 7 mai 2026** : Ces décrets portent application de l'article 105 de la LFSS 2026 et précisent les conséquences de la suspension de la réforme des retraites pour les conditions de départ anticipé (carrières longues, assurés handicapés) et l'âge légal à Mayotte, applicables aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV publiée le 6 mars 2026** : Clarifie l'application concrète de la suspension de la réforme des retraites de 2023, notamment pour l'âge légal et la durée d'assurance requise pour les assurés nés en 1964 et 1965.
 *   **Décret n° 2023-436 du 3 juin 2023** : Porte application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023, relatif au relèvement de l'âge d'ouverture des droits à la retraite et aux dispositifs de retraite anticipée.
