@@ -37,7 +37,7 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
     | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
     | 1966                   | 63 ans et 3 mois                | 172                                                          |
     | 1967                   | 63 ans et 6 mois                | 172                                                          |
-    | 1968                   | 63 ans et 9 mois                | 172                                                          |
+    | 1968                   | 64 ans                           | 172                                                          |
     | 1969 et après          | 64 ans                           | 172                                                          |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
@@ -48,10 +48,12 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 Le dispositif de retraite progressive, permettant de travailler à temps partiel tout en percevant une fraction de sa retraite, est désormais accessible dès l'âge de 60 ans pour les assurés de tous les régimes, à compter du 1er septembre 2025. Cette mesure résulte de l'Accord National Interprofessionnel (ANI) du 14 novembre 2024 sur l'emploi des seniors et de décrets publiés en juillet 2025.
 
 ### Mises à jour réglementaires
-*   **Arrêté du 19 décembre 2024** portant fixation du plafond de la sécurité sociale pour 2025, publié au Journal Officiel du 29 décembre 2024. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2025 est fixé à 47 100 €.
+*   **Arrêté du 22 décembre 2025** portant fixation du plafond de la sécurité sociale pour 2026, publié au Journal Officiel du 29 décembre 2025. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 est fixé à 48 060 €.
 *   **Décrets n° 2025-681 du 15 juillet 2025** publiés au Journal Officiel du 23 juillet 2025, abaissant l'âge d'ouverture du droit à retraite progressive à 60 ans pour toutes les pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** annulant et remplaçant la circulaire Agirc-Arrco 2024-14 DRJ et communiquant les coefficients spécifiques applicables aux retraites progressives prenant effet de septembre à décembre 2025.
-*   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)**, notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
+*   **Circulaire Agirc-Arrco n° 2026-1-SG-DRJ du 16 janvier 2026** annulant et remplaçant la circulaire Agirc-Arrco 2025-14-SG-DRJ et communiquant les coefficients spécifiques applicables aux retraites progressives prenant effet à partir de janvier 2026.
+*   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** (Loi n° 2025-1403 du 30 décembre 2025), notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV du 6 mars 2026** clarifiant l'application concrète de la suspension de la réforme des retraites de 2023 pour les départs à compter du 1er septembre 2026.
 *   **Décrets n° 2026-344 et n° 2026-345 du 7 mai 2026** mettant en œuvre les dispositions de l'article 105 de la LFSS 2026, applicables aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
+
+Date de mise à jour : 4 juillet 2026.

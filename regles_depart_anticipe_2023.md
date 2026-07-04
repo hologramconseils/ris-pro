@@ -21,7 +21,7 @@ L'assuré justifiant d'un taux d'incapacité permanente d'au moins 50 % tout au 
 ## 3. Retraite pour Incapacité Permanente
 Suite à un accident du travail ou une maladie professionnelle reconnue :
 - Taux d’incapacité **≥ 20%** : Départ dès 60 ans (sans décote, sans condition de durée d'assurance pour le taux plein).
-- Taux **entre 10% et 19%** : Départ possible 2 ans avant l'âge légal (à terme, 62 ans au lieu de 64 ans) sous conditions strictes d'exposition pendant 17 ans (68 trimestres) au risque avec lien qualifié. La réforme des retraites de 2023 a assoupli ce dispositif en supprimant, pour les assurés dont le taux d'incapacité permanente est compris entre 10 % et 19 %, la condition d'identité de lésions entre un accident du travail et une maladie professionnelle. Ce dispositif est également étendu aux travailleurs indépendants ayant adhéré à l'assurance volontaire pour le risque AT/MP.
+- Taux **entre 10% et 19%** : Départ possible 2 ans avant l'âge légal (à terme, 62 ans au lieu de 64 ans) sous conditions strictes d'exposition pendant 17 ans (68 trimestres) au risque avec lien qualifié. La réforme des retraites de 2023 a assoupli ce dispositif. Pour les assurés dont le taux d'incapacité permanente est compris entre 10 % et 19 %, la condition d'identité de lésions entre un accident du travail et une maladie professionnelle reste requise pour le cumul de taux en vue d'atteindre le seuil de 20% d'incapacité. Ce dispositif est également étendu aux travailleurs indépendants ayant adhéré à l'assurance volontaire pour le risque AT/MP.
 
 ## 4. Retraite Progressive
 Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivant une activité à temps partiel.
@@ -36,6 +36,7 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Décret n° 2023-753 du 10 août 2023** portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 relatif au cumul emploi retraite et à la retraite progressive (détermine les modalités d'élargissement et d'assouplissement de l'accès à la retraite progressive et l'étend aux fonctionnaires civils de l'État, professionnels libéraux et avocats).
 - **Décrets n°2025-680 et n°2025-681 du 15 juillet 2025** (publiés au Journal officiel du 23 juillet 2025) abaissant l'âge d'accès à la retraite progressive à 60 ans pour tous, applicable à compter du 1er septembre 2025.
 - **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** officialisant l'ouverture du droit à retraite progressive dès 60 ans pour tous.
+- **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
 
 **Date de mise à jour :** Juillet 2026
