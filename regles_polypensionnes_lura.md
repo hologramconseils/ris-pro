@@ -1,4 +1,4 @@
-# Règles pour les Polypensionnés et la LURA (2023)
+# Règles pour les Polypensionnés et la LURA (2023 et mises à jour)
 
 Ce document régit les droits à la retraite des assurés ayant cotisé à plusieurs régimes de base obligatoires au cours de leur carrière (polypensionnés).
 
@@ -22,27 +22,36 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 - L'assuré perçoit plusieurs pensions de base.
 - **Taux plein :** Le droit au taux plein (âge ou durée d'assurance) s'apprécie en prenant en compte **la totalité des trimestres validés tous régimes confondus**. Un trimestre cotisé à la CNAVPL compte pour atteindre la durée d'assurance requise au Régime Général, et inversement.
 
-    Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. L'âge d'annulation de la décote reste fixé à 67 ans.
+    Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023) et aux ajustements apportés par la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. L'âge d'annulation de la décote reste fixé à 67 ans.
 
-    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2023 :
+    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, suite à la "suspension" partielle du calendrier initial de la réforme de 2023:
 
-    | Année de naissance | Âge légal de départ à la retraite | Durée d'assurance requise pour le taux plein (en trimestres) |
-    | :----------------- | :------------------------------- | :----------------------------------------------------------- |
-    | Avant 01/09/1961   | 62 ans                 | 167 (1960) / 168 (Jan-Août 1961)            |
-    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois | 169                                         |
-    | 1962               | 62 ans et 6 mois | 169                                         |
-    | 1963               | 62 ans et 9 mois | 170                                         |
-    | 1964               | 63 ans          | 171                                         |
-    | 1965               | 63 ans et 3 mois | 172                                         |
-    | 1966               | 63 ans et 6 mois | 172                                            |
-    | 1967               | 63 ans et 9 mois | 172                                            |
-    | 1968 et après      | 64 ans             | 172                                            |
+    | Année de naissance     | Âge légal de départ à la retraite | Durée d'assurance requise pour le taux plein (en trimestres) |
+    | :--------------------- | :------------------------------- | :----------------------------------------------------------- |
+    | Avant 01/09/1961       | 62 ans                           | 167 (1960) / 168 (Jan-Août 1961)                              |
+    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                                          |
+    | 1962                   | 62 ans et 6 mois                | 169                                                          |
+    | 1963                   | 62 ans et 9 mois                | 170                                                          |
+    | 1964                   | 62 ans et 9 mois                | 170                                                          |
+    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                          |
+    | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
+    | 1966                   | 63 ans et 3 mois                | 172                                                          |
+    | 1967                   | 63 ans et 6 mois                | 172                                                          |
+    | 1968                   | 63 ans et 9 mois                | 172                                                          |
+    | 1969 et après          | 64 ans                           | 172                                                          |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
 
 - **Salaire/Revenu de référence :** Contrairement à la LURA, les 25 meilleures années (pour le privé) ou les 6 derniers mois (pour le public) sont calculés uniquement sur la base des périodes d'affiliation au régime concerné. La règle des "25 meilleures années" est proratisée dans le privé si l'assuré a passé une grande partie de sa carrière dans le public.
 
+### Dispositif de Retraite Progressive
+Le dispositif de retraite progressive, permettant de travailler à temps partiel tout en percevant une fraction de sa retraite, est désormais accessible dès l'âge de 60 ans pour les assurés de tous les régimes, à compter du 1er septembre 2025. Cette mesure résulte de l'Accord National Interprofessionnel (ANI) du 14 novembre 2024 sur l'emploi des seniors et de décrets publiés en juillet 2025.
+
 ### Mises à jour réglementaires
-*   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023, entrée en vigueur le 1er septembre 2023. Cette loi a modifié l'âge légal de départ à la retraite et la durée d'assurance requise pour bénéficier d'une pension à taux plein.
-*   **Circulaire CNAV 2023-14 du 10 juillet 2023** confirmant les nouvelles règles de calcul de la retraite pour les départs à partir de septembre 2023.
-*   **Circulaire CNAV 2023/19 du 15 septembre 2023** détaillant l'âge légal de la retraite et la durée d'assurance.
+*   **Arrêté du 19 décembre 2024** portant fixation du plafond de la sécurité sociale pour 2025, publié au Journal Officiel du 29 décembre 2024. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2025 est fixé à 47 100 €.
+*   **Décrets n° 2025-681 du 15 juillet 2025** publiés au Journal Officiel du 23 juillet 2025, abaissant l'âge d'ouverture du droit à retraite progressive à 60 ans pour toutes les pensions prenant effet à compter du 1er septembre 2025.
+*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** annulant et remplaçant la circulaire Agirc-Arrco 2024-14 DRJ et communiquant les coefficients spécifiques applicables aux retraites progressives prenant effet de septembre à décembre 2025.
+*   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)**, notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
+*   **Circulaire CNAV du 6 mars 2026** clarifiant l'application concrète de la suspension de la réforme des retraites de 2023 pour les départs à compter du 1er septembre 2026.
+*   **Décrets n° 2026-344 et n° 2026-345 du 7 mai 2026** mettant en œuvre les dispositions de l'article 105 de la LFSS 2026, applicables aux pensions prenant effet à compter du 1er septembre 2026.
+*   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
