@@ -1,6 +1,6 @@
 # Règles de Gestion : Âge de Départ à la Retraite (Réforme 2023 et LFSS 2026)
 
-Conformément à la réforme des retraites entrée en vigueur en septembre 2023 et aux instructions officielles de l'Assurance Retraite, l'âge légal de départ et le nombre de trimestres requis varient en fonction de l'année (et parfois du mois) de naissance.
+Conformément à la réforme des retraites entrée en vigueur en septembre 2023 et à la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026) qui a modifié le calendrier de certaines dispositions, l'âge légal de départ et le nombre de trimestres requis varient en fonction de l'année (et parfois du mois) de naissance. Ces nouvelles règles s'appliquent pour les pensions prenant effet à compter du 1er septembre 2026.
 
 **À noter : Les règles ci-dessous prennent en compte les ajustements apportés par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et les circulaires CNAV/Agirc-Arrco publiées ultérieurement, qui modifient la trajectoire de la réforme de 2023 pour les pensions prenant effet à compter du 1er septembre 2026.**
 
