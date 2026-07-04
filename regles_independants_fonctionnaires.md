@@ -49,7 +49,10 @@ Les fonctionnaires ayant un emploi présentant un "risque particulier ou des fat
 *   **LOI n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (LFSS 2026), qui introduit une suspension partielle du calendrier de relèvement de l'âge légal et de la durée d'assurance de la réforme de 2023 pour certaines générations, et modifie les règles du cumul emploi-retraite à partir de 2027.
 *   **Circulaire Cnav 2025/29 du 22 décembre 2025** relative à la revalorisation des pensions de vieillesse, des minima sociaux et des minima de pension au 1er janvier 2026 (revalorisation de 0,9% pour les pensions de base).
 *   **Décret n° 2026-344 et n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adaptations de l'âge de départ anticipé pour carrière longue et assurés handicapés, applicables au 1er septembre 2026).
-*   **Circulaire Cnav 2026-07 du 05 mars 2026** pour les retraites prenant effet à compter du 1er septembre 2026 (modifications de l'âge légal, durée d'assurance et âge du taux plein en métropole).
+*   **Circulaire Cnav 2026-07 du 1er juillet 2026** pour les retraites prenant effet à compter du 1er septembre 2026 (modifications de l'âge légal, durée d'assurance et âge du taux plein en métropole).
+*   **Circulaire Cnav 2026/16 du 12 juin 2026** relative à la revalorisation du Smic au 1er juin 2026 et ses incidences en matière de législation vieillesse.
+*   **Circulaire Cnav 2026/17 du 12 juin 2026** relative à la retraite anticipée pour carrière longue à compter du 1er septembre 2026.
+*   **Circulaire Cnav 2026/18 du 15 juin 2026** relative à la retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.
 *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** sur la retraite progressive 2026.
 
 Date de mise à jour : July 4, 2026.

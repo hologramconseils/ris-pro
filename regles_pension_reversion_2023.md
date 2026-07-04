@@ -11,7 +11,7 @@ La pension de réversion du régime de base correspond à **54%** de la retraite
 - **Ressources :** La réversion de base est soumise à des conditions de ressources. Pour une demande en 2026, les ressources annuelles brutes du survivant ne doivent pas dépasser un plafond fixé par décret :
     - **25 001,60 €** pour une personne seule.
     - **40 002,56 €** pour une personne vivant en couple (si le survivant s'est remarié, pacsé ou vit en concubinage).
-    Dans le calcul des ressources, 70% des revenus professionnels sont pris en compte, ainsi que 3% de la valeur des biens immobiliers (hors résidence principale et exploitation agricole) et des placements. Les allocations chômage, indemnités journalières, RSA, aides au logement et prestations familiales ne sont pas comptabilisées.
+    Dans le calcul des ressources, 70% des revenus professionnels sont pris en compte (un abattement de 30% s'applique après 55 ans), ainsi que 3% de la valeur des biens immobiliers (hors résidence principale et exploitation agricole) et des placements. Les allocations chômage, indemnités journalières, RSA et AAH sont comptabilisées. Les aides au logement et prestations familiales ne sont pas comptabilisées.
 - **Remariage :** Au régime général, le fait d'être remarié n'annule pas le droit à la réversion, mais les revenus du nouveau conjoint sont pris en compte dans le plafond de ressources.
 
 ## 2. Pluralité de mariages (Divorces)
