@@ -42,6 +42,9 @@ def recuperer_regles_retraite(type_regle: str) -> str:
                     - 'expatriation_internationale' (règles UE et conventions bilatérales)
                     - 'independants_fonctionnaires' (TNS, libéraux, SRE, CNRACL)
                     - 'minima_sociaux_aspa' (MICO, ASPA)
+                    - 'cumul_createur_droits' (Cumul emploi-retraite créateur de nouveaux droits)
+                    - 'retraite_progressive' (Retraite progressive accessible dès 60 ans)
+                    - 'conge_naissance' (Nouveau congé de naissance et ses effets)
     """
     files_map = {
         'depart_anticipe': 'regles_depart_anticipe_2023.md',
@@ -51,7 +54,10 @@ def recuperer_regles_retraite(type_regle: str) -> str:
         'pension_reversion': 'regles_pension_reversion_2023.md',
         'expatriation_internationale': 'regles_expatriation_internationale.md',
         'independants_fonctionnaires': 'regles_independants_fonctionnaires.md',
-        'minima_sociaux_aspa': 'regles_minima_sociaux_aspa.md'
+        'minima_sociaux_aspa': 'regles_minima_sociaux_aspa.md',
+        'cumul_createur_droits': 'regles_cumul_emploi_retraite_createur_droits.md',
+        'retraite_progressive': 'regles_retraite_progressive_60_ans.md',
+        'conge_naissance': 'regles_nouveau_conge_naissance_retraite.md'
     }
     filename = files_map.get(type_regle, f"regles_{type_regle}_2023.md")
     paths_to_try = [

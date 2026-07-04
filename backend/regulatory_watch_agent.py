@@ -25,7 +25,10 @@ FILES_TO_WATCH = [
     "regles_pension_reversion_2023.md",
     "regles_expatriation_internationale.md",
     "regles_independants_fonctionnaires.md",
-    "regles_minima_sociaux_aspa.md"
+    "regles_minima_sociaux_aspa.md",
+    "regles_cumul_emploi_retraite_createur_droits.md",
+    "regles_retraite_progressive_60_ans.md",
+    "regles_nouveau_conge_naissance_retraite.md"
 ]
 
 def get_file_path(filename):
