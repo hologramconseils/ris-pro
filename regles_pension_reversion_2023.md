@@ -3,7 +3,7 @@
 Ce document détaille les conditions d'attribution des pensions de réversion (droits dérivés) suite au décès de l'assuré(e).
 
 ## 1. Régime Général (CNAV) et Indépendants (SSI)
-La pension de réversion du régime de base correspond à **54%** de la retraite que percevait (ou aurait perçu) le conjoint décédé. Son montant minimal garanti est de 334,92 € par mois en 2026, si le défunt a cotisé au moins 60 trimestres.
+La pension de réversion du régime de base correspond à **54%** de la retraite que percevait (ou aurait perçu) le conjoint décédé. Son montant minimal garanti est de 334,92 € par mois en 2026, si le défunt a cotisé au moins 60 trimestres. Le montant maximal de la pension de réversion pour le régime général est fixé à 1 081,35 € par mois en 2026.
 
 ### Conditions d'attribution :
 - **Lien matrimonial :** Il faut avoir été **marié(e)** avec la personne décédée. Le PACS et le concubinage n'ouvrent AUCUN droit à la réversion dans le système français.
@@ -31,14 +31,14 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 ## 4. Fonction Publique (SRE / CNRACL)
 - **Taux :** 50% de la pension du fonctionnaire.
 - **Conditions d'attribution (CNRACL) :** Au moins une des conditions suivantes doit être remplie : 4 ans de mariage ; ou avoir un enfant issu de l'union ; ou 2 ans de services valables entre la date de mariage et la date de radiation des cadres de l'auteur du droit.
-- **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion principale. Cependant, un complément de pension peut être versé sous conditions de ressources (plafond annuel brut de 12 523,14 € en 2026 pour une réversion à 50% pour la CNRACL).
+- **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion.
 - **Majorations :** La pension peut être majorée de 10% si le conjoint décédé et le bénéficiaire ont élevé au moins trois enfants. Une majoration pour enfant à charge de 113,59 € par mois est également possible sous certaines conditions.
 - **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire.
 
 ### Mises à jour réglementaires
-- **Circulaire CNAV n° 2025-29 du 22/12/2025** : Fixe les plafonds de ressources du régime général pour 2026 à 25 001,60 € pour une personne seule et 40 002,56 € pour un couple.
+- **Circulaire CNAV n° 2025-29 du 22/12/2025** : Fixe les plafonds de ressources du régime général pour 2026 à 25 001,60 € pour une personne seule et 40 002,56 € pour un couple, et le montant minimum de la pension de réversion du régime général à 334,92 € par mois au 1er janvier 2026.
 - **Circulaire CNAV du 22 décembre 2025 / Instruction interministérielle n° DSS/3A/DB/6BRS/2025/174 du 15 décembre 2025** : Revalorisation des pensions de retraite de base de 0,9% au 1er janvier 2026, impactant indirectement la pension de réversion.
-- **Circulaire CNAV du 22 décembre 2025** : Fixe le montant minimum de la pension de réversion du régime général à 334,92 € par mois au 1er janvier 2026.
 - **Circulaire Agirc-Arrco 2025-15-DT du 23 octobre 2025** : Gèle la valeur de service du point Agirc-Arrco à 1,4386 € jusqu'au 31 octobre 2026.
 - La Loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 a apporté des modifications à l'âge légal de départ à la retraite, mais n'a pas directement modifié les conditions d'attribution des pensions de réversion.
 - Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur.
+- **Mise à jour du 04/07/2026** : Le montant maximal de la pension de réversion du régime général est de 1 081,35 € par mois en 2026.
