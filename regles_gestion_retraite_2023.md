@@ -1,6 +1,6 @@
 # Règles de Gestion : Âge de Départ à la Retraite (Réforme 2023 et LFSS 2026)
 
-Conformément à la réforme des retraites entrée en vigueur en septembre 2023 et à la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026) qui a modifié le calendrier de certaines dispositions, l'âge légal de départ et le nombre de trimestres requis varient en fonction de l'année (et parfois du mois) de naissance. Ces nouvelles règles s'appliquent pour les pensions prenant effet à compter du 1er septembre 2026.
+Conformément à la réforme des retraites entrée en vigueur en septembre 2023 et à la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026) (n° 2025-1403 du 30 décembre 2025) qui a modifié le calendrier de certaines dispositions en instaurant une suspension partielle du relèvement de l'âge légal et de la durée de cotisation pour certaines générations, l'âge légal de départ et le nombre de trimestres requis varient en fonction de l'année (et parfois du mois) de naissance. Ces nouvelles règles s'appliquent pour les pensions prenant effet à compter du 1er septembre 2026.
 
 **À noter : Les règles ci-dessous prennent en compte les ajustements apportés par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et les circulaires CNAV/Agirc-Arrco publiées ultérieurement, qui modifient la trajectoire de la réforme de 2023 pour les pensions prenant effet à compter du 1er septembre 2026.**
 
@@ -17,8 +17,8 @@ L’âge légal de départ augmente progressivement de 62 ans à 64 ans, avec de
 | **Entre le 01/09 et le 31/12/1961** | 62 ans et 3 mois |
 | **1962** | 62 ans et 6 mois |
 | **1963** | 62 ans et 9 mois |
-| **1964** | 62 ans et 3 mois |
-| **Entre le 01/01 et le 30/09/1965** | 62 ans et 3 mois |
+| **1964** | 62 ans et 9 mois |
+| **Entre le 01/01 et le 30/09/1965** | 62 ans et 9 mois |
 | **Entre le 01/10 et le 31/12/1965** | 62 ans et 6 mois |
 | **1966** | 62 ans et 9 mois |
 | **1967** | 63 ans |
@@ -38,8 +38,8 @@ La durée d'assurance requise pour obtenir une retraite au taux plein a égaleme
 | **Entre le 01/09 et le 31/12/1961** | 169 trimestres |
 | **1962** | 169 trimestres |
 | **1963** | 170 trimestres |
-| **1964** | 166 trimestres |
-| **Entre le 01/01 et le 30/09/1965** | 166 trimestres |
+| **1964** | 170 trimestres |
+| **Entre le 01/01 et le 30/09/1965** | 170 trimestres |
 | **Entre le 01/10 et le 31/12/1965** | 167 trimestres |
 | **1966** | 168 trimestres |
 | **1967** | 169 trimestres |
@@ -47,6 +47,8 @@ La durée d'assurance requise pour obtenir une retraite au taux plein a égaleme
 | **1969** | 170 trimestres |
 | **1970** | 170 trimestres |
 | **1971** | 171 trimestres |
+| **1972** | 171 trimestres |
+| **1973** | 171 trimestres |
 | **À partir de 1974** | 172 trimestres |
 
 ## Implémentation technique
