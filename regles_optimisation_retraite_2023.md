@@ -9,7 +9,7 @@ Ce dispositif permet d'acheter des trimestres manquants pour combler une carriè
 - **Motifs d'éligibilité :**
   - Années d'études supérieures validées par un diplôme (ou assimilées).
   - Années civiles incomplètes (au cours desquelles l'assuré n'a pas réuni ses 4 trimestres validés, souvent au début de carrière ou pendant un temps partiel).
-  - Dispositif spécifique pour douze professions exercées par des travailleurs indépendants qui n'avaient pas pu être affiliés à un régime de retraite avant le 1er janvier 2018 (décret n° 2024-766 du 8 juillet 2024, applicable via la circulaire CNAV n° 2025-03 du 15 janvier 2025).
+  - Dispositif spécifique pour douze professions exercées par des travailleurs indépendants qui n'avaient pas pu être affiliés à un régime de retraite avant le 1er janvier 2018 (décret n° 2024-766 du 8 juillet 2024, applicable via la circulaire CNAV n° 2026-13 du 15 avril 2026).
 - **Conditions spécifiques post-réforme 2023 :**
   - Il est possible d'effectuer un rachat de trimestres pour études supérieures à coût réduit jusqu'au 31 décembre de l'année des 40 ans de l'assuré (au lieu du 31 décembre de la 10e année suivant la fin des études).
   - La demande de versement de cotisations au titre d'un stage en entreprise peut être déposée jusqu'au 31 décembre de l'année des 30 ans de l'assuré (au lieu de la 2e année suivant la fin du stage).
@@ -24,7 +24,7 @@ La surcote est un bonus qui majore le montant de la retraite de base pour les pe
   - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
   - Continuer à travailler au-delà de ces deux seuils.
 - **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
-- **Surcote parentale (post-réforme 2023) :** Une surcote spécifique a été mise en place pour les parents nés à partir du 1er avril 1965, sous réserve d'avoir acquis au moins un trimestre de majoration au titre de la maternité, de l'éducation, de l'adoption, d'un enfant handicapé ou d'un congé parental.
+- **Surcote parentale (post-réforme 2023) :** Une surcote spécifique a été mise en place pour les parents nés à partir du 1er avril 1965, sous réserve d'avoir acquis au moins un trimestre de majoration au titre de la maternité, de l'éducation, de l'adoption, d'un enfant handicapé ou d'un congé parental. Ce dispositif s'applique lorsque la durée d'assurance dépasse le nombre de trimestres nécessaires pour le taux plein, et il sera réservé aux personnes nées à partir du 1er avril 1965 à compter du 1er septembre 2026.
 - **Indication Algorithmique :** Suggéré automatiquement si l'assuré atteint le taux plein à l'âge légal mais souhaite prolonger.
 
 ## 3. Le Cumul Emploi-Retraite
@@ -52,7 +52,7 @@ La législation française favorise les parents.
 - **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Décret n° 2024-766 du 8 juillet 2024** portant diverses mesures d'application relatives aux rachats de trimestres de retraite de base, notamment pour certaines professions libérales.
-- **Circulaire CNAV n° 2025-03 du 15 janvier 2025** relative au rachat de trimestres pour certaines professions libérales (en application du décret n° 2024-766 du 8 juillet 2024).
+- **Circulaire CNAV n° 2026-13 du 15 avril 2026** relative au rachat de trimestres pour certaines professions libérales (en application du décret n° 2024-766 du 8 juillet 2024).
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
 - **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
 - **Circulaire de la CNAV du 5 février 2026** pour le barème 2026 du rachat de trimestres.

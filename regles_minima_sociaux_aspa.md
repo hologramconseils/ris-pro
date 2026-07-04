@@ -1,6 +1,3 @@
-Voici le document de référence mis à jour :
-
-```markdown
 # Règles des Minima Sociaux : MICO et ASPA (2026)
 
 Ce document précise les règles des dispositifs permettant de garantir un niveau de vie minimal aux retraités ayant de faibles pensions ou des carrières hachées.
@@ -11,7 +8,7 @@ Le MICO n'est pas une aide sociale versée par l'État, mais un plancher de pens
 ### Conditions d'attribution
 - Avoir droit à une retraite à **taux plein** (soit par la durée d'assurance, soit par l'âge de l'annulation de la décote : 67 ans).
 - Avoir liquidé **toutes** ses retraites de base et complémentaires.
-- Le total des pensions de retraite (base + complémentaire, françaises et étrangères) ne doit pas dépasser un plafond mensuel. Ce plafond est fixé à 1 367,51 € brut par mois au 1er janvier 2024, puis à 1 394,86 € à partir du 1er novembre 2024 et pour le 1er janvier 2025, et à 1 444,89 € à partir de juin 2026.
+- Le total des pensions de retraite (base + complémentaire, françaises et étrangères) ne doit pas dépasser un plafond mensuel. Ce plafond est fixé à 1 367,51 € brut par mois au 1er janvier 2024, puis à 1 394,86 € à partir du 1er novembre 2024 et pour le 1er janvier 2025, et à 1 410,89 € à partir du 1er janvier 2026.
 
 ### Montant
 Le MICO se divise en deux niveaux :
@@ -69,3 +66,5 @@ Ce seuil est fixé à :
 *   **Circulaire Cnav 2025-29 du 22 décembre 2025** : Revalorisation des montants et plafonds de l'ASPA au 1er janvier 2026.
 *   **Circulaire Cnav n° 2025-34 du 23 décembre 2025** : Revalorisation des montants du MICO au 1er janvier 2026.
 *   **Circulaire Cnav 2026-3 du 1er février 2026 (ou Circulaire CNAV du 28 janvier 2026)** : Précisions sur les paramètres financiers 2026 et revalorisation de l'ASPA.
+*   **Loi de financement de la sécurité sociale (LFSS) pour 2026 (promulguée fin décembre 2025)** : Suspension/décalage du calendrier de relèvement de l'âge légal et de la durée d'assurance de la réforme des retraites de 2023, applicable à partir du 1er septembre 2026.
+*   **Décret n° 2026-344 du 7 mai 2026** et **Décret n° 2026-345 du 7 mai 2026** : Application de la LFSS 2026 concernant l'âge d'ouverture des droits et la durée d'assurance requise pour certains assurés sociaux, notamment pour les carrières longues, à compter du 1er septembre 2026.
