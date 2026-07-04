@@ -1,3 +1,6 @@
+Voici le document de référence mis à jour :
+
+```markdown
 # Règles des Minima Sociaux : MICO et ASPA (2026)
 
 Ce document précise les règles des dispositifs permettant de garantir un niveau de vie minimal aux retraités ayant de faibles pensions ou des carrières hachées.
@@ -8,14 +11,14 @@ Le MICO n'est pas une aide sociale versée par l'État, mais un plancher de pens
 ### Conditions d'attribution
 - Avoir droit à une retraite à **taux plein** (soit par la durée d'assurance, soit par l'âge de l'annulation de la décote : 67 ans).
 - Avoir liquidé **toutes** ses retraites de base et complémentaires.
-- Le total des pensions de retraite (base + complémentaire, françaises et étrangères) ne doit pas dépasser un plafond mensuel. Ce plafond est fixé à 1 367,51 € brut par mois au 1er janvier 2024, puis à 1 394,86 € à partir du 1er novembre 2024 et pour le 1er janvier 2025, et à 1 444,89 € à partir de juin 2024 (pour 2026).
+- Le total des pensions de retraite (base + complémentaire, françaises et étrangères) ne doit pas dépasser un plafond mensuel. Ce plafond est fixé à 1 367,51 € brut par mois au 1er janvier 2024, puis à 1 394,86 € à partir du 1er novembre 2024 et pour le 1er janvier 2025, et à 1 444,89 € à partir de juin 2026.
 
 ### Montant
 Le MICO se divise en deux niveaux :
 1.  **MICO de base (non majoré) :** Pour une carrière complète, son montant a évolué comme suit :
     *   709,13 € par mois au 1er septembre 2023.
     *   733,03 € par mois au 1er janvier 2024.
-    *   747,47 € par mois au 1er janvier 2025.
+    *   747,69 € par mois au 1er janvier 2025.
     *   756,29 € par mois au 1er janvier 2026.
 2.  **MICO majoré :** Pour une carrière complète avec au moins **120 trimestres cotisés** (travaillés). Son montant a évolué comme suit :
     *   847,57 € par mois au 1er septembre 2023.
@@ -53,8 +56,8 @@ Contrairement au MICO ou à la retraite classique, les sommes versées au titre 
 Ce seuil est fixé à :
 -   100 000 € en métropole pour les décès survenus entre le 1er septembre 2023 et le 31 décembre 2023.
 -   105 300 € en métropole pour les décès survenus entre le 1er janvier 2024 et le 31 décembre 2024.
--   107 616 € en métropole pour les décès survenus entre le 1er janvier 2025 et le 31 décembre 2025.
--   108 586 € en métropole pour les décès survenus à compter du 1er janvier 2026.
+-   107 616,60 € en métropole pour les décès survenus entre le 1er janvier 2025 et le 31 décembre 2025.
+-   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
 ### Mises à jour réglementaires
@@ -62,4 +65,7 @@ Ce seuil est fixé à :
 *   **Circulaire CNAV 2023-18 (13 septembre 2023)** et **Circulaire Cnav n°2023-34 (29 décembre 2023)** : Revalorisation des montants et plafonds de l'ASPA et du MICO au 1er janvier 2024.
 *   **Loi de financement de la sécurité sociale (LFSS) pour 2024 (27 décembre 2023)** : Extension du seuil de recouvrement de l'ASPA à 150 000€ à Saint-Martin et Saint-Barthélémy pour les décès survenus à compter du 1er janvier 2024.
 *   **Circulaire Cnav du 5 avril 2024** : Rappel des montants du seuil de recouvrement de l'ASPA sur succession au 1er janvier 2024.
-*   **Revalorisations annuelles (notamment au 1er janvier 2025 et 2026)** : Montants du MICO et de l'ASPA, ainsi que leurs plafonds et seuils de recouvrement, sont indexés sur l'inflation ou le SMIC selon les cas.
+*   **Circulaire Cnav 2025-21 du 31 juillet 2025** : Service de l'allocation de solidarité aux personnes âgées (SASPA).
+*   **Circulaire Cnav 2025-29 du 22 décembre 2025** : Revalorisation des montants et plafonds de l'ASPA au 1er janvier 2026.
+*   **Circulaire Cnav n° 2025-34 du 23 décembre 2025** : Revalorisation des montants du MICO au 1er janvier 2026.
+*   **Circulaire Cnav 2026-3 du 1er février 2026 (ou Circulaire CNAV du 28 janvier 2026)** : Précisions sur les paramètres financiers 2026 et revalorisation de l'ASPA.

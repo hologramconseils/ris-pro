@@ -13,7 +13,7 @@ Ce dispositif permet d'acheter des trimestres manquants pour combler une carriè
 - **Conditions spécifiques post-réforme 2023 :**
   - Il est possible d'effectuer un rachat de trimestres pour études supérieures à coût réduit jusqu'au 31 décembre de l'année des 40 ans de l'assuré (au lieu du 31 décembre de la 10e année suivant la fin des études).
   - La demande de versement de cotisations au titre d'un stage en entreprise peut être déposée jusqu'au 31 décembre de l'année des 30 ans de l'assuré (au lieu de la 2e année suivant la fin du stage).
-- **Coût du rachat :** Le barème du rachat de trimestres est revalorisé annuellement par la CNAV et son coût augmente avec l'âge et les revenus de l'assuré. Le barème 2026 a été publié.
+- **Coût du rachat :** Le barème du rachat de trimestres est revalorisé annuellement par la CNAV et son coût augmente avec l'âge et les revenus de l'assuré. Le barème 2026 a été publié via la circulaire de la CNAV du 5 février 2026. Il est à noter que le coût forfaitaire lui-même n'a pas été revalorisé depuis 2013, mais les seuils de revenus des tranches sont actualisés en fonction du PASS.
 - **Indication Algorithmique (RIS Pro) :** Suggéré automatiquement si `trimestres_requis > trimestres_projetes`.
 
 ## 2. La Surcote (Travailler plus pour gagner plus)
@@ -32,10 +32,10 @@ Ce mécanisme autorise à cumuler ses pensions de retraite liquidées avec les r
 
 - **Avant la réforme 2023 :** Le cumul était possible, mais ne générait aucun nouveau droit à retraite.
 - **Réforme de 2023 (Nouveaux droits) :** Les retraités en cumul emploi-retraite intégral se constituent de **nouveaux droits** qui viendront s'ajouter lors du second départ. Ces nouveaux droits concernent les activités exercées depuis le 1er janvier 2023.
-  - Le montant de cette seconde pension est toutefois plafonné par la loi et ne peut dépasser 5 % du plafond annuel de la Sécurité sociale (PASS). En 2026, ce plafond est de 2 403 euros bruts mensuels.
+  - Le montant de cette seconde pension est toutefois plafonné par la loi et ne peut dépasser 5 % du plafond annuel de la Sécurité sociale (PASS), soit **2 403 euros bruts par an** en 2026. Un plafond "à vie" de 10% du PASS (soit 4 806 euros en 2026) est également appliqué.
   - **Conditions du cumul intégral :** L'assuré doit avoir liquidé toutes ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions pour une retraite à taux plein (soit en ayant l'âge du taux plein automatique à 67 ans pour les générations nées en 1955 ou après, soit en ayant à la fois l'âge légal et la durée d'assurance requise).
-  - **Délai de carence :** Si la première retraite prend effet à partir du 1er novembre 2023 et que l'activité salariée est reprise chez le *dernier employeur*, un délai de 6 mois est requis pour acquérir de nouveaux droits. Ce délai ne s'applique pas si l'activité est reprise chez un *nouvel employeur*.
-- **Cumul plafonné :** Si les conditions du cumul intégral ne sont pas remplies (par exemple, retraite avec décote), le cumul est plafonné. Le total des pensions de retraite et des revenus d'activité ne doit pas dépasser le montant le plus élevé entre 160 % du SMIC (soit 2 916,85 € bruts mensuels en 2026) ou la moyenne mensuelle des trois derniers salaires bruts perçus avant la liquidation de la retraite. En cas de dépassement, la pension est réduite.
+  - **Délai de carence :** Si la première retraite prend effet à partir du 1er novembre 2023 et que l'activité salariée est reprise chez le *dernier employeur*, un délai de 6 mois est requis pour acquérir de nouveaux droits. Ce délai ne s'applique pas si l'activité est reprise chez un *nouvel employeur*. Ce délai de carence sera supprimé au 1er janvier 2027 (LFSS 2026).
+- **Cumul plafonné :** Si les conditions du cumul intégral ne sont pas remplies (par exemple, retraite avec décote), le cumul est plafonné. Le total des pensions de retraite et des revenus d'activité ne doit pas dépasser le montant le plus élevé entre 160 % du SMIC (soit **2 987,23 € bruts mensuels** à partir du 1er juin 2026) ou la moyenne mensuelle des trois derniers salaires bruts perçus avant la liquidation de la retraite. En cas de dépassement, la pension est réduite.
 
 ## 4. Les Majorations Familiales (Pour Informations)
 La législation française favorise les parents.
@@ -51,9 +51,12 @@ La législation française favorise les parents.
 - **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023 (Réforme des retraites).
 - **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
+- **Décret n° 2024-766 du 8 juillet 2024** portant diverses mesures d'application relatives aux rachats de trimestres de retraite de base, notamment pour certaines professions libérales.
 - **Circulaire CNAV n° 2025-03 du 15 janvier 2025** relative au rachat de trimestres pour certaines professions libérales (en application du décret n° 2024-766 du 8 juillet 2024).
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
 - **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Circulaire de la CNAV - 05/02/2026** pour le barème 2026 du rachat de trimestres.
+- **Circulaire de la CNAV du 5 février 2026** pour le barème 2026 du rachat de trimestres.
+- **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
+- **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
 
-Date de mise à jour : 3 juillet 2026.
+Date de mise à jour : 4 juillet 2026.
