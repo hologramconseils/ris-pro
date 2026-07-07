@@ -31,17 +31,26 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   **Acquisition de points :** Les cotisations patronales et salariales dues à compter du 1er janvier 2023 sur la tranche 1 des rémunérations (n'excédant pas le Plafond Annuel de la Sécurité Sociale) sont génératrices de points Agirc-Arrco. Les cotisations sur la tranche 2 ne génèrent pas de nouveaux droits.
 *   **Montant de la seconde pension complémentaire :** Le montant annuel de cette deuxième pension complémentaire est calculé en multipliant le nombre de points acquis par la valeur du point Agirc-Arrco. Il n'est pas plafonné. Aucune minoration ou majoration (y compris pour enfants) ne peut être appliquée à cette seconde pension complémentaire. Les points acquis peuvent être liquidés à compter du 1er janvier 2024.
 
+### Évolution à partir du 1er janvier 2027
+
+La Loi de financement de la sécurité sociale pour 2026 (Loi n° 2025-1403 du 30 décembre 2025) a profondément réformé le dispositif de cumul emploi-retraite pour les assurés dont la première pension de retraite prendra effet à compter du **1er janvier 2027**.
+
+*   **Entre l'âge légal et 67 ans :** Les assurés liquidant leur première pension entre l'âge légal et 67 ans et reprenant ou poursuivant une activité professionnelle pourront cumuler leur pension et leurs revenus d'activité (et de remplacement) dans la limite d'un seuil annuel (qui devrait être de 7 000 € brut par an, décret d'application non encore publié). En cas de dépassement de ce seuil, les pensions seront écrêtées. **Toutefois, les cotisations versées durant cette période ne permettront plus l'acquisition de nouveaux droits à la retraite.**
+*   **À partir de 67 ans (âge d'annulation de la décote) :** Les assurés liquidant leur première pension à partir de 67 ans et reprenant ou poursuivant une activité professionnelle pourront cumuler intégralement leur pension de retraite et leurs revenus professionnels et de remplacement (sans plafond). Dans ce cas, les cotisations versées permettront de continuer à acquérir de nouveaux droits à une seconde pension de retraite.
+
 ## Entrée en Vigueur
 
 *   Les nouvelles règles du cumul emploi-retraite créateur de droits pour le régime de base s'appliquent aux pensions dont l'entrée en jouissance intervient à compter du **1er septembre 2023**, en prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
+*   Les modifications concernant l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite, notamment la suppression de la création de nouveaux droits entre l'âge légal et 67 ans, s'appliqueront aux assurés dont la première pension de retraite prendra effet à compter du **1er janvier 2027**.
 
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco 2024-4-DRJ du 5 février 2024** (précisant les modalités d'application).
+*   **Arrêté du 22 décembre 2025** fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026.
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (introduisant la réforme du cumul emploi-retraite applicable au 1er janvier 2027).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 7 juillet 2026.
