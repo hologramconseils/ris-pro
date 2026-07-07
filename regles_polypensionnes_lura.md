@@ -23,6 +23,7 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 - **Taux plein :** Le droit au taux plein (âge ou durée d'assurance) s'apprécie en prenant en compte **la totalité des trimestres validés tous régimes confondus**. Un trimestre cotisé à la CNAVPL compte pour atteindre la durée d'assurance requise au Régime Général, et inversement.
 
     Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023) et aux ajustements apportés par la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. L'âge d'annulation de la décote reste fixé à 67 ans.
+    La LFSS 2026, notamment son article 105, a introduit une suspension partielle du calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein.
 
     Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, suite à la "suspension" partielle du calendrier initial de la réforme de 2023:
 
@@ -48,7 +49,7 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 Le dispositif de retraite progressive, permettant de travailler à temps partiel tout en percevant une fraction de sa retraite, est désormais accessible dès l'âge de 60 ans pour les assurés de tous les régimes, à compter du 1er septembre 2025. Cette mesure résulte de l'Accord National Interprofessionnel (ANI) du 14 novembre 2024 sur l'emploi des seniors et de décrets publiés en juillet 2025.
 
 ### Mises à jour réglementaires
-*   **Arrêté du 22 décembre 2025** portant fixation du plafond de la sécurité sociale pour 2026, publié au Journal Officiel du 29 décembre 2025. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 est fixé à 48 060 €.
+*   **Arrêté du 22 décembre 2025** portant fixation du plafond de la sécurité sociale pour 2026, publié au Journal Officiel du 23 décembre 2025. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 est fixé à 48 060 €.
 *   **Décrets n° 2025-681 du 15 juillet 2025** publiés au Journal Officiel du 23 juillet 2025, abaissant l'âge d'ouverture du droit à retraite progressive à 60 ans pour toutes les pensions prenant effet à compter du 1er septembre 2025.
 *   **Circulaire Agirc-Arrco n° 2026-1-SG-DRJ du 16 janvier 2026** annulant et remplaçant la circulaire Agirc-Arrco 2025-14-SG-DRJ et communiquant les coefficients spécifiques applicables aux retraites progressives prenant effet à partir de janvier 2026.
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** (Loi n° 2025-1403 du 30 décembre 2025), notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
@@ -56,7 +57,7 @@ Le dispositif de retraite progressive, permettant de travailler à temps partiel
 *   **Décrets n° 2026-344 et n° 2026-345 du 7 mai 2026** mettant en œuvre les dispositions de l'article 105 de la LFSS 2026, applicables aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
 *   **Circulaire CNAV 2026/17 du 12 juin 2026** et **Circulaire CNAV 2026/18 du 15 juin 2026** précisant les conditions de retraite anticipée pour carrière longue et au profit des assurés handicapés à compter du 1er septembre 2026.
-*   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à compter du 1er janvier 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
+*   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à partir du 1er septembre 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
 *   Les règles du dispositif de **cumul emploi-retraite** sont modifiées pour les salariés partant à la retraite après le 1er janvier 2027, exigeant la liquidation de toutes les retraites (base et complémentaires) pour pouvoir cumuler emploi et retraite, avec des règles d'écrêtement de la pension en fonction de l'âge et des revenus d'activité.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 7 juillet 2026.
