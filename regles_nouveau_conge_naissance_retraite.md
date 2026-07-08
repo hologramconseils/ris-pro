@@ -8,16 +8,17 @@ Un congé supplémentaire de naissance est mis en place pour les parents. Bien q
 
 ## Conditions d'application
 
-Les dispositions relatives à ce nouveau congé de naissance s'appliquent aux enfants nés ou adoptés à compter du 1er janvier 2026. Pour les parents d'enfants nés ou arrivés au foyer entre le 1er janvier et le 30 juin 2026, le congé pourra être pris jusqu'au 31 mars 2027. Des décrets d'application ont été publiés pour préciser les modalités exactes de la validation de ces périodes assimilées pour la retraite, notamment pour les agents publics.
+Les dispositions relatives à ce nouveau congé de naissance s'appliquent aux enfants nés ou adoptés à compter du 1er janvier 2026. Pour les parents d'enfants nés ou arrivés au foyer entre le 1er janvier et le 30 juin 2026, le congé pourra être pris jusqu'au 31 mars 2027. Des décrets d'application ont été publiés pour préciser les modalités exactes de la validation de ces périodes assimilées pour la retraite, notamment pour les agents publics et les assurés du régime général.
 
 ## Mesures spécifiques pour les agents publics civils et militaires
 
-Pour les agents publics civils et militaires, le congé supplémentaire de naissance est explicitement pris en compte pour le calcul de la retraite. Le Décret n° 2026-427 du 30 mai 2026 modifie le code des pensions civiles et militaires de retraite pour y intégrer les périodes de ce congé. Ces mesures visent à améliorer la prise en compte des interruptions de carrière liées à la parentalité dans le secteur public, en reconnaissant l'impact de ces périodes sur la carrière et les droits à la retraite des agents concernés, dans le respect du cadre existant des avantages familiaux pour la retraite.
+Pour les agents publics civils et militaires, le congé supplémentaire de naissance est explicitement pris en compte pour le calcul de la retraite. Le Décret n° 2026-427 du 30 mai 2026 modifie le code des pensions civiles et militaires de retraite pour y intégrer les périodes de ce congé. Ces mesures visent à améliorer la prise en compte des interruptions de carrière liées à la parentalité dans le secteur public, en reconnaissant l'impact de ces périodes sur la carrière et les droits à la retraite des agents concernés, dans le respect du cadre existant des avantages familiaux pour la retraite. La durée du congé est considérée comme du service effectif pour l'avancement d'échelon et de grade ainsi que pour les droits à pension de retraite. Pour les agents publics, la rémunération est de 70 % du traitement indiciaire et des primes le premier mois, et de 60 % le second mois.
 
 ### Mises à jour réglementaires
 
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025).
 *   **Décret n° 2026-427 du 30 mai 2026** relatif au congé supplémentaire de naissance des agents publics civils et militaires (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-428 du 30 mai 2026** portant diverses dispositions relatives au congé supplémentaire de naissance des agents publics (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-425 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 8 juillet 2026.
