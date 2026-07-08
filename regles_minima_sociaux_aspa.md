@@ -54,7 +54,7 @@ Ce seuil est fixé à :
 -   100 000 € en métropole pour les décès survenus entre le 1er septembre 2023 et le 31 décembre 2023.
 -   105 300 € en métropole pour les décès survenus entre le 1er janvier 2024 et le 31 décembre 2024.
 -   107 616,60 € en métropole pour les décès survenus entre le 1er janvier 2025 et le 31 décembre 2025.
--   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
+-   108 585,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
 Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
@@ -74,3 +74,5 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026-17 du 12 juin 2026** : Retraite anticipée pour carrière longue à compter du 1er septembre 2026.
+*   **Circulaire Cnav 2026-18 du 15 juin 2026** : Retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.

@@ -1,3 +1,6 @@
+Voici le document de référence mis à jour :
+
+```markdown
 # Règles de la Retraite Progressive accessible dès 60 ans
 
 ## Introduction
@@ -20,7 +23,7 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 ## Bénéficiaires
 
 Ce dispositif est désormais accessible à tous les salariés du secteur privé, ainsi qu'aux agents de la fonction publique (fonctionnaires et contractuels).
-Cependant, les agents de catégorie "active" de la fonction publique, qui peuvent partir avant l'âge légal, en restent généralement exclus. Les contractuels de la fonction publique bénéficient de la retraite progressive mais peuvent ne pas avoir droit au maintien de leurs cotisations pour la retraite.
+Les agents de catégorie "active" ou "super-active" de la fonction publique peuvent également bénéficier de la retraite progressive, mais la condition d'âge de 60 ans s'applique à eux comme aux autres catégories, indépendamment de leur âge de départ anticipé spécifique. Les contractuels de la fonction publique bénéficient de la retraite progressive et les périodes de travail accomplies peuvent être prises en compte pour la surcote.
 
 ## Calcul de la pension
 
@@ -40,8 +43,11 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
-*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
-*   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Décret n° 2023-751 du 10 août 2023** : Relatif au cumul emploi retraite et à la retraite progressive, entrant en vigueur le 1er septembre 2023 pour les pensions prenant effet à compter de cette date, et étendant le dispositif notamment aux fonctionnaires territoriaux et hospitaliers.
+*   **Décret n° 2023-753 du 10 août 2023** : Portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 relatif au cumul emploi retraite et à la retraite progressive pour les fonctionnaires.
+*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État, publié au Journal officiel du 23 juillet 2025 pour une application au 1er septembre 2025.
+*   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, publié au Journal officiel du 23 juillet 2025, applicable aux pensions prenant effet à compter du 1er septembre 2025.
+*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Met à jour les coefficients applicables aux retraites progressives et intègre les évolutions en matière d'âge légal et de durée d'assurance.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 8 juillet 2026.
