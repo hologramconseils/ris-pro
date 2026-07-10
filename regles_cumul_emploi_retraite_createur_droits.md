@@ -13,6 +13,7 @@ Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assur�
 *   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans).
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
 *   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
+    *   **À noter :** La loi de financement de la sécurité sociale pour 2026 prévoit la suppression de ce délai de carence de 6 mois à compter du 1er janvier 2027.
 
 ## Acquisition de la seconde pension
 
@@ -22,6 +23,7 @@ Les périodes travaillées en cumul emploi-retraite après le 1er septembre 2023
 
 *   **Calcul de la seconde pension :** Cette seconde pension est calculée selon les règles du régime de retraite de base auquel l'assuré est affilié au titre de sa nouvelle activité. Elle est calculée au taux plein (50 %), mais aucune majoration, supplément ou accessoire (par exemple, pour enfants) n'est applicable à cette seconde pension.
 *   **Plafond de la seconde pension de base :** Un plafond annuel est fixé pour cette nouvelle pension liquidée dans le cadre du cumul emploi-retraite créateur de droits. Il correspond à 5 % du montant annuel du Plafond Annuel de la Sécurité Sociale (PASS). Pour l'année 2026, le PASS est de 48 060 €, ce qui représente un plafond d'environ 2 403 € par an (5% de 48 060 €).
+    *   **À noter :** La loi de financement de la sécurité sociale pour 2026 prévoit la suppression de ce plafond de 5% du PASS à compter du 1er janvier 2027.
 *   Après la liquidation de cette seconde pension, la poursuite ou la reprise d'une nouvelle activité professionnelle ne pourra pas donner lieu à de nouveaux droits à retraite.
 
 ### Régimes complémentaires (Agirc-Arrco)
@@ -42,6 +44,7 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
 *   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Loi de financement de la sécurité sociale pour 2026** (modifiant les règles du cumul emploi-retraite à partir du 1er janvier 2027 concernant le délai de carence et le plafond de la seconde pension de base).
+*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026** (confirmant 48 060 €).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 10 juillet 2026.
