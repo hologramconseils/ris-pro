@@ -1,6 +1,6 @@
 # Règles du Cumul Emploi-Retraite Créateur de Nouveaux Droits à Pension
 
-La Loi de financement rectificative de la sécurité sociale pour 2023 (Loi n° 2023-270 du 14 avril 2023), a introduit des évolutions majeures pour le dispositif de cumul emploi-retraite en France. À compter du 1er septembre 2023 pour la retraite de base et du 1er janvier 2024 pour la retraite complémentaire, le fait de poursuivre une activité professionnelle après la liquidation d'une première pension peut, sous conditions, permettre d'acquérir de nouveaux droits à la retraite, donnant lieu à une seconde pension.
+La Loi de financement rectificative de la sécurité sociale pour 2023 (Loi n° 2023-270 du 14 avril 2023) a introduit des évolutions majeures pour le dispositif de cumul emploi-retraite en France. À compter du 1er septembre 2023 pour la retraite de base et du 1er janvier 2024 pour la retraite complémentaire, le fait de poursuivre une activité professionnelle après la liquidation d'une première pension peut, sous conditions, permettre d'acquérir de nouveaux droits à la retraite, donnant lieu à une seconde pension.
 
 ## Contexte et Objectif
 
@@ -12,7 +12,7 @@ Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assur�
 
 *   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans).
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
-*   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
+*   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023). Il est à noter que ce délai de carence sera supprimé à compter du 1er janvier 2027 par la Loi de financement de la sécurité sociale pour 2026.
 
 ## Acquisition de la seconde pension
 
@@ -37,11 +37,23 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
 
+### Évolution future au 1er janvier 2027
+
+La Loi de financement de la sécurité sociale pour 2026, adoptée en décembre 2025, modifie les règles du cumul emploi-retraite qui s'appliqueront aux pensions liquidées à compter du **1er janvier 2027**. À cette date, la distinction entre cumul intégral et cumul plafonné sera remplacée par un dispositif en trois paliers, basé sur l'âge de l'assuré :
+
+*   **Avant l'âge minimum légal :** Les revenus d'activité professionnelle et de remplacement seront intégralement déduits de la pension de retraite.
+*   **Entre l'âge minimum légal et 67 ans (âge du taux plein automatique) :** Le cumul des pensions de retraite et des revenus d'activité sera plafonné à un seuil annuel (qui devrait être de 7 000 euros, mais un décret est attendu pour le fixer). En cas de dépassement, les pensions seront écrêtées à hauteur de 50 % des revenus d'activité professionnelle et de remplacement.
+*   **À partir de 67 ans (âge du taux plein automatique) :** Le cumul des pensions de retraite et des revenus d'activité sera intégral et sans plafond.
+
+De plus, le délai de carence de 6 mois en cas de reprise d'activité chez le dernier employeur sera supprimé à compter du 1er janvier 2027.
+
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco).
+*   **Circulaire Agirc-Arrco n° 2024-4 du 5 février 2024** (précisant les modalités d'application).
+*   **Arrêté du 22 décembre 2025** portant fixation du Plafond Annuel de la Sécurité Sociale (PASS) pour 2026.
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (applicable à compter du 1er janvier 2027 pour les nouvelles règles du cumul emploi-retraite).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 11 juillet 2026.
