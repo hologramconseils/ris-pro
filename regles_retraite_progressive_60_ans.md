@@ -15,7 +15,7 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 *   **Âge :** Avoir au moins 60 ans.
 *   **Durée d'assurance :** Justifier d'au moins 150 trimestres de cotisation tous régimes de base confondus.
 *   **Activité professionnelle :** Exercer une activité à temps partiel (ou à temps réduit) dont la durée doit être comprise entre 40 % et 80 % d'un temps complet pour les salariés du secteur privé. Pour les fonctionnaires, la quotité de travail doit être comprise entre 50 % et 90 % d'un temps complet.
-*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé.
+*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis. L'employeur ne peut refuser la demande qu'en justifiant sa décision pour des motifs liés à l'activité de l'entreprise. En l'absence de réponse de l'employeur dans un délai de deux mois, la demande est réputée acceptée.
 
 ## Bénéficiaires
 
@@ -24,11 +24,11 @@ Cependant, les agents de catégorie "active" de la fonction publique, qui peuven
 
 ## Calcul de la pension
 
-La fraction de la pension de retraite versée est proportionnelle à la réduction du temps de travail. Par exemple, si l'activité professionnelle est réduite de 40 %, l'assuré percevra 60 % de sa pension de retraite.
+La fraction de la pension de retraite versée est proportionnelle à la réduction du temps de travail. Par exemple, si l'activité professionnelle est réduite de 40 %, l'assuré percevra 60 % de sa pension de retraite. Pendant cette période, l'assuré continue de cotiser et d'acquérir des droits, ce qui permet de recalculer sa pension définitive lors de son départ total à la retraite. Pour la retraite complémentaire Agirc-Arrco, si l'assuré ne remplit pas les conditions du taux plein au moment de la demande, un coefficient d'abattement spécifique est appliqué sur la fraction de pension versée.
 
 ## Démarches
 
-La demande de retraite progressive doit être effectuée auprès de la caisse d'assurance retraite compétente (par exemple, l'Assurance retraite pour les salariés du régime général) environ 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, il est recommandé d'anticiper la demande, le délai de traitement par le Service des Retraites de l'État (SRE) pouvant atteindre 6 mois.
+La demande de retraite progressive doit être effectuée auprès de la caisse d'assurance retraite compétente (par exemple, l'Assurance retraite pour les salariés du régime général) environ 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, il est recommandé d'anticiper la demande, le délai de traitement par le Service des Retraites de l'État (SRE) pouvant atteindre 6 mois. Il existe un service de demande de retraite progressive commun à tous les régimes, disponible via "Ma retraite publique" ou sur le portail info-retraite.fr.
 
 ## Objectifs de la réforme
 
@@ -40,8 +40,9 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
+*   **Loi Séniors n° 2025-989 du 24 octobre 2025** : Précise les modalités de l'accord de l'employeur, notamment en cas de refus et d'absence de réponse (charge de la preuve pour le refus employeur).
 *   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit et des ajustements apportés par la loi de financement de la sécurité sociale pour 2026 concernant certains paramètres.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 13 juillet 2026.

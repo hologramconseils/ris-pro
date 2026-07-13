@@ -4,7 +4,7 @@ La Loi de financement rectificative de la sécurité sociale pour 2023 (Loi n° 
 
 ## Contexte et Objectif
 
-Jusqu'à cette réforme, le cumul emploi-retraite permettait de travailler tout en percevant sa pension, mais sans acquérir de nouveaux droits. L'objectif de ces nouvelles dispositions est de mieux valoriser les carrières des seniors qui souhaitent ou doivent rester actifs après leur départ à la retraite, en leur permettant de constituer une seconde pension.
+Jusqu'à cette réforme, le cumul emploi-retraite permettait de travailler tout en percevant sa pension, mais sans acquérir de nouveaux droits. L'objectif de ces nouvelles dispositions est de mieux valoriser les carrières des seniors qui souhaitent ou doivent rester actifs après leur départ à la retraite, en leur permettant de constituer une seconde pension. Ces règles sont applicables pour les assurés liquidant leur première pension de retraite jusqu'au 31 décembre 2026. Des évolutions sont prévues à compter du 1er janvier 2027.
 
 ## Conditions d'éligibilité pour l'acquisition de nouveaux droits
 
@@ -37,11 +37,21 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
 
+### Évolutions Législatives à Partir de 2027
+
+La loi de financement de la sécurité sociale pour 2026 (Loi n° 2025-1403 du 30 décembre 2025) modifie les règles du cumul emploi-retraite à compter du 1er janvier 2027. Pour les assurés dont la première pension de vieillesse de base prendra effet à partir de cette date, la distinction entre cumul intégral et cumul plafonné sera supprimée, et l'âge de l'assuré sera le critère principal.
+
+*   **Avant l'âge minimum légal :** Les montants des revenus d'activité professionnelle seront déduits en totalité de la pension de retraite.
+*   **Entre l'âge minimum légal et l'âge du taux plein automatique (67 ans) :** Le cumul des pensions de retraite et des revenus d'activité sera possible dans la limite d'un seuil annuel, fixé par décret, qui devrait être de 7 000 euros.
+*   **À partir de l'âge du taux plein automatique (67 ans) :** Le cumul intégral des pensions de retraite et des revenus d'activité sera autorisé sans plafond. Les périodes travaillées dans le cadre de ce cumul pourront également donner droit à une seconde retraite.
+
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco).
+*   **Circulaire Agirc-Arrco n° 2024-4-DRJ du 5 février 2024** (précisant les modalités d'application).
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (modifiant les règles du cumul emploi-retraite à compter du 1er janvier 2027).
+*   **Arrêté du 22 décembre 2025** portant fixation du Plafond de la Sécurité Sociale (PASS) pour 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 13 juillet 2026.
