@@ -41,6 +41,7 @@ La législation française favorise les parents.
 
 - **Majoration Enfant :** Octroi classique de 8 trimestres par enfant (4 trimestres au titre de la maternité ou de l'adoption, et 4 trimestres au titre de l'éducation).
   - **Attribution des trimestres d'éducation (post-réforme 2023) :** Désormais, 2 des 4 trimestres "éducation" acquis pour chaque enfant sont automatiquement attribués à la mère. Les 2 autres peuvent être attribués à la mère ou au père.
+  - **Calcul de la pension de base pour les mères (post-réforme LFSS 2026) :** Pour les retraites liquidées à compter du 1er janvier 2026, les pensions de base des femmes ayant un enfant seront calculées sur les 24 meilleures années de rémunération pour un enfant, et sur les 23 meilleures années pour les femmes ayant deux enfants et plus, contre 25 années habituellement.
 - **Majoration Famille Nombreuse :** Majoration forfaitaire de **10 %** du montant de la pension pour l'assuré (homme ou femme) justifiant avoir élevé au moins **3 enfants**. Ceci s'applique en fin de calcul, sur la retraite de base comme sur les complémentaires Agirc-Arrco.
   - **Conditions d'éducation :** Les enfants doivent avoir été élevés pendant au moins neuf ans avant leur 16e anniversaire, ou avant l'âge auquel ils ont cessé de donner droit aux prestations familiales.
 
@@ -49,9 +50,11 @@ La législation française favorise les parents.
 - **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
-- **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
+- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1403 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
+- **Décret n° 2026-344 du 7 mai 2026** tirant les conséquences de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 sur les conditions de départ à la retraite de certains assurés sociaux.
+- **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026, notamment pour la retraite anticipée pour carrière longue et les assurés handicapés.
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
+- **Circulaire CNAV 2026-07 du 1er juillet 2026** précisant les nouvelles dispositions et déclinant les conséquences des modifications sur la détermination de certains éléments de calcul de la retraite, notamment l'âge d'ouverture du droit et la durée d'assurance requise pour le taux plein.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 14 juillet 2026.
