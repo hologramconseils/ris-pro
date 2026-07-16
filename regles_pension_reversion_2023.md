@@ -18,7 +18,7 @@ La pension de réversion du régime de base correspond à **54%** de la retraite
 Si le défunt a été marié plusieurs fois :
 - La pension de réversion est **partagée** entre le conjoint survivant et le(s) ex-conjoint(s) divorcé(s).
 - Ce partage est strictement proportionnel à la **durée respective de chaque mariage**.
-- Si l'un des bénéficiaires décède, sa part accroît la part de l'autre (des autres).
+- Si l'un des bénéficiaires décède, sa part accroît la part de l'autre (des autres) au régime général. Toutefois, dans la fonction publique, cette part peut être attribuée aux enfants orphelins sous certaines conditions, et n'accroît donc pas celle d'un autre conjoint.
 
 ## 3. Retraite Complémentaire (Agirc-Arrco)
 Les règles pour la complémentaire des salariés du privé diffèrent :
@@ -31,14 +31,15 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 ## 4. Fonction Publique (SRE / CNRACL)
 - **Taux :** 50% de la pension du fonctionnaire.
 - **Conditions d'attribution (CNRACL) :** Au moins une des conditions suivantes doit être remplie : 4 ans de mariage ; ou avoir un enfant issu de l'union ; ou 2 ans de services valables entre la date de mariage et la date de radiation des cadres de l'auteur du droit.
-- **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion.
+- **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion principale. Cependant, des conditions de ressources peuvent s'appliquer pour l'attribution de compléments visant à porter la pension au niveau de l'Allocation de Solidarité aux Personnes Âgées (ASPA).
 - **Majorations :** La pension peut être majorée de 10% si le conjoint décédé et le bénéficiaire ont élevé au moins trois enfants. Une majoration pour enfant à charge de 113,59 € par mois est également possible sous certaines conditions.
-- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire.
+- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire, mais il peut être récupéré en cas de cessation de la nouvelle union (décès du nouveau conjoint, divorce ou fin du concubinage).
 
 ### Mises à jour réglementaires
 - **Circulaire CNAV n° 2025-29 du 22/12/2025** : Fixe les plafonds de ressources du régime général pour 2026 à 25 001,60 € pour une personne seule et 40 002,56 € pour un couple, et le montant minimum de la pension de réversion du régime général à 334,92 € par mois au 1er janvier 2026.
 - **Circulaire CNAV du 22 décembre 2025 / Instruction interministérielle n° DSS/3A/DB/6BRS/2025/174 du 15 décembre 2025** : Revalorisation des pensions de retraite de base de 0,9% au 1er janvier 2026, impactant indirectement la pension de réversion.
 - **Circulaire Agirc-Arrco 2025-15-DT du 23 octobre 2025** : Gèle la valeur de service du point Agirc-Arrco à 1,4386 € jusqu'au 31 octobre 2026.
 - La Loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 a apporté des modifications à l'âge légal de départ à la retraite, mais n'a pas directement modifié les conditions d'attribution des pensions de réversion.
-- Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur.
+- Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur. La "réforme majeure" de la pension de réversion évoquée pour 2026 concerne principalement des ajustements de montants et plafonds, et non une refonte des conditions d'éligibilité liées au lien matrimonial ou une harmonisation complète des régimes, qui sont repoussées à 2027 ou au-delà.
 - **Mise à jour du 04/07/2026** : Le montant maximal de la pension de réversion du régime général est de 1 081,35 € par mois en 2026.
+- **Mise à jour du 16/07/2026**: Ajout de précisions sur le partage de la pension de réversion en cas de pluralité de mariages pour la fonction publique et sur les conditions de ressources pour les compléments de pension dans la fonction publique.

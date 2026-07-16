@@ -1,4 +1,4 @@
-# Règles d'Optimisation du Montant de la Retraite (2023, mis à jour en 2026)
+# Règles d'Optimisation du Montant de la Retraite (2023, mis à jour le 16 juillet 2026)
 
 Conformément à la législation en vigueur, les algorithmes de RIS Pro évaluent proactivement les dispositifs légaux d'amélioration du montant de la pension pour les suggérer aux assurés lorsque leur carrière le justifie.
 
@@ -19,7 +19,8 @@ Ce dispositif permet d'acheter des trimestres manquants pour combler une carriè
 La surcote est un bonus qui majore le montant de la retraite de base pour les personnes qui poursuivent leur activité alors qu'elles sont déjà éligibles à une retraite à taux plein.
 
 - **Conditions :**
-  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026.
+  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023.
+  - Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026.
   - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
   - Continuer à travailler au-delà de ces deux seuils.
 - **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
@@ -43,6 +44,8 @@ La législation française favorise les parents.
   - **Attribution des trimestres d'éducation (post-réforme 2023) :** Désormais, 2 des 4 trimestres "éducation" acquis pour chaque enfant sont automatiquement attribués à la mère. Les 2 autres peuvent être attribués à la mère ou au père.
 - **Majoration Famille Nombreuse :** Majoration forfaitaire de **10 %** du montant de la pension pour l'assuré (homme ou femme) justifiant avoir élevé au moins **3 enfants**. Ceci s'applique en fin de calcul, sur la retraite de base comme sur les complémentaires Agirc-Arrco.
   - **Conditions d'éducation :** Les enfants doivent avoir été élevés pendant au moins neuf ans avant leur 16e anniversaire, ou avant l'âge auquel ils ont cessé de donner droit aux prestations familiales.
+- **Mode de calcul plus favorable pour les mères (post-réforme 2026) :** Pour les retraites liquidées à compter du 1er janvier 2026, les pensions de base des femmes ayant un enfant seront calculées sur les 24 meilleures années de rémunération (au lieu de 25). Pour les femmes ayant deux enfants et plus, le calcul sera effectué sur les 23 meilleures années (au lieu de 25). Cette mesure, issue de la LFSS 2026, vise à améliorer le montant de la retraite pour une part significative des nouvelles retraitées.
+- **Nouveau Congé de Naissance (post-réforme 2026) :** Un nouveau congé de naissance a été créé par la LFSS 2026. Il s'ajoute aux congés de maternité, paternité ou d'adoption et permet aux parents de bénéficier d'un ou deux mois de congé supplémentaires. Ces périodes donnent lieu au versement d'indemnités journalières et sont prises en compte pour la retraite, pouvant générer un trimestre assimilé. Cette mesure s'applique pour les enfants nés ou adoptés à partir du 1er juillet 2026. Pour les enfants nés à partir du 1er janvier 2026, ce congé pourra être pris, mais à compter du 1er juillet 2026.
 
 ### Mises à jour réglementaires
 - **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023 (Réforme des retraites).
@@ -50,8 +53,10 @@ La législation française favorise les parents.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
 - **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
+- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1403 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, introduit plusieurs mesures dont la suspension du calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028, une réforme des règles du cumul emploi-retraite à compter du 1er janvier 2027, un mode de calcul plus favorable de la retraite de base pour les mères (23 ou 24 meilleures années de rémunération au lieu de 25 pour les pensions liquidées à compter du 1er janvier 2026), et la création d'un congé de naissance.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
+- **Décret n° 2026-344 du 7 mai 2026** tirant les conséquences de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 sur les conditions de départ à la retraite de certains assurés sociaux. Ce décret précise notamment les modalités de mise en œuvre de la suspension de la réforme des retraites pour les carrières longues.
+- **Circulaire Cnav 2026-07 du 1er juillet 2026** précisant les nouvelles dispositions relatives à l'âge légal de départ à la retraite et à la durée d'assurance pour les retraites prenant effet à compter du 1er septembre 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 16 juillet 2026.
