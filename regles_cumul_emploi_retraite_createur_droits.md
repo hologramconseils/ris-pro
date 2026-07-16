@@ -6,7 +6,9 @@ La Loi de financement rectificative de la sécurité sociale pour 2023 (Loi n° 
 
 Jusqu'à cette réforme, le cumul emploi-retraite permettait de travailler tout en percevant sa pension, mais sans acquérir de nouveaux droits. L'objectif de ces nouvelles dispositions est de mieux valoriser les carrières des seniors qui souhaitent ou doivent rester actifs après leur départ à la retraite, en leur permettant de constituer une seconde pension.
 
-## Conditions d'éligibilité pour l'acquisition de nouveaux droits
+## Règles applicables avant le 1er janvier 2027
+
+### Conditions d'éligibilité pour l'acquisition de nouveaux droits
 
 Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assuré doit remplir les conditions cumulatives suivantes:
 
@@ -14,9 +16,9 @@ Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assur�
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
 *   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
 
-## Acquisition de la seconde pension
+### Acquisition de la seconde pension
 
-### Régime de base
+#### Régime de base
 
 Les périodes travaillées en cumul emploi-retraite après le 1er septembre 2023 pourront donner droit à une seconde pension de retraite de base.
 
@@ -24,24 +26,37 @@ Les périodes travaillées en cumul emploi-retraite après le 1er septembre 2023
 *   **Plafond de la seconde pension de base :** Un plafond annuel est fixé pour cette nouvelle pension liquidée dans le cadre du cumul emploi-retraite créateur de droits. Il correspond à 5 % du montant annuel du Plafond Annuel de la Sécurité Sociale (PASS). Pour l'année 2026, le PASS est de 48 060 €, ce qui représente un plafond d'environ 2 403 € par an (5% de 48 060 €).
 *   Après la liquidation de cette seconde pension, la poursuite ou la reprise d'une nouvelle activité professionnelle ne pourra pas donner lieu à de nouveaux droits à retraite.
 
-### Régimes complémentaires (Agirc-Arrco)
+#### Régimes complémentaires (Agirc-Arrco)
 
 Le cumul emploi-retraite génère également des points de retraite complémentaire Agirc-Arrco pour l'affilié qui remplit les conditions d'un cumul emploi-retraite intégral.
 
 *   **Acquisition de points :** Les cotisations patronales et salariales dues à compter du 1er janvier 2023 sur la tranche 1 des rémunérations (n'excédant pas le Plafond Annuel de la Sécurité Sociale) sont génératrices de points Agirc-Arrco. Les cotisations sur la tranche 2 ne génèrent pas de nouveaux droits.
 *   **Montant de la seconde pension complémentaire :** Le montant annuel de cette deuxième pension complémentaire est calculé en multipliant le nombre de points acquis par la valeur du point Agirc-Arrco. Il n'est pas plafonné. Aucune minoration ou majoration (y compris pour enfants) ne peut être appliquée à cette seconde pension complémentaire. Les points acquis peuvent être liquidés à compter du 1er janvier 2024.
 
-## Entrée en Vigueur
+### Entrée en Vigueur
 
 *   Les nouvelles règles du cumul emploi-retraite créateur de droits pour le régime de base s'appliquent aux pensions dont l'entrée en jouissance intervient à compter du **1er septembre 2023**, en prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
 
+## Nouvelles règles applicables à compter du 1er janvier 2027
+
+La Loi de financement de la Sécurité sociale pour 2026 (Loi n° 2025-1403 du 30 décembre 2025) modifie en profondeur le dispositif de cumul emploi-retraite à compter du 1er janvier 2027. Ces nouvelles règles s'appliqueront aux personnes dont la *première pension prendra effet* à partir de cette date. Il n'y aura plus de distinction entre cumul intégral et cumul plafonné basée sur les conditions de liquidation, mais un système à trois paliers fondé sur l'âge de l'assuré.
+
+*   **Avant l'âge minimum légal de départ à la retraite (y compris carrières longues) :** Les revenus d'activité professionnelle seront intégralement déduits de la pension de retraite. La possibilité d'acquérir de nouveaux droits à la retraite à raison de l'activité est supprimée.
+
+*   **Entre l'âge minimum légal et 67 ans (âge du taux plein automatique) :** Le cumul d'une pension de retraite et de revenus d'activité sera possible dans la limite d'un plafond annuel. Si les revenus d'activité (et de remplacement) dépassent ce seuil (qui devrait avoisiner les 7 000 € bruts par an, en attente de décret d'application), la pension de retraite sera diminuée d'un montant égal à 50 % du dépassement. Aucune acquisition de nouveaux droits à la retraite n'est prévue dans cette tranche d'âge.
+
+*   **À partir de 67 ans (âge du taux plein automatique) :** Le cumul emploi-retraite sera autorisé sans délai de carence et sans plafond. Les cotisations obligatoires prélevées sur les nouveaux revenus permettront d'acquérir de nouveaux droits à la retraite, donnant lieu à une seconde pension. Le montant de cette seconde pension de retraite ne sera pas plafonné (contrairement à la règle actuelle des 5% du PASS pour la seconde pension de base).
+
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Décret n° 2023-753 du 10 août 2023** (portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 relatif au cumul emploi retraite et à la retraite progressive).
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco).
+*   **Circulaire Agirc-Arrco n° 2024-4 du 5 février 2024** (précisant les modalités d'application pour l'acquisition de nouveaux droits à la retraite complémentaire).
+*   **Arrêté du 22 décembre 2025** portant fixation du Plafond Annuel de la Sécurité Sociale (PASS) pour 2026.
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (introduisant les nouvelles règles applicables à compter du 1er janvier 2027 pour le cumul emploi-retraite).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 16 juillet 2026.

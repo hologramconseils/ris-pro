@@ -15,7 +15,7 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 *   **Âge :** Avoir au moins 60 ans.
 *   **Durée d'assurance :** Justifier d'au moins 150 trimestres de cotisation tous régimes de base confondus.
 *   **Activité professionnelle :** Exercer une activité à temps partiel (ou à temps réduit) dont la durée doit être comprise entre 40 % et 80 % d'un temps complet pour les salariés du secteur privé. Pour les fonctionnaires, la quotité de travail doit être comprise entre 50 % et 90 % d'un temps complet.
-*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé.
+*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé. La loi n° 2025-989 du 24 octobre 2025 (dite "Loi Séniors") a inversé la charge de la preuve en cas de refus de l'employeur.
 
 ## Bénéficiaires
 
@@ -28,7 +28,7 @@ La fraction de la pension de retraite versée est proportionnelle à la réducti
 
 ## Démarches
 
-La demande de retraite progressive doit être effectuée auprès de la caisse d'assurance retraite compétente (par exemple, l'Assurance retraite pour les salariés du régime général) environ 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, il est recommandé d'anticiper la demande, le délai de traitement par le Service des Retraites de l'État (SRE) pouvant atteindre 6 mois.
+La demande de retraite progressive peut désormais être effectuée intégralement en ligne sur info-retraite.fr via le service "Demander ma retraite progressive" depuis le 10 février 2025. Il est recommandé d'anticiper la demande environ 4 à 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, le délai de traitement par le Service des Retraites de l'État (SRE) peut être plus long, bien que la dématérialisation ait raccourci les délais de traitement pour les Carsat.
 
 ## Objectifs de la réforme
 
@@ -42,6 +42,7 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
 *   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
+*   **Loi n° 2025-989 du 24 octobre 2025 (dite "Loi Séniors")** : Inverse la charge de la preuve en cas de refus de l'employeur pour la retraite progressive.
 *   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 16 juillet 2026.
