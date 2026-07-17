@@ -8,7 +8,7 @@ Un congé supplémentaire de naissance est mis en place pour les parents. Bien q
 
 ## Conditions d'application
 
-Les dispositions relatives à ce nouveau congé de naissance s'appliquent aux enfants nés ou adoptés à compter du 1er janvier 2026. Pour les parents d'enfants nés ou arrivés au foyer entre le 1er janvier et le 30 juin 2026, le congé pourra être pris jusqu'au 31 mars 2027. Des décrets d'application ont été publiés pour préciser les modalités exactes de la validation de ces périodes assimilées pour la retraite, notamment pour les agents publics.
+Les dispositions relatives à ce nouveau congé de naissance s'appliquent aux enfants nés ou adoptés à compter du 1er janvier 2026. Pour les parents d'enfants nés ou arrivés au foyer entre le 1er janvier et le 30 juin 2026, le congé pourra être pris jusqu'au 31 mars 2027. Des décrets d'application ont été publiés pour préciser les modalités exactes de la validation de ces périodes assimilées pour la retraite, notamment pour les agents publics et les assurés du régime général.
 
 ## Mesures spécifiques pour les agents publics civils et militaires
 
@@ -17,7 +17,8 @@ Pour les agents publics civils et militaires, le congé supplémentaire de naiss
 ### Mises à jour réglementaires
 
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025).
+*   **Décret n° 2026-425 du 30 mai 2026** relatif au congé supplémentaire de naissance, applicable aux salariés, assurés du régime général, salariés agricoles et non-salariés agricoles, et précisant les modalités d'indemnisation et l'acquisition des trimestres de retraite (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-427 du 30 mai 2026** relatif au congé supplémentaire de naissance des agents publics civils et militaires (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-428 du 30 mai 2026** portant diverses dispositions relatives au congé supplémentaire de naissance des agents publics (Journal officiel du 31 mai 2026).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 17 juillet 2026.

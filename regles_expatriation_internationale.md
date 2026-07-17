@@ -11,7 +11,7 @@ La coordination européenne s'applique pour garantir qu'aucun trimestre cotisé 
     *   *La pension nationale :* Calculée uniquement sur les années et salaires français, avec la décote éventuelle si la totalisation EEE ne suffit pas pour le taux plein.
     *   *La pension communautaire (proratisée) :* La caisse calcule une pension "théorique" comme si toute la carrière (France + Étranger) avait été faite en France, puis proratise ce montant selon la formule : `(Pension Théorique) * (Durée Française / Durée Totale UE)`.
 
-Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. Un vote en plénière est attendu les 7 ou 8 juillet 2026 pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
+Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Un vote en plénière a eu lieu le 7 juillet 2026 pour leur approbation définitive. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
 
 ## 2. Carrière hors EEE (Pays avec Convention Bilatérale)
 La France a signé des conventions de Sécurité Sociale avec une quarantaine de pays (ex: États-Unis, Canada, Japon, Maroc...).
@@ -25,7 +25,7 @@ Si l'assuré a travaillé dans un pays sans accord avec la France (ex: Chine, É
 *   L'assuré percevra sa pension du pays étranger selon les règles locales, indépendamment de sa retraite française.
 
 ## 4. Rachat de trimestres pour Expatriation
-Un assuré de nationalité française ayant travaillé à l'étranger peut, sous certaines conditions, racheter ces années d'expatriation auprès de la Sécurité Sociale française pour améliorer son taux et sa durée d'assurance en France.
+Un assuré de nationalité française ayant travaillé à l'étranger peut, sous certaines conditions, racheter ces années d'expatriation auprès de la Sécurité Sociale française pour améliorer son taux et sa durée d'assurance en France. Il doit notamment justifier d'au moins 5 ans d'affiliation à l'assurance maladie française pour être éligible.
 *   Contrairement au rachat de trimestres "classique" (plafonné à 12 trimestres pour études ou années incomplètes), le rachat de trimestres pour expatriation n'est **soumis à aucun plafond maximal de trimestres** rachetables.
 *   La demande de rachat doit être déposée dans un délai maximal de **10 ans** suivant la fin de l'activité concernée à l'étranger.
 *   Le coût du rachat varie selon l'âge de l'assuré au moment de la demande, ses revenus perçus en France durant les 3 dernières années, et l'option de rachat choisie (taux seul ou taux et durée d'assurance).
@@ -41,7 +41,7 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
 *   **Décret n° 2023-436 du 3 juin 2023** et **Décrets n° 2023-751, n° 2023-752, n° 2023-753 du 10 août 2023** : Ces décrets ont initialement mis en application des dispositions de la loi de financement rectificative de la sécurité sociale pour 2023, notamment concernant le relèvement de l'âge d'ouverture des droits à la retraite et les dispositifs de retraite anticipée. Les ajustements apportés par la LFSS 2026 modifient certaines de ces progressions pour les générations concernées.
 *   **Décret n° 2026-344 du 7 mai 2026** et **Décret n° 2026-345 du 7 mai 2026** : Ces décrets précisent les conséquences de la LFSS 2026 sur les règles de départ à la retraite, notamment les âges d'ouverture des droits, les durées d'assurance requises, et les conditions de départ anticipé (carrières longues et handicap) pour les pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaires CNAV :**
-    *   **Circulaire CNAV 2026-07 du 5 mars 2026** : Précise les nouvelles dispositions et les conséquences de la suspension de la réforme des retraites sur la détermination de l'âge d'ouverture du droit à la retraite et de la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026. Elle remplace la circulaire Cnav 2024-25 et apporte des modifications concernant l'âge légal de départ à la retraite en métropole, la durée d'assurance pour le taux plein et la durée de référence, ainsi que l'âge du taux plein.
+    *   **Circulaire CNAV 2026-07 du 1er juillet 2026** : Précise les nouvelles dispositions et les conséquences de la suspension de la réforme des retraites sur la détermination de l'âge d'ouverture du droit à la retraite et de la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026. Elle remplace la circulaire Cnav 2024-25 et apporte des modifications concernant l'âge légal de départ à la retraite en métropole, la durée d'assurance pour le taux plein et la durée de référence, ainsi que l'âge du taux plein.
     *   **Circulaire Cnav 2026/16 du 12 juin 2026** : Concerne la revalorisation du Smic au 1er juin 2026 et ses incidences en matière de législation vieillesse.
     *   **Circulaire Cnav 2026/17 du 12 juin 2026** : Porte sur la retraite anticipée pour carrière longue (RACL) pour les retraites prenant effet à compter du 1er septembre 2026.
     *   **Circulaire Cnav 2026/18 du 15 juin 2026** : Relatif à la retraite anticipée au profit des assurés handicapés (RAAH) à compter du 1er septembre 2026.
@@ -49,6 +49,7 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
     *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites.
     *   **Circulaire Agirc-Arrco 2023-10-DT du 9 novembre 2023** : Arrête les paramètres du régime 2023-2024, y compris la valeur de service et la valeur d'achat du point, et la suppression du coefficient de solidarité.
     *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** : Concerne la retraite progressive 2026.
+    *   La valeur de service du point Agirc-Arrco reste fixée à 1,4386 € depuis le 1er novembre 2024, et n'a pas été revalorisée au 1er novembre 2025 pour 2026.
 *   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC, soit 1 803 € brut. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 212 € est requis.
 
-**Date de mise à jour :** 4 juillet 2026.
+**Date de mise à jour :** 17 juillet 2026.
