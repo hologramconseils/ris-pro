@@ -10,7 +10,7 @@ Jusqu'à cette réforme, le cumul emploi-retraite permettait de travailler tout 
 
 Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assuré doit remplir les conditions cumulatives suivantes:
 
-*   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans).
+*   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans). Il est important de noter que la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026), promulguée fin décembre 2025, a suspendu temporairement le calendrier de relèvement de l'âge légal et de la durée d'assurance initialement prévu par la réforme des retraites de 2023 pour les générations nées entre 1964 et 1968. À partir du 1er septembre 2026 et jusqu'en janvier 2028, l'âge légal est figé à 62 ans et 9 mois et la durée d'assurance requise est maintenue à 170 trimestres pour ces générations.
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
 *   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
 
@@ -40,8 +40,10 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
-*   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
-*   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Décret n° 2023-751 du 10 août 2023** relatif au cumul emploi retraite et à la retraite progressive (précisant les conditions d'application pour le régime de base).
+*   **Décret n° 2023-753 du 10 août 2023** portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 relatif au cumul emploi retraite et à la retraite progressive.
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco n° 2024-4 du 5 février 2024** (précisant les modalités d'application).
+*   **Arrêté du 22 décembre 2025** fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026.
+*   **Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026)**, promulguée fin décembre 2025, suspendant le calendrier de relèvement de l'âge légal et de la durée d'assurance de la réforme de 2023 pour les générations nées entre 1964 et 1968.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 18 juillet 2026.

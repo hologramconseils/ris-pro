@@ -11,7 +11,7 @@ La coordination européenne s'applique pour garantir qu'aucun trimestre cotisé 
     *   *La pension nationale :* Calculée uniquement sur les années et salaires français, avec la décote éventuelle si la totalisation EEE ne suffit pas pour le taux plein.
     *   *La pension communautaire (proratisée) :* La caisse calcule une pension "théorique" comme si toute la carrière (France + Étranger) avait été faite en France, puis proratise ce montant selon la formule : `(Pension Théorique) * (Durée Française / Durée Totale UE)`.
 
-Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. Un vote en plénière est attendu les 7 ou 8 juillet 2026 pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
+Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Le Parlement européen a approuvé ces règles lors de sa session plénière le 7 juillet 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. L'entrée en application est prévue pour l'automne 2026, après son adoption formelle par les deux institutions et sa mise au point par les juristes-linguistes.
 
 ## 2. Carrière hors EEE (Pays avec Convention Bilatérale)
 La France a signé des conventions de Sécurité Sociale avec une quarantaine de pays (ex: États-Unis, Canada, Japon, Maroc...).
@@ -49,6 +49,6 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
     *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites.
     *   **Circulaire Agirc-Arrco 2023-10-DT du 9 novembre 2023** : Arrête les paramètres du régime 2023-2024, y compris la valeur de service et la valeur d'achat du point, et la suppression du coefficient de solidarité.
     *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** : Concerne la retraite progressive 2026.
-*   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC, soit 1 803 € brut. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 212 € est requis.
+*   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC, soit **1 846,50 € brut** (basé sur le SMIC horaire de 12,31 € brut en vigueur au 1er juin 2026). Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de **7 386 €** est requis.
 
-**Date de mise à jour :** 4 juillet 2026.
+**Date de mise à jour :** 18 juillet 2026.
