@@ -49,9 +49,12 @@ La législation française favorise les parents.
 - **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
-- **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
 - **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
+- **Circulaire Cnav 2026-07 du 5 mars 2026** précisant les nouvelles dispositions et conséquences de la LFSS 2026 sur l'âge légal et la durée d'assurance requise (remplaçant la circulaire Cnav 2024-25 du 1er août 2024 pour les retraites prenant effet à compter du 1er septembre 2026).
+- **Circulaire Cnav 2026/16 du 12 juin 2026** relative à la revalorisation du Smic au 1er juin 2026 et ses incidences en matière de législation vieillesse.
+- **Circulaire Cnav 2026/17 du 12 juin 2026** concernant la retraite anticipée pour carrière longue applicable à compter du 1er septembre 2026 (remplaçant la circulaire Cnav 2023-14 du 10 juillet 2023).
+- **Circulaire Agirc-Arrco 2026-1-SG-DRJ** sur la retraite progressive 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 18 juillet 2026.
