@@ -4,7 +4,7 @@ Conformément à la documentation officielle, le moteur de règles intègre des 
 
 ## 1. Carrière Longue
 Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 21 ans.
-- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), et les périodes d'apprentissage entre 1972 et 2013, sont désormais prises en compte comme trimestres cotisés.
+- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), les périodes d'apprentissage entre 1972 et 2013, et désormais jusqu'à 2 trimestres pour la naissance, l'éducation ou l'adoption d'un enfant, sont prises en compte comme trimestres cotisés.
 - **Âge de départ anticipé :**
   - **Dès 58 ans** (activité avant 16 ans)
   - **Dès 60 ans** (activité avant 18 ans)
@@ -38,5 +38,7 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** officialisant l'ouverture du droit à retraite progressive dès 60 ans pour tous.
 - **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
+- **Circulaire Cnav 2026/17 du 12 juin 2026** relative à la retraite anticipée pour carrière longue à compter du 1er septembre 2026.
+- **Circulaire Cnav 2026/18 du 15 juin 2026** relative à la retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.
 
 **Date de mise à jour :** Juillet 2026

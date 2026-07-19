@@ -32,13 +32,15 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
     | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                                          |
     | 1962                   | 62 ans et 6 mois                | 169                                                          |
     | 1963                   | 62 ans et 9 mois                | 170                                                          |
-    | 1964                   | 62 ans et 9 mois                | 170                                                          |
-    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                          |
-    | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
-    | 1966                   | 63 ans et 3 mois                | 172                                                          |
-    | 1967                   | 63 ans et 6 mois                | 172                                                          |
-    | 1968                   | 63 ans et 9 mois                | 172                                                          |
-    | 1969 et après          | 64 ans                           | 172                                                          |
+    | 1964                   | 62 ans et 9 mois                | 170                                                         |
+    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                         |
+    | Avril à Décembre 1965  | 63 ans                           | 171                                                         |
+    | 1966                   | 63 ans et 3 mois                | 172                                                         |
+    | 1967                   | 63 ans et 6 mois                | 172                                                         |
+    | 1968                   | 63 ans et 9 mois                | 172                                                         |
+    | 01/01/1969 au 31/03/1970 | 64 ans                           | 170                                                         |
+    | 01/04/1970 au 31/12/1970 | 64 ans                           | 171                                                         |
+    | 1971 et après          | 64 ans                           | 172                                                          |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
 
@@ -59,4 +61,4 @@ Le dispositif de retraite progressive, permettant de travailler à temps partiel
 *   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à compter du 1er janvier 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
 *   Les règles du dispositif de **cumul emploi-retraite** sont modifiées pour les salariés partant à la retraite après le 1er janvier 2027, exigeant la liquidation de toutes les retraites (base et complémentaires) pour pouvoir cumuler emploi et retraite, avec des règles d'écrêtement de la pension en fonction de l'âge et des revenus d'activité.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 19 juillet 2026.
