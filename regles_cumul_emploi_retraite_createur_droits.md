@@ -11,6 +11,9 @@ Jusqu'à cette réforme, le cumul emploi-retraite permettait de travailler tout 
 Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assuré doit remplir les conditions cumulatives suivantes:
 
 *   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans).
+    
+    *Note sur les conditions d'âge légal et de durée d'assurance (à partir du 1er septembre 2026) :* La Loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 a introduit une suspension de la réforme des retraites de 2023 pour les pensions prenant effet à compter du 1er septembre 2026. Cette suspension ralentit l'évolution de l'âge légal de départ et réduit la durée d'assurance requise pour certaines générations (notamment les générations 1964 à 1968). Il convient de se référer à la législation et aux circulaires spécifiques (notamment la Circulaire Cnav 2026-07 du 1er juillet 2026) pour les paramètres exacts applicables à chaque génération et date de départ.
+    
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
 *   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
 
@@ -41,7 +44,9 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco 2024-4-DRJ du 5 février 2024** (précisant les modalités d'application).
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026.
+*   **Circulaire Cnav 2026-07 du 1er juillet 2026** (précisant les nouvelles dispositions suite à la Loi de financement de la sécurité sociale pour 2026 pour les retraites prenant effet à compter du 1er septembre 2026).
 *   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 19 juillet 2026.
