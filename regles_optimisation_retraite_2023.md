@@ -19,7 +19,7 @@ Ce dispositif permet d'acheter des trimestres manquants pour combler une carriè
 La surcote est un bonus qui majore le montant de la retraite de base pour les personnes qui poursuivent leur activité alors qu'elles sont déjà éligibles à une retraite à taux plein.
 
 - **Conditions :**
-  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026.
+  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026. L'âge légal sera ajusté entre 62 ans et 9 mois et 63 ans et 9 mois pour les générations nées entre 1964 et 1968.
   - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
   - Continuer à travailler au-delà de ces deux seuils.
 - **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
@@ -41,6 +41,7 @@ La législation française favorise les parents.
 
 - **Majoration Enfant :** Octroi classique de 8 trimestres par enfant (4 trimestres au titre de la maternité ou de l'adoption, et 4 trimestres au titre de l'éducation).
   - **Attribution des trimestres d'éducation (post-réforme 2023) :** Désormais, 2 des 4 trimestres "éducation" acquis pour chaque enfant sont automatiquement attribués à la mère. Les 2 autres peuvent être attribués à la mère ou au père.
+  - **Calcul du Salaire Annuel Moyen (post-LFSS 2026) :** Pour les retraites liquidées à compter du 1er janvier 2026, la pension de base des femmes ayant un enfant sera calculée sur les 24 meilleures années de rémunération. Pour les femmes ayant deux enfants et plus, ce calcul s'effectuera sur les 23 meilleures années, au lieu des 25 meilleures années habituellement retenues.
 - **Majoration Famille Nombreuse :** Majoration forfaitaire de **10 %** du montant de la pension pour l'assuré (homme ou femme) justifiant avoir élevé au moins **3 enfants**. Ceci s'applique en fin de calcul, sur la retraite de base comme sur les complémentaires Agirc-Arrco.
   - **Conditions d'éducation :** Les enfants doivent avoir été élevés pendant au moins neuf ans avant leur 16e anniversaire, ou avant l'âge auquel ils ont cessé de donner droit aux prestations familiales.
 
@@ -50,8 +51,13 @@ La législation française favorise les parents.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
 - **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
+- **Loi n° 2025-1403 du 30 décembre 2025** de financement de la Sécurité sociale pour 2026. Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
+- **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026, adaptant l'âge de départ anticipé pour carrière longue, la durée d'assurance cotisée pour assurés handicapés et l'âge légal de départ en retraite à Mayotte, applicable aux pensions prenant effet à compter du 1er septembre 2026.
+- **Circulaire Cnav 2026/16 du 12 juin 2026** relative à la revalorisation du Smic au 01/06/2026 et ses incidences en matière de législation vieillesse.
+- **Circulaire Cnav 2026/17 du 12 juin 2026** concernant la retraite anticipée pour carrière longue à compter du 01/09/2026.
+- **Circulaire Cnav 2026/18 du 15 juin 2026** concernant la retraite anticipée au profit des assurés handicapés à compter du 01/09/2026.
+- **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** communiquant les coefficients spécifiques applicables en 2026 pour la retraite progressive pour les générations nées à partir de 1964.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 20 juillet 2026.
