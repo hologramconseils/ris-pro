@@ -16,7 +16,7 @@ Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 2
 L'assuré justifiant d'un taux d'incapacité permanente d'au moins 50 % tout au long de sa période d'assurance peut liquider sa retraite par anticipation.
 - **Âge de départ :** Dès 55 ans.
 - **Réforme 2023 :** Seule la condition de durée d'assurance totale cotisée sous handicap est exigée (la condition préalable de la durée d'assurance validée est supprimée).
-- **Mise à jour réglementaire :** Le Décret n°2026-345 du 7 mai 2026, applicable aux pensions prenant effet à compter du 1er septembre 2026, adapte la durée d'assurance cotisée requise pour les assurés handicapés en tenant compte de la suspension de la réforme des retraites de 2023.
+- **Mise à jour réglementaire :** Le Décret n°2026-345 du 7 mai 2026, applicable aux pensions prenant effet à compter du 1er septembre 2026, adapte la durée d'assurance cotisée requise pour les assurés handicapés en tenant compte de la suspension de la réforme des retraites de 2023. Ce décret supprime notamment, pour les assurés nés avant ou à partir de 1973, la distinction de la diminution de trimestres apportée à la durée d'assurance nécessaire pour le taux plein selon l'âge de départ à la retraite anticipée.
 
 ## 3. Retraite pour Incapacité Permanente
 Suite à un accident du travail ou une maladie professionnelle reconnue :
@@ -38,5 +38,6 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** officialisant l'ouverture du droit à retraite progressive dès 60 ans pour tous.
 - **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
+- **Circulaire CNAV 2026-07 du 1er juillet 2026** remplaçant la Circulaire Cnav 2024-25 (précise les nouvelles dispositions de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 et du Décret n° 2026-345 du 7 mai 2026, applicable aux pensions prenant effet à compter du 1er septembre 2026).
 
 **Date de mise à jour :** Juillet 2026
