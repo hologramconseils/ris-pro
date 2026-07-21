@@ -15,12 +15,12 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 *   **Âge :** Avoir au moins 60 ans.
 *   **Durée d'assurance :** Justifier d'au moins 150 trimestres de cotisation tous régimes de base confondus.
 *   **Activité professionnelle :** Exercer une activité à temps partiel (ou à temps réduit) dont la durée doit être comprise entre 40 % et 80 % d'un temps complet pour les salariés du secteur privé. Pour les fonctionnaires, la quotité de travail doit être comprise entre 50 % et 90 % d'un temps complet.
-*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé.
+*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé. En l'absence de réponse de l'employeur dans un délai de deux mois, l'accord est réputé tacite.
 
 ## Bénéficiaires
 
 Ce dispositif est désormais accessible à tous les salariés du secteur privé, ainsi qu'aux agents de la fonction publique (fonctionnaires et contractuels).
-Cependant, les agents de catégorie "active" de la fonction publique, qui peuvent partir avant l'âge légal, en restent généralement exclus. Les contractuels de la fonction publique bénéficient de la retraite progressive mais peuvent ne pas avoir droit au maintien de leurs cotisations pour la retraite.
+Tous les agents de la fonction publique, y compris ceux des catégories "active" et "super-active", peuvent bénéficier de la retraite progressive dès lors qu'ils remplissent les conditions générales (âge, trimestres, quotité de travail). Les contractuels de la fonction publique bénéficient de la retraite progressive mais peuvent ne pas avoir droit au maintien de leurs cotisations pour la retraite à temps plein sans accord de l'employeur.
 
 ## Calcul de la pension
 
@@ -40,8 +40,8 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
-*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
-*   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
+*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État, publié au Journal officiel du 23 juillet 2025.
+*   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025, publié au Journal officiel du 23 juillet 2025.
 *   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 21 juillet 2026.
