@@ -12,14 +12,14 @@ Ce dispositif permet d'acheter des trimestres manquants pour combler une carriè
 - **Conditions spécifiques post-réforme 2023 :**
   - Il est possible d'effectuer un rachat de trimestres pour études supérieures à coût réduit jusqu'au 31 décembre de l'année des 40 ans de l'assuré (au lieu du 31 décembre de la 10e année suivant la fin des études).
   - La demande de versement de cotisations au titre d'un stage en entreprise peut être déposée jusqu'au 31 décembre de l'année des 30 ans de l'assuré (au lieu de la 2e année suivant la fin du stage).
-- **Coût du rachat :** Le barème du rachat de trimestres est revalorisé annuellement et son coût augmente avec l'âge et les revenus de l'assuré. Il est à noter que les seuils de revenus des tranches sont actualisés en fonction du PASS.
+- **Coût du rachat :** Le barème du rachat de trimestres, bien que demeurant inchangé depuis 2013 pour le régime général, voit ses seuils de revenus revalorisés annuellement en fonction du Plafond Annuel de la Sécurité Sociale (PASS). Son coût augmente avec l'âge et les revenus de l'assuré.
 - **Indication Algorithmique (RIS Pro) :** Suggéré automatiquement si `trimestres_requis > trimestres_projetes`.
 
 ## 2. La Surcote (Travailler plus pour gagner plus)
 La surcote est un bonus qui majore le montant de la retraite de base pour les personnes qui poursuivent leur activité alors qu'elles sont déjà éligibles à une retraite à taux plein.
 
 - **Conditions :**
-  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026.
+  - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026, fixant temporairement l'âge légal pour certaines générations (par exemple 62 ans et 9 mois pour la génération 1964).
   - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
   - Continuer à travailler au-delà de ces deux seuils.
 - **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
@@ -41,6 +41,7 @@ La législation française favorise les parents.
 
 - **Majoration Enfant :** Octroi classique de 8 trimestres par enfant (4 trimestres au titre de la maternité ou de l'adoption, et 4 trimestres au titre de l'éducation).
   - **Attribution des trimestres d'éducation (post-réforme 2023) :** Désormais, 2 des 4 trimestres "éducation" acquis pour chaque enfant sont automatiquement attribués à la mère. Les 2 autres peuvent être attribués à la mère ou au père.
+  - **Nouveauté LFSS 2026 (Calcul Salaire Annuel Moyen pour les mères) :** Pour les retraites liquidées à compter du 1er janvier 2026, la Loi de financement de la Sécurité sociale pour 2026 introduit une mesure favorable aux mères de famille. Le salaire de référence sera établi sur la base des 24 meilleures années de carrière pour les mères d'un enfant, et des 23 meilleures années de carrière pour les mères de deux enfants et plus, au lieu des 25 meilleures années habituellement retenues.
 - **Majoration Famille Nombreuse :** Majoration forfaitaire de **10 %** du montant de la pension pour l'assuré (homme ou femme) justifiant avoir élevé au moins **3 enfants**. Ceci s'applique en fin de calcul, sur la retraite de base comme sur les complémentaires Agirc-Arrco.
   - **Conditions d'éducation :** Les enfants doivent avoir été élevés pendant au moins neuf ans avant leur 16e anniversaire, ou avant l'âge auquel ils ont cessé de donner droit aux prestations familiales.
 
@@ -50,8 +51,10 @@ La législation française favorise les parents.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
 - **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
+- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027. Elle améliore également le calcul du Salaire Annuel Moyen pour les mères.
+- **Décret n°2025-1340 du 26 décembre 2025** relatif au rachat d'années d'études pour les fonctionnaires, clarifiant et actualisant le barème pour cette catégorie d'assurés à compter du 1er janvier 2026.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
+- **Circulaire CNAV du 5 février 2026** confirmant le barème du rachat de trimestres pour 2026, avec actualisation des seuils de revenus par référence au PASS 2026.
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 22 juillet 2026.
