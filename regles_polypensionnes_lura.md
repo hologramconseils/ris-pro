@@ -24,32 +24,34 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 
     Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023) et aux ajustements apportés par la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. L'âge d'annulation de la décote reste fixé à 67 ans.
 
-    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, suite à la "suspension" partielle du calendrier initial de la réforme de 2023:
+    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, suite à la "suspension" partielle du calendrier initial de la réforme de 2023 par la LFSS 2026:
 
     | Année de naissance     | Âge légal de départ à la retraite | Durée d'assurance requise pour le taux plein (en trimestres) |
     | :--------------------- | :------------------------------- | :----------------------------------------------------------- |
-    | Avant 01/09/1961       | 62 ans                           | 167 (1960) / 168 (Jan-Août 1961)                              |
-    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                                          |
-    | 1962                   | 62 ans et 6 mois                | 169                                                          |
-    | 1963                   | 62 ans et 9 mois                | 170                                                          |
-    | 1964                   | 62 ans et 9 mois                | 170                                                          |
-    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                          |
-    | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
-    | 1966                   | 63 ans et 3 mois                | 172                                                          |
-    | 1967                   | 63 ans et 6 mois                | 172                                                          |
-    | 1968                   | 63 ans et 9 mois                | 172                                                          |
-    | 1969 et après          | 64 ans                           | 172                                                          |
+    | Avant 01/09/1961       | 62 ans                           | 167 (1960) / 168 (Jan-Août 1961)               |
+    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                               |
+    | 1962                   | 62 ans et 6 mois                | 169                                               |
+    | 1963                   | 62 ans et 9 mois                | 170                                               |
+    | 1964                   | 62 ans et 9 mois                | 170                                      |
+    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                            |
+    | Avril à Décembre 1965  | 63 ans                           | 171                                            |
+    | 1966                   | 63 ans et 3 mois                | 172                                     |
+    | 1967                   | 63 ans et 6 mois                | 172                                     |
+    | 1968                   | 63 ans et 9 mois                | 172                                     |
+    | 1969 et après          | 64 ans                           | 172                                     |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
 
 - **Salaire/Revenu de référence :** Contrairement à la LURA, les 25 meilleures années (pour le privé) ou les 6 derniers mois (pour le public) sont calculés uniquement sur la base des périodes d'affiliation au régime concerné. La règle des "25 meilleures années" est proratisée dans le privé si l'assuré a passé une grande partie de sa carrière dans le public.
 
 ### Dispositif de Retraite Progressive
-Le dispositif de retraite progressive, permettant de travailler à temps partiel tout en percevant une fraction de sa retraite, est désormais accessible dès l'âge de 60 ans pour les assurés de tous les régimes, à compter du 1er septembre 2025. Cette mesure résulte de l'Accord National Interprofessionnel (ANI) du 14 novembre 2024 sur l'emploi des seniors et de décrets publiés en juillet 2025.
+Le dispositif de retraite progressive, permettant de travailler à temps partiel tout en percevant une fraction de sa retraite, est accessible à partir d'un certain âge, généralement deux ans avant l'âge légal de départ à la retraite, sous conditions de durée d'assurance. Les conditions précises sont définies par la législation en vigueur et peuvent varier selon les situations individuelles.
+
+### Dispositif de Cumul Emploi-Retraite
+Le dispositif de cumul emploi-retraite a été modifié par la réforme des retraites de 2023. Pour bénéficier du cumul emploi-retraite intégral (sans limitation de revenus), l'assuré doit avoir liquidé l'ensemble de ses pensions de retraite (de base et complémentaires). Des règles d'écrêtement peuvent s'appliquer à la pension en fonction des revenus d'activité et de l'âge de l'assuré dans le cadre du cumul emploi-retraite plafonné.
 
 ### Mises à jour réglementaires
 *   **Arrêté du 22 décembre 2025** portant fixation du plafond de la sécurité sociale pour 2026, publié au Journal Officiel du 29 décembre 2025. Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 est fixé à 48 060 €.
-*   **Décrets n° 2025-681 du 15 juillet 2025** publiés au Journal Officiel du 23 juillet 2025, abaissant l'âge d'ouverture du droit à retraite progressive à 60 ans pour toutes les pensions prenant effet à compter du 1er septembre 2025.
 *   **Circulaire Agirc-Arrco n° 2026-1-SG-DRJ du 16 janvier 2026** annulant et remplaçant la circulaire Agirc-Arrco 2025-14-SG-DRJ et communiquant les coefficients spécifiques applicables aux retraites progressives prenant effet à partir de janvier 2026.
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** (Loi n° 2025-1403 du 30 décembre 2025), notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV du 6 mars 2026** clarifiant l'application concrète de la suspension de la réforme des retraites de 2023 pour les départs à compter du 1er septembre 2026.
@@ -57,6 +59,5 @@ Le dispositif de retraite progressive, permettant de travailler à temps partiel
 *   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
 *   **Circulaire CNAV 2026/17 du 12 juin 2026** et **Circulaire CNAV 2026/18 du 15 juin 2026** précisant les conditions de retraite anticipée pour carrière longue et au profit des assurés handicapés à compter du 1er septembre 2026.
 *   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à compter du 1er janvier 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
-*   Les règles du dispositif de **cumul emploi-retraite** sont modifiées pour les salariés partant à la retraite après le 1er janvier 2027, exigeant la liquidation de toutes les retraites (base et complémentaires) pour pouvoir cumuler emploi et retraite, avec des règles d'écrêtement de la pension en fonction de l'âge et des revenus d'activité.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 24 juillet 2026.

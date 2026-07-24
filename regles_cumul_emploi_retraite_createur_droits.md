@@ -12,7 +12,7 @@ Pour pouvoir bénéficier du cumul emploi-retraite créateur de droits, l'assur�
 
 *   **Avoir liquidé sa première retraite à taux plein :** L'assuré doit avoir obtenu l'ensemble de ses pensions de retraite (de base et complémentaires, françaises et étrangères) et remplir les conditions d'obtention d'une retraite à taux plein (soit atteindre l'âge légal et la durée d'assurance requise pour sa génération, soit atteindre l'âge d'annulation de la décote, soit 67 ans).
 *   **Reprise d'activité :** Il doit exercer une activité professionnelle rémunérée.
-*   **Absence de délai de carence (pour la retraite de base) :** Si la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la liquidation de la pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si l'assuré a liquidé sa pension au plus tard 6 mois après la publication de la loi (soit avant le 15 octobre 2023).
+*   **Délai de carence (pour la retraite de base) :** Si la première pension a pris effet à compter du 1er septembre 2023 et que la reprise d'activité a lieu chez le dernier employeur, les nouveaux droits ne sont créés qu'après un délai de carence de 6 mois à compter de la date d'effet de la première pension. Ce délai ne s'applique pas si la reprise d'activité a lieu chez un nouvel employeur, ou si la première pension a pris effet avant le 1er septembre 2023.
 
 ## Acquisition de la seconde pension
 
@@ -40,8 +40,8 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
-*   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
-*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
+*   **Décret n° 2023-753 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
+*   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco n° 2024-4 du 5 février 2024** (précisant les modalités d'application).
 *   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 24 juillet 2026.
