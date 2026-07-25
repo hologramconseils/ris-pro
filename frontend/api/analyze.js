@@ -154,6 +154,7 @@ export default async function handler(req, res) {
 - Si une colonne est vide, mets 0 (ou "N/A" pour les textes).
 - Pour detail_employeurs, l'année de début (start_year) et de fin (end_year) doivent être déduites de "Date début" et "Date fin" (ex: "01/09/2000" => 2000).
 - Copie exactement le revenu brut avec sa devise (ex: "3 744 FRF" ou "2 386 €").
+- DÉDUPLICATION VITALE DES SALAIRES : Un salarié cotise au régime de base ET au régime complémentaire. Le document affiche donc souvent le MÊME salaire sur deux lignes distinctes pour la même année (ex: Régime Général 20000€ ET AGIRC-ARRCO 20000€). Tu as l'interdiction formelle de conserver ces doublons. Si tu vois le même salaire (ou très proche) pour la même année chez le même employeur, ne l'extrais qu'une seule fois dans "detail_employeurs".
 </regles_strictes>
       `;
 
@@ -228,6 +229,7 @@ export default async function handler(req, res) {
         
         let totalSalaryEur = 0;
         let empNames = new Set();
+        let processedSalaries = []; // Empêcher la double-comptabilisation (Régime de base vs Complémentaire)
         
         activeEmp.forEach(emp => {
           if (emp.employer && emp.employer !== 'N/A') empNames.add(emp.employer);
@@ -238,7 +240,12 @@ export default async function handler(req, res) {
                if (isFrf) {
                  val = val / 6.55957; // Conversion Francs en Euros
                }
-               totalSalaryEur += val;
+               // Déduplication robuste : on ignore les salaires identiques (à 1€ près) dans la même année
+               const isDuplicate = processedSalaries.some(s => Math.abs(s - val) < 1.0);
+               if (!isDuplicate) {
+                 totalSalaryEur += val;
+                 processedSalaries.push(val);
+               }
             }
           }
         });
@@ -339,7 +346,13 @@ export default async function handler(req, res) {
       }
 
       // --- AGENT 3 : RÉDACTEUR (IA) ---
-      console.log("Démarrage Agent 3 : Rédacteur...");
+      const simplifiedCarrieres = carrieres.filter(c => parseInt(c.year) <= currentYear).map(c => ({
+        year: c.year,
+        employer: c.employer,
+        salary: c.salary,
+        trimesters: c.trimesters
+      }));
+
       const writerPrompt = `
 <role>Tu es le conseiller expert en retraite de RIS Pro. Tu rédiges le bilan final en te basant STRICTEMENT sur les données calculées.</role>
 
@@ -347,6 +360,7 @@ export default async function handler(req, res) {
 - Trimestres validés : ${trimestres_valides}
 - Trimestres requis : ${trimestres_requis}
 - Anomalies détectées (faits incontestables) : ${JSON.stringify(rawAnomalies)}
+- Historique de carrière détaillé du client (pour personnaliser les stratégies) : ${JSON.stringify(simplifiedCarrieres)}
 </contexte_et_donnees>
 
 <regles_constitutionnelles>
