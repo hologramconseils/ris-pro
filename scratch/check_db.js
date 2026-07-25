@@ -1,24 +1,23 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), 'frontend/.env.local') });
+config({ path: resolve(process.cwd(), 'frontend/.env') });
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-  ssl: { rejectUnauthorized: false }
-});
+import { getDb } from '../frontend/api/db.js';
 
 async function run() {
+  const pool = getDb();
   try {
-    const res = await pool.query("SELECT * FROM analyses ORDER BY created_at DESC LIMIT 1");
+    const res = await pool.query('SELECT user_id, file_path, results FROM analyses ORDER BY created_at DESC LIMIT 1');
     if (res.rows.length > 0) {
-      const results = res.rows[0].results;
-      console.log("Trimestres valides (Ag2):", results.trimestres_valides);
-      console.log("Anomalies (Ag2/Ag3):", results.anomalies);
-      console.log("Summary (Ag3 text):", results.summary.substring(0, 500));
+      console.log(JSON.stringify(res.rows[0].results, null, 2));
+    } else {
+      console.log('No analyses found.');
     }
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error(e);
   } finally {
-    await pool.end();
+    pool.end();
   }
 }
 run();

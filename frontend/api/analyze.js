@@ -141,18 +141,22 @@ export default async function handler(req, res) {
       // --- AGENT 1 : EXTRACTEUR (IA) ---
       console.log("Démarrage Agent 1 : Extracteur...");
       const extractorPrompt = `
-<role>Tu es un outil d'extraction de données automatisé (Extracteur). Ta seule tâche est de lire le document PDF fourni (un relevé de carrière, RIS ou EIG) et d'extraire les données brutes dans le format structuré attendu.</role>
+<role>Tu es un outil d'extraction de données automatisé (Extracteur expert). Ta tâche exclusive est d'analyser le document PDF (Relevé de Carrière, RIS ou EIG) et d'en extraire les données brutes avec une précision absolue, sans aucune interprétation.</role>
 
 <instructions>
-1. Analyse le document pour trouver le NIR (Numéro de Sécurité Sociale) et déterminer s'il s'agit bien d'un relevé de carrière.
-2. Extrais TOUTES les années de carrière, ligne par ligne ou tableau par tableau.
-3. Ne fais aucun calcul de totaux, recopie juste les données.
+1. Repère le NIR (Numéro de Sécurité Sociale) pour valider le document.
+2. Parcourt le document année par année, ligne par ligne.
+3. Pour chaque ligne de carrière, extrais l'année, le nom de l'employeur (ou la nature: Chômage, Maladie, Service Militaire), les trimestres validés (ou "trimestres retenus"), les points de retraite complémentaire, et le revenu/salaire brut.
 </instructions>
 
 <regles_strictes>
-- N'invente AUCUNE donnée.
-- Tu n'as pas le droit d'ajouter des années qui ne sont pas explicitement écrites.
-- Si un champ est manquant, renseigne 0 pour les chiffres (trimestres, points) et 'N/A' pour les textes (salaire, employeur).
+- ZERO HALLUCINATION : N'invente jamais une année ou un employeur. Si la page est illisible, n'invente rien.
+- Sépare bien les lignes si une année comporte plusieurs employeurs.
+- Si une colonne est vide, absente, ou non chiffrée pour une ligne spécifique : 
+  - Trimestres : 0
+  - Points : 0.0
+  - Salaire : "N/A"
+- Ne consolide pas les lignes, n'additionne pas, copie fidèlement le tableau.
 </regles_strictes>
 
 <few_shot_example>
@@ -269,14 +273,25 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
           trimestres_valides += yearTrim;
           
           if (yearTrim < 4 || yearPoints <= 0) {
-             rawAnomalies.push({
-               year: y.toString(),
-               employer: Array.from(employers).join(", "),
-               trimesters: yearTrim,
-               points: yearPoints,
-               salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
-               reason_code: yearTrim < 4 ? "CAS 1/4: Moins de 4 trimestres validés" : "CAS 2/3: Trimestres validés mais 0 point"
-             });
+             if (totalSalary > 0 || yearTrim > 0 || yearPoints > 0) {
+               // Filtrage intelligent : on ne remonte au LLM que les années avec une vraie incohérence mathématique
+               const isPotentialAnomaly = 
+                  (totalSalary > 1500 && yearTrim === 0) || 
+                  (totalSalary > 6000 && yearTrim < 4) ||
+                  (totalSalary > 2000 && yearPoints === 0) || 
+                  (yearTrim === 0 && employers.size > 0 && Array.from(employers)[0] !== "Aucun");
+
+               if (isPotentialAnomaly) {
+                 rawAnomalies.push({
+                   year: y.toString(),
+                   employer: Array.from(employers).join(", "),
+                   trimesters: yearTrim,
+                   points: yearPoints,
+                   salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
+                   reason_code: yearTrim < 4 ? "Suspicion de trimestres manquants (salaire significatif)" : "Suspicion de points manquants (salaire significatif)"
+                 });
+               }
+             }
           }
         }
       }
@@ -293,10 +308,13 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
 </contexte_et_donnees>
 
 <regles_constitutionnelles>
-1. Interdiction formelle de modifier les chiffres fournis (Trimestres validés, requis).
-2. Interdiction formelle d'ajouter de nouvelles anomalies qui ne figurent pas dans la liste fournie.
-3. TU DOIS OBLIGATOIREMENT RENVOYER DANS LE JSON FINAL EXACTEMENT LE MÊME NOMBRE D'ANOMALIES QUE CELUI FOURNI DANS LA LISTE. AUCUNE ANOMALIE NE DOIT ÊTRE SUPPRIMÉE, MÊME SI ELLE TE PARAÎT INCOMPLÈTE.
-4. Pour chaque anomalie fournie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire, la solution, et les documents à réclamer au client. Conserve scrupuleusement les années et chiffres donnés.
+1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis).
+2. Les anomalies détectées (brutes) te sont fournies. Ton rôle est de les ANALYSER et de NE CONSERVER QUE LES VÉRITABLES ERREURS de l'administration. 
+- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h au SMIC (soit environ 1500€). Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie.
+- Règle B : Ne garde une anomalie "Moins de 4 trimestres" QUE SI le salaire est manifestement assez élevé pour justifier plus de trimestres.
+- Règle C : Ne garde une anomalie "0 point" QUE SI le régime du travailleur attribue normalement des points (ex: cadre, salarié privé) et que le salaire est significatif.
+3. Tu ne dois renvoyer dans le JSON QUE les anomalies que tu estimes pertinentes et justifiées après ton tri d'expert. Il est tout à fait normal de renvoyer une liste vide \`[]\` si aucune anomalie n'est avérée.
+4. Pour chaque anomalie retenue, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire (expliquant par exemple le seuil de validation du trimestre pour cette année-là), la solution, et les documents à réclamer au client. Conserve scrupuleusement l'année et les chiffres.
 5. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
 6. Si tu utilises ta capacité de recherche Google pour vérifier ou compléter une loi, tu as l'OBLIGATION ABSOLUE de te restreindre aux sources officielles (Journal officiel, legifrance.gouv.fr, lassuranceretraite.fr, info-retraite.fr, Ircantec, SRE, agirc-arrco.fr). Ajoute 'site:legifrance.gouv.fr OR site:lassuranceretraite.fr' à tes recherches si nécessaire. N'utilise AUCUNE information provenant d'un blog, forum ou site commercial.
 </regles_constitutionnelles>
