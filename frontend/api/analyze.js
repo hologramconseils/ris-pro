@@ -170,7 +170,7 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
       };
 
       const extractorModel = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: { 
           responseMimeType: "application/json",
           responseSchema: extractorSchema 
