@@ -67,6 +67,9 @@ export default async function handler(req, res) {
     try {
       const pool = getDb();
       
+      // S'assurer que la colonne file_base64 existe (migration auto)
+      await pool.query('ALTER TABLE analyses ADD COLUMN IF NOT EXISTS file_base64 TEXT;');
+      
       // Créer le profil si inexistant (premier upload)
       if (userId) {
         await pool.query(
@@ -77,10 +80,12 @@ export default async function handler(req, res) {
         );
       }
 
+      const base64Data = buffer.toString('base64');
+
       await pool.query(
-        `INSERT INTO analyses (file_path, status, user_id, results, created_at, updated_at)
-         VALUES ($1, 'pending', $2, '{}'::jsonb, NOW(), NOW())`,
-        [filePath, userId]
+        `INSERT INTO analyses (file_path, status, user_id, results, created_at, updated_at, file_base64)
+         VALUES ($1, 'pending', $2, '{}'::jsonb, NOW(), NOW(), $3)`,
+        [filePath, userId, base64Data]
       );
     } catch (dbError) {
       // L'upload Blob a réussi, on retourne quand même l'URL

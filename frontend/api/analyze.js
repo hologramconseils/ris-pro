@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getDb } from "./db.js";
-import { getDownloadUrl } from "@vercel/blob";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
@@ -111,25 +110,24 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log(`Début de l'analyse pour : ${dbFilePath}`);
-
-    // 3. Télécharger le fichier depuis Vercel Blob (store privé)
+    // 3. Récupérer le fichier (base64) depuis la base Neon directement
     let base64Data;
     try {
-      // getDownloadUrl() génère une URL signée temporaire pour les blobs privés
-      const signedUrl = await getDownloadUrl(dbFilePath);
-      console.log(`URL signée obtenue, téléchargement...`);
+      const pool = getDb();
+      const { rows } = await pool.query(
+        'SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1',
+        [dbFilePath]
+      );
       
-      const fileResponse = await fetch(signedUrl);
-      if (!fileResponse.ok) {
-        throw new Error(`Fetch échoué (${fileResponse.status}): ${fileResponse.statusText}`);
+      if (rows.length > 0 && rows[0].file_base64) {
+        base64Data = rows[0].file_base64;
+        console.log(`Fichier chargé depuis la DB (longueur base64: ${base64Data.length})`);
+      } else {
+        throw new Error("Contenu du fichier introuvable dans la base de données. Veuillez réessayer l'upload.");
       }
-      const arrayBuffer = await fileResponse.arrayBuffer();
-      base64Data = Buffer.from(arrayBuffer).toString('base64');
-      console.log(`Fichier Blob téléchargé: ${arrayBuffer.byteLength} octets`);
-    } catch (blobErr) {
-      console.error('Erreur téléchargement Blob:', blobErr.message);
-      throw new Error(`Impossible de télécharger le fichier depuis le stockage: ${blobErr.message}`);
+    } catch (dbErr) {
+      console.error('Erreur récupération DB:', dbErr.message);
+      throw new Error(`Impossible de récupérer le contenu du fichier: ${dbErr.message}`);
     }
 
     // 4. Appeler le moteur d'expertise Gemini (ou restaurer depuis la source brute)
