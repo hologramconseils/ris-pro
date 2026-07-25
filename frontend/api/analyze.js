@@ -145,8 +145,9 @@ export default async function handler(req, res) {
 
 <instructions>
 1. Repère le NIR (Numéro de Sécurité Sociale) pour valider le document.
-2. Extrais le tableau de synthèse des trimestres par année (généralement intitulé "Détail par année"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
-3. Extrais le tableau du détail des employeurs (généralement intitulé "Détail de votre carrière" avec employeur, date de début, date de fin, revenus). Mets ces données dans "detail_employeurs".
+2. Repère la "Synthèse de vos droits" (souvent en 1ère page) et extrais le nombre de trimestres requis (ex: 172) et le nombre de trimestres enregistrés (ex: 72).
+3. Extrais le tableau de synthèse des trimestres par année (généralement intitulé "Détail par année"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
+4. Extrais le tableau du détail des employeurs (généralement intitulé "Détail de votre carrière" avec employeur, date de début, date de fin, revenus). Mets ces données dans "detail_employeurs".
 </instructions>
 
 <regles_strictes>
@@ -163,6 +164,8 @@ export default async function handler(req, res) {
         properties: {
           is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS ou EIG) valide, false sinon." },
           nir: { type: SchemaType.STRING, description: "Numéro de sécurité sociale (sans les clés)." },
+          total_trimestres_enregistres: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres déjà enregistrés/validés, figurant dans la Synthèse de vos droits (ex: 72)." },
+          total_trimestres_requis: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres requis pour partir à taux plein, figurant dans la Synthèse de vos droits (ex: 172)." },
           synthese_annees: {
             type: SchemaType.ARRAY,
             description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
@@ -259,24 +262,26 @@ export default async function handler(req, res) {
         });
       });
 
-      let trimestres_valides = 0;
-      let trimestres_requis = 172; 
+      let calculated_trimestres = 0;
       let rawAnomalies = [];
       let earliestYear = 9999;
       let latestYear = 0;
-
+      let fallback_trimestres_requis = 172;
+      
       if (extractedData.nir) {
         const cleanNirStr = extractedData.nir.replace(/\s/g, '');
         if (cleanNirStr.length >= 3) {
            const birthYearSuffix = parseInt(cleanNirStr.substring(1, 3));
            const birthYear = birthYearSuffix > 26 ? 1900 + birthYearSuffix : 2000 + birthYearSuffix;
-           if (birthYear >= 1973) trimestres_requis = 172;
-           else if (birthYear >= 1968) trimestres_requis = 172;
-           else if (birthYear === 1967) trimestres_requis = 171;
-           else if (birthYear >= 1964) trimestres_requis = 171;
-           else trimestres_requis = 170;
+           if (birthYear >= 1973) fallback_trimestres_requis = 172;
+           else if (birthYear >= 1968) fallback_trimestres_requis = 172;
+           else if (birthYear === 1967) fallback_trimestres_requis = 171;
+           else if (birthYear >= 1964) fallback_trimestres_requis = 171;
+           else fallback_trimestres_requis = 170;
         }
       }
+      
+      const currentYear = new Date().getFullYear();
 
       carrieres.forEach(c => {
         const y = parseInt(c.year);
@@ -285,8 +290,6 @@ export default async function handler(req, res) {
           if (y > latestYear) latestYear = y;
         }
       });
-
-      const currentYear = new Date().getFullYear();
 
       if (earliestYear < 9999) {
         for (let y = earliestYear; y <= latestYear; y++) {
@@ -313,13 +316,13 @@ export default async function handler(req, res) {
           yearsData.forEach(yd => {
             yearTrim += parseInt(yd.trimesters) || 0;
             yearPoints += parseFloat(yd.points) || 0;
-            if (yd.employer) employers.add(yd.employer);
+            if (yd.employer && yd.employer !== "Aucun") employers.add(yd.employer);
             const sal = parseFloat(String(yd.salary).replace(/[^0-9.-]+/g,""));
             if (!isNaN(sal)) totalSalary += sal;
           });
           
           if (yearTrim > 4) yearTrim = 4;
-          trimestres_valides += yearTrim;
+          calculated_trimestres += yearTrim;
           
           if (yearTrim < 4 || yearPoints <= 0) {
              if (totalSalary > 0 || yearTrim > 0 || yearPoints > 0) {
@@ -344,6 +347,10 @@ export default async function handler(req, res) {
           }
         }
       }
+
+      // Utiliser les totaux explicites extraits du document s'ils existent, sinon se rabattre sur le calcul
+      let trimestres_valides = extractedData.total_trimestres_enregistres || calculated_trimestres;
+      let trimestres_requis = extractedData.total_trimestres_requis || fallback_trimestres_requis;
 
       // --- AGENT 3 : RÉDACTEUR (IA) ---
       const simplifiedCarrieres = carrieres.filter(c => parseInt(c.year) <= currentYear).map(c => ({
