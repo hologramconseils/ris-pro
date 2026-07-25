@@ -297,6 +297,7 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
 2. Interdiction formelle d'ajouter de nouvelles anomalies qui ne figurent pas dans la liste fournie.
 3. Pour chaque anomalie fournie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire, la solution, et les documents à réclamer au client. Conserve scrupuleusement les années et chiffres donnés.
 4. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
+5. Si tu utilises ta capacité de recherche Google pour vérifier ou compléter une loi, tu as l'OBLIGATION ABSOLUE de te restreindre aux sources officielles (Journal officiel, legifrance.gouv.fr, lassuranceretraite.fr, info-retraite.fr, Ircantec, SRE, agirc-arrco.fr). Ajoute 'site:legifrance.gouv.fr OR site:lassuranceretraite.fr' à tes recherches si nécessaire. N'utilise AUCUNE information provenant d'un blog, forum ou site commercial.
 </regles_constitutionnelles>
 
 <regles_reglementaires>
@@ -370,6 +371,7 @@ Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans
 
       const writerModel = genAI.getGenerativeModel({ 
         model: "gemini-2.5-pro",
+        tools: [{ googleSearch: {} }],
         generationConfig: { 
           responseMimeType: "application/json",
           responseSchema: writerSchema 
