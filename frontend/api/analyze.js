@@ -116,9 +116,16 @@ export default async function handler(req, res) {
     // 3. Télécharger le fichier depuis Vercel Blob (store privé - via SDK get())
     let base64Data;
     try {
-      // get() avec access:'private' s'authentifie automatiquement sur Vercel via OIDC
-      const blobResponse = await getBlob(dbFilePath, { access: 'private' });
-      const arrayBuffer = await blobResponse.arrayBuffer();
+      // get() retourne les métadonnées du blob, dont downloadUrl (URL signée temporaire)
+      const blobMeta = await getBlob(dbFilePath, { access: 'private' });
+      const downloadUrl = blobMeta.downloadUrl || blobMeta.url;
+      console.log(`Blob downloadUrl obtenue, téléchargement...`);
+      
+      const fileResponse = await fetch(downloadUrl);
+      if (!fileResponse.ok) {
+        throw new Error(`Fetch downloadUrl échoué (${fileResponse.status}): ${fileResponse.statusText}`);
+      }
+      const arrayBuffer = await fileResponse.arrayBuffer();
       base64Data = Buffer.from(arrayBuffer).toString('base64');
       console.log(`Fichier Blob téléchargé: ${arrayBuffer.byteLength} octets`);
     } catch (blobErr) {
