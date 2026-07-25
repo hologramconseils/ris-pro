@@ -231,23 +231,30 @@ export default function Bilan() {
   }
 
   const extractTrimestres = (text) => {
-    if (typeof results?.trimestres_valides === 'number') {
-      return {
-        valides: results.trimestres_valides,
-        requis: typeof results.trimestres_requis === 'number' ? results.trimestres_requis : 172
-      };
+    if (results?.trimestres_valides !== undefined && results?.trimestres_valides !== null) {
+      const validesNum = Number(results.trimestres_valides);
+      const requisNum = Number(results.trimestres_requis);
+      if (!isNaN(validesNum)) {
+        return {
+          valides: validesNum,
+          requis: !isNaN(requisNum) ? requisNum : 172
+        };
+      }
     }
-    if (!text) return { valides: 136, requis: 172 };
-    const match = text.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i) ||
-                  text.match(/(\d+)\s+trimestres?\s+validés/i) ||
-                  text.match(/trimestres?\s+validés?\s*\((\d+)/i) ||
-                  text.match(/(\d+)\s+trimestres/i);
+    if (!text) return { valides: 0, requis: 172 };
+    
+    // Fallback regex if it's an old DB entry without trimestres_valides
+    const cleanText = text.replace(/\*/g, '');
+    const match = cleanText.match(/(\d+)\s+trimestres?\s+enregistrés?\s+sur\s+les\s+(\d+)/i) ||
+                  cleanText.match(/(\d+)\s+trimestres?\s+validés/i) ||
+                  cleanText.match(/trimestres?\s+validés?\s*\((\d+)/i) ||
+                  cleanText.match(/(\d+)\s+trimestres/i);
     if (match) {
       const val = parseInt(match[1] || match[2]);
       const req = match[2] && match[1] !== match[2] ? parseInt(match[2]) : 172;
       return { valides: val, requis: req };
     }
-    return { valides: 136, requis: 172 };
+    return { valides: 0, requis: 172 };
   }
 
   const trimestresInfo = extractTrimestres(results?.summary || "");

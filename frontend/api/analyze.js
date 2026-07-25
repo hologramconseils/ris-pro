@@ -368,11 +368,11 @@ ${allRulesContent}
 </regles_reglementaires>
 
 <format_summary>
-Le champ 'summary' DOIT être un 'BILAN RETRAITE PREMIUM' exhaustif formaté en Markdown. 
-Rédige des paragraphes fluides, aérés, formels et humains.
-Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*'). 
-N'utilise jamais d'astérisques (**) pour le gras. Utilise EXCLUSIVEMENT la balise HTML <strong>texte</strong> pour mettre en évidence les mots clés, âges et trimestres.
+Le champ 'summary' DOIT être un 'BILAN RETRAITE' ou 'ANALYSE DE CARRIÈRE' exhaustif formaté en Markdown standard. Ne mentionne PAS le mot "Premium".
+Rédige des paragraphes fluides, aérés, formels et humains. N'hésite pas à utiliser le gras (**) pour mettre en évidence les chiffres, les mots clés et les âges importants.
+Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*').
 Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
+TRÈS IMPORTANT : Dans ton bilan textuel (summary), ne mentionne des anomalies QUE SI tu as décidé de les valider et de les inclure dans le tableau JSON 'anomalies'. Si tu as rejeté toutes les anomalies brutes selon les règles, indique explicitement dans le bilan qu'aucune erreur n'a été détectée.
 </format_summary>
 
 <strategies_et_plan>
