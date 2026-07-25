@@ -372,7 +372,6 @@ Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans
 
       const writerModel = genAI.getGenerativeModel({ 
         model: "gemini-2.5-pro",
-        tools: [{ googleSearch: {} }],
         generationConfig: { 
           responseMimeType: "application/json",
           responseSchema: writerSchema 
