@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getDb } from "./db.js";
-import { get as getBlob } from "@vercel/blob";
+import { getDownloadUrl } from "@vercel/blob";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
@@ -113,23 +113,22 @@ export default async function handler(req, res) {
 
     console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
-    // 3. Télécharger le fichier depuis Vercel Blob (store privé - via SDK get())
+    // 3. Télécharger le fichier depuis Vercel Blob (store privé)
     let base64Data;
     try {
-      // get() retourne les métadonnées du blob, dont downloadUrl (URL signée temporaire)
-      const blobMeta = await getBlob(dbFilePath, { access: 'private' });
-      const downloadUrl = blobMeta.downloadUrl || blobMeta.url;
-      console.log(`Blob downloadUrl obtenue, téléchargement...`);
+      // getDownloadUrl() génère une URL signée temporaire pour les blobs privés
+      const signedUrl = await getDownloadUrl(dbFilePath);
+      console.log(`URL signée obtenue, téléchargement...`);
       
-      const fileResponse = await fetch(downloadUrl);
+      const fileResponse = await fetch(signedUrl);
       if (!fileResponse.ok) {
-        throw new Error(`Fetch downloadUrl échoué (${fileResponse.status}): ${fileResponse.statusText}`);
+        throw new Error(`Fetch échoué (${fileResponse.status}): ${fileResponse.statusText}`);
       }
       const arrayBuffer = await fileResponse.arrayBuffer();
       base64Data = Buffer.from(arrayBuffer).toString('base64');
       console.log(`Fichier Blob téléchargé: ${arrayBuffer.byteLength} octets`);
     } catch (blobErr) {
-      console.error('Erreur getBlob:', blobErr.message);
+      console.error('Erreur téléchargement Blob:', blobErr.message);
       throw new Error(`Impossible de télécharger le fichier depuis le stockage: ${blobErr.message}`);
     }
 
