@@ -145,17 +145,18 @@ export default async function handler(req, res) {
 
 <instructions>
 1. Repère le NIR (Numéro de Sécurité Sociale) pour valider le document.
-2. Cherche dans le document (généralement au début, dans un encadré ou une synthèse) les totaux officiels : le nombre total de trimestres validés/enregistrés et le nombre de trimestres requis pour le taux plein. La présentation ou le titre varie selon les documents (RIS, EIG, Relevé de carrière classique...).
-3. Extrais le tableau de synthèse des trimestres par année (souvent intitulé "Détail par année" ou "Vos droits"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
-4. Extrais le tableau détaillé de carrière (souvent "Détail de votre carrière" avec employeur, date de début/fin, revenus). Mets ces données dans "detail_employeurs".
+2. Cherche dans le document (généralement au début, dans un encadré ou une synthèse) les totaux officiels : le nombre total de trimestres validés/enregistrés et le nombre de trimestres requis pour le taux plein.
+3. Extrais le tableau de synthèse des trimestres par année (il liste toutes les années avec une colonne "Durée" ou "Trimestres" et parfois "Points"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés, et la somme des points. Mets ces données dans "synthese_annees".
+4. Extrais le tableau détaillé de carrière (il liste les périodes d'emploi avec employeur, date de début, date de fin, et revenus/salaires). Mets ces données dans "detail_employeurs".
 </instructions>
 
 <regles_strictes>
 - ZERO HALLUCINATION : Ne fusionne pas les tableaux. N'invente rien.
 - Si une colonne est vide, mets 0 (ou "N/A" pour les textes).
-- Pour detail_employeurs, l'année de début (start_year) et de fin (end_year) doivent être déduites de "Date début" et "Date fin" (ex: "01/09/2000" => 2000).
+- Pour detail_employeurs, l'année de début (start_year) et de fin (end_year) doivent être déduites de "Date début" et "Date fin" (ex: "01/09/2000" => 2000). Si l'année est absente, déduis-la du contexte de la page.
 - Copie exactement le revenu brut avec sa devise (ex: "3 744 FRF" ou "2 386 €").
-- DÉDUPLICATION VITALE DES SALAIRES : Un salarié cotise au régime de base ET au régime complémentaire. Le document affiche donc souvent le MÊME salaire sur deux lignes distinctes pour la même année (ex: Régime Général 20000€ ET AGIRC-ARRCO 20000€). Tu as l'interdiction formelle de conserver ces doublons. Si tu vois le même salaire (ou très proche) pour la même année chez le même employeur, ne l'extrais qu'une seule fois dans "detail_employeurs".
+- DÉDUPLICATION VITALE DES SALAIRES : Le document affiche souvent le MÊME salaire sur deux lignes pour la même année (ex: Régime Général ET AGIRC-ARRCO). Si tu vois le même salaire (ou très proche) pour la même année, ne l'extrais qu'une seule fois.
+- EXHAUSTIVITÉ : Le document PDF comporte souvent de très nombreuses pages (jusqu'à 15 pages). Tu dois analyser et extraire ABSOLUMENT TOUTES LES ANNÉES ET TOUS LES EMPLOYEURS, de la toute première à la toute dernière année. Ne t'arrête pas à la première page.
 </regles_strictes>
       `;
 
