@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getDb } from "./db.js";
+import { head } from "@vercel/blob";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
@@ -112,12 +113,18 @@ export default async function handler(req, res) {
 
     console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
-    // 3. Télécharger le fichier depuis Vercel Blob (store privé)
-    const blobHeaders = {};
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      blobHeaders['Authorization'] = `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`;
+    // 3. Télécharger le fichier depuis Vercel Blob (store privé - via SDK)
+    let fileResponse;
+    try {
+      // Pour les blobs privés, head() retourne une downloadUrl signée temporaire
+      const blobMeta = await head(dbFilePath);
+      const downloadUrl = blobMeta.downloadUrl || blobMeta.url;
+      fileResponse = await fetch(downloadUrl);
+    } catch (blobErr) {
+      // Fallback : tentative directe (fonctionne si blob devient public)
+      console.warn('head() échoué, tentative fetch directe:', blobErr.message);
+      fileResponse = await fetch(dbFilePath);
     }
-    const fileResponse = await fetch(dbFilePath, { headers: blobHeaders });
     if (!fileResponse.ok) {
       throw new Error(`Erreur Fetch Blob (${fileResponse.status}): ${fileResponse.statusText}`);
     }
