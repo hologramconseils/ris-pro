@@ -376,7 +376,7 @@ Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans
         }
       });
 
-      const writerResult = await writerModel.generateContent({ text: writerPrompt });
+      const writerResult = await writerModel.generateContent(writerPrompt);
 
       const writerData = JSON.parse(writerResult.response.text());
 
