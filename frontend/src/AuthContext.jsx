@@ -1,78 +1,60 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from './lib/supabase'
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useUser, useSession } from '@clerk/clerk-react';
 
-const AuthContext = createContext({})
+const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [session, setSession] = useState(null)
-  const [profile, setProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { user: clerkUser, isLoaded: userLoaded } = useUser();
+  const { session, isLoaded: sessionLoaded } = useSession();
+  
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else setLoading(false)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
+    if (userLoaded && sessionLoaded) {
+      if (clerkUser && session) {
+        fetchProfile(session);
       } else {
-        setProfile(null)
-        setLoading(false)
+        setProfile(null);
+        setLoading(false);
       }
-    })
+    }
+  }, [userLoaded, sessionLoaded, clerkUser, session]);
 
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const fetchProfile = async (userId) => {
+  const fetchProfile = async (currentSession) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      const token = await currentSession.getToken();
+      const response = await fetch('/api/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      const { count, error: countError } = await supabase
-        .from('analyses')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-      
-      if (!error && data) {
-        const userAnalysisCount = countError ? 0 : (count || 0);
-        const credits = data.analysis_credits || 0;
-
-        setProfile({
-          ...data,
-          analysis_credits: credits,
-          analysis_count: userAnalysisCount
-        })
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      } else {
+        console.error("Failed to fetch profile");
       }
     } catch (err) {
-      console.error("Erreur profile:", err)
+      console.error("Erreur profile:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const refreshProfile = async () => {
-    if (user) {
-      console.log("Rafraîchissement manuel du profil pour:", user.id);
-      await fetchProfile(user.id)
+    if (session) {
+      console.log("Rafraîchissement manuel du profil pour:", clerkUser?.id);
+      await fetchProfile(session);
     }
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, refreshProfile }}>
+    <AuthContext.Provider value={{ user: clerkUser, session, profile, loading, refreshProfile }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext);

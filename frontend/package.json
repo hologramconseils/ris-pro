@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/backend": "^3.13.1",
+    "@clerk/clerk-react": "^5.61.9",
     "@google/generative-ai": "^0.21.0",
-    "@supabase/supabase-js": "^2.39.3",
+    "@neondatabase/serverless": "^1.1.0",
+    "@vercel/blob": "^2.6.1",
     "axios": "^1.13.6",
     "docx": "^9.6.1",
     "dotenv": "^16.4.1",

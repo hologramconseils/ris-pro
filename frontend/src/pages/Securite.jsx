@@ -18,7 +18,7 @@ export default function Securite() {
         <section>
           <h2 className="text-xl font-semibold mb-2">2. Hébergement Sécurisé</h2>
           <p className="text-muted">
-            L'infrastructure de stockage et d'authentification est gérée via <strong>Supabase</strong> (ISO 27001), qui assure de hauts standards de sécurité. Les données sont hébergées de manière cloisonnée. L'application est propulsée par <strong>Vercel</strong>.
+            L'infrastructure de stockage et d'authentification est gérée via <strong>Clerk, Neon et Vercel Blob</strong>, qui assurent de hauts standards de sécurité. Les données sont hébergées de manière cloisonnée. L'application est propulsée par <strong>Vercel</strong>.
           </p>
         </section>
 

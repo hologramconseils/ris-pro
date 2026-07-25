@@ -1,14 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createClient } from "@supabase/supabase-js";
+import { getDb } from "./db.js";
 import crypto from "crypto";
+import { createClerkClient } from "@clerk/backend";
 
 export const maxDuration = 60; // Timeout Vercel augmenté pour l'analyse PDF
-
-// Initialisation de Supabase (Admin pour lire les fichiers privés et profils)
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
-);
 
 // Initialisation de Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
@@ -66,28 +61,32 @@ export default async function handler(req, res) {
 
   if (token) {
     try {
-      const { data: { user: supabaseUser }, error: authError } = await supabase.auth.getUser(token);
-      if (!authError && supabaseUser) {
-        authenticatedUser = supabaseUser;
+      const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+      const verified = await clerk.verifyToken(token);
+      if (verified && verified.sub) {
+        authenticatedUser = { id: verified.sub };
       }
     } catch (authErr) {
       console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
     }
   }
 
+  const pool = getDb();
+  let dbFilePath = filePath;
+
   try {
     console.log(`Vérification de la propriété du document : ${filePath}`);
 
-    // Récupérer le record d'analyse dans Supabase pour vérifier le propriétaire
-    const { data: analysisRecord, error: recordError } = await supabase
-      .from('analyses')
-      .select('user_id, status, file_path, results')
-      .ilike('file_path', filePath)
-      .single();
+    // Récupérer le record d'analyse dans Postgres pour vérifier le propriétaire
+    const { rows: analysisRows } = await pool.query(
+      `SELECT user_id, status, file_path, results FROM analyses WHERE file_path = $1 LIMIT 1`,
+      [filePath]
+    );
+    
+    const analysisRecord = analysisRows.length > 0 ? analysisRows[0] : null;
+    dbFilePath = analysisRecord?.file_path || filePath;
 
-    const dbFilePath = analysisRecord?.file_path || filePath;
-
-    if (recordError || !analysisRecord) {
+    if (!analysisRecord) {
       return res.status(404).json({ error: 'Document introuvable dans la base de données' });
     }
 
@@ -96,12 +95,11 @@ export default async function handler(req, res) {
       // Vérifier si l'utilisateur est admin
       let isAdmin = false;
       if (authenticatedUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', authenticatedUser.id)
-          .single();
-        if (profile?.role === 'admin') {
+        const { rows: profileRows } = await pool.query(
+          `SELECT role FROM profiles WHERE clerk_user_id = $1 LIMIT 1`,
+          [authenticatedUser.id]
+        );
+        if (profileRows.length > 0 && profileRows[0].role === 'admin') {
           isAdmin = true;
         }
       }
@@ -114,15 +112,14 @@ export default async function handler(req, res) {
 
     console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
-    // 3. Télécharger le fichier depuis Supabase Storage
-    const { data: fileData, error: downloadError } = await supabase.storage
-      .from('documents')
-      .download(dbFilePath);
-
-    if (downloadError) throw new Error(`Erreur Supabase Download: ${downloadError.message}`);
+    // 3. Télécharger le fichier depuis Vercel Blob (URLs publiques pour ce projet)
+    const fileResponse = await fetch(dbFilePath);
+    if (!fileResponse.ok) {
+      throw new Error(`Erreur Fetch Blob: ${fileResponse.statusText}`);
+    }
 
     // Convertir le fichier en buffer/base64 pour Gemini
-    const arrayBuffer = await fileData.arrayBuffer();
+    const arrayBuffer = await fileResponse.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
     // 4. Appeler le moteur d'expertise Gemini (ou restaurer depuis la source brute)
@@ -264,67 +261,48 @@ export default async function handler(req, res) {
       try {
         // Associer le user_id à la ligne d'analyse s'il n'était pas encore défini (guest login)
         if (analysisRecord && !analysisRecord.user_id) {
-          await supabase
-            .from('analyses')
-            .update({ user_id: targetUserId })
-            .eq('file_path', dbFilePath);
+          await pool.query(
+            `UPDATE analyses SET user_id = $1 WHERE file_path = $2`,
+            [targetUserId, dbFilePath]
+          );
         }
 
         // Vérifier si cette identité a déjà été analysée par cet utilisateur
-        // On récupère aussi le champ 'results' pour savoir si l'analyse précédente était restreinte
-        const { data: existingAnalysisList } = await supabase
-          .from('analyses')
-          .select('id, results')
-          .eq('user_id', targetUserId)
-          .eq('nir_hash', nirHash)
-          .eq('status', 'completed')
-          .limit(1);
+        const { rows: existingAnalysisList } = await pool.query(
+          `SELECT id, results FROM analyses 
+           WHERE user_id = $1 AND nir_hash = $2 AND status = 'completed' LIMIT 1`,
+          [targetUserId, nirHash]
+        );
 
-        const existingAnalysis = existingAnalysisList && existingAnalysisList.length > 0 ? existingAnalysisList[0] : null;
+        const existingAnalysis = existingAnalysisList.length > 0 ? existingAnalysisList[0] : null;
         const isNewIdentity = !existingAnalysis;
         // Cas critique : l'analyse existante était restreinte (freemium)
-        // Si l'utilisateur a maintenant des crédits, on doit la traiter comme une nouvelle identité
         const wasRestricted = existingAnalysis && existingAnalysis.results && existingAnalysis.results.is_restricted === true;
 
         // Récupérer le profil pour vérifier les crédits
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('analysis_credits, role')
-          .eq('id', targetUserId)
-          .single();
-
-        // Récupérer le nombre total d'analyses pour le fallback de bienvenue
-        const { count: userAnalysisCount, error: countError } = await supabase
-          .from('analyses')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', targetUserId);
-
-        const analysisCountVal = countError ? 0 : (userAnalysisCount || 0);
+        const { rows: profileRows } = await pool.query(
+          `SELECT analysis_credits, role, email FROM profiles WHERE clerk_user_id = $1 LIMIT 1`,
+          [targetUserId]
+        );
+        const profile = profileRows.length > 0 ? profileRows[0] : null;
 
         let currentCredits = profile?.analysis_credits || 0;
-        const isAdmin = profile?.role === 'admin' || (authenticatedUser && authenticatedUser.email === 'btsaulnerond@icloud.com');
+        const isAdmin = profile?.role === 'admin' || profile?.email === 'btsaulnerond@icloud.com';
 
         if (isAdmin || currentCredits > 0) {
           hasPremiumAccess = true;
         }
 
         // Décompter un crédit si :
-        // - C'est une nouvelle identité (premier upload de ce NIR)
-        // - OU si l'analyse existante était restreinte et que l'utilisateur a maintenant des crédits
         const shouldDeductCredit = !isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted);
 
         if (shouldDeductCredit) {
           // Décompte sécurisé du crédit d'analyse
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ analysis_credits: currentCredits - 1 })
-            .eq('id', targetUserId);
-          
-          if (updateError) {
-            console.error("[Credits] Erreur décrémentation:", updateError.message);
-          } else {
-            console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}. Raison: ${isNewIdentity ? 'nouvelle identité' : 'upgrade restreint->premium'}`);
-          }
+          await pool.query(
+            `UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE clerk_user_id = $1`,
+            [targetUserId]
+          );
+          console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}. Raison: ${isNewIdentity ? 'nouvelle identité' : 'upgrade restreint->premium'}`);
         }
       } catch (dbError) {
         console.error("[Credits] Erreur DB (droits ou colonnes manquantes):", dbError.message);
@@ -393,8 +371,6 @@ export default async function handler(req, res) {
     }
 
     // 7. Mettre à jour la base de données
-    // On sauvegarde les résultats complets de Gemini + un flag is_restricted pour savoir
-    // si cette analyse a été servie en mode freemium (pour permettre l'upgrade ultérieur)
     const dbResults = { ...analysisResults };
     if (!hasPremiumAccess) {
       dbResults.is_restricted = true;
@@ -406,18 +382,14 @@ export default async function handler(req, res) {
       status: 'completed',
       results: dbResults
     };
-    if (targetUserId) updateData.user_id = targetUserId;
 
     try {
-      await supabase
-        .from('analyses')
-        .update({ ...updateData, nir_hash: nirHash })
-        .eq('file_path', dbFilePath);
+      await pool.query(
+        `UPDATE analyses SET status = $1, results = $2, nir_hash = $3, user_id = COALESCE($4, user_id), updated_at = NOW() WHERE file_path = $5`,
+        [updateData.status, JSON.stringify(updateData.results), nirHash, targetUserId, dbFilePath]
+      );
     } catch (e) {
-      await supabase
-        .from('analyses')
-        .update(updateData)
-        .eq('file_path', dbFilePath);
+      console.error("Erreur mise à jour analyse completed :", e);
     }
 
     return res.status(200).json(clientResponse);
@@ -426,11 +398,12 @@ export default async function handler(req, res) {
     console.error("CRITICAL API ERROR:", error);
     
     try {
-      await supabase.from('analyses')
-        .update({ status: 'failed', results: { error: error.message, stack: error.stack } })
-        .eq('file_path', dbFilePath);
+      await pool.query(
+        `UPDATE analyses SET status = 'failed', results = $1, updated_at = NOW() WHERE file_path = $2`,
+        [JSON.stringify({ error: error.message, stack: error.stack }), dbFilePath]
+      );
     } catch (e) {
-      console.error("Failed to log error to Supabase:", e.message);
+      console.error("Failed to log error to Postgres:", e.message);
     }
 
     return res.status(500).json({ 

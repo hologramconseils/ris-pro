@@ -90,7 +90,7 @@ export default function PolitiqueConfidentialite() {
           <ul className="text-muted" style={{ paddingLeft: '1.5rem', listStyleType: 'disc' }}>
             <li><strong>Masquage et Hachage du NIR</strong> : Le NIR extrait du document PDF n'est <strong>jamais stocké en clair</strong>. Il est immédiatement haché de manière irréversible sous forme d'empreinte cryptographique unique pour prévenir les doublons, puis masqué sous la forme <code>1 77 05 XX XXX XXX XX</code> (seuls le genre, l'année et le mois de naissance indispensables au calcul de la retraite restent visibles).</li>
             <li><strong>Anonymisation des bilans</strong> : Les noms de famille et les données textuelles brutes sont anonymisés à l'affichage pour l'administration afin d'empêcher toute fuite interne.</li>
-            <li><strong>Sécurisation du Stockage (RLS)</strong> : Les fichiers PDF importés sont stockés dans un espace de stockage Supabase entièrement privé. Des règles d'accès RLS (Row Level Security) garantissent que seul le propriétaire connecté à son compte personnel peut lire, télécharger ou supprimer ses propres fichiers.</li>
+            <li><strong>Sécurisation du Stockage</strong> : Les fichiers PDF importés sont stockés dans un espace de stockage Vercel Blob. La base de données Neon garantit que seul le propriétaire connecté à son compte personnel peut lire, télécharger ou supprimer ses propres fichiers.</li>
             <li><strong>Chiffrement & Monitoring</strong> : Les données transitent via HTTPS, sont chiffrées au repos, et un système d'alerte automatique par e-mail informe l'administrateur en cas d'accès anormal.</li>
           </ul>
         </section>
@@ -101,8 +101,8 @@ export default function PolitiqueConfidentialite() {
             Vos données personnelles ne sont jamais vendues ou cédées à des tiers. Elles sont uniquement partagées avec nos sous-traitants techniques dans la limite nécessaire au bon fonctionnement de l'Application :
           </p>
           <ul className="text-muted" style={{ paddingLeft: '1.5rem', listStyleType: 'disc' }}>
-            <li><strong>Vercel</strong> : Hébergement du site web et de l'API.</li>
-            <li><strong>Supabase</strong> : Stockage sécurisé des fichiers PDF et de la base de données.</li>
+            <li><strong>Vercel & Vercel Blob</strong> : Hébergement de l'application et stockage des fichiers PDF.</li>
+            <li><strong>Neon</strong> : Base de données sécurisée.</li>
             <li><strong>Stripe</strong> : Traitement sécurisé des transactions de paiement.</li>
             <li><strong>Resend</strong> : Envoi des e-mails transactionnels (confirmation, réinitialisation de mot de passe, alertes).</li>
             <li><strong>Modèles d'Intelligence Artificielle (Gemini API)</strong> : Traitement temporaire du relevé pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).</li>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../AuthContext'
-import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
 
 export default function Diagnostic() {
@@ -61,15 +60,8 @@ export default function Diagnostic() {
     };
   }, [loading]);
 
-  const [showSignup, setShowSignup] = useState(false)
   const [showAuthChoice, setShowAuthChoice] = useState(false)
   const [showGuestCheckout, setShowGuestCheckout] = useState(false)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
-  const [authError, setAuthError] = useState('')
   const [checkoutEmail, setCheckoutEmail] = useState('')
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
@@ -95,8 +87,10 @@ export default function Diagnostic() {
   const performAnalysis = async (path) => {
     try {
       setLoading(true)
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
+      let token = null;
+      if (user && typeof window.Clerk !== 'undefined') {
+        token = await window.Clerk.session?.getToken();
+      }
       
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -139,7 +133,8 @@ export default function Diagnostic() {
     }
 
     // Si admin ou a déjà payé (legacy) ou a des crédits restants ou analyse débloquée
-    const isAdmin = profile?.role === 'admin' || user?.email === 'btsaulnerond@icloud.com';
+    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    const isAdmin = profile?.role === 'admin' || userEmail === 'btsaulnerond@icloud.com';
     const isUnlocked = results && !results.is_restricted;
 
     if (isAdmin || hasCredits || isUnlocked) {
@@ -206,48 +201,6 @@ export default function Diagnostic() {
     }
   }
 
-  const handleSignupAndPay = async (e) => {
-    e.preventDefault()
-    setAuthLoading(true)
-    setAuthError('')
-    
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { first_name: firstName, last_name: lastName } }
-      })
-      if (signUpError) throw signUpError
-      
-      const createdUser = data.user
-      
-      if (results) {
-        sessionStorage.setItem(`ris_pro_analysis_${filePath}`, JSON.stringify(results));
-      }
-
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: createdUser.id, 
-          userEmail: createdUser.email,
-          filePath: filePath
-        })
-      });
-      const resData = await response.json();
-      
-      if (resData.url) {
-        window.location.href = resData.url;
-      } else {
-        setAuthError("Erreur d'initialisation du paiement.");
-      }
-    } catch (err) {
-      console.error(err)
-      setAuthError(err.message || "Une erreur est survenue lors de l'inscription.")
-    } finally {
-      setAuthLoading(false)
-    }
-  }
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { ClerkProvider } from '@clerk/clerk-react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { AuthProvider } from './AuthContext'
@@ -15,6 +16,8 @@ const CGV = lazy(() => import('./pages/CGV'))
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'))
 const Securite = lazy(() => import('./pages/Securite'))
 
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
 function PageLoader() {
   return (
     <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: '50vh', flexDirection: 'column', gap: '1rem' }}>
@@ -25,29 +28,35 @@ function PageLoader() {
 }
 
 function App() {
+  if (!PUBLISHABLE_KEY) {
+    return <div>Missing Publishable Key</div>
+  }
+  
   return (
-    <AuthProvider>
-      <Router>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <Header />
-          <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/diagnostic" element={<Diagnostic />} />
-                <Route path="/bilan" element={<Bilan />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/mentions-legales" element={<MentionsLegales />} />
-                <Route path="/cgv" element={<CGV />} />
-                <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-                <Route path="/securite" element={<Securite />} />
-              </Routes>
-            </Suspense>
-          </main>
-          <Footer />
-        </div>
-      </Router>
-    </AuthProvider>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <AuthProvider>
+        <Router>
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Header />
+            <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/diagnostic" element={<Diagnostic />} />
+                  <Route path="/bilan" element={<Bilan />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/mentions-legales" element={<MentionsLegales />} />
+                  <Route path="/cgv" element={<CGV />} />
+                  <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+                  <Route path="/securite" element={<Securite />} />
+                </Routes>
+              </Suspense>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </AuthProvider>
+    </ClerkProvider>
   )
 }
 

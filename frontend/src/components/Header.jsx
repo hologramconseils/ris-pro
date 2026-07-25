@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
 import { useAuth } from '../AuthContext'
-import { supabase } from '../lib/supabase'
+import { UserButton } from '@clerk/clerk-react'
 import { LABELS } from '../config/labels'
 
 function ThemeToggle() {
@@ -38,14 +38,7 @@ function ThemeToggle() {
 
 export default function Header() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-    setIsMenuOpen(false);
-  };
 
   return (
     <header className="glass" style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
@@ -64,12 +57,7 @@ export default function Header() {
           <div className="h-4 w-px bg-border mx-1" />
           
           {user ? (
-            <button 
-              className="btn btn-secondary btn-sm"
-              onClick={handleLogout}
-            >
-              {LABELS.CTA_LOGOUT}
-            </button>
+            <UserButton afterSignOutUrl="/" />
           ) : (
             <Link to="/login" className="btn btn-primary btn-sm animate-pulse-subtle" style={{ padding: '0.6rem 1.5rem', height: 'auto' }}>
               {LABELS.CTA_LOGIN}
@@ -110,12 +98,9 @@ export default function Header() {
           <div className="h-px w-full bg-border" />
           
           {user ? (
-            <button 
-              className="btn btn-secondary w-full"
-              onClick={handleLogout}
-            >
-              {LABELS.CTA_LOGOUT}
-            </button>
+            <div className="flex justify-center p-2">
+              <UserButton afterSignOutUrl="/" />
+            </div>
           ) : (
             <Link to="/login" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full animate-pulse-subtle">
               Se connecter
@@ -126,3 +111,4 @@ export default function Header() {
     </header>
   )
 }
+

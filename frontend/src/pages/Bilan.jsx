@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Navigate } from 'react-router-dom'
 import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle, Loader2, Lock, Award, Sparkles, TrendingUp, ChevronRight } from 'lucide-react'
 import { useAuth } from '../AuthContext'
-import { supabase } from '../lib/supabase'
 import { LABELS } from '../config/labels'
 
 const renderMarkdown = (text) => {
@@ -101,20 +100,19 @@ export default function Bilan() {
     }
   }, [filePath, isSuccess, user, profile?.analysis_credits])
 
-  // Déclencher l'analyse de l'agent patrimonial IA si nécessaire
   const triggerAgentAnalysis = async (path) => {
     if (hasAttemptedAgent || agentLoading) return;
     try {
       setAgentLoading(true);
       setHasAttemptedAgent(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
       
-      const response = await fetch('/api/analyse-patrimoniale', {
+      const clerkToken = await window.Clerk?.session?.getToken();
+      
+      const response = await fetch('/api/run-analysis', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
+          ...(clerkToken && { 'Authorization': `Bearer ${clerkToken}` })
         },
         body: JSON.stringify({ filePath: path })
       });
@@ -125,12 +123,18 @@ export default function Bilan() {
           sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(enriched));
           
           // Sauvegarder les résultats enrichis dans la base de données
-          supabase.from('analyses')
-            .update({ results: enriched })
-            .ilike('file_path', path)
-            .then(({ error }) => {
-              if (error) console.error("Erreur mise à jour DB:", error.message);
-            });
+          fetch('/api/update-analysis', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(clerkToken && { 'Authorization': `Bearer ${clerkToken}` })
+            },
+            body: JSON.stringify({ filePath: path, results: enriched })
+          }).then(res => {
+            if (!res.ok) console.error("Erreur mise à jour DB:", res.statusText);
+          }).catch(error => {
+            console.error("Erreur mise à jour DB:", error.message);
+          });
 
           return enriched;
         });
@@ -170,24 +174,31 @@ export default function Bilan() {
         sessionStorage.removeItem(`ris_pro_analysis_${path}`);
       }
 
-      const { data, error: dbError } = await supabase
-        .from('analyses')
-        .select('results, user_id')
-        .ilike('file_path', path)
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      if (dbError) throw dbError
-      if (data && data.length > 0 && data[0].results) {
-        // Associer l'analyse au compte utilisateur s'il était déconnecté lors de la soumission
-        if (!data[0].user_id && user?.id) {
-          try {
-            await supabase.from('analyses').update({ user_id: user.id }).ilike('file_path', path);
-          } catch (e) {
-            console.error("Erreur lors de l'association de l'analyse au compte:", e);
-          }
+      const headers = { 'Content-Type': 'application/json' };
+      if (user) {
+        // Clerk token if authenticated
+        const clerkToken = await window.Clerk?.session?.getToken();
+        if (clerkToken) {
+          headers['Authorization'] = `Bearer ${clerkToken}`;
         }
-        setResults(data[0].results)
+      }
+
+      const response = await fetch(`/api/get-analysis?filePath=${encodeURIComponent(path)}`, {
+        method: 'GET',
+        headers
+      });
+
+      if (!response.ok && !isMock) {
+        throw new Error("Aucun résultat trouvé pour ce document.");
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.results) {
+          setResults(data.results);
+        } else {
+          throw new Error("Résultats non disponibles");
+        }
       } else if (isMock) {
         // Fallback mock pour les tests E2E locaux
         const mockBaseResults = {
@@ -223,8 +234,6 @@ export default function Bilan() {
           ]
         };
         setResults(mockBaseResults);
-      } else {
-        throw new Error("Aucun résultat trouvé pour ce document.")
       }
     } catch (err) {
       console.error(err)

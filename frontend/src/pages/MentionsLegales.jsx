@@ -29,7 +29,7 @@ export default function MentionsLegales() {
           <h2 className="text-xl font-semibold mb-2">3. Hébergement</h2>
           <p className="text-muted">
             Ce site est hébergé par : <strong>Vercel Inc.</strong><br/>
-            Le stockage et le traitement des données (documents) sont gérés de manière sécurisée via <strong>Supabase</strong>.
+            Le stockage et le traitement des données (documents) sont gérés de manière sécurisée via <strong>Neon et Vercel Blob</strong>.
           </p>
         </section>
 

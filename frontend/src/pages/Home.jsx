@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert, CreditCard } from 'lucide-react'
-import { supabase } from '../lib/supabase'
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 
@@ -67,30 +66,28 @@ export default function Home() {
     setError(null)
     
     try {
-      const fileExt = selectedFile.name.split('.').pop()
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
-      const filePath = `uploads/${fileName}`
+      // 1. Obtenir le token Clerk si l'utilisateur est connecté
+      let token = null;
+      if (user && typeof window.Clerk !== 'undefined') {
+        token = await window.Clerk.session?.getToken();
+      }
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, selectedFile, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      // 2. Upload vers notre nouvelle API
+      const response = await fetch(`/api/upload?filename=${encodeURIComponent(selectedFile.name)}`, {
+        method: 'POST',
+        body: selectedFile,
+        headers: {
+          'Content-Type': 'application/pdf',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
 
-      if (uploadError) throw uploadError
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'upload du document");
+      }
 
-      const { error: dbError } = await supabase
-        .from('analyses')
-        .insert([
-          { 
-            file_path: filePath, 
-            status: 'pending',
-            user_id: user?.id 
-          }
-        ])
-
-      if (dbError) throw dbError
+      const data = await response.json();
+      const filePath = data.filePath;
 
       setTimeout(() => {
         navigate(`/diagnostic?file=${encodeURIComponent(filePath)}`)

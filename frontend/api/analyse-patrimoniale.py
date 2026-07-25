@@ -69,28 +69,13 @@ def recuperer_regles_retraite(type_regle: str) -> str:
                 with open(path, 'r', encoding='utf-8') as f:
                     return f.read()
             except Exception as e:
-                return f"Erreur de lecture du fichier {path}: {str(e)}"
-    return f"Aucune règle trouvée pour '{type_regle}'."
-
-async def telecharger_fichier_supabase(file_path: str) -> bytes:
-    """Télécharge le fichier PDF depuis Supabase Storage."""
-    supabase_url = os.environ.get("VITE_SUPABASE_URL")
-    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
-    
-    if not supabase_url or not supabase_key:
-        raise ValueError("Supabase configuration is missing in environment variables.")
-        
-    url = f"{supabase_url}/storage/v1/object/authenticated/documents/{file_path}"
-    headers = {
-        "Authorization": f"Bearer {supabase_key}",
-        "apikey": supabase_key
-    }
-    
+                return f"Erreur de lecture du fichier {path}: {strasync def telecharger_fichier_blob(file_url: str) -> bytes:
+    """Télécharge le fichier PDF depuis l'URL (ex: Vercel Blob)."""
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(file_url)
         if response.status_code == 200:
             return response.content
-        raise Exception(f"Failed to download file from Supabase storage (status {response.status_code}): {response.text}")
+        raise Exception(f"Failed to download file from Blob storage (status {response.status_code}): {response.text}")
 
 async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dict:
     """Fallback résilient utilisant un workflow en deux étapes :
@@ -204,98 +189,23 @@ async def fallback_direct_gemini(file_bytes: bytes, file_path_param: str) -> dic
     except Exception as fallback_err:
         raise Exception(f"Le fallback de secours direct a échoué: {str(fallback_err)}")
 
-async def get_supabase_user(token: str) -> dict:
-    """Valide le token JWT en interrogeant l'API d'authentification Supabase."""
-    supabase_url = os.environ.get("VITE_SUPABASE_URL")
-    if not supabase_url:
-        raise ValueError("VITE_SUPABASE_URL manquant.")
-    url = f"{supabase_url}/auth/v1/user"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "apikey": os.environ.get("VITE_SUPABASE_ANON_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-    }
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(url, headers=headers)
-        if response.status_code == 200:
-            return response.json()
-        return None
-
-async def verifier_est_admin(user_id: str) -> bool:
-    """Vérifie si l'utilisateur possède le rôle d'administrateur dans la table des profils."""
-    supabase_url = os.environ.get("VITE_SUPABASE_URL")
-    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
-    url = f"{supabase_url}/rest/v1/profiles"
-    headers = {
-        "Authorization": f"Bearer {supabase_key}",
-        "apikey": supabase_key
-    }
-    params = {
-        "id": f"eq.{user_id}",
-        "select": "role"
-    }
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            raise HTTPException(status_code=500, detail=f"Erreur d'infrastructure Supabase (Profils: {response.status_code})")
-        records = response.json()
-        if records and records[0].get("role") == "admin":
-            return True
-        return False
-
-async def verifier_propriete_document(file_path: str, user_id: str) -> bool:
-    """Vérifie que l'utilisateur est le propriétaire légitime du document ou est admin."""
-    supabase_url = os.environ.get("VITE_SUPABASE_URL")
-    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
-    url = f"{supabase_url}/rest/v1/analyses"
-    headers = {
-        "Authorization": f"Bearer {supabase_key}",
-        "apikey": supabase_key
-    }
-    params = {
-        "file_path": f"ilike.{file_path}",
-        "select": "user_id"
-    }
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            raise HTTPException(status_code=500, detail=f"Erreur d'infrastructure Supabase (Analyses: {response.status_code})")
-        records = response.json()
-        if records:
-            record_user_id = records[0].get("user_id")
-            # Si le document est lié à un utilisateur et que ce n'est pas le demandeur
-            if record_user_id and record_user_id != user_id:
-                # Vérifier si le demandeur est admin
-                return await verifier_est_admin(user_id)
-            return True
-        return False
-
 @app.post("/api/analyse-patrimoniale")
-async def api_analyse_patrimoniale(data: dict, authorization: str = Header(None)):
+async def api_analyse_patrimoniale(data: dict, x_internal_secret: str = Header(None)):
     """Génère un conseil patrimonial personnalisé. Tente l'agent Antigravity, sinon utilise le fallback Gemini."""
-    # 0. Sécurisation : Validation du Token JWT & IDOR (SEC-002)
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Token d'authentification manquant")
+    
+    expected_secret = os.environ.get("BLOB_READ_WRITE_TOKEN") or "local_secret"
+    if x_internal_secret != expected_secret:
+        raise HTTPException(status_code=401, detail="Non autorisé (internal secret invalide)")
         
-    token = authorization.replace("Bearer ", "").strip()
-    user_info = await get_supabase_user(token)
-    if not user_info:
-        raise HTTPException(status_code=401, detail="Session expirée ou invalide")
-        
-    user_id = user_info.get("id")
     file_path_param = data.get("filePath") or data.get("filename")
     if not file_path_param:
         raise HTTPException(status_code=400, detail="Missing filePath or filename parameter")
 
-    # Vérification IDOR de la propriété
-    est_proprietaire = await verifier_propriete_document(file_path_param, user_id)
-    if not est_proprietaire:
-        raise HTTPException(status_code=403, detail="Accès non autorisé à ce document")
-
-    # 1. Télécharger le fichier depuis Supabase
+    # 1. Télécharger le fichier
     try:
-        file_bytes = await telecharger_fichier_supabase(file_path_param)
+        file_bytes = await telecharger_fichier_blob(file_path_param)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur Supabase: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur de téléchargement du fichier: {str(e)}")
 
     # 2. Tenter l'analyse via l'agent Google Antigravity
     temp_file_path = None
