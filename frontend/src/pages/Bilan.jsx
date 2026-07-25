@@ -482,9 +482,7 @@ export default function Bilan() {
                 </div>
               </div>
               <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1.25rem', borderLeft: '3px solid rgba(37, 99, 235, 0.4)' }}>
-                <p className="text-base font-medium" style={{ margin: 0, lineHeight: '1.7', color: 'var(--text-main)' }}>
-                  {results.summary}
-                </p>
+                {renderMarkdown(results.summary)}
               </div>
             </div>
           )}
@@ -503,7 +501,9 @@ export default function Bilan() {
                       {strat.priority ? `Priorité : ${strat.priority}` : "Opportunité"}
                     </div>
                     <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-main)' }}>{strat.title || strat.titre}</h4>
-                    <p className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>{strat.description}</p>
+                    <div className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>
+                      {renderMarkdown(strat.description)}
+                    </div>
                   </div>
                 ))}
               </div>

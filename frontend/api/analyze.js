@@ -295,9 +295,10 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
 <regles_constitutionnelles>
 1. Interdiction formelle de modifier les chiffres fournis (Trimestres validés, requis).
 2. Interdiction formelle d'ajouter de nouvelles anomalies qui ne figurent pas dans la liste fournie.
-3. Pour chaque anomalie fournie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire, la solution, et les documents à réclamer au client. Conserve scrupuleusement les années et chiffres donnés.
-4. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
-5. Si tu utilises ta capacité de recherche Google pour vérifier ou compléter une loi, tu as l'OBLIGATION ABSOLUE de te restreindre aux sources officielles (Journal officiel, legifrance.gouv.fr, lassuranceretraite.fr, info-retraite.fr, Ircantec, SRE, agirc-arrco.fr). Ajoute 'site:legifrance.gouv.fr OR site:lassuranceretraite.fr' à tes recherches si nécessaire. N'utilise AUCUNE information provenant d'un blog, forum ou site commercial.
+3. TU DOIS OBLIGATOIREMENT RENVOYER DANS LE JSON FINAL EXACTEMENT LE MÊME NOMBRE D'ANOMALIES QUE CELUI FOURNI DANS LA LISTE. AUCUNE ANOMALIE NE DOIT ÊTRE SUPPRIMÉE, MÊME SI ELLE TE PARAÎT INCOMPLÈTE.
+4. Pour chaque anomalie fournie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire, la solution, et les documents à réclamer au client. Conserve scrupuleusement les années et chiffres donnés.
+5. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
+6. Si tu utilises ta capacité de recherche Google pour vérifier ou compléter une loi, tu as l'OBLIGATION ABSOLUE de te restreindre aux sources officielles (Journal officiel, legifrance.gouv.fr, lassuranceretraite.fr, info-retraite.fr, Ircantec, SRE, agirc-arrco.fr). Ajoute 'site:legifrance.gouv.fr OR site:lassuranceretraite.fr' à tes recherches si nécessaire. N'utilise AUCUNE information provenant d'un blog, forum ou site commercial.
 </regles_constitutionnelles>
 
 <regles_reglementaires>
@@ -334,10 +335,10 @@ Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans
                 docs: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: "Documents justificatifs" },
                 salary: { type: SchemaType.STRING },
                 trimesters: { type: SchemaType.STRING },
-                points: { type: SchemaType.NUMBER },
+                points: { type: SchemaType.STRING },
                 severity: { type: SchemaType.STRING, description: "high, medium, ou low" }
               },
-              required: ["id", "year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
+              required: ["year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
             }
           },
           summary: { type: SchemaType.STRING, description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
