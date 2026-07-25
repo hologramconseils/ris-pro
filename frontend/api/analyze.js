@@ -96,7 +96,7 @@ export default async function handler(req, res) {
       let isAdmin = false;
       if (authenticatedUser) {
         const { rows: profileRows } = await pool.query(
-          `SELECT role FROM profiles WHERE clerk_user_id = $1 LIMIT 1`,
+          `SELECT role FROM profiles WHERE id = $1 LIMIT 1`,
           [authenticatedUser.id]
         );
         if (profileRows.length > 0 && profileRows[0].role === 'admin') {
@@ -112,10 +112,14 @@ export default async function handler(req, res) {
 
     console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
-    // 3. Télécharger le fichier depuis Vercel Blob (URLs publiques pour ce projet)
-    const fileResponse = await fetch(dbFilePath);
+    // 3. Télécharger le fichier depuis Vercel Blob (store privé)
+    const blobHeaders = {};
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      blobHeaders['Authorization'] = `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`;
+    }
+    const fileResponse = await fetch(dbFilePath, { headers: blobHeaders });
     if (!fileResponse.ok) {
-      throw new Error(`Erreur Fetch Blob: ${fileResponse.statusText}`);
+      throw new Error(`Erreur Fetch Blob (${fileResponse.status}): ${fileResponse.statusText}`);
     }
 
     // Convertir le fichier en buffer/base64 pour Gemini
@@ -281,7 +285,7 @@ export default async function handler(req, res) {
 
         // Récupérer le profil pour vérifier les crédits
         const { rows: profileRows } = await pool.query(
-          `SELECT analysis_credits, role, email FROM profiles WHERE clerk_user_id = $1 LIMIT 1`,
+          `SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`,
           [targetUserId]
         );
         const profile = profileRows.length > 0 ? profileRows[0] : null;
@@ -299,7 +303,7 @@ export default async function handler(req, res) {
         if (shouldDeductCredit) {
           // Décompte sécurisé du crédit d'analyse
           await pool.query(
-            `UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE clerk_user_id = $1`,
+            `UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`,
             [targetUserId]
           );
           console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}. Raison: ${isNewIdentity ? 'nouvelle identité' : 'upgrade restreint->premium'}`);
