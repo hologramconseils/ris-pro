@@ -93,7 +93,10 @@ export default async function handler(req, res) {
     console.error('Upload error:', error);
     return res.status(500).json({ 
       error: 'Erreur lors du téléchargement du fichier.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: error.message,
+      stack: error.stack?.split('\n').slice(0,3).join(' | '),
+      hasBlob: !!process.env.BLOB_READ_WRITE_TOKEN,
+      hasDb: !!process.env.DATABASE_URL
     });
   }
 }
