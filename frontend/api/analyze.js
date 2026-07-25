@@ -1,15 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
-export const maxDuration = 60; // Timeout Vercel augmenté pour l'analyse PDF
+export const maxDuration = 60;
 
-// Initialisation de Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export default async function handler(req, res) {
-  // Gestion CORS sécurisée pour Vercel (SEC-006)
   const origin = req.headers.origin;
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_SITE_URL,
@@ -26,10 +24,7 @@ export default async function handler(req, res) {
   
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-  );
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -42,7 +37,6 @@ export default async function handler(req, res) {
 
   const { filePath, userId } = req.body;
 
-  // 1. Validation de la variable NIR_SALT (SEC-005)
   const nirSalt = process.env.NIR_SALT;
   if (!nirSalt && process.env.NODE_ENV === 'production') {
     console.error("FATAL: NIR_SALT est manquant en production.");
@@ -54,7 +48,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
 
-  // 2. Validation de l'identité et Contrôle d'Accès JWT / IDOR (SEC-002)
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
   let authenticatedUser = null;
@@ -75,9 +68,6 @@ export default async function handler(req, res) {
   let dbFilePath = filePath;
 
   try {
-    console.log(`Vérification de la propriété du document : ${filePath}`);
-
-    // Récupérer le record d'analyse dans Postgres pour vérifier le propriétaire
     const { rows: analysisRows } = await pool.query(
       `SELECT user_id, status, file_path, results FROM analyses WHERE file_path = $1 LIMIT 1`,
       [filePath]
@@ -90,234 +80,340 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Document introuvable dans la base de données' });
     }
 
-    // Protection IDOR : Si le fichier appartient à quelqu'un d'autre
     if (analysisRecord.user_id && (!authenticatedUser || authenticatedUser.id !== analysisRecord.user_id)) {
-      // Vérifier si l'utilisateur est admin
       let isAdmin = false;
       if (authenticatedUser) {
-        const { rows: profileRows } = await pool.query(
-          `SELECT role FROM profiles WHERE id = $1 LIMIT 1`,
-          [authenticatedUser.id]
-        );
-        if (profileRows.length > 0 && profileRows[0].role === 'admin') {
-          isAdmin = true;
-        }
+        const { rows: profileRows } = await pool.query(`SELECT role FROM profiles WHERE id = $1 LIMIT 1`, [authenticatedUser.id]);
+        if (profileRows.length > 0 && profileRows[0].role === 'admin') isAdmin = true;
       }
-      
-      if (!isAdmin) {
-        console.warn(`[IDOR Warn] Tentative d'accès non autorisé par ${authenticatedUser?.id || 'Anonyme'} sur le fichier de ${analysisRecord.user_id}`);
-        return res.status(403).json({ error: 'Accès non autorisé à ce document' });
-      }
+      if (!isAdmin) return res.status(403).json({ error: 'Accès non autorisé à ce document' });
     }
 
-    // 3. Récupérer le fichier (base64) depuis la base Neon directement
     let base64Data;
     try {
-      const pool = getDb();
-      const { rows } = await pool.query(
-        'SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1',
-        [dbFilePath]
-      );
-      
-      if (rows.length > 0 && rows[0].file_base64) {
-        base64Data = rows[0].file_base64;
-        console.log(`Fichier chargé depuis la DB (longueur base64: ${base64Data.length})`);
-      } else {
-        throw new Error("Contenu du fichier introuvable dans la base de données. Veuillez réessayer l'upload.");
-      }
+      const { rows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
+      if (rows.length > 0 && rows[0].file_base64) base64Data = rows[0].file_base64;
+      else throw new Error("Contenu du fichier introuvable dans la base de données.");
     } catch (dbErr) {
-      console.error('Erreur récupération DB:', dbErr.message);
       throw new Error(`Impossible de récupérer le contenu du fichier: ${dbErr.message}`);
     }
 
-    // 4. Appeler le moteur d'expertise Gemini (ou restaurer depuis la source brute)
     let analysisResults = null;
-    let lastError = null;
 
-    // Règle 4 : Reconstruire dataset complet depuis DB si l'analyse existe déjà
     if (analysisRecord && analysisRecord.status === 'completed' && analysisRecord.results && !analysisRecord.results.is_restricted) {
-      console.log(`[Cache DB] Données brutes restaurées depuis la DB pour : ${filePath}`);
       analysisResults = analysisRecord.results;
     } else {
-      // Sinon, on lance l'analyse IA
-      const modelsToTry = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-flash"];
-
-      const prompt = `
-        Tu es le conseiller expert en retraite de RIS Pro spécialisé dans l'audit des relevés de carrière (RIS / EIG).
-        Ton rôle est d'analyser STRICTEMENT les informations historiques réelles disponibles sur le relevé de carrière téléchargé (PDF) et de les comparer rigoureusement aux textes légaux, réglementaires et législatifs français pour produire un bilan et des prévisions au plus près de la réalité actuelle et future.
-
-        DIRECTIVE TERMINOLOGIQUE :
-        Ne mentionne JAMAIS les mots "agent" ou "IA" dans tes descriptions, explications ou résumés. Remplacer par "conseiller", "expert", "bilan" ou "conseil".
-
-        RÈGLES DE DÉTECTION DES ANOMALIES (À COMPARER AUX TEXTES RÉGLEMENTAIRES) :
-        Une année est une ANOMALIE si elle remplit l'une des conditions suivantes :
-        - CAS 1 : Moins de 4 trimestres validés.
-        - CAS 2 : Nombre de points égal à 0.
-        - CAS 3 : 4 trimestres validés MAIS avec 0 point.
-        - CAS 4 : Toute combinaison où (trimestres < 4) OU (points <= 0).
-        - CAS 5 : Année totalement ABSENTE du relevé alors qu'elle se situe entre le début et la fin de la carrière (trou de carrière).
-
-        ANALYSE DE CONTINUITÉ OBLIGATOIRE :
-        1. Identifie l'année la plus ancienne et l'année la plus récente du relevé.
-        2. Vérifie chaque année dans cet intervalle.
-        3. Si une année est manquante, ajoute-la aux anomalies avec le titre "Année absente du relevé".
-
-        DÉFINITION D'UNE ANNÉE NORMALE (À EXCLURE) :
-        Une année est NORMALE uniquement si : (Trimestres == 4) ET (Points > 0).
-        NE JAMAIS inclure d'année normale dans la liste des anomalies.
-        Vérifie rigoureusement si le document fourni est bien un relevé de situation individuelle (RIS), un relevé de carrière, ou un relevé de retraite (EIG). S'il s'agit d'un document totalement différent (ex: facture, pièce d'identité, CV, etc.), tu dois obligatoirement mettre le champ 'is_valid_document' à false.
-
-        EXCLUSION SYSTÉMATIQUE :
-        - Exclure l'année en cours (2026) car non consolidée.
-
-        STRUCTURE JSON ATTENDUE :
-        {
-          "is_valid_document": true,
-          "nir": "XXXXXXXXXXXXXXX",
-          "trimestres_valides": 136,
-          "trimestres_requis": 172,
-          "anomalies": [
-            {
-              "id": "anom_1",
-              "year": "YYYY",
-              "employer": "Nom de l'employeur",
-              "title": "Titre synthétique du problème",
-              "description": "Description courte (constat uniquement)",
-              "reason": "Explication réglementaire directe",
-              "solution": "Action de correction spécifique",
-              "docs": ["Fiche de paie de MMMM YYYY", "Attestation employeur"],
-              "salary": "Montant ou nature des revenus",
-              "trimesters": "X/4",
-              "points": "X.XX",
-              "severity": "high/medium/low"
-            }
-          ],
-          "summary": "Synthèse exécutive et bilan global de l'audit de carrière",
-          "strategies": [
-            {
-              "title": "Titre de l'optimisation (ex: Régularisation CNAV / Rachat Fillon)",
-              "description": "Opportunité financière et impact estimé sur la pension",
-              "priority": "Haute / Moyenne"
-            }
-          ],
-          "action_plan": [
-            {
-              "step": 1,
-              "title": "Action immédiate",
-              "description": "Procédure pas à pas sans répétition de la description des anomalies"
-            }
-          ]
+      
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const getRules = (type) => {
+        const filename = `regles_${type}_2023.md`;
+        const paths = [
+          path.join(process.cwd(), filename),
+          path.join(process.cwd(), '..', filename)
+        ];
+        for (const p of paths) {
+          if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
         }
+        return "";
+      };
+      
+      const regles_dep = getRules("depart_anticipe");
+      const regles_opt = getRules("optimisation");
+
+      // --- AGENT 1 : EXTRACTEUR (IA) ---
+      console.log("Démarrage Agent 1 : Extracteur...");
+      const extractorPrompt = `
+<role>Tu es un outil d'extraction de données automatisé (Extracteur). Ta seule tâche est de lire le document PDF fourni (un relevé de carrière, RIS ou EIG) et d'extraire les données brutes dans le format structuré attendu.</role>
+
+<instructions>
+1. Analyse le document pour trouver le NIR (Numéro de Sécurité Sociale) et déterminer s'il s'agit bien d'un relevé de carrière.
+2. Extrais TOUTES les années de carrière, ligne par ligne ou tableau par tableau.
+3. Ne fais aucun calcul de totaux, recopie juste les données.
+</instructions>
+
+<regles_strictes>
+- N'invente AUCUNE donnée.
+- Tu n'as pas le droit d'ajouter des années qui ne sont pas explicitement écrites.
+- Si un champ est manquant, renseigne 0 pour les chiffres (trimestres, points) et 'N/A' pour les textes (salaire, employeur).
+</regles_strictes>
+
+<few_shot_example>
+Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
+{"year": 1998, "employer": "Renault", "trimesters": 4, "points": 125.40, "salary": "15000"}
+</few_shot_example>
       `;
 
-      for (const modelName of modelsToTry) {
-        try {
-          console.log(`Tentative avec ${modelName}...`);
-          const model = genAI.getGenerativeModel({ 
-            model: modelName,
-            generationConfig: { responseMimeType: "application/json" }
-          });
-
-          const result = await model.generateContent([
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: "application/pdf"
-              }
-            },
-            { text: prompt }
-          ]);
-
-          const responseText = result.response.text();
-          
-          // Nettoyage robuste du JSON
-          let cleanText = responseText.trim();
-          if (cleanText.startsWith('```json')) cleanText = cleanText.substring(7);
-          else if (cleanText.startsWith('```')) cleanText = cleanText.substring(3);
-          if (cleanText.endsWith('```')) cleanText = cleanText.substring(0, cleanText.length - 3);
-          cleanText = cleanText.trim();
-
-          const parsed = JSON.parse(cleanText);
-          if (parsed.is_valid_document === false) {
-             throw new Error("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+      const extractorSchema = {
+        type: SchemaType.OBJECT,
+        properties: {
+          is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS ou EIG) valide, false sinon." },
+          nir: { type: SchemaType.STRING, description: "Numéro de sécurité sociale (sans les clés)." },
+          carrieres: {
+            type: SchemaType.ARRAY,
+            description: "Liste de toutes les années travaillées extraites",
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                year: { type: SchemaType.INTEGER, description: "L'année (ex: 1998)" },
+                employer: { type: SchemaType.STRING, description: "Nom de l'employeur ou nature de l'activité" },
+                trimesters: { type: SchemaType.INTEGER, description: "Nombre de trimestres validés pour cette année (0 à 4)" },
+                points: { type: SchemaType.NUMBER, description: "Nombre de points de retraite acquis" },
+                salary: { type: SchemaType.STRING, description: "Salaire brut ou 'N/A' si absent" }
+              },
+              required: ["year", "employer", "trimesters", "points", "salary"]
+            }
           }
-          if (parsed.anomalies || parsed.nir) {
-            analysisResults = parsed;
-            console.log(`Analyse réussie avec ${modelName}`);
-            break;
-          }
-        } catch (err) {
-          console.error(`Échec avec ${modelName}:`, err.message);
-          lastError = err;
+        },
+        required: ["is_valid_document", "nir", "carrieres"]
+      };
+
+      const extractorModel = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: { 
+          responseMimeType: "application/json",
+          responseSchema: extractorSchema 
+        }
+      });
+
+      const extractorResult = await extractorModel.generateContent([
+        { inlineData: { data: base64Data, mimeType: "application/pdf" } },
+        { text: extractorPrompt }
+      ]);
+
+      const extractedData = JSON.parse(extractorResult.response.text());
+      if (!extractedData.is_valid_document) {
+        throw new Error("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+      }
+
+      // --- AGENT 2 : CALCULATEUR (Code JS) ---
+      console.log("Démarrage Agent 2 : Calculateur...");
+      let trimestres_valides = 0;
+      let trimestres_requis = 172; 
+      let rawAnomalies = [];
+      let earliestYear = 9999;
+      let latestYear = 0;
+
+      if (extractedData.nir) {
+        const cleanNirStr = extractedData.nir.replace(/\s/g, '');
+        if (cleanNirStr.length >= 3) {
+           const birthYearSuffix = parseInt(cleanNirStr.substring(1, 3));
+           const birthYear = birthYearSuffix > 26 ? 1900 + birthYearSuffix : 2000 + birthYearSuffix;
+           if (birthYear >= 1973) trimestres_requis = 172;
+           else if (birthYear >= 1968) trimestres_requis = 172;
+           else if (birthYear === 1967) trimestres_requis = 171;
+           else if (birthYear >= 1964) trimestres_requis = 171;
+           else trimestres_requis = 170;
         }
       }
 
-      if (!analysisResults) {
-        throw lastError || new Error("L'IA n'a pas pu extraire de données valides.");
+      const carrieres = extractedData.carrieres || [];
+      carrieres.forEach(c => {
+        const y = parseInt(c.year);
+        if (y > 1900 && y < 2100) {
+          if (y < earliestYear) earliestYear = y;
+          if (y > latestYear) latestYear = y;
+        }
+      });
+
+      const currentYear = new Date().getFullYear();
+
+      if (earliestYear < 9999) {
+        for (let y = earliestYear; y <= latestYear; y++) {
+          if (y >= currentYear) continue; // Exclure l'année en cours
+          
+          const yearsData = carrieres.filter(c => parseInt(c.year) === y);
+          if (yearsData.length === 0) {
+            rawAnomalies.push({
+              year: y.toString(),
+              employer: "Aucun",
+              trimesters: 0,
+              points: 0,
+              salary: "0",
+              reason_code: "CAS 5: Année absente du relevé"
+            });
+            continue;
+          }
+          
+          let yearTrim = 0;
+          let yearPoints = 0;
+          let employers = new Set();
+          let totalSalary = 0;
+          
+          yearsData.forEach(yd => {
+            yearTrim += parseInt(yd.trimesters) || 0;
+            yearPoints += parseFloat(yd.points) || 0;
+            if (yd.employer) employers.add(yd.employer);
+            const sal = parseFloat(String(yd.salary).replace(/[^0-9.-]+/g,""));
+            if (!isNaN(sal)) totalSalary += sal;
+          });
+          
+          if (yearTrim > 4) yearTrim = 4;
+          trimestres_valides += yearTrim;
+          
+          if (yearTrim < 4 || yearPoints <= 0) {
+             rawAnomalies.push({
+               year: y.toString(),
+               employer: Array.from(employers).join(", "),
+               trimesters: yearTrim,
+               points: yearPoints,
+               salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
+               reason_code: yearTrim < 4 ? "CAS 1/4: Moins de 4 trimestres validés" : "CAS 2/3: Trimestres validés mais 0 point"
+             });
+          }
+        }
       }
+
+      // --- AGENT 3 : RÉDACTEUR (IA) ---
+      console.log("Démarrage Agent 3 : Rédacteur...");
+      const writerPrompt = `
+<role>Tu es le conseiller expert en retraite de RIS Pro. Tu rédiges le bilan final en te basant STRICTEMENT sur les données calculées.</role>
+
+<contexte_et_donnees>
+- Trimestres validés : ${trimestres_valides}
+- Trimestres requis : ${trimestres_requis}
+- Anomalies détectées (faits incontestables) : ${JSON.stringify(rawAnomalies)}
+</contexte_et_donnees>
+
+<regles_constitutionnelles>
+1. Interdiction formelle de modifier les chiffres fournis (Trimestres validés, requis).
+2. Interdiction formelle d'ajouter de nouvelles anomalies qui ne figurent pas dans la liste fournie.
+3. Pour chaque anomalie fournie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire, la solution, et les documents à réclamer au client. Conserve scrupuleusement les années et chiffres donnés.
+4. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
+</regles_constitutionnelles>
+
+<regles_reglementaires>
+1. L'âge d'annulation automatique de la décote est de 67 ans pour les générations nées en 1958 et après (Article L351-8 du CSS).
+2. L'âge du taux plein cotisé est l'âge d'atteinte de ${trimestres_requis} trimestres.
+${regles_dep}
+${regles_opt}
+</regles_reglementaires>
+
+<format_summary>
+Le champ 'summary' DOIT être un 'BILAN RETRAITE PREMIUM' exhaustif formaté en Markdown. 
+Rédige des paragraphes fluides, aérés, formels et humains.
+Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*'). 
+N'utilise jamais d'astérisques (**) pour le gras. Utilise EXCLUSIVEMENT la balise HTML <strong>texte</strong> pour mettre en évidence les mots clés, âges et trimestres.
+Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
+</format_summary>
+      `;
+
+      const writerSchema = {
+        type: SchemaType.OBJECT,
+        properties: {
+          anomalies: {
+            type: SchemaType.ARRAY,
+            description: "Liste des anomalies enrichies",
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                id: { type: SchemaType.STRING },
+                year: { type: SchemaType.STRING },
+                employer: { type: SchemaType.STRING },
+                title: { type: SchemaType.STRING, description: "Titre synthétique du problème" },
+                description: { type: SchemaType.STRING, description: "Description courte (constat)" },
+                reason: { type: SchemaType.STRING, description: "Explication réglementaire" },
+                solution: { type: SchemaType.STRING, description: "Action de correction spécifique" },
+                docs: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: "Documents justificatifs" },
+                salary: { type: SchemaType.STRING },
+                trimesters: { type: SchemaType.STRING },
+                points: { type: SchemaType.NUMBER },
+                severity: { type: SchemaType.STRING, description: "high, medium, ou low" }
+              },
+              required: ["id", "year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
+            }
+          },
+          summary: { type: SchemaType.STRING, description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
+          strategies: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                title: { type: SchemaType.STRING },
+                description: { type: SchemaType.STRING },
+                priority: { type: SchemaType.STRING }
+              },
+              required: ["title", "description", "priority"]
+            }
+          },
+          action_plan: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                step: { type: SchemaType.INTEGER },
+                title: { type: SchemaType.STRING },
+                description: { type: SchemaType.STRING }
+              },
+              required: ["step", "title", "description"]
+            }
+          }
+        },
+        required: ["anomalies", "summary", "strategies", "action_plan"]
+      };
+
+      const writerModel = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-pro",
+        generationConfig: { 
+          responseMimeType: "application/json",
+          responseSchema: writerSchema 
+        }
+      });
+
+      const writerResult = await writerModel.generateContent({ text: writerPrompt });
+
+      const writerData = JSON.parse(writerResult.response.text());
+
+      // Assemblage final
+      analysisResults = {
+        is_valid_document: true,
+        nir: extractedData.nir,
+        trimestres_valides: trimestres_valides,
+        trimestres_requis: trimestres_requis,
+        anomalies: writerData.anomalies || [],
+        summary: writerData.summary || "",
+        strategies: writerData.strategies || [],
+        action_plan: writerData.action_plan || []
+      };
+
+      console.log("Analyse à 3 agents réussie !");
     }
 
-    // Hashing du NIR
     const cleanNir = (analysisResults.nir || "").replace(/\s/g, '') || "000000000000000";
     const nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
 
-    // 5. Logique de Crédits et Droits d'Accès Premium
     let hasPremiumAccess = false;
     const targetUserId = authenticatedUser?.id || userId;
 
     if (targetUserId) {
       try {
-        // Associer le user_id à la ligne d'analyse s'il n'était pas encore défini (guest login)
         if (analysisRecord && !analysisRecord.user_id) {
-          await pool.query(
-            `UPDATE analyses SET user_id = $1 WHERE file_path = $2`,
-            [targetUserId, dbFilePath]
-          );
+          await pool.query(`UPDATE analyses SET user_id = $1 WHERE file_path = $2`, [targetUserId, dbFilePath]);
         }
-
-        // Vérifier si cette identité a déjà été analysée par cet utilisateur
         const { rows: existingAnalysisList } = await pool.query(
-          `SELECT id, results FROM analyses 
-           WHERE user_id = $1 AND nir_hash = $2 AND status = 'completed' LIMIT 1`,
+          `SELECT id, results FROM analyses WHERE user_id = $1 AND nir_hash = $2 AND status = 'completed' LIMIT 1`,
           [targetUserId, nirHash]
         );
-
         const existingAnalysis = existingAnalysisList.length > 0 ? existingAnalysisList[0] : null;
         const isNewIdentity = !existingAnalysis;
-        // Cas critique : l'analyse existante était restreinte (freemium)
         const wasRestricted = existingAnalysis && existingAnalysis.results && existingAnalysis.results.is_restricted === true;
 
-        // Récupérer le profil pour vérifier les crédits
-        const { rows: profileRows } = await pool.query(
-          `SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`,
-          [targetUserId]
-        );
+        const { rows: profileRows } = await pool.query(`SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`, [targetUserId]);
         const profile = profileRows.length > 0 ? profileRows[0] : null;
-
         let currentCredits = profile?.analysis_credits || 0;
         const isAdmin = profile?.role === 'admin' || profile?.email === 'btsaulnerond@icloud.com';
 
-        if (isAdmin || currentCredits > 0) {
-          hasPremiumAccess = true;
-        }
+        if (isAdmin || currentCredits > 0) hasPremiumAccess = true;
 
-        // Décompter un crédit si :
-        const shouldDeductCredit = !isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted);
-
-        if (shouldDeductCredit) {
-          // Décompte sécurisé du crédit d'analyse
-          await pool.query(
-            `UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`,
-            [targetUserId]
-          );
-          console.log(`[Credits] -1 pour ${targetUserId}. Restant: ${currentCredits - 1}. Raison: ${isNewIdentity ? 'nouvelle identité' : 'upgrade restreint->premium'}`);
+        if (!isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted)) {
+          await pool.query(`UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`, [targetUserId]);
         }
       } catch (dbError) {
-        console.error("[Credits] Erreur DB (droits ou colonnes manquantes):", dbError.message);
+        console.error("[Credits] Erreur DB:", dbError.message);
       }
     }
 
-    // 6. Obfuscation & Rédaction Freemium (SEC-001)
     let clientResponse = analysisResults;
 
     if (!hasPremiumAccess) {
@@ -326,38 +422,23 @@ export default async function handler(req, res) {
       const rawAnomalies = clientResponse.anomalies || [];
       const currentYear = new Date().getFullYear();
 
-      // Tri chronologique des anomalies pour identifier la plus ancienne et la plus récente
       const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
         const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
         const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0');
         return yearA - yearB;
       });
 
-      const validAnomalies = sortedAnomalies.filter(a => {
-        const year = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
-        return year < currentYear;
-      });
+      const validAnomalies = sortedAnomalies.filter(a => parseInt(String(a.year).match(/\d{4}/)?.[0] || '0') < currentYear);
 
-      // Identifier la plus ancienne et la plus récente
       const freemiumIndices = new Set();
       if (validAnomalies.length > 0) {
-        const oldest = validAnomalies[0];
-        const newest = validAnomalies[validAnomalies.length - 1];
-        
-        rawAnomalies.forEach((anom, idx) => {
-          if (anom === oldest || anom === newest) {
-            freemiumIndices.add(idx);
-          }
-        });
+        freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[0]));
+        freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[validAnomalies.length - 1]));
       }
 
-      // Redacter les anomalies non freemium
       clientResponse.anomalies = rawAnomalies.map((anom, idx) => {
         if (freemiumIndices.has(idx)) {
-          return {
-            ...anom,
-            is_premium: false
-          };
+          return { ...anom, is_premium: false };
         } else {
           return {
             year: anom.year || "Année masquée",
@@ -378,23 +459,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7. Mettre à jour la base de données
     const dbResults = { ...analysisResults };
-    if (!hasPremiumAccess) {
-      dbResults.is_restricted = true;
-    } else {
-      delete dbResults.is_restricted; // S'assurer qu'on retire le flag si l'accès est premium
-    }
-
-    const updateData = { 
-      status: 'completed',
-      results: dbResults
-    };
+    if (!hasPremiumAccess) dbResults.is_restricted = true;
+    else delete dbResults.is_restricted;
 
     try {
       await pool.query(
         `UPDATE analyses SET status = $1, results = $2, nir_hash = $3, user_id = COALESCE($4, user_id), updated_at = NOW() WHERE file_path = $5`,
-        [updateData.status, JSON.stringify(updateData.results), nirHash, targetUserId, dbFilePath]
+        ['completed', JSON.stringify(dbResults), nirHash, targetUserId, dbFilePath]
       );
     } catch (e) {
       console.error("Erreur mise à jour analyse completed :", e);
@@ -404,21 +476,13 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
-    
     try {
       await pool.query(
         `UPDATE analyses SET status = 'failed', results = $1, updated_at = NOW() WHERE file_path = $2`,
-        [JSON.stringify({ error: error.message, stack: error.stack }), dbFilePath]
+        [JSON.stringify({ error: error.message }), dbFilePath]
       );
-    } catch (e) {
-      console.error("Failed to log error to Postgres:", e.message);
-    }
+    } catch (e) {}
 
-    return res.status(500).json({ 
-      error: "L'analyse a échoué", 
-      message: error.message,
-      code: error.code || 'UNKNOWN_ERROR',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
-    });
+    return res.status(500).json({ error: "L'analyse a échoué", message: error.message });
   }
 }
