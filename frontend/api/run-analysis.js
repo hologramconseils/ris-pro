@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       let isAdmin = false;
       if (authenticatedUser) {
         const { rows: profileRows } = await pool.query(
-          `SELECT role FROM profiles WHERE clerk_user_id = $1 LIMIT 1`,
+          `SELECT role FROM profiles WHERE id = $1 LIMIT 1`,
           [authenticatedUser.id]
         );
         if (profileRows.length > 0 && profileRows[0].role === 'admin') {
