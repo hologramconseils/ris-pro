@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
-config({ path: resolve(process.cwd(), 'frontend/.env.local') });
-config({ path: resolve(process.cwd(), 'frontend/.env') });
+
+config({ path: resolve(process.cwd(), '.env.vercel') });
 
 import { getDb } from '../frontend/api/db.js';
 

@@ -4,65 +4,29 @@ import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 
-const renderMarkdown = (text) => {
-  if (!text) return null;
-  const lines = text.split('\n');
-  return lines.map((line, idx) => {
-    const trimmed = line.trim();
-    const isBullet = trimmed.startsWith('- ') || trimmed.startsWith('* ');
-    
-    // Nettoyer les balises de mise en valeur
-    let cleanLine = trimmed;
-    cleanLine = cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    cleanLine = cleanLine.replace(/\*/g, ''); // Enlever les astérisques restants
-    
-    if (cleanLine.startsWith('# ')) {
-      return <h1 key={idx} className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(2)}</h1>;
-    }
-    if (cleanLine.startsWith('## ')) {
-      return <h2 key={idx} className="text-xl font-bold mt-8 mb-4 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(3)}</h2>;
-    }
-    if (cleanLine.startsWith('### ')) {
-      return <h3 key={idx} className="text-lg font-bold mt-6 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)' }}>{cleanLine.slice(4)}</h3>;
-    }
-    if (cleanLine.match(/^\d+\.\s+/)) {
-      const numMatch = cleanLine.match(/^\d+\./)[0];
-      const headingText = cleanLine.replace(/^\d+\.\s+/, '');
-      const parts = headingText.split(/<\/?strong>/);
-      return (
-        <h3 key={idx} className="text-lg font-bold mt-8 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)', display: 'flex', gap: '0.6rem', alignItems: 'flex-start', lineHeight: '1.5' }}>
-          <span className="text-primary font-extrabold" style={{ flexShrink: 0, lineHeight: '1.5' }}>{numMatch}</span>
-          <span style={{ flex: 1 }}>
-            {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)' }}>{part}</strong> : part)}
-          </span>
-        </h3>
-      );
-    }
-    if (isBullet) {
-      const bulletText = cleanLine.startsWith('- ') ? cleanLine.slice(2) : (cleanLine.startsWith(' ') ? cleanLine.trim() : cleanLine);
-      const parts = bulletText.split(/<\/?strong>/);
-      return (
-        <div key={idx} className="text-base my-3 pl-4 border-l-2 border-primary/30" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>
-          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
-        </div>
-      );
-    }
-    if (cleanLine === '') {
-      return <div key={idx} className="h-4" />;
-    }
-    
-    // Remplacement des balises <strong> pour le gras
-    const parts = cleanLine.split(/<\/?strong>/);
-    if (parts.length > 1) {
-      return (
-        <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>
-          {parts.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }}>{part}</strong> : part)}
-        </p>
-      );
-    }
-    return <p key={idx} className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }}>{cleanLine}</p>;
-  });
-}
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
+const MarkdownRenderer = ({ content }) => {
+  if (!content) return null;
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h1: ({node, ...props}) => <h1 className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }} {...props} />,
+        h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-8 mb-4 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }} {...props} />,
+        h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-6 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)' }} {...props} />,
+        p: ({node, ...props}) => <p className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
+        ul: ({node, ...props}) => <ul className="list-disc pl-5 my-3 text-base print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
+        ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-3 text-base print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
+        li: ({node, ...props}) => <li className="mb-1" {...props} />,
+        strong: ({node, ...props}) => <strong className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }} {...props} />
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+};
 
 export default function Bilan() {
   const [searchParams] = useSearchParams()
@@ -427,7 +391,7 @@ export default function Bilan() {
                 </div>
               </div>
               <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1.25rem', borderLeft: '3px solid rgba(37, 99, 235, 0.4)' }}>
-                {renderMarkdown(results.summary)}
+                <MarkdownRenderer content={results.summary} />
               </div>
             </div>
           )}
@@ -447,7 +411,7 @@ export default function Bilan() {
                     </div>
                     <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-main)' }}>{strat.title || strat.titre}</h4>
                     <div className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>
-                      {renderMarkdown(strat.description)}
+                      <MarkdownRenderer content={strat.description} />
                     </div>
                   </div>
                 ))}

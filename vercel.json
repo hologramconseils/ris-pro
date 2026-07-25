@@ -19,6 +19,7 @@
     { "src": "/api/(.*)", "dest": "/frontend/api/$1" },
     { "handle": "filesystem" },
     { "src": "/((?!api|assets|src|node_modules|@vite|@react-refresh|logo.png|favicon.ico).*)", "dest": "/frontend/dist/index.html" }
+  ],
   "functions": {
     "frontend/api/*.js": {
       "maxDuration": 300
