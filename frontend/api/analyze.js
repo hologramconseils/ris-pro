@@ -107,8 +107,22 @@ export default async function handler(req, res) {
       const fs = await import('fs');
       const path = await import('path');
       
-      const getRules = (type) => {
-        const filename = `regles_${type}_2023.md`;
+      const allRuleFiles = [
+        "regles_conge_naissance.md",
+        "regles_cumul_emploi_retraite_createur_droits.md",
+        "regles_depart_anticipe_2023.md",
+        "regles_expatriation_internationale.md",
+        "regles_gestion_retraite_2023.md",
+        "regles_independants_fonctionnaires.md",
+        "regles_minima_sociaux_aspa.md",
+        "regles_nouveau_conge_naissance_retraite.md",
+        "regles_optimisation_retraite_2023.md",
+        "regles_pension_reversion_2023.md",
+        "regles_polypensionnes_lura.md",
+        "regles_retraite_progressive_60_ans.md"
+      ];
+
+      const getRuleContent = (filename) => {
         const paths = [
           path.join(process.cwd(), filename),
           path.join(process.cwd(), '..', filename)
@@ -118,9 +132,11 @@ export default async function handler(req, res) {
         }
         return "";
       };
-      
-      const regles_dep = getRules("depart_anticipe");
-      const regles_opt = getRules("optimisation");
+
+      let allRulesContent = "";
+      for (const file of allRuleFiles) {
+        allRulesContent += getRuleContent(file) + "\n\n";
+      }
 
       // --- AGENT 1 : EXTRACTEUR (IA) ---
       console.log("Démarrage Agent 1 : Extracteur...");
@@ -286,8 +302,7 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
 <regles_reglementaires>
 1. L'âge d'annulation automatique de la décote est de 67 ans pour les générations nées en 1958 et après (Article L351-8 du CSS).
 2. L'âge du taux plein cotisé est l'âge d'atteinte de ${trimestres_requis} trimestres.
-${regles_dep}
-${regles_opt}
+${allRulesContent}
 </regles_reglementaires>
 
 <format_summary>
