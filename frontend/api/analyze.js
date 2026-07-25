@@ -145,9 +145,9 @@ export default async function handler(req, res) {
 
 <instructions>
 1. Repère le NIR (Numéro de Sécurité Sociale) pour valider le document.
-2. Repère la "Synthèse de vos droits" (souvent en 1ère page) et extrais le nombre de trimestres requis (ex: 172) et le nombre de trimestres enregistrés (ex: 72).
-3. Extrais le tableau de synthèse des trimestres par année (généralement intitulé "Détail par année"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
-4. Extrais le tableau du détail des employeurs (généralement intitulé "Détail de votre carrière" avec employeur, date de début, date de fin, revenus). Mets ces données dans "detail_employeurs".
+2. Cherche dans le document (généralement au début, dans un encadré ou une synthèse) les totaux officiels : le nombre total de trimestres validés/enregistrés et le nombre de trimestres requis pour le taux plein. La présentation ou le titre varie selon les documents (RIS, EIG, Relevé de carrière classique...).
+3. Extrais le tableau de synthèse des trimestres par année (souvent intitulé "Détail par année" ou "Vos droits"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
+4. Extrais le tableau détaillé de carrière (souvent "Détail de votre carrière" avec employeur, date de début/fin, revenus). Mets ces données dans "detail_employeurs".
 </instructions>
 
 <regles_strictes>
@@ -162,10 +162,10 @@ export default async function handler(req, res) {
       const extractorSchema = {
         type: SchemaType.OBJECT,
         properties: {
-          is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS ou EIG) valide, false sinon." },
+          is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS, EIG ou autre document de retraite officiel) valide, false sinon." },
           nir: { type: SchemaType.STRING, description: "Numéro de sécurité sociale (sans les clés)." },
-          total_trimestres_enregistres: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres déjà enregistrés/validés, figurant dans la Synthèse de vos droits (ex: 72)." },
-          total_trimestres_requis: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres requis pour partir à taux plein, figurant dans la Synthèse de vos droits (ex: 172)." },
+          total_trimestres_enregistres: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres déjà enregistrés/validés par les différents régimes, indiqué globalement dans le document." },
+          total_trimestres_requis: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres requis/nécessaires pour pouvoir partir à taux plein, indiqué globalement dans le document." },
           synthese_annees: {
             type: SchemaType.ARRAY,
             description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
