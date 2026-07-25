@@ -54,9 +54,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Fichier vide reçu.' });
     }
 
-    // Upload vers Vercel Blob
+    // Upload vers Vercel Blob (store configuré en private)
     const blob = await put(safeName, buffer, {
-      access: 'public',
+      access: 'private',
       contentType: 'application/pdf',
       addRandomSuffix: false,
     });
@@ -92,11 +92,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Upload error:', error);
     return res.status(500).json({ 
-      error: 'Erreur lors du téléchargement du fichier.',
-      details: error.message,
-      stack: error.stack?.split('\n').slice(0,3).join(' | '),
-      hasBlob: !!process.env.BLOB_READ_WRITE_TOKEN,
-      hasDb: !!process.env.DATABASE_URL
+      error: 'Erreur lors du téléchargement du fichier.'
     });
   }
 }
