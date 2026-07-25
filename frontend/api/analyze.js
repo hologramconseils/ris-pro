@@ -314,6 +314,10 @@ Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun
 N'utilise jamais d'astérisques (**) pour le gras. Utilise EXCLUSIVEMENT la balise HTML <strong>texte</strong> pour mettre en évidence les mots clés, âges et trimestres.
 Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
 </format_summary>
+
+<strategies_et_plan>
+Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir 2 à 3 stratégies d'optimisation (rachat de trimestres, cumul emploi-retraite, surcote, retraite progressive, etc.) dans le tableau 'strategies', et un 'action_plan' exhaustif avec des étapes claires pour préparer le départ à la retraite. Ne laisse jamais ces champs vides.
+</strategies_et_plan>
       `;
 
       const writerSchema = {

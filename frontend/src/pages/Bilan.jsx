@@ -100,62 +100,7 @@ export default function Bilan() {
     }
   }, [filePath, isSuccess, user, profile?.analysis_credits])
 
-  const triggerAgentAnalysis = async (path) => {
-    if (hasAttemptedAgent || agentLoading) return;
-    try {
-      setAgentLoading(true);
-      setHasAttemptedAgent(true);
-      
-      const clerkToken = await window.Clerk?.session?.getToken();
-      
-      const response = await fetch('/api/run-analysis', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(clerkToken && { 'Authorization': `Bearer ${clerkToken}` })
-        },
-        body: JSON.stringify({ filePath: path })
-      });
-      if (response.ok) {
-        const agentData = await response.json();
-        setResults(prev => {
-          const enriched = { ...prev, ...agentData };
-          sessionStorage.setItem(`ris_pro_analysis_${path}`, JSON.stringify(enriched));
-          
-          // Sauvegarder les résultats enrichis dans la base de données
-          fetch('/api/update-analysis', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(clerkToken && { 'Authorization': `Bearer ${clerkToken}` })
-            },
-            body: JSON.stringify({ filePath: path, results: enriched })
-          }).then(res => {
-            if (!res.ok) console.error("Erreur mise à jour DB:", res.statusText);
-          }).catch(error => {
-            console.error("Erreur mise à jour DB:", error.message);
-          });
 
-          return enriched;
-        });
-      } else {
-        console.error("L'API d'analyse patrimoniale a renvoyé une erreur:", response.status);
-      }
-    } catch (err) {
-      console.error("Erreur de l'agent patrimonial:", err);
-    } finally {
-      setAgentLoading(false);
-    }
-  }
-
-  // Activer l'agent si on a accès premium et que les stratégies ne sont pas encore calculées, ou s'il manque les champs de cohérence de trimestres
-  useEffect(() => {
-    if (authLoading) return;
-    const isPremium = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess;
-    if (results && isPremium && (!results.strategies || typeof results.trimestres_valides !== 'number') && !agentLoading && !hasAttemptedAgent && filePath) {
-      triggerAgentAnalysis(filePath);
-    }
-  }, [results, profile, isSuccess, filePath, agentLoading, hasAttemptedAgent, authLoading])
 
   const fetchAnalysis = async (path) => {
     try {
@@ -341,7 +286,7 @@ export default function Bilan() {
     return { valides: 136, requis: 172 };
   }
 
-  const trimestresInfo = extractTrimestres(results?.synthese_situation || "");
+  const trimestresInfo = extractTrimestres(results?.summary || "");
   const careerScore = Math.min(100, Math.round((trimestresInfo.valides / trimestresInfo.requis) * 100));
 
   const currentYear = new Date().getFullYear()
