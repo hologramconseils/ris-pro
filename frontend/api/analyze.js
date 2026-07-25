@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getDb } from "./db.js";
-import { head } from "@vercel/blob";
+import { get as getBlob } from "@vercel/blob";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
@@ -113,25 +113,18 @@ export default async function handler(req, res) {
 
     console.log(`Début de l'analyse pour : ${dbFilePath}`);
 
-    // 3. Télécharger le fichier depuis Vercel Blob (store privé - via SDK)
-    let fileResponse;
+    // 3. Télécharger le fichier depuis Vercel Blob (store privé - via SDK get())
+    let base64Data;
     try {
-      // Pour les blobs privés, head() retourne une downloadUrl signée temporaire
-      const blobMeta = await head(dbFilePath);
-      const downloadUrl = blobMeta.downloadUrl || blobMeta.url;
-      fileResponse = await fetch(downloadUrl);
+      // get() avec access:'private' s'authentifie automatiquement sur Vercel via OIDC
+      const blobResponse = await getBlob(dbFilePath, { access: 'private' });
+      const arrayBuffer = await blobResponse.arrayBuffer();
+      base64Data = Buffer.from(arrayBuffer).toString('base64');
+      console.log(`Fichier Blob téléchargé: ${arrayBuffer.byteLength} octets`);
     } catch (blobErr) {
-      // Fallback : tentative directe (fonctionne si blob devient public)
-      console.warn('head() échoué, tentative fetch directe:', blobErr.message);
-      fileResponse = await fetch(dbFilePath);
+      console.error('Erreur getBlob:', blobErr.message);
+      throw new Error(`Impossible de télécharger le fichier depuis le stockage: ${blobErr.message}`);
     }
-    if (!fileResponse.ok) {
-      throw new Error(`Erreur Fetch Blob (${fileResponse.status}): ${fileResponse.statusText}`);
-    }
-
-    // Convertir le fichier en buffer/base64 pour Gemini
-    const arrayBuffer = await fileResponse.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
     // 4. Appeler le moteur d'expertise Gemini (ou restaurer depuis la source brute)
     let analysisResults = null;
