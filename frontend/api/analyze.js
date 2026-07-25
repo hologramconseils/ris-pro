@@ -141,28 +141,20 @@ export default async function handler(req, res) {
       // --- AGENT 1 : EXTRACTEUR (IA) ---
       console.log("Démarrage Agent 1 : Extracteur...");
       const extractorPrompt = `
-<role>Tu es un outil d'extraction de données automatisé (Extracteur expert). Ta tâche exclusive est d'analyser le document PDF (Relevé de Carrière, RIS ou EIG) et d'en extraire les données brutes avec une précision absolue, sans aucune interprétation.</role>
+<role>Tu es un outil d'extraction de données automatisé (Extracteur expert). Ta tâche exclusive est d'analyser le document PDF (Relevé de Carrière, RIS ou EIG) et d'en extraire deux tableaux distincts sans essayer de les fusionner.</role>
 
 <instructions>
 1. Repère le NIR (Numéro de Sécurité Sociale) pour valider le document.
-2. Parcourt le document année par année, ligne par ligne.
-3. Pour chaque ligne de carrière, extrais l'année, le nom de l'employeur (ou la nature: Chômage, Maladie, Service Militaire), les trimestres validés (ou "trimestres retenus"), les points de retraite complémentaire, et le revenu/salaire brut.
+2. Extrais le tableau de synthèse des trimestres par année (généralement intitulé "Détail par année"). Pour chaque ligne (année), extrait l'année, le total des trimestres validés ("Durée tous régimes"), et la somme des points. Mets ces données dans "synthese_annees".
+3. Extrais le tableau du détail des employeurs (généralement intitulé "Détail de votre carrière" avec employeur, date de début, date de fin, revenus). Mets ces données dans "detail_employeurs".
 </instructions>
 
 <regles_strictes>
-- ZERO HALLUCINATION : N'invente jamais une année ou un employeur. Si la page est illisible, n'invente rien.
-- Sépare bien les lignes si une année comporte plusieurs employeurs.
-- Si une colonne est vide, absente, ou non chiffrée pour une ligne spécifique : 
-  - Trimestres : 0
-  - Points : 0.0
-  - Salaire : "N/A"
-- Ne consolide pas les lignes, n'additionne pas, copie fidèlement le tableau.
+- ZERO HALLUCINATION : Ne fusionne pas les tableaux. N'invente rien.
+- Si une colonne est vide, mets 0 (ou "N/A" pour les textes).
+- Pour detail_employeurs, l'année de début (start_year) et de fin (end_year) doivent être déduites de "Date début" et "Date fin" (ex: "01/09/2000" => 2000).
+- Copie exactement le revenu brut avec sa devise (ex: "3 744 FRF" ou "2 386 €").
 </regles_strictes>
-
-<few_shot_example>
-Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
-{"year": 1998, "employer": "Renault", "trimesters": 4, "points": 125.40, "salary": "15000"}
-</few_shot_example>
       `;
 
       const extractorSchema = {
@@ -170,23 +162,35 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
         properties: {
           is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS ou EIG) valide, false sinon." },
           nir: { type: SchemaType.STRING, description: "Numéro de sécurité sociale (sans les clés)." },
-          carrieres: {
+          synthese_annees: {
             type: SchemaType.ARRAY,
-            description: "Liste de toutes les années travaillées extraites",
+            description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
             items: {
               type: SchemaType.OBJECT,
               properties: {
                 year: { type: SchemaType.INTEGER, description: "L'année (ex: 1998)" },
-                employer: { type: SchemaType.STRING, description: "Nom de l'employeur ou nature de l'activité" },
-                trimesters: { type: SchemaType.INTEGER, description: "Nombre de trimestres validés pour cette année (0 à 4)" },
-                points: { type: SchemaType.NUMBER, description: "Nombre de points de retraite acquis" },
-                salary: { type: SchemaType.STRING, description: "Salaire brut ou 'N/A' si absent" }
+                trimesters: { type: SchemaType.INTEGER, description: "Nombre total de trimestres validés pour cette année (0 à 4)" },
+                points: { type: SchemaType.NUMBER, description: "Nombre de points de retraite acquis (ex: 34.5)" }
               },
-              required: ["year", "employer", "trimesters", "points", "salary"]
+              required: ["year", "trimesters", "points"]
+            }
+          },
+          detail_employeurs: {
+            type: SchemaType.ARRAY,
+            description: "Tableau des employeurs avec dates de début, dates de fin et revenus.",
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                employer: { type: SchemaType.STRING, description: "Nom de l'employeur ou de l'activité (CHÔMAGE, MALADIE...)" },
+                start_year: { type: SchemaType.INTEGER, description: "Année de début (ex: 2000)" },
+                end_year: { type: SchemaType.INTEGER, description: "Année de fin (ex: 2001)" },
+                salary: { type: SchemaType.STRING, description: "Revenus bruts (exactement comme écrit, ex: '3 744 FRF', '25 €' ou 'N/A')" }
+              },
+              required: ["employer", "start_year", "end_year", "salary"]
             }
           }
         },
-        required: ["is_valid_document", "nir", "carrieres"]
+        required: ["is_valid_document", "nir", "synthese_annees", "detail_employeurs"]
       };
 
       const extractorModel = genAI.getGenerativeModel({ 
@@ -209,6 +213,45 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
 
       // --- AGENT 2 : CALCULATEUR (Code JS) ---
       console.log("Démarrage Agent 2 : Calculateur...");
+      
+      const synthese = extractedData.synthese_annees || [];
+      const employeurs = extractedData.detail_employeurs || [];
+      const carrieres = [];
+      
+      // Fusion (Merge) et conversion des devises
+      synthese.forEach(s => {
+        const year = parseInt(s.year);
+        if (isNaN(year)) return;
+        
+        // Trouver tous les employeurs de cette année
+        const activeEmp = employeurs.filter(e => parseInt(e.start_year) <= year && parseInt(e.end_year) >= year);
+        
+        let totalSalaryEur = 0;
+        let empNames = new Set();
+        
+        activeEmp.forEach(emp => {
+          if (emp.employer && emp.employer !== 'N/A') empNames.add(emp.employer);
+          if (emp.salary && emp.salary !== 'N/A') {
+            const isFrf = emp.salary.toUpperCase().includes('FRF') || emp.salary.toUpperCase().includes('F');
+            let val = parseFloat(String(emp.salary).replace(/[^0-9,.-]+/g,"").replace(',', '.'));
+            if (!isNaN(val)) {
+               if (isFrf) {
+                 val = val / 6.55957; // Conversion Francs en Euros
+               }
+               totalSalaryEur += val;
+            }
+          }
+        });
+        
+        carrieres.push({
+          year: year,
+          employer: empNames.size > 0 ? Array.from(empNames).join(", ") : "Aucun",
+          trimesters: s.trimesters || 0,
+          points: s.points || 0,
+          salary: totalSalaryEur > 0 ? totalSalaryEur.toFixed(2) : "N/A"
+        });
+      });
+
       let trimestres_valides = 0;
       let trimestres_requis = 172; 
       let rawAnomalies = [];
@@ -228,7 +271,6 @@ Si tu lis "1998 | Renault | 4 | 125,40 | 15000", tu dois renvoyer :
         }
       }
 
-      const carrieres = extractedData.carrieres || [];
       carrieres.forEach(c => {
         const y = parseInt(c.year);
         if (y > 1900 && y < 2100) {
