@@ -11,7 +11,7 @@ La coordination européenne s'applique pour garantir qu'aucun trimestre cotisé 
     *   *La pension nationale :* Calculée uniquement sur les années et salaires français, avec la décote éventuelle si la totalisation EEE ne suffit pas pour le taux plein.
     *   *La pension communautaire (proratisée) :* La caisse calcule une pension "théorique" comme si toute la carrière (France + Étranger) avait été faite en France, puis proratise ce montant selon la formule : `(Pension Théorique) * (Durée Française / Durée Totale UE)`.
 
-Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. Un vote en plénière est attendu les 7 ou 8 juillet 2026 pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
+Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Le vote en plénière a eu lieu le 7 juillet 2026, pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026.
 
 ## 2. Carrière hors EEE (Pays avec Convention Bilatérale)
 La France a signé des conventions de Sécurité Sociale avec une quarantaine de pays (ex: États-Unis, Canada, Japon, Maroc...).
@@ -46,9 +46,11 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
     *   **Circulaire Cnav 2026/17 du 12 juin 2026** : Porte sur la retraite anticipée pour carrière longue (RACL) pour les retraites prenant effet à compter du 1er septembre 2026.
     *   **Circulaire Cnav 2026/18 du 15 juin 2026** : Relatif à la retraite anticipée au profit des assurés handicapés (RAAH) à compter du 1er septembre 2026.
 *   **Circulaires Agirc-Arrco :**
-    *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites.
+    *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites. Elle supprime notamment les coefficients de solidarité et majorants, et instaure l'acquisition de droits à retraite complémentaire au titre des périodes d'activité des bénéficiaires du dispositif de cumul emploi-retraite.
     *   **Circulaire Agirc-Arrco 2023-10-DT du 9 novembre 2023** : Arrête les paramètres du régime 2023-2024, y compris la valeur de service et la valeur d'achat du point, et la suppression du coefficient de solidarité.
-    *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** : Concerne la retraite progressive 2026.
-*   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC, soit 1 803 € brut. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 212 € est requis.
+    *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Concerne la retraite progressive 2026.
+*   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC.
+    *   Du 1er janvier 2026 au 31 mai 2026 (SMIC horaire brut à 12,02 €) : 1 803 € brut pour un trimestre, et 7 212 € brut pour 4 trimestres.
+    *   À compter du 1er juin 2026 (SMIC horaire brut à 12,31 €) : 1 846,50 € brut pour un trimestre, et 7 386 € brut pour 4 trimestres.
 
-**Date de mise à jour :** 4 juillet 2026.
+**Date de mise à jour :** 26 juillet 2026.

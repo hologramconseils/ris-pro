@@ -6,13 +6,15 @@ Ce document détaille les conditions d'attribution des pensions de réversion (d
 La pension de réversion du régime de base correspond à **54%** de la retraite que percevait (ou aurait perçu) le conjoint décédé. Son montant minimal garanti est de 334,92 € par mois en 2026, si le défunt a cotisé au moins 60 trimestres. Le montant maximal de la pension de réversion pour le régime général est fixé à 1 081,35 € par mois en 2026.
 
 ### Conditions d'attribution :
-- **Lien matrimonial :** Il faut avoir été **marié(e)** avec la personne décédée. Le PACS et le concubinage n'ouvrent AUCUN droit à la réversion dans le système français.
+- **Lien matrimonial :** Il faut avoir été **marié(e)** avec la personne décédée. Le PACS et le concubinage n'ouvrent AUCUN droit à la réversion dans le système français pour le régime général.
 - **Âge :** Le conjoint survivant doit avoir au moins **55 ans**.
 - **Ressources :** La réversion de base est soumise à des conditions de ressources. Pour une demande en 2026, les ressources annuelles brutes du survivant ne doivent pas dépasser un plafond fixé par décret :
     - **25 001,60 €** pour une personne seule.
     - **40 002,56 €** pour une personne vivant en couple (si le survivant s'est remarié, pacsé ou vit en concubinage).
     Dans le calcul des ressources, 70% des revenus professionnels sont pris en compte (un abattement de 30% s'applique après 55 ans), ainsi que 3% de la valeur des biens immobiliers (hors résidence principale et exploitation agricole) et des placements. Les allocations chômage, indemnités journalières, RSA et AAH sont comptabilisées. Les aides au logement et prestations familiales ne sont pas comptabilisées.
+- **Résidence :** Une condition de résidence stable en France ou dans certaines collectivités d'outre-mer est requise.
 - **Remariage :** Au régime général, le fait d'être remarié n'annule pas le droit à la réversion, mais les revenus du nouveau conjoint sont pris en compte dans le plafond de ressources.
+- **Majoration de 11,1% :** Une majoration de 11,1 % peut être appliquée si le bénéficiaire a atteint l'âge de la retraite à taux plein (67 ans), a fait valoir tous ses droits à la retraite et que le total de ses retraites ne dépasse pas un plafond de ressources trimestriel de 3 020,07 € (soit 1 006,69 € par mois en 2026).
 
 ## 2. Pluralité de mariages (Divorces)
 Si le défunt a été marié plusieurs fois :
@@ -27,6 +29,7 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 - **Ressources :** La réversion Agirc-Arrco est accordée **sans aucune condition de ressources**.
 - **Remariage :** Attention, en cas de remariage du conjoint survivant, le droit à la réversion Agirc-Arrco est **définitivement annulé** (contrairement au régime de base).
 - **Valeur du point :** La valeur de service du point Agirc-Arrco est gelée à 1,4386 € jusqu'au 31 octobre 2026.
+- **Orphelins :** Extension de la pension de réversion aux orphelins sous certaines conditions.
 
 ## 4. Fonction Publique (SRE / CNRACL)
 - **Taux :** 50% de la pension du fonctionnaire.
@@ -42,3 +45,7 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 - La Loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 a apporté des modifications à l'âge légal de départ à la retraite, mais n'a pas directement modifié les conditions d'attribution des pensions de réversion.
 - Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur.
 - **Mise à jour du 04/07/2026** : Le montant maximal de la pension de réversion du régime général est de 1 081,35 € par mois en 2026.
+- **Loi de finances pour 2026 (non citée spécifiquement par numéro/date exacte dans les snippets, mais son contenu est rapporté par la presse juridique)** : Ajout d'une condition de résidence stable en France ou dans certaines collectivités d'outre-mer pour bénéficier de la pension de réversion du régime général.
+- **Réforme entrée en vigueur en 2026 (date exacte non précisée dans les snippets, mais rapportée par la presse juridique)** : Extension de la pension de réversion aux orphelins du régime général et de l'Agirc-Arrco sous certaines conditions.
+
+Date de mise à jour : 26 juillet 2026
