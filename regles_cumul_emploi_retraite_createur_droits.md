@@ -37,11 +37,24 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
 
+## Évolutions du Cumul Emploi-Retraite créateur de droits à compter du 1er janvier 2027
+
+La Loi de financement de la Sécurité sociale pour 2026 (Loi n°2025-1403 du 30 décembre 2025) introduit des modifications substantielles au dispositif du cumul emploi-retraite pour toute première liquidation de pension de retraite de base intervenant à compter du 1er janvier 2027.
+
+Ces nouvelles règles simplifieront le cumul emploi-retraite en se basant uniquement sur l'âge de l'assuré, abandonnant la distinction actuelle entre cumul intégral et cumul plafonné basée sur l'obtention du taux plein.
+
+Principaux changements :
+*   **Acquisition de nouveaux droits :** L'acquisition de nouveaux droits à une seconde pension sera principalement réservée aux assurés qui poursuivent ou reprennent une activité professionnelle à partir de l'âge du taux plein automatique, fixé à 67 ans. Les retraités âgés entre l'âge légal et 67 ans pourraient ne plus créer de nouveaux droits à pension sur les périodes travaillées.
+*   **Plafonnement de la seconde pension de base :** Pour les pensions liquidées sous ce nouveau régime, le plafonnement de la seconde pension de base à 5 % du Plafond Annuel de la Sécurité Sociale (PASS) est supprimé.
+
+Ces évolutions visent à inciter les assurés à se maintenir en activité jusqu'à 67 ans.
+
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
 *   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
 *   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Loi n°2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (article 102).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 26 juillet 2026.
