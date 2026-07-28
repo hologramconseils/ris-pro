@@ -4,10 +4,26 @@ Ce document rassemble les règles dérogatoires ou spécifiques pour les régime
 
 ## 1. Sécurité Sociale des Indépendants (SSI)
 Anciennement RSI, ce régime s'applique aux artisans, commerçants et industriels.
-- **Règles générales :** Depuis l'alignement (LURA), la retraite de base de la SSI fonctionne de manière identique à celle des salariés (calcul sur les 25 meilleures années, même âge légal, mêmes conditions de trimestres). L'âge légal de départ à la retraite est progressivement relevé de 62 à 64 ans, avec une augmentation de trois mois par année de naissance à partir du 1er septembre 2023. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour les générations nées entre 1964 et 1968, avec une réduction de trois mois de l'âge légal initialement prévu pour ces générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. Par exemple, l'âge légal pour les assurés nés en 1964 est désormais fixé à 62 ans et 9 mois (au lieu de 63 ans), et pour ceux nés entre le 1er janvier et le 31 mars 1965, il est également de 62 ans et 9 mois (au lieu de 63 ans et 3 mois). Pour les générations nées à partir de 1969, l'âge légal reste fixé à 64 ans. La durée de cotisation requise pour une retraite à taux plein est également progressivement augmentée à 172 trimestres (43 ans) pour les générations nées à partir de 1965, mais elle a été **réduite pour certaines générations par la LFSS 2026** : 170 trimestres pour 1964 et pour les générations nées entre le 1er janvier et le 31 mars 1965, 171 trimestres pour celles nées entre le 1er avril et le 31 décembre 1965. Pour les générations nées à partir de 1966, elle demeure à 172 trimestres.
+- **Règles générales :** Depuis l'alignement (LURA), la retraite de base de la SSI fonctionne de manière identique à celle des salariés (calcul sur les 25 meilleures années, même âge légal, mêmes conditions de trimestres). L'âge légal de départ à la retraite est progressivement relevé de 62 à 64 ans, avec une augmentation de trois mois par année de naissance à partir du 1er septembre 2023. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour certaines générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. L'âge légal est fixé comme suit:
+    *   62 ans et 9 mois pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   62 ans et 6 mois pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   62 ans et 9 mois pour les assurés nés en 1966.
+    *   63 ans pour les assurés nés en 1967.
+    *   63 ans et 3 mois pour les assurés nés en 1968.
+    *   63 ans et 6 mois pour les assurés nés en 1969.
+    *   63 ans et 9 mois pour les assurés nés en 1970.
+    *   64 ans pour les assurés nés à partir de 1971.
+La durée de cotisation requise pour une retraite à taux plein a également été **modifiée pour certaines générations par la LFSS 2026**:
+    *   166 trimestres pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   167 trimestres pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   168 trimestres pour les assurés nés en 1966.
+    *   169 trimestres pour les assurés nés en 1967.
+    *   170 trimestres pour les assurés nés en 1968, 1969 et 1970.
+    *   171 trimestres pour les assurés nés en 1971, 1972 et 1973.
+    *   172 trimestres pour les assurés nés à partir de 1974.
 - **Artisans/Commerçants avant 1973 :** Le calcul des retraites pour les périodes antérieures à 1973 utilise un système par points et non par trimestres/salaires.
 - **Retraite complémentaire (RCI) :** Contrairement à l'Agirc-Arrco, la RCI est gérée par la Sécurité Sociale. C'est un régime par points.
-- **Cumul emploi-retraite :** Le cumul emploi-retraite intégral permet l'acquisition de nouveaux droits à la retraite, sous réserve de remplir les conditions d'une retraite à taux plein et d'avoir liquidé toutes ses pensions. Cependant, les règles du cumul emploi-retraite sont **profondément modifiées à partir du 1er janvier 2027**, et dépendront de l'âge de l'assuré :
+- **Cumul emploi-retraite :** Le cumul emploi-retraite intégral permet l'acquisition de nouveaux droits à la retraite, sous réserve de remplir les conditions d'une retraite à taux plein et d'avoir liquidé toutes ses pensions. Cependant, les règles du cumul emploi-retraite sont **profondément modifiées à partir du 1er janvier 2027**, et dépendront de l'âge de l'assuré:
     *   **Avant l'âge légal de départ à la retraite :** Les montants du revenu d'activité professionnelle seront déduits en totalité de la pension de retraite.
     *   **Entre l'âge légal de départ et l'âge du taux plein automatique (67 ans) :** Le cumul sera plafonné à un seuil annuel (estimé à 7 000 euros), avec un écrêtement des pensions au-delà de ce seuil.
     *   **À partir de 67 ans (âge du taux plein automatique) :** Le cumul intégral de la pension et des revenus d'activité sera possible sans plafond, et l'acquisition de nouveaux droits à retraite se poursuivra. Ces nouvelles règles s'appliqueront uniquement aux personnes qui commencent un cumul emploi-retraite à compter du 1er janvier 2027.
@@ -16,7 +32,24 @@ Anciennement RSI, ce régime s'applique aux artisans, commerçants et industriel
 Les professions libérales (médecins, avocats, experts-comptables, architectes...) ont un régime de base commun (CNAVPL) et des régimes complémentaires distincts selon leur métier (CARMF, CNBF, CAVMAC...).
 - **Retraite de Base par points :** Le régime de base des libéraux est intégralement un régime par points (il n'y a pas de calcul sur "les 25 meilleures années"). Le Décret n° 2023-799 du 21 août 2023 a relevé le taux de surcote du régime des professions libérales.
 - **Trimestres :** Les libéraux valident néanmoins des trimestres (selon le niveau de chiffre d'affaires) pour déterminer la durée d'assurance globale et appliquer ou non une décote sur le taux plein.
-- **La réforme de 2023 :** Maintien de l'âge légal aligné sur le régime général (décalage progressif vers 64 ans). L'âge légal de départ est progressivement relevé de 62 à 64 ans à partir du 1er septembre 2023, avec une augmentation de trois mois par année de naissance. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour les générations nées entre 1964 et 1968, avec une réduction de trois mois de l'âge légal initialement prévu pour ces générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. Pour les générations nées à partir de 1969, l'âge légal reste fixé à 64 ans. La durée de cotisation requise pour une retraite à taux plein a également été **réduite pour certaines générations par la LFSS 2026**. L'âge d'annulation de la décote reste fixé à 67 ans.
+- **La réforme de 2023 :** Maintien de l'âge légal aligné sur le régime général (décalage progressif vers 64 ans). L'âge légal de départ est progressivement relevé de 62 à 64 ans à partir du 1er septembre 2023, avec une augmentation de trois mois par année de naissance. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour certaines générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. L'âge légal est fixé comme suit:
+    *   62 ans et 9 mois pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   62 ans et 6 mois pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   62 ans et 9 mois pour les assurés nés en 1966.
+    *   63 ans pour les assurés nés en 1967.
+    *   63 ans et 3 mois pour les assurés nés en 1968.
+    *   63 ans et 6 mois pour les assurés nés en 1969.
+    *   63 ans et 9 mois pour les assurés nés en 1970.
+    *   64 ans pour les assurés nés à partir de 1971.
+La durée de cotisation requise pour une retraite à taux plein a également été **modifiée pour certaines générations par la LFSS 2026**:
+    *   166 trimestres pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   167 trimestres pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   168 trimestres pour les assurés nés en 1966.
+    *   169 trimestres pour les assurés nés en 1967.
+    *   170 trimestres pour les assurés nés en 1968, 1969 et 1970.
+    *   171 trimestres pour les assurés nés en 1971, 1972 et 1973.
+    *   172 trimestres pour les assurés nés à partir de 1974.
+L'âge d'annulation de la décote reste fixé à 67 ans.
 - **Retraite progressive :** Le dispositif de retraite progressive a été étendu aux professionnels libéraux et avocats. Il est désormais **accessible dès 60 ans pour tous**, quelle que soit l'année de naissance, pour les retraites progressives prenant effet à compter du 1er septembre 2025. Les conditions incluent au moins 150 trimestres validés tous régimes de base confondus, et une activité comprise entre 40% et 80% d'un temps plein.
 - **Cumul emploi-retraite :** Le cumul emploi-retraite intégral permet désormais l'acquisition de nouveaux droits à la retraite, sous réserve de remplir les conditions d'une retraite à taux plein et d'avoir liquidé toutes ses pensions. Les règles concernant le cumul emploi-retraite sont **modifiées à partir du 1er janvier 2027**, comme détaillé pour les indépendants ci-dessus.
 
@@ -29,8 +62,24 @@ SRE (Service des Retraites de l'État) pour les fonctionnaires d'État, Magistra
 
 ### Calcul de la pension
 - La formule est : `(Traitement de référence) x (Pourcentage maximum, ex: 75%) x (Trimestres acquis fonction publique / Trimestres requis pour la génération)`.
-- **Bonifications :** Des trimestres supplémentaires gratuits (bonifications) peuvent s'ajouter pour les enfants nés avant 2004 (à condition d'avoir interrompu son activité au moins 2 mois). Les conditions précises de ces bonifications de durée pour enfants ont été modifiées par la réforme de 2023 et doivent être vérifiées individuellement. Par ailleurs, une majoration de 10 % de la pension est accordée aux parents d'au moins 3 enfants pour les pensions prenant effet à partir du 1er septembre 2023. **La Loi de financement de la sécurité sociale pour 2026 (LFSS 2026) a introduit de nouvelles mesures familiales applicables aux pensions prenant effet à compter du 1er septembre 2026 : les femmes fonctionnaires ou militaires ayant accouché après leur recrutement et après le 1er janvier 2004 bénéficieront de 1 trimestre de bonification par enfant et de 2 trimestres de majoration de durée d'assurance.** De plus, un nouveau congé supplémentaire de naissance sera accordé aux parents pour les enfants nés ou adoptés à partir du 1er janvier 2026 et sera pris en compte pour le calcul de la retraite. D'autres bonifications existent pour le service hors Europe ou pour les services aériens/sous-marins.
-- **Âge légal et durée d'assurance :** L'âge légal de départ à la retraite est progressivement relevé de 62 à 64 ans, avec une augmentation de trois mois par année de naissance à partir du 1er septembre 2023. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour les générations nées entre 1964 et 1968, avec une réduction de trois mois de l'âge légal initialement prévu pour ces générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. Pour les générations nées à partir de 1969, l'âge légal reste fixé à 64 ans. La durée de cotisation requise pour une retraite à taux plein est progressivement portée à 172 trimestres (43 ans) pour les générations nées à partir de 1965, mais elle a été **réduite pour certaines générations par la LFSS 2026**.
+- **Bonifications :** Des trimestres supplémentaires gratuits (bonifications) peuvent s'ajouter pour les enfants nés avant 2004 (à condition d'avoir interrompu son activité au moins 2 mois). Les conditions précises de ces bonifications de durée pour enfants ont été modifiées par la réforme de 2023 et doivent être vérifiées individuellement. Par ailleurs, une majoration de 10 % de la pension est accordée aux parents d'au moins 3 enfants pour les pensions prenant effet à partir du 1er septembre 2023. La Loi de financement de la sécurité sociale pour 2026 (LFSS 2026) a introduit de nouvelles mesures familiales applicables aux pensions prenant effet à compter du 1er septembre 2026 : les femmes fonctionnaires ou militaires ayant accouché après leur recrutement et après le 1er janvier 2004 bénéficieront de 1 trimestre de bonification par enfant et de 2 trimestres de majoration de durée d'assurance. De plus, un nouveau congé supplémentaire de naissance sera accordé aux parents pour les enfants nés ou adoptés à partir du 1er janvier 2026 et sera pris en compte pour le calcul de la retraite. Ce congé pourra donner lieu à la validation d'un trimestre "assimilé" si la période de congé donne lieu à indemnisation journalière et atteint le seuil requis pour valider un trimestre. Une majoration de durée d'assurance est également accordée aux sapeurs-pompiers volontaires : 1 trimestre à partir de 10 ans d'engagement, 2 trimestres à partir de 20 ans, et 3 trimestres au-delà de 25 ans d'engagement. Ces dispositions s'appliquent aux pensions prenant effet à compter du 1er juillet 2026. D'autres bonifications existent pour le service hors Europe ou pour les services aériens/sous-marins.
+- **Âge légal et durée d'assurance :** L'âge légal de départ à la retraite est progressivement relevé de 62 à 64 ans, avec une augmentation de trois mois par année de naissance à partir du 1er septembre 2023. Cependant, la Loi de financement de la sécurité sociale pour 2026 a **ralenti ce relèvement pour certaines générations**, applicable aux pensions prenant effet à compter du 1er septembre 2026. L'âge légal est fixé comme suit:
+    *   62 ans et 9 mois pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   62 ans et 6 mois pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   62 ans et 9 mois pour les assurés nés en 1966.
+    *   63 ans pour les assurés nés en 1967.
+    *   63 ans et 3 mois pour les assurés nés en 1968.
+    *   63 ans et 6 mois pour les assurés nés en 1969.
+    *   63 ans et 9 mois pour les assurés nés en 1970.
+    *   64 ans pour les assurés nés à partir de 1971.
+La durée de cotisation requise pour une retraite à taux plein a également été **modifiée pour certaines générations par la LFSS 2026**:
+    *   166 trimestres pour les assurés nés en 1964 et ceux nés entre le 1er janvier et le 30 septembre 1965.
+    *   167 trimestres pour les assurés nés entre le 1er octobre et le 31 décembre 1965.
+    *   168 trimestres pour les assurés nés en 1966.
+    *   169 trimestres pour les assurés nés en 1967.
+    *   170 trimestres pour les assurés nés en 1968, 1969 et 1970.
+    *   171 trimestres pour les assurés nés en 1971, 1972 et 1973.
+    *   172 trimestres pour les assurés nés à partir de 1974.
 - **Retraite progressive :** Le dispositif de retraite progressive a été étendu aux fonctionnaires de la fonction publique territoriale et hospitalière, ainsi qu'aux ouvriers de l'État. Il est désormais **accessible dès 60 ans pour tous**, quelle que soit l'année de naissance, pour les retraites progressives prenant effet à compter du 1er septembre 2025. Pour les fonctionnaires, la quotité de travail à temps partiel doit être comprise entre 50% et 90%.
 - **Cumul emploi-retraite :** Le cumul emploi-retraite intégral permet désormais l'acquisition de nouveaux droits à la retraite pour les fonctionnaires, sous réserve de remplir les conditions d'une retraite à taux plein et d'avoir liquidé toutes leurs pensions. Les règles concernant le cumul emploi-retraite sont **modifiées à partir du 1er janvier 2027**, comme détaillé pour les indépendants ci-dessus.
 
@@ -54,5 +103,7 @@ Les fonctionnaires ayant un emploi présentant un "risque particulier ou des fat
 *   **Circulaire Cnav 2026/17 du 12 juin 2026** relative à la retraite anticipée pour carrière longue à compter du 1er septembre 2026.
 *   **Circulaire Cnav 2026/18 du 15 juin 2026** relative à la retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.
 *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** sur la retraite progressive 2026.
+*   **Circulaire Cnav 2026/21 du 23 juillet 2026** Salaires forfaitaires HCR de 1ère catégorie au 01/06/2026.
+*   **Circulaire Cnav 2026/22 du 23 juillet 2026** Majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire.
 
-Date de mise à jour : July 4, 2026.
+Date de mise à jour : July 28, 2026.
