@@ -17,7 +17,7 @@ L’âge légal de départ augmente progressivement de 62 ans à 64 ans, avec de
 | **Entre le 01/09 et le 31/12/1961** | 62 ans et 3 mois |
 | **1962** | 62 ans et 6 mois |
 | **1963** | 62 ans et 9 mois |
-| **1964** | 62 ans et 9 mois |
+| **1964** | 62 ans et 3 mois |
 | **Entre le 01/01 et le 30/09/1965** | 62 ans et 3 mois |
 | **Entre le 01/10 et le 31/12/1965** | 62 ans et 6 mois |
 | **1966** | 62 ans et 9 mois |
@@ -38,7 +38,7 @@ La durée d'assurance requise pour obtenir une retraite au taux plein a égaleme
 | **Entre le 01/09 et le 31/12/1961** | 169 trimestres |
 | **1962** | 169 trimestres |
 | **1963** | 170 trimestres |
-| **1964** | 170 trimestres |
+| **1964** | 166 trimestres |
 | **Entre le 01/01 et le 30/09/1965** | 166 trimestres |
 | **Entre le 01/10 et le 31/12/1965** | 167 trimestres |
 | **1966** | 168 trimestres |
@@ -56,7 +56,7 @@ La granularité par mois de naissance a été ajoutée à la méthode de project
 
 ### Mises à jour réglementaires
 
-Les informations de ce document ont été mises à jour le 04 juillet 2026 pour refléter les modifications apportées par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et ses décrets et circulaires d'application, notamment :
+Les informations de ce document ont été mises à jour le 29 juillet 2026 pour refléter les modifications apportées par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et ses décrets et circulaires d'application, notamment :
 
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** : Cette loi (n° 2025-1403 du 30 décembre 2025) a introduit une "suspension" partielle de la trajectoire d'allongement de la durée de cotisation et a ralenti le relèvement de l'âge légal pour certaines générations (notamment 1964 à 1970), applicable aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire Cnav 2026-07 du 5 mars 2026** : Précise les nouvelles dispositions concernant l'âge légal et la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026, annulant et remplaçant les circulaires précédentes pour cette période. Ce document a été révisé pour intégrer précisément les données de cette circulaire pour l'âge légal et le nombre de trimestres requis.
