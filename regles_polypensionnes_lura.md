@@ -28,17 +28,17 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 
     | Année de naissance     | Âge légal de départ à la retraite | Durée d'assurance requise pour le taux plein (en trimestres) |
     | :--------------------- | :------------------------------- | :----------------------------------------------------------- |
-    | Avant 01/09/1961       | 62 ans                           | 167 (1960) / 168 (Jan-Août 1961)                              |
-    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                                          |
-    | 1962                   | 62 ans et 6 mois                | 169                                                          |
-    | 1963                   | 62 ans et 9 mois                | 170                                                          |
-    | 1964                   | 62 ans et 9 mois                | 170                                                          |
-    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                          |
-    | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
-    | 1966                   | 63 ans et 3 mois                | 172                                                          |
-    | 1967                   | 63 ans et 6 mois                | 172                                                          |
-    | 1968                   | 63 ans et 9 mois                | 172                                                          |
-    | 1969 et après          | 64 ans                           | 172                                                          |
+    | Avant 01/09/1961       | 62 ans                           | 167 (1960) / 168 (Jan-Août 1961) |
+    | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169 |
+    | 1962                   | 62 ans et 6 mois                | 169 |
+    | 1963                   | 62 ans et 9 mois                | 170 |
+    | 1964                   | 62 ans et 9 mois                | 170 |
+    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170 |
+    | Avril à Décembre 1965  | 63 ans                           | 171 |
+    | 1966                   | 63 ans et 3 mois                | 172 |
+    | 1967                   | 63 ans et 6 mois                | 172 |
+    | 1968                   | 63 ans et 9 mois                | 172 |
+    | 1969 et après          | 64 ans                           | 172 |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
 
@@ -56,7 +56,6 @@ Le dispositif de retraite progressive, permettant de travailler à temps partiel
 *   **Décrets n° 2026-344 et n° 2026-345 du 7 mai 2026** mettant en œuvre les dispositions de l'article 105 de la LFSS 2026, applicables aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
 *   **Circulaire CNAV 2026/17 du 12 juin 2026** et **Circulaire CNAV 2026/18 du 15 juin 2026** précisant les conditions de retraite anticipée pour carrière longue et au profit des assurés handicapés à compter du 1er septembre 2026.
-*   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à compter du 1er janvier 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
 *   Les règles du dispositif de **cumul emploi-retraite** sont modifiées pour les salariés partant à la retraite après le 1er janvier 2027, exigeant la liquidation de toutes les retraites (base et complémentaires) pour pouvoir cumuler emploi et retraite, avec des règles d'écrêtement de la pension en fonction de l'âge et des revenus d'activité.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 30 juillet 2026.

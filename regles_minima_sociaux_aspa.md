@@ -65,12 +65,20 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Loi de financement de la sécurité sociale (LFSS) pour 2024 (27 décembre 2023)** : Extension du seuil de recouvrement de l'ASPA à 150 000€ à Saint-Martin et Saint-Barthélémy pour les décès survenus à compter du 1er janvier 2024.
 *   **Circulaire Cnav du 5 avril 2024** : Rappel des montants du seuil de recouvrement de l'ASPA sur succession au 1er janvier 2024.
 *   **Circulaire Cnav 2025-21 du 31 juillet 2025** : Service de l'allocation de solidarité aux personnes âgées (SASPA).
+*   **Circulaire Agirc-Arrco 2025-16-SG-DRJ (30 octobre 2025)** : Paramètres 2026.
 *   **Circulaire Cnav 2025-29 du 22 décembre 2025** : Revalorisation des montants et plafonds de l'ASPA au 1er janvier 2026.
 *   **Circulaire Cnav n° 2025-34 du 23 décembre 2025** : Revalorisation des montants du MICO au 1er janvier 2026.
 *   **Loi de financement de la sécurité sociale (LFSS) pour 2026 (promulguée fin décembre 2025)** : Suspension/décalage du calendrier de relèvement de l'âge légal et de la durée d'assurance de la réforme des retraites de 2023, applicable à partir du 1er septembre 2026.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ (16 janvier 2026)** : Retraite progressive 2026.
+*   **Circulaire Agirc-Arrco 2026-2-SG** : Calendrier des Instances Agirc-Arrco 2027.
 *   **Circulaire Cnav 2026-3 du 1er février 2026 (ou Circulaire CNAV du 28 janvier 2026)** : Précisions sur les paramètres financiers 2026 et revalorisation de l'ASPA de 0,9% au 1er janvier 2026.
 *   **Circulaire Cnav 2026-07 du 05 mars 2026** : Précisions sur l'âge d'ouverture du droit à la retraite et la durée d'assurance requise à compter du 1er septembre 2026, remplaçant la circulaire Cnav 2024-25.
 *   **Décret n° 2026-344 du 7 mai 2026** et **Décret n° 2026-345 du 7 mai 2026** : Application de la LFSS 2026 concernant l'âge d'ouverture des droits et la durée d'assurance requise pour certains assurés sociaux, notamment pour les carrières longues et travailleurs handicapés, à compter du 1er septembre 2026.
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026-18 du 15 juin 2026** : Retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.
+*   **Circulaire Cnav 2026-21 du 23 juillet 2026** : Salaires forfaitaires HCR de 1ère catégorie au 01/06/2026.
+*   **Circulaire Cnav 2026-22 du 23 juillet 2026** : Majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire.
+
+**Date de mise à jour : 30 juillet 2026**

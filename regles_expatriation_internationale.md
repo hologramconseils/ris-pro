@@ -11,7 +11,7 @@ La coordination européenne s'applique pour garantir qu'aucun trimestre cotisé 
     *   *La pension nationale :* Calculée uniquement sur les années et salaires français, avec la décote éventuelle si la totalisation EEE ne suffit pas pour le taux plein.
     *   *La pension communautaire (proratisée) :* La caisse calcule une pension "théorique" comme si toute la carrière (France + Étranger) avait été faite en France, puis proratise ce montant selon la formule : `(Pension Théorique) * (Durée Française / Durée Totale UE)`.
 
-Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. Un vote en plénière est attendu les 7 ou 8 juillet 2026 pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
+Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026. Cet accord a été validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Le Parlement européen a adopté en séance plénière la révision de ces règlements de coordination des systèmes nationaux de sécurité sociale le 7 juillet 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. L'entrée en application est prévue pour l'automne 2026.
 
 ## 2. Carrière hors EEE (Pays avec Convention Bilatérale)
 La France a signé des conventions de Sécurité Sociale avec une quarantaine de pays (ex: États-Unis, Canada, Japon, Maroc...).
@@ -34,7 +34,10 @@ Un assuré de nationalité française ayant travaillé à l'étranger peut, sous
 L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres travaillés à l'étranger sont directement validés par le Régime Général français (CNAV), exactement comme s'il travaillait en France. Il n'y a alors pas de calcul de proratisation international pour ces périodes.
 *   L'adhésion à l'assurance vieillesse volontaire de la CFE permet de valider des trimestres pour la **retraite de base** uniquement.
 *   Les cotisations à la CFE ne génèrent **pas de points Agirc-Arrco**. Toutefois, les salariés expatriés peuvent adhérer volontairement au régime complémentaire Agirc-Arrco International, sous certaines conditions (notamment avoir déjà cotisé au régime Agirc-Arrco pendant au moins six mois ou être affilié à la CFE pour la retraite de base).
-*   La pension issue des cotisations CFE est plafonnée (par exemple, à 2 002,5 € brut/mois maximum en 2026, basée sur 50% du Plafond Annuel de la Sécurité Sociale 2026). Les barèmes de cotisation pour la retraite à la CFE dépendent des ressources annuelles et sont mis à jour (par exemple, au 1er janvier 2026, la base de calcul pour des ressources égales ou supérieures à 48 060 € était de 48 060 € pour une cotisation trimestrielle de 2 148 € pour la catégorie maximale).
+*   La pension issue des cotisations CFE est plafonnée (par exemple, à 2 002,5 € brut/mois maximum en 2026, basée sur 50% du Plafond Mensuel de la Sécurité Sociale 2026). Le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 est de 48 060 € et le Plafond Mensuel de la Sécurité Sociale (PMSS) est de 4 005 €. Les barèmes de cotisation pour la retraite à la CFE dépendent des ressources annuelles et sont mis à jour (par exemple, au 1er janvier 2026, la base de calcul pour des ressources égales ou supérieures à 48 060 € était de 48 060 € pour une cotisation trimestrielle de 2 148 € pour la catégorie maximale).
+
+### Règles de validation des trimestres (2026)
+Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC. Au 1er juin 2026, le SMIC horaire brut est passé à 12,31 €, soit 1 846,50 € brut pour valider un trimestre. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 386 € est requis.
 
 ### Mises à jour réglementaires
 *   **Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026)**, promulguée le 30 décembre 2025 et publiée au Journal officiel du 31 décembre 2025: Introduit la suspension du calendrier d'augmentation progressive de l'âge légal de départ à la retraite et du nombre de trimestres requis pour la retraite à taux plein, à compter du 1er septembre 2026 jusqu'au 1er janvier 2028. Cela ralentit l'augmentation progressive de l'âge légal de départ à la retraite, qui ne s'appliquera à 64 ans qu'aux personnes nées à partir de 1969. Pour les générations nées entre 1964 et 1968, l'âge légal variera entre 62 ans et 9 mois et 63 ans et 9 mois. Elle assouplit également le système de retraite anticipée pour carrières longues pour les personnes nées entre 1964 et 1968.
@@ -45,10 +48,10 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
     *   **Circulaire Cnav 2026/16 du 12 juin 2026** : Concerne la revalorisation du Smic au 1er juin 2026 et ses incidences en matière de législation vieillesse.
     *   **Circulaire Cnav 2026/17 du 12 juin 2026** : Porte sur la retraite anticipée pour carrière longue (RACL) pour les retraites prenant effet à compter du 1er septembre 2026.
     *   **Circulaire Cnav 2026/18 du 15 juin 2026** : Relatif à la retraite anticipée au profit des assurés handicapés (RAAH) à compter du 1er septembre 2026.
+    *   **Circulaire Cnav 2026-21 du 23 juillet 2026** : Concerne la revalorisation du SMIC au 1er juin 2026 et ses conséquences sur les bases forfaitaires des salariés des hôtels, cafés et restaurants (HCR) rémunérés aux pourboires.
 *   **Circulaires Agirc-Arrco :**
     *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites.
     *   **Circulaire Agirc-Arrco 2023-10-DT du 9 novembre 2023** : Arrête les paramètres du régime 2023-2024, y compris la valeur de service et la valeur d'achat du point, et la suppression du coefficient de solidarité.
     *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** : Concerne la retraite progressive 2026.
-*   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC, soit 1 803 € brut. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 212 € est requis.
 
-**Date de mise à jour :** 4 juillet 2026.
+**Date de mise à jour :** 30 juillet 2026.
