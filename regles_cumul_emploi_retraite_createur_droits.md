@@ -37,11 +37,16 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
 
+### Évolutions Législatives Prévues à compter du 1er janvier 2027
+
+À compter du 1er janvier 2027, la Loi de financement de la Sécurité sociale pour 2026 (publiée en fin d'année 2025) modifie les règles du cumul emploi-retraite créateur de nouveaux droits. La distinction entre cumul intégral et cumul plafonné sera remplacée par une approche principalement basée sur l'âge. Seuls les assurés ayant atteint l'âge d'obtention du taux plein automatique (généralement 67 ans) pourront continuer à cumuler intégralement leur pension de retraite et leurs revenus d'activité sans plafond, tout en acquérant de nouveaux droits à retraite pour les périodes travaillées après leur retraite. Pour les assurés liquidant leur retraite avant cet âge (même avec la durée d'assurance requise pour le taux plein), les conditions d'acquisition de nouveaux droits seront restreintes, voire supprimées dans certains cas, basculant vers un cumul plafonné sans création de droits nouveaux si les conditions d'âge ne sont pas remplies.
+
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
 *   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
 *   **Arrêté fixant le Plafond Annuel de la Sécurité Sociale (PASS) pour 2026**.
+*   **Loi de financement de la Sécurité sociale pour 2026** (publiée en fin d'année 2025, modifiant les règles à compter du 1er janvier 2027).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 30 juillet 2026.
