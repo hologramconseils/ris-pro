@@ -15,6 +15,7 @@ test_env/
 *.md
 !README.md
 !regles_*.md
+!CLAUDE.md
 
 # Node
 node_modules/
