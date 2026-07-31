@@ -3,7 +3,7 @@ import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
@@ -100,7 +100,21 @@ export default async function handler(req, res) {
 
     let analysisResults = null;
 
-    if (analysisRecord && analysisRecord.status === 'completed' && analysisRecord.results && !analysisRecord.results.is_restricted) {
+    // Un résultat "completed" dégénéré (extraction passée précédemment vide malgré un
+    // document valide) ne doit jamais être resservi indéfiniment : on force une nouvelle
+    // analyse plutôt que d'afficher éternellement un bilan à 0 trimestre / 0 anomalie.
+    const isDegenerateResult = (results) =>
+      !(Number(results.trimestres_valides) > 0) &&
+      (!Array.isArray(results.action_plan) || results.action_plan.length === 0) &&
+      (!Array.isArray(results.anomalies) || results.anomalies.length === 0);
+
+    if (
+      analysisRecord &&
+      analysisRecord.status === 'completed' &&
+      analysisRecord.results &&
+      !analysisRecord.results.is_restricted &&
+      !isDegenerateResult(analysisRecord.results)
+    ) {
       analysisResults = analysisRecord.results;
     } else {
       
@@ -206,14 +220,32 @@ export default async function handler(req, res) {
         }
       });
 
-      const extractorResult = await extractorModel.generateContent([
-        { inlineData: { data: base64Data, mimeType: "application/pdf" } },
-        { text: extractorPrompt }
-      ]);
+      const runExtraction = async () => {
+        const extractorResult = await extractorModel.generateContent([
+          { inlineData: { data: base64Data, mimeType: "application/pdf" } },
+          { text: extractorPrompt }
+        ]);
+        return JSON.parse(extractorResult.response.text());
+      };
 
-      const extractedData = JSON.parse(extractorResult.response.text());
+      let extractedData = await runExtraction();
       if (!extractedData.is_valid_document) {
         throw new Error("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+      }
+
+      // Un document valide doit contenir au moins un total global ou une synthèse par année.
+      // Si l'extraction est vide malgré is_valid_document=true, l'IA a échoué silencieusement :
+      // on retente une fois avant d'échouer explicitement plutôt que de produire un bilan à 0.
+      const isExtractionEmpty = (data) =>
+        !(data.total_trimestres_enregistres > 0) &&
+        !(Array.isArray(data.synthese_annees) && data.synthese_annees.length > 0);
+
+      if (isExtractionEmpty(extractedData)) {
+        console.warn("[Extracteur] Extraction vide malgré un document valide, nouvelle tentative...");
+        extractedData = await runExtraction();
+        if (isExtractionEmpty(extractedData)) {
+          throw new Error("L'extraction n'a pas pu identifier de données de trimestres dans ce document. Le fichier est peut-être illisible ou mal numérisé.");
+        }
       }
 
       // --- AGENT 2 : CALCULATEUR (Code JS) ---
@@ -380,7 +412,7 @@ export default async function handler(req, res) {
 3. Tu ne dois renvoyer dans le JSON QUE les anomalies que tu estimes pertinentes et justifiées après ton tri d'expert. Il est tout à fait normal de renvoyer une liste vide \`[]\` si aucune anomalie n'est avérée.
 4. Pour chaque anomalie retenue, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire (expliquant par exemple le seuil de validation du trimestre pour cette année-là), la solution, et les documents à réclamer au client. Conserve scrupuleusement l'année et les chiffres.
 5. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
-6. Si tu utilises ta capacité de recherche Google pour vérifier ou compléter une loi, tu as l'OBLIGATION ABSOLUE de te restreindre aux sources officielles (Journal officiel, legifrance.gouv.fr, lassuranceretraite.fr, info-retraite.fr, Ircantec, SRE, agirc-arrco.fr). Ajoute 'site:legifrance.gouv.fr OR site:lassuranceretraite.fr' à tes recherches si nécessaire. N'utilise AUCUNE information provenant d'un blog, forum ou site commercial.
+6. Tu n'as PAS accès à internet. Fonde-toi EXCLUSIVEMENT sur les règles réglementaires fournies ci-dessous dans <regles_reglementaires> ; n'invente et ne suppose aucune loi ou seuil qui n'y figure pas.
 </regles_constitutionnelles>
 
 <regles_reglementaires>
@@ -398,7 +430,9 @@ TRÈS IMPORTANT : Dans ton bilan textuel (summary), ne mentionne des anomalies Q
 </format_summary>
 
 <strategies_et_plan>
-Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir 2 à 3 stratégies d'optimisation (rachat de trimestres, cumul emploi-retraite, surcote, retraite progressive, etc.) dans le tableau 'strategies', et un 'action_plan' exhaustif avec des étapes claires pour préparer le départ à la retraite. Ne laisse jamais ces champs vides.
+Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir AU MOINS 2 stratégies d'optimisation pertinentes (rachat de trimestres, cumul emploi-retraite, surcote, retraite progressive, etc.) dans le tableau 'strategies'. Adapte le nombre de stratégies à la richesse réelle de la carrière : une situation complexe (plusieurs statuts, anomalies multiples, carrière longue ou fragmentée) mérite davantage de stratégies (jusqu'à 5) qu'une carrière simple. Ne te limite JAMAIS artificiellement à 2 ou 3 si la situation du client en justifie plus.
+Pour CHAQUE stratégie, renseigne obligatoirement le champ 'impact' avec une estimation concrète et chiffrée de l'effet sur la situation retraite du client (ex : "+250€ de pension mensuelle estimée", "+8 trimestres validés", "Départ anticipé possible de 6 mois"). Base cette estimation sur les données réelles de la carrière fournie ; si un chiffrage précis est impossible, donne au minimum un ordre de grandeur qualifié — n'écris jamais une valeur vide ou générique comme "à déterminer".
+Fournis également un 'action_plan' exhaustif avec des étapes claires pour préparer le départ à la retraite. Ne laisse jamais ces champs vides.
 </strategies_et_plan>
       `;
 
@@ -435,9 +469,10 @@ Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir 2
               properties: {
                 title: { type: SchemaType.STRING },
                 description: { type: SchemaType.STRING },
-                priority: { type: SchemaType.STRING }
+                priority: { type: SchemaType.STRING },
+                impact: { type: SchemaType.STRING, description: "Impact estimé et chiffré sur la situation retraite (ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois')." }
               },
-              required: ["title", "description", "priority"]
+              required: ["title", "description", "priority", "impact"]
             }
           },
           action_plan: {
@@ -456,11 +491,11 @@ Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir 2
         required: ["anomalies", "summary", "strategies", "action_plan"]
       };
 
-      const writerModel = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",
-        generationConfig: { 
+      const writerModel = genAI.getGenerativeModel({
+        model: "gemini-2.5-pro",
+        generationConfig: {
           responseMimeType: "application/json",
-          responseSchema: writerSchema 
+          responseSchema: writerSchema
         }
       });
 
