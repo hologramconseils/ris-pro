@@ -21,7 +21,7 @@ L'assuré justifiant d'un taux d'incapacité permanente d'au moins 50 % tout au 
 ## 3. Retraite pour Incapacité Permanente
 Suite à un accident du travail ou une maladie professionnelle reconnue :
 - Taux d’incapacité **≥ 20%** : Départ dès 60 ans (sans décote, sans condition de durée d'assurance pour le taux plein).
-- Taux **entre 10% et 19%** : Départ possible 2 ans avant l'âge légal (à terme, 62 ans au lieu de 64 ans) sous conditions strictes d'exposition pendant 17 ans (68 trimestres) au risque avec lien qualifié. La réforme des retraites de 2023 a assoupli ce dispositif. Pour les assurés dont le taux d'incapacité permanente est compris entre 10 % et 19 %, la condition d'identité de lésions entre un accident du travail et une maladie professionnelle reste requise pour le cumul de taux en vue d'atteindre le seuil de 20% d'incapacité. Ce dispositif est également étendu aux travailleurs indépendants ayant adhéré à l'assurance volontaire pour le risque AT/MP.
+- Taux **entre 10% et 19%** : Départ possible 2 ans avant l'âge légal (à terme, 62 ans au lieu de 64 ans) sous conditions strictes d'exposition pendant 17 ans (68 trimestres) au risque avec lien qualifié. La réforme des retraites de 2023 a assoupli ce dispositif. Pour les assurés dont le taux d'incapacité permanente est compris entre 10 % et 19 %, la condition d'identité de lésions entre un accident du travail et une maladie professionnelle a été supprimée. Ce dispositif est également étendu aux travailleurs indépendants ayant adhéré à l'assurance volontaire pour le risque AT/MP.
 
 ## 4. Retraite Progressive
 Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivant une activité à temps partiel.
