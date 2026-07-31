@@ -93,7 +93,7 @@ export default async function handler(req, res) {
           try {
             const signInToken = await clerkClient.signInTokens.createSignInToken({
               userId: finalUserId,
-              expiresInDays: 7
+              expiresInSeconds: 7 * 24 * 60 * 60
             });
             
             // signInToken.url permet de se connecter automatiquement
