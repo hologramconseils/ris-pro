@@ -54,5 +54,9 @@ Les fonctionnaires ayant un emploi présentant un "risque particulier ou des fat
 *   **Circulaire Cnav 2026/17 du 12 juin 2026** relative à la retraite anticipée pour carrière longue à compter du 1er septembre 2026.
 *   **Circulaire Cnav 2026/18 du 15 juin 2026** relative à la retraite anticipée au profit des assurés handicapés à compter du 1er septembre 2026.
 *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** sur la retraite progressive 2026.
+*   **Décret n° 2026-699 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents, notamment l'introduction d'une bonification d'un trimestre pour les femmes ayant accouché après le 1er janvier 2004 dans certains régimes de la fonction publique, et la réduction du nombre d'années prises en compte pour le calcul du revenu annuel moyen des bénéficiaires de bonifications et majorations de durée d'assurance au titre de leurs enfants.
+*   **Décret n° 2026-700 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents.
+*   **Circulaire Cnav 2026/21 du 23 juillet 2026** relative aux salaires forfaitaires HCR de 1ère catégorie au 01/06/2026.
+*   **Circulaire Cnav 2026/22 du 23 juillet 2026** relative à la majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire.
 
-Date de mise à jour : July 4, 2026.
+Date de mise à jour : July 31, 2026.
