@@ -420,6 +420,21 @@ export default function Bilan() {
                     <div className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>
                       <MarkdownRenderer content={strat.description} />
                     </div>
+                    {strat.impact && (
+                      <div
+                        className="text-xs font-bold"
+                        style={{
+                          marginTop: '0.75rem',
+                          width: 'fit-content',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '999px',
+                          background: 'rgba(22, 163, 74, 0.12)',
+                          color: 'var(--success)'
+                        }}
+                      >
+                        {strat.impact}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
