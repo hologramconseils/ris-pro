@@ -22,9 +22,9 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
 - L'assuré perçoit plusieurs pensions de base.
 - **Taux plein :** Le droit au taux plein (âge ou durée d'assurance) s'apprécie en prenant en compte **la totalité des trimestres validés tous régimes confondus**. Un trimestre cotisé à la CNAVPL compte pour atteindre la durée d'assurance requise au Régime Général, et inversement.
 
-    Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023) et aux ajustements apportés par la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. L'âge d'annulation de la décote reste fixé à 67 ans.
+    Suite à la réforme des retraites de 2023 (Loi n° 2023-270 du 14 avril 2023) et aux ajustements apportés par la Loi de financement de la sécurité sociale pour 2026 (LFSS 2026), l'âge légal de départ à la retraite et la durée d'assurance requise pour le taux plein ont été progressivement relevés. Une "suspension" partielle du calendrier initial de la réforme de 2023 a été mise en œuvre, modifiant les paramètres pour certaines générations. L'âge d'annulation de la décote reste fixé à 67 ans.
 
-    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, suite à la "suspension" partielle du calendrier initial de la réforme de 2023:
+    Voici les nouvelles conditions pour l'âge légal de départ et la durée d'assurance requise pour un taux plein, applicables aux pensions prenant effet à partir du 1er septembre 2026, conformément notamment à la Circulaire CNAV 2026-07 du 1er juillet 2026 :
 
     | Année de naissance     | Âge légal de départ à la retraite | Durée d'assurance requise pour le taux plein (en trimestres) |
     | :--------------------- | :------------------------------- | :----------------------------------------------------------- |
@@ -32,13 +32,16 @@ Si l'assuré a cotisé à un régime non aligné (Fonction publique, Professions
     | 01/09/1961 au 31/12/1961 | 62 ans et 3 mois                | 169                                                          |
     | 1962                   | 62 ans et 6 mois                | 169                                                          |
     | 1963                   | 62 ans et 9 mois                | 170                                                          |
-    | 1964                   | 62 ans et 9 mois                | 170                                                          |
-    | Janvier à Mars 1965    | 62 ans et 9 mois                | 170                                                          |
-    | Avril à Décembre 1965  | 63 ans                           | 171                                                          |
-    | 1966                   | 63 ans et 3 mois                | 172                                                          |
-    | 1967                   | 63 ans et 6 mois                | 172                                                          |
-    | 1968                   | 63 ans et 9 mois                | 172                                                          |
-    | 1969 et après          | 64 ans                           | 172                                                          |
+    | 1964                   | 62 ans et 9 mois                | 166                                                |
+    | Janvier au 30 septembre 1965 | 62 ans et 9 mois                | 166                                                |
+    | 1er octobre au 31 décembre 1965 | 62 ans et 6 mois             | 167                                                |
+    | 1966                   | 62 ans et 9 mois                | 168                                                |
+    | 1967                   | 63 ans                           | 169                                                |
+    | 1968                   | 63 ans et 3 mois                | 170                                                |
+    | 1969                   | 63 ans et 6 mois                | 170                                                |
+    | 1970                   | 63 ans et 9 mois                | 170 (Jan-Mar) / 171 (Avr-Déc)                      |
+    | 1971 à 1973            | 64 ans                           | 171                                                |
+    | À partir de 1974       | 64 ans                           | 172                                                |
 
     L'âge du taux plein automatique, sans condition de durée d'assurance, est maintenu à 67 ans pour les personnes nées à partir de 1955.
 
@@ -54,9 +57,15 @@ Le dispositif de retraite progressive, permettant de travailler à temps partiel
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** (Loi n° 2025-1403 du 30 décembre 2025), notamment son article 105, qui a modifié le calendrier de relèvement de l'âge légal de départ à la retraite et de la durée d'assurance requise pour le taux plein, applicable aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV du 6 mars 2026** clarifiant l'application concrète de la suspension de la réforme des retraites de 2023 pour les départs à compter du 1er septembre 2026.
 *   **Décrets n° 2026-344 et n° 2026-345 du 7 mai 2026** mettant en œuvre les dispositions de l'article 105 de la LFSS 2026, applicables aux pensions prenant effet à compter du 1er septembre 2026.
-*   **Circulaire CNAV 2024-25 du 1er août 2024** remplaçant la circulaire CNAV 2023-19 du 15 septembre 2023, détaillant l'âge légal de la retraite et la durée d'assurance et apportant des précisions sur le remboursement de certains rachats.
+*   **Circulaire CNAV 2026-07 du 1er juillet 2026** remplace la Circulaire CNAV 2024-25 du 1er août 2024 et précise l'âge légal de la retraite et la durée d'assurance pour les retraites prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV 2026/17 du 12 juin 2026** et **Circulaire CNAV 2026/18 du 15 juin 2026** précisant les conditions de retraite anticipée pour carrière longue et au profit des assurés handicapés à compter du 1er septembre 2026.
+*   **Décret du 20 janvier 2026 et Circulaire CNAV du 23 juillet 2026** introduisant une bonification de trimestres supplémentaires pour les sapeurs-pompiers volontaires (un trimestre à partir de 10 ans d'engagement, deux à partir de 20 ans, et trois au-delà de 25 ans), applicable aux retraites prenant effet à compter du 1er juillet 2026.
 *   La **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** a introduit un mode de calcul plus favorable de la retraite de base pour les mères, applicable aux pensions liquidées à compter du 1er janvier 2026, où les pensions sont calculées sur les 24 meilleures années de rémunération pour un enfant et sur les 23 meilleures années pour deux enfants ou plus (au lieu des 25 meilleures années habituelles).
-*   Les règles du dispositif de **cumul emploi-retraite** sont modifiées pour les salariés partant à la retraite après le 1er janvier 2027, exigeant la liquidation de toutes les retraites (base et complémentaires) pour pouvoir cumuler emploi et retraite, avec des règles d'écrêtement de la pension en fonction de l'âge et des revenus d'activité.
+*   Le dispositif de cumul emploi-retraite, permettant de travailler tout en percevant sa pension, a été modifié. Pour les retraites liquidées depuis le 1er septembre 2023 et avant le 1er janvier 2027, le cumul emploi-retraite intégral permet, sous certaines conditions (notamment avoir liquidé l'ensemble de ses retraites de base et complémentaires et bénéficier d'une retraite à taux plein), l'acquisition de nouveaux droits et l'obtention d'une seconde pension.
+    Les règles sont à nouveau modifiées pour les assurés liquidant leur première pension de retraite à compter du 1er janvier 2027. Ces nouvelles dispositions, issues de la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026), suppriment la distinction entre cumul intégral et cumul plafonné, basant désormais les conditions de cumul sur l'âge du retraité.
+    *   **Avant l'âge légal de départ à la retraite :** Les revenus d'activité sont déduits en totalité de la pension de retraite.
+    *   **Entre l'âge légal et 67 ans (âge du taux plein automatique) :** Le cumul pensions et revenus d'activité est autorisé, mais la pension pourra être diminuée si les revenus d'activité dépassent un certain seuil (environ 7 000 € brut par an, à confirmer par décret). Au-delà de ce seuil, la pension est réduite d'un montant égal à 50% du dépassement.
+    *   **À partir de 67 ans (âge du taux plein automatique) :** Le cumul de la pension de retraite et des revenus d'activité est intégral et sans plafond. De plus, les cotisations versées permettent d'acquérir de nouveaux droits à la retraite (seconde pension), plafonnée à 5% du PASS.
+    Le délai de carence de 6 mois en cas de reprise d'activité chez le dernier employeur est supprimé à compter du 1er janvier 2027.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 2 août 2026.
