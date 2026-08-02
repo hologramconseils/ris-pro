@@ -74,3 +74,7 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026/17 du 12 juin 2026** : Retraite anticipée pour carrière longue à compter du 01/09/2026.
+*   **Circulaire Cnav 2026/18 du 15 juin 2026** : Retraite anticipée au profit des assurés handicapés à compter du 01/09/2026.
+*   **Circulaire Cnav 2026/21 du 23 juillet 2026** : Salaires forfaitaires des salariés des hôtels, cafés, restaurants et assimilés (HCR) 1ère catégorie au 01/06/2026.
+*   **Circulaire Cnav 2026/22 du 23 juillet 2026** : Majoration de durée d'assurance sapeur-pompier volontaire.
