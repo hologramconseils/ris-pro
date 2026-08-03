@@ -4,7 +4,7 @@ Conformément à la documentation officielle, le moteur de règles intègre des 
 
 ## 1. Carrière Longue
 Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 21 ans.
-- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), et les périodes d'apprentissage entre 1972 et 2013, sont désormais prises en compte comme trimestres cotisés.
+- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), les périodes d'apprentissage entre 1972 et 2013, et jusqu'à deux trimestres de majoration accordés au titre des enfants (applicables aux retraites prenant effet à compter du 1er septembre 2026) sont désormais prises en compte comme trimestres cotisés.
 - **Âge de départ anticipé :**
   - **Dès 58 ans** (activité avant 16 ans)
   - **Dès 60 ans** (activité avant 18 ans)
@@ -16,7 +16,7 @@ Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 2
 L'assuré justifiant d'un taux d'incapacité permanente d'au moins 50 % tout au long de sa période d'assurance peut liquider sa retraite par anticipation.
 - **Âge de départ :** Dès 55 ans.
 - **Réforme 2023 :** Seule la condition de durée d'assurance totale cotisée sous handicap est exigée (la condition préalable de la durée d'assurance validée est supprimée).
-- **Mise à jour réglementaire :** Le Décret n°2026-345 du 7 mai 2026, applicable aux pensions prenant effet à compter du 1er septembre 2026, adapte la durée d'assurance cotisée requise pour les assurés handicapés en tenant compte de la suspension de la réforme des retraites de 2023.
+- **Mise à jour réglementaire :** Le Décret n°2026-345 du 7 mai 2026, applicable aux pensions prenant effet à compter du 1er septembre 2026, adapte la durée d'assurance cotisée requise pour les assurés handicapés en tenant compte de la suspension de la réforme des retraites de 2023. Ce décret permet un retour partiel aux conditions antérieures à la réforme de 2023 pour les assurés nés avant le 1er janvier 1973.
 
 ## 3. Retraite pour Incapacité Permanente
 Suite à un accident du travail ou une maladie professionnelle reconnue :
@@ -26,7 +26,7 @@ Suite à un accident du travail ou une maladie professionnelle reconnue :
 ## 4. Retraite Progressive
 Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivant une activité à temps partiel.
 - **Âge de départ progressif :** Depuis le 1er septembre 2025, l'âge d'accès à la retraite progressive est uniformément fixé à **60 ans** pour tous les actifs, quelle que soit leur année de naissance.
-- **Conditions imposées :** Avoir acquis un cumul inter-régimes d'au minimum 150 trimestres et poursuivre une activité à temps partiel (entre 40 % et 80 % d'un temps complet).
+- **Conditions imposées :** Avoir acquis un cumul inter-régimes d'au minimum 150 trimestres et poursuivre une activité à temps partiel (entre 40 % et 80 % d'un temps complet, ou entre 50% et 90% pour les fonctionnaires).
 - **Extension :** Le dispositif a été étendu à la fonction publique (fonctionnaires civils de l'État, territoriaux et hospitaliers) ainsi qu'aux professionnels libéraux et avocats, à compter du 1er septembre 2023.
 
 ### Mises à jour réglementaires
@@ -36,7 +36,7 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Décret n° 2023-753 du 10 août 2023** portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 relatif au cumul emploi retraite et à la retraite progressive (détermine les modalités d'élargissement et d'assouplissement de l'accès à la retraite progressive et l'étend aux fonctionnaires civils de l'État, professionnels libéraux et avocats).
 - **Décrets n°2025-680 et n°2025-681 du 15 juillet 2025** (publiés au Journal officiel du 23 juillet 2025) abaissant l'âge d'accès à la retraite progressive à 60 ans pour tous, applicable à compter du 1er septembre 2025.
 - **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** officialisant l'ouverture du droit à retraite progressive dès 60 ans pour tous.
-- **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
+- **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023 et l'article 104 permet l'intégration de trimestres de majoration pour enfants dans la durée cotisée pour carrière longue.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
 
-**Date de mise à jour :** Juillet 2026
+**Date de mise à jour :** Août 2026

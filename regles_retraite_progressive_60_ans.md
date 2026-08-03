@@ -20,11 +20,12 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 ## Bénéficiaires
 
 Ce dispositif est désormais accessible à tous les salariés du secteur privé, ainsi qu'aux agents de la fonction publique (fonctionnaires et contractuels).
-Cependant, les agents de catégorie "active" de la fonction publique, qui peuvent partir avant l'âge légal, en restent généralement exclus. Les contractuels de la fonction publique bénéficient de la retraite progressive mais peuvent ne pas avoir droit au maintien de leurs cotisations pour la retraite.
+L'ensemble des agents de la fonction publique (sédentaires, actifs et super-actifs) peuvent bénéficier de la retraite progressive dès lors qu'ils remplissent les conditions d'accès, y compris l'âge de 60 ans, même s'ils peuvent prétendre à un départ anticipé à un âge inférieur en raison de leur catégorie active ou super-active.
+Les contractuels de la fonction publique bénéficient de la retraite progressive. Ils peuvent choisir de surcotiser pour que leurs périodes de travail à temps partiel soient décomptées comme des périodes à temps plein pour le calcul de leur retraite.
 
 ## Calcul de la pension
 
-La fraction de la pension de retraite versée est proportionnelle à la réduction du temps de travail. Par exemple, si l'activité professionnelle est réduite de 40 %, l'assuré percevra 60 % de sa pension de retraite.
+La fraction de la pension de retraite versée est proportionnelle à la réduction du temps de travail. Par exemple, si l'activité professionnelle est réduite de 40 %, l'assuré percevra 60 % de sa pension de retraite. Pendant cette période, l'assuré continue de cotiser et d'acquérir des droits, et sa pension définitive est recalculée à son départ effectif à la retraite.
 
 ## Démarches
 
@@ -40,8 +41,11 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
-*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
+*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État, applicable aux pensions prenant effet à compter du 1er septembre 2025.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026** : Introduit diverses mesures impactant le système de retraite, y compris des ajustements pour les carrières longues et des dispositions sur les pensions des parents, sans modifier les conditions d'accès à la retraite progressive à 60 ans.
+*   **Décret n° 2026-345 du 7 mai 2026** : Porte application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025, adaptant l'âge de départ à la retraite anticipée pour carrière longue et la durée d'assurance cotisée pour les assurés handicapés.
+*   **Décret n° 2026-700 du 29 juillet 2026** : Prévoit diverses mesures relatives aux pensions de retraite des parents, appliquant l'article 104 de la loi n° 2025-1403 du 30 décembre 2025, visant à réduire les inégalités d'accès à la retraite anticipée pour carrière longue.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 3 août 2026.
