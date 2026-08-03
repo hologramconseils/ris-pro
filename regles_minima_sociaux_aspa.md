@@ -24,7 +24,6 @@ Le MICO se divise en deux niveaux :
     *   903,93 € par mois au 1er janvier 2026.
 
 *Si l'assuré n'a pas tous ses trimestres mais part au taux plein (ex: à 67 ans ou invalidité), le montant du MICO est proratisé en fonction de ses trimestres réels au régime général.*
-
 *Le mode de revalorisation du MICO (avec ou sans majoration) a été modifié par la réforme de 2023 : il évolue désormais selon le SMIC lors de la liquidation initiale, mais après attribution avec la retraite personnelle, il évolue comme les retraites (c'est-à-dire selon l'inflation).*
 
 ## 2. L'ASPA (Allocation de Solidarité aux Personnes Âgées)
@@ -54,7 +53,7 @@ Ce seuil est fixé à :
 -   100 000 € en métropole pour les décès survenus entre le 1er septembre 2023 et le 31 décembre 2023.
 -   105 300 € en métropole pour les décès survenus entre le 1er janvier 2024 et le 31 décembre 2024.
 -   107 616,60 € en métropole pour les décès survenus entre le 1er janvier 2025 et le 31 décembre 2025.
--   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
+-   108 585,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
 Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
@@ -66,9 +65,9 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Circulaire Cnav du 5 avril 2024** : Rappel des montants du seuil de recouvrement de l'ASPA sur succession au 1er janvier 2024.
 *   **Circulaire Cnav 2025-21 du 31 juillet 2025** : Service de l'allocation de solidarité aux personnes âgées (SASPA).
 *   **Circulaire Cnav 2025-29 du 22 décembre 2025** : Revalorisation des montants et plafonds de l'ASPA au 1er janvier 2026.
-*   **Circulaire Cnav n° 2025-34 du 23 décembre 2025** : Revalorisation des montants du MICO au 1er janvier 2026.
+*   **Circulaire Cnav n° 2025-33 du 23 décembre 2025** : Revalorisation des montants du MICO au 1er janvier 2026.
 *   **Loi de financement de la sécurité sociale (LFSS) pour 2026 (promulguée fin décembre 2025)** : Suspension/décalage du calendrier de relèvement de l'âge légal et de la durée d'assurance de la réforme des retraites de 2023, applicable à partir du 1er septembre 2026.
-*   **Circulaire Cnav 2026-3 du 1er février 2026 (ou Circulaire CNAV du 28 janvier 2026)** : Précisions sur les paramètres financiers 2026 et revalorisation de l'ASPA de 0,9% au 1er janvier 2026.
+*   **Circulaire Cnav 2026-3 du 28 janvier 2026 (publiée le 1er février 2026)** : Précisions sur les paramètres financiers 2026 et revalorisation de l'ASPA de 0,9% au 1er janvier 2026.
 *   **Circulaire Cnav 2026-07 du 05 mars 2026** : Précisions sur l'âge d'ouverture du droit à la retraite et la durée d'assurance requise à compter du 1er septembre 2026, remplaçant la circulaire Cnav 2024-25.
 *   **Décret n° 2026-344 du 7 mai 2026** et **Décret n° 2026-345 du 7 mai 2026** : Application de la LFSS 2026 concernant l'âge d'ouverture des droits et la durée d'assurance requise pour certains assurés sociaux, notamment pour les carrières longues et travailleurs handicapés, à compter du 1er septembre 2026.
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
