@@ -19,5 +19,7 @@ Pour les agents publics civils et militaires, le congé supplémentaire de naiss
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025).
 *   **Décret n° 2026-427 du 30 mai 2026** relatif au congé supplémentaire de naissance des agents publics civils et militaires (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-428 du 30 mai 2026** portant diverses dispositions relatives au congé supplémentaire de naissance des agents publics (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-699 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents (Journal officiel du 31 juillet 2026). Ce décret vise à réduire le nombre d'années prises en compte pour le calcul du revenu annuel moyen des bénéficiaires de bonifications et de majorations de durée d'assurance au titre de leurs enfants. Il introduit également une nouvelle bonification d'un trimestre pour les femmes ayant accouché à compter du 1er janvier 2004 pour les régimes de la CNRACL et du FSPOEIE.
+*   **Décret n° 2026-700 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents (Journal officiel du 31 juillet 2026). Ce décret permet la prise en compte de bonifications ou de majorations de durée d'assurance attribuées au titre des enfants dans la période réputée cotisée pour l'accès à la retraite anticipée pour carrière longue, dans la limite de deux trimestres par assuré.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 4 août 2026.
