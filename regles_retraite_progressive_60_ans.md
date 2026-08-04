@@ -20,15 +20,17 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 ## Bénéficiaires
 
 Ce dispositif est désormais accessible à tous les salariés du secteur privé, ainsi qu'aux agents de la fonction publique (fonctionnaires et contractuels).
-Cependant, les agents de catégorie "active" de la fonction publique, qui peuvent partir avant l'âge légal, en restent généralement exclus. Les contractuels de la fonction publique bénéficient de la retraite progressive mais peuvent ne pas avoir droit au maintien de leurs cotisations pour la retraite.
+Contrairement aux précédentes exclusions, l'ensemble des fonctionnaires, incluant ceux de catégorie "active" ou "super-active", peuvent bénéficier de la retraite progressive dès lors qu'ils remplissent les conditions d'accès, notamment l'âge de 60 ans.
+Les contractuels de la fonction publique bénéficient de la retraite progressive avec des règles similaires aux salariés du privé concernant le régime, mais avec les modalités de temps partiel applicables aux agents publics. Ils ont la possibilité de choisir de surcotiser pour leurs droits à la retraite sur la base d'un traitement à temps complet.
 
 ## Calcul de la pension
 
 La fraction de la pension de retraite versée est proportionnelle à la réduction du temps de travail. Par exemple, si l'activité professionnelle est réduite de 40 %, l'assuré percevra 60 % de sa pension de retraite.
+Pendant la période de retraite progressive, les trimestres travaillés à temps partiel sont comptabilisés au prorata de la quotité travaillée (par exemple, un trimestre à 60 % d'activité compte pour 0,6 trimestre). Cependant, l'assuré continue de cotiser et d'acquérir des droits, et la pension définitive est recalculée à son départ complet à la retraite.
 
 ## Démarches
 
-La demande de retraite progressive doit être effectuée auprès de la caisse d'assurance retraite compétente (par exemple, l'Assurance retraite pour les salariés du régime général) environ 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, il est recommandé d'anticiper la demande, le délai de traitement par le Service des Retraites de l'État (SRE) pouvant atteindre 6 mois.
+La demande de retraite progressive doit être effectuée auprès de la caisse d'assurance retraite compétente (par exemple, l'Assurance retraite pour les salariés du régime général) environ 5 mois avant la date souhaitée de début du dispositif. Pour les fonctionnaires, il est recommandé d'anticiper la demande, le délai d'instruction par le Service des Retraites de l'État (SRE) pouvant atteindre 6 mois.
 
 ## Objectifs de la réforme
 
@@ -40,8 +42,10 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
-*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
+*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État, applicable aux pensions prenant effet à compter du 1er septembre 2025.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Circulaire CNAV du 6 mars 2026** : Précise les modalités d'application de la réforme de l'âge et des trimestres, concernant la retraite progressive.
+*   **Circulaire CNAV 2026-07 du 1er juillet 2026** : Détaille les modalités d'application pour l'ouverture du droit, la détermination du taux et de la durée d'assurance pour le calcul de la retraite progressive et de la retraite définitive.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Précise les modalités d'application et les coefficients spécifiques applicables pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 4 août 2026.
