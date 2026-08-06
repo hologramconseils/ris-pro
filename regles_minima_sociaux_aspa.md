@@ -57,7 +57,7 @@ Ce seuil est fixé à :
 -   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
-Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
+Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets et de la publication au Journal Officiel. Les bénéficiaires actuels de l'ASPA auront un droit d'option pour choisir entre le nouveau système du forfait logement ou le maintien du mécanisme de récupération sur succession.
 
 ### Mises à jour réglementaires
 *   **Loi de financement rectificative de la sécurité sociale (LFRSS) pour 2023 (14 avril 2023)** et **décret n° 2023-754 du 10 août 2023** : relèvement du seuil de recouvrement de l'ASPA et de la condition de résidence à 9 mois (applicable au 1er septembre 2023).
@@ -74,3 +74,5 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaires Cnav 2026-19 et 2026-20 du 29 juillet 2026** : Précisions sur les nouvelles mesures applicables aux pensions prenant effet à compter du 1er septembre 2026, incluant un calcul plus favorable pour les parents (nombre de meilleures années de revenus, prise en compte des enfants pour les carrières longues).
+*   **Décrets n° 2026-699 et n° 2026-700 du 2 août 2026** : Application des nouvelles mesures concernant les enfants et la retraite, en lien avec la LFSS 2026.
