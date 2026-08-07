@@ -35,7 +35,7 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 
 *   Les nouvelles règles du cumul emploi-retraite créateur de droits pour le régime de base s'appliquent aux pensions dont l'entrée en jouissance intervient à compter du **1er septembre 2023**, en prenant en compte les cotisations versées à partir du 1er janvier 2023.
 *   Pour les régimes complémentaires (Agirc-Arrco), l'acquisition de nouveaux droits a pris effet au **1er janvier 2024**, prenant en compte les cotisations versées à partir du 1er janvier 2023.
-*   Les assurés ayant liquidé leur première pension de retraite **avant le 1er septembre 2023** ne sont pas concernés par l'acquisition de nouveaux droits à la retraite dans le cadre du cumul emploi-retraite.
+*   Les cotisations versées à compter du 1er janvier 2023 peuvent générer de nouveaux droits à retraite pour une seconde pension, à condition que cette seconde pension prenne effet après le 1er septembre 2023 pour le régime de base et le 1er janvier 2024 pour les régimes complémentaires.
 
 ## Évolutions à compter du 1er janvier 2027
 
@@ -48,9 +48,9 @@ La Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026), adoptée e
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
-*   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
+*   **Décret n° 2023-751 du 10 août 2023** (relatif au cumul emploi retraite et à la retraite progressive) et **Décret n° 2023-753 du 10 août 2023** (portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 précisant les conditions d'application pour le régime de base).
 *   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
 *   **Arrêté du 22 décembre 2025** portant fixation du Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 (publié au JO le 23 décembre 2025).
-*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025), réformant le cumul emploi-retraite à compter du 1er janvier 2027.
+*   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, notamment son article 102 (Journal officiel du 31 décembre 2025), réformant le cumul emploi-retraite à compter du 1er janvier 2027.
 
-Date de mise à jour : 5 juillet 2026.
+Date de mise à jour : 7 août 2026.

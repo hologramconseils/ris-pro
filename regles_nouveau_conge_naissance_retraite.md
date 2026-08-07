@@ -12,12 +12,16 @@ Les dispositions relatives à ce nouveau congé de naissance s'appliquent aux en
 
 ## Mesures spécifiques pour les agents publics civils et militaires
 
-Pour les agents publics civils et militaires, le congé supplémentaire de naissance est explicitement pris en compte pour le calcul de la retraite. Le Décret n° 2026-427 du 30 mai 2026 modifie le code des pensions civiles et militaires de retraite pour y intégrer les périodes de ce congé. Ces mesures visent à améliorer la prise en compte des interruptions de carrière liées à la parentalité dans le secteur public, en reconnaissant l'impact de ces périodes sur la carrière et les droits à la retraite des agents concernés, dans le respect du cadre existant des avantages familiaux pour la retraite.
+Pour les agents publics civils et militaires, le congé supplémentaire de naissance est explicitement pris en compte pour le calcul de la retraite. Le Décret n° 2026-427 du 30 mai 2026 modifie le code des pensions civiles et militaires de retraite pour y intégrer les périodes de ce congé. Ces mesures visent à améliorer la prise en compte des interruptions de carrière liées à la parentalité dans le secteur public, en reconnaissant l'impact de ces périodes sur la carrière et les droits à la retraite des agents concernés, dans le respect du cadre existant des avantages familiaux pour la retraite. Le Décret n° 2026-428 du 30 mai 2026 porte diverses dispositions relatives au congé supplémentaire de naissance des agents publics.
 
 ### Mises à jour réglementaires
 
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025).
+*   **Décret n° 2026-419 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-425 du 30 mai 2026** relatif au congé supplémentaire de naissance, précisant notamment les conditions d'ouverture de droits à des trimestres de retraite pour ses bénéficiaires (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-426 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-427 du 30 mai 2026** relatif au congé supplémentaire de naissance des agents publics civils et militaires (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-428 du 30 mai 2026** portant diverses dispositions relatives au congé supplémentaire de naissance des agents publics (Journal officiel du 31 mai 2026).
+*   **Circulaire CNAV 2026-07 du 1er juillet 2026** relative aux nouvelles dispositions sur la retraite suite à la loi n° 2025-1403.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 7 août 2026.

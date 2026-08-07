@@ -20,10 +20,10 @@ La surcote est un bonus qui majore le montant de la retraite de base pour les pe
 
 - **Conditions :**
   - Avoir atteint l'âge légal de départ à la retraite, qui passe progressivement de 62 à 64 ans selon l'année de naissance, pour les pensions prenant effet à compter du 1er septembre 2023. Ce relèvement est cependant suspendu pour les pensions prenant effet à compter du 1er septembre 2026, suite à la Loi de financement de la Sécurité sociale pour 2026.
-  - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 172 trimestres pour les générations nées en 1966 et après).
+  - Justifier du nombre requis de trimestres pour son année de naissance afin d'obtenir une retraite à taux plein (par exemple : 168 trimestres pour la génération née en 1966, et 172 trimestres pour les générations nées à partir de 1974).
   - Continuer à travailler au-delà de ces deux seuils.
 - **Majoration accordée :** **+1,25 % par trimestre supplémentaire cotisé** (soit +5 % par an d'effort) après avoir atteint l'âge légal et la durée d'assurance requise pour le taux plein.
-- **Surcote parentale (post-réforme 2023) :** Une surcote spécifique a été mise en place pour les parents nés à partir du 1er avril 1965, sous réserve d'avoir acquis au moins un trimestre de majoration au titre de la maternité, de l'éducation, de l'adoption, d'un enfant handicapé ou d'un congé parental. Ce dispositif s'applique lorsque la durée d'assurance dépasse le nombre de trimestres nécessaires pour le taux plein. Toutefois, en raison de la suspension de l'augmentation de l'âge légal de départ à la retraite par la LFSS 2026, certaines générations (comme celles nées en 1964 et début 1965) dont l'âge légal sera inférieur à 63 ans à compter du 1er septembre 2026, pourraient ne plus remplir la condition d'âge légal supérieur ou égal à 63 ans et ne pourront pas bénéficier de la surcote parentale.
+- **Surcote parentale (post-réforme 2023) :** Une surcote spécifique a été mise en place pour les parents nés à partir du 1er avril 1965, sous réserve d'avoir acquis au moins un trimestre de majoration au titre de la maternité, de l'éducation, de l'adoption, d'un enfant handicapé ou d'un congé parental. Ce dispositif s'applique lorsque la durée d'assurance dépasse le nombre de trimestres nécessaires pour le taux plein. Toutefois, en raison de la suspension de l'augmentation de l'âge légal de départ à la retraite par la LFSS 2026, certaines générations (comme celles nées en 1964 et début 1965) dont l'âge légal sera inférieur à 63 ans à compter du 1er septembre 2026, pourraient ne plus remplir la condition d'âge légal supérieur ou égal à 63 ans et ne pourront pas bénéficier de la surcote parentale, qui s'applique pour chaque trimestre travaillé après l'âge de 63 ans.
 - **Indication Algorithmique :** Suggéré automatiquement si l'assuré atteint le taux plein à l'âge légal mais souhaite prolonger.
 
 ## 3. Le Cumul Emploi-Retraite
@@ -49,9 +49,11 @@ La législation française favorise les parents.
 - **Décret n° 2023-436 du 3 juin 2023** portant application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023, notamment concernant l'âge légal et la durée d'assurance.
 - **Décret n° 2023-751 et n° 2023-753 du 10 août 2023** relatifs au cumul emploi retraite et à la retraite progressive, portant application de l'article 26 de la loi n° 2023-270.
 - **Circulaire Agirc-Arrco 2023-8-DRJ du 15 septembre 2023** concernant les coefficients applicables à la retraite progressive suite à la réforme.
-- **Circulaires CNAV post-septembre 2023** clarifiant l'âge légal, la durée d'assurance requise et le rachat de cotisations.
-- **Loi de financement de la Sécurité sociale pour 2026 (L. n° 2025-1719 du 30 décembre 2025).** Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
+- **Circulaire Agirc-Arrco du 26 octobre 2023** détaillant les accords sur le régime de retraite complémentaire Agirc-Arrco 2023-2026, incluant la suppression des coefficients de solidarité et majorant, et les nouveaux droits pour le cumul emploi-retraite intégral.
+- **Circulaire CNAV 2025/29 du 22 décembre 2025** relative à la revalorisation des pensions de vieillesse, des minima sociaux et des minima de pension au 1er janvier 2026.
+- **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026. Cette loi, promulguée le 30 décembre 2025 et publiée au Journal officiel le 31 décembre 2025, suspend le calendrier d'augmentation de l'âge légal de départ à la retraite pour certaines générations jusqu'à janvier 2028 et réforme les règles du cumul emploi-retraite à compter du 1er janvier 2027.
 - **Arrêté du 22 décembre 2025** portant fixation du plafond de la Sécurité sociale pour 2026 (PASS à 48 060 €).
+- **Circulaire CNAV 2026-07 du 1er juillet 2026** précisant les nouvelles dispositions et les conséquences sur le calcul de la retraite suite à l'article 105 de la loi n° 2025-1403 du 30 décembre 2025.
 - **Arrêté du 22 mai 2026** relatif au relèvement du salaire minimum de croissance (SMIC), portant le SMIC horaire brut à 12,31 euros et le SMIC mensuel brut (35 heures) à 1 867,02 euros à compter du 1er juin 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 7 août 2026.
