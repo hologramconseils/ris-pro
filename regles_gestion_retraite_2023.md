@@ -51,16 +51,27 @@ La durée d'assurance requise pour obtenir une retraite au taux plein a égaleme
 | **1973** | 171 trimestres |
 | **À partir de 1974** | 172 trimestres |
 
-## Implémentation technique
+## 3. Dispositions spécifiques pour les parents
+
+Dans le cadre de la LFSS 2026, des mesures spécifiques ont été introduites pour les parents, visant à réduire les inégalités dans le calcul des pensions et l'accès à la retraite anticipée. Ces dispositions s'appliquent aux pensions prenant effet à compter du 1er septembre 2026.
+
+*   **Calcul du salaire annuel moyen pour les parents** : Le nombre d'années prises en compte pour le calcul du revenu annuel moyen est réduit pour les assurés bénéficiant de majorations ou bonifications de durée d'assurance au titre de leurs enfants.
+    *   Pour les parents ayant eu un enfant, le calcul se fait sur les 24 meilleures années de la carrière (au lieu de 25).
+    *   Pour les parents ayant eu deux enfants ou plus, le calcul se fait sur les 23 meilleures années de la carrière (au lieu de 25).
+*   **Trimestres enfants pour les carrières longues** : Jusqu'à deux trimestres de majoration pour enfants peuvent désormais être pris en compte comme "réputés cotisés" pour l'accès au dispositif de retraite anticipée pour carrière longue.
+
+## 4. Implémentation technique
 La granularité par mois de naissance a été ajoutée à la méthode de projection `RetirementRulesEngine.project_future_career` afin de traiter la césure spécifique de l'année 1961 (septembre) et, désormais, la granularité par trimestre de naissance pour l'année 1965. Le reste de l'implémentation exploite l'année brute. Aucun changement disruptif n'a été appliqué aux années de générations adjacentes afin de préserver la fiabilité existante du moteur de règles.
 
-### Mises à jour réglementaires
+### 5. Mises à jour réglementaires
 
-Les informations de ce document ont été mises à jour le 04 juillet 2026 pour refléter les modifications apportées par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et ses décrets et circulaires d'application, notamment :
+Les informations de ce document ont été mises à jour le 07 Août 2026 pour refléter les modifications apportées par la Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026) et ses décrets et circulaires d'application, notamment :
 
 *   **Loi de financement de la sécurité sociale pour 2026 (LFSS 2026)** : Cette loi (n° 2025-1403 du 30 décembre 2025) a introduit une "suspension" partielle de la trajectoire d'allongement de la durée de cotisation et a ralenti le relèvement de l'âge légal pour certaines générations (notamment 1964 à 1970), applicable aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire Cnav 2026-07 du 5 mars 2026** : Précise les nouvelles dispositions concernant l'âge légal et la durée d'assurance requise pour les retraites prenant effet à compter du 1er septembre 2026, annulant et remplaçant les circulaires précédentes pour cette période. Ce document a été révisé pour intégrer précisément les données de cette circulaire pour l'âge légal et le nombre de trimestres requis.
 *   **Décret n° 2026-344 du 7 mai 2026 et Décret n° 2026-345 du 7 mai 2026** : Ces décrets portent application de l'article 105 de la LFSS 2026 et précisent les conséquences de la suspension de la réforme des retraites pour les conditions de départ anticipé (carrières longues, assurés handicapés) et l'âge légal à Mayotte, applicables aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Circulaire CNAV publiée le 6 mars 2026** : Clarifie l'application concrète de la suspension de la réforme des retraites de 2023, notamment pour l'âge légal et la durée d'assurance requise pour les assurés nés en 1964 et 1965.
+*   **Décret n° 2026-699 du 29 juillet 2026** : Prévoit diverses mesures relatives aux pensions de retraite des parents, notamment la réduction du nombre d'années prises en compte pour le calcul du revenu annuel moyen des bénéficiaires de bonification et de majorations de durée d'assurance au titre de leurs enfants. Ces dispositions s'appliquent aux pensions prenant effet à compter du 1er septembre 2026.
+*   **Décret n° 2026-700 du 29 juillet 2026** : Modifie les règles d'accès à la retraite anticipée pour carrière longue en permettant la prise en compte de bonifications ou de majorations de durée d'assurance attribuées au titre des enfants dans la période réputée cotisée, dans la limite de deux trimestres par assuré. Ces dispositions s'appliquent aux pensions prenant effet à compter du 1er septembre 2026.
 *   **Décret n° 2023-436 du 3 juin 2023** : Porte application des articles 10 et 11 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023, relatif au relèvement de l'âge d'ouverture des droits à la retraite et aux dispositifs de retraite anticipée.
 *   **Décrets n° 2023-690, n° 2023-692, n° 2023-689 et n° 2023-693 parus au Journal officiel le 30 juillet 2023** : Concrétisent la fermeture au 1er septembre 2023 des principaux régimes spéciaux de retraite, et transposent les évolutions paramétriques de la réforme des retraites à ces régimes.
