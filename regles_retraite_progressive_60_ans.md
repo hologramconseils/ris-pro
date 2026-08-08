@@ -15,7 +15,7 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 *   **Âge :** Avoir au moins 60 ans.
 *   **Durée d'assurance :** Justifier d'au moins 150 trimestres de cotisation tous régimes de base confondus.
 *   **Activité professionnelle :** Exercer une activité à temps partiel (ou à temps réduit) dont la durée doit être comprise entre 40 % et 80 % d'un temps complet pour les salariés du secteur privé. Pour les fonctionnaires, la quotité de travail doit être comprise entre 50 % et 90 % d'un temps complet.
-*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé.
+*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis. En l'absence de réponse de l'employeur dans un délai de deux mois suivant la demande de travail à temps partiel, son accord est réputé acquis. Tout refus de l'employeur doit être motivé.
 
 ## Bénéficiaires
 
@@ -40,8 +40,11 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
-*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
+*   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État, applicable aux pensions prenant effet à compter du 1er septembre 2025.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Loi n° 2025-989 du 24 octobre 2025** : Loi Séniors inversant la charge de la preuve pour l'accord de l'employeur, l'absence de réponse sous deux mois valant acceptation.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Décret n° 2026-699 du 29 juillet 2026** : Prévoit diverses mesures relatives aux pensions de retraite des parents, notamment l'amélioration du calcul de certaines pensions de base et une nouvelle bonification d'un trimestre pour les femmes ayant accouché à compter du 1er janvier 2004 dans certains régimes.
+*   **Décret n° 2026-700 du 29 juillet 2026** : Prévoit diverses mesures relatives aux pensions de retraite des parents, notamment la prise en compte de bonifications ou de majorations de durée d'assurance attribuées au titre des enfants dans la période réputée cotisée pour le dispositif de retraite anticipée pour carrière longue, dans la limite de deux trimestres par assuré.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 8 août 2026.

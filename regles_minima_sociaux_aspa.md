@@ -57,7 +57,7 @@ Ce seuil est fixé à :
 -   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
-Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
+Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Un droit d'option sera ouvert aux bénéficiaires actuels de l'ASPA. La loi a été transmise au Sénat pour examen et n'est pas encore promulguée ; les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
 
 ### Mises à jour réglementaires
 *   **Loi de financement rectificative de la sécurité sociale (LFRSS) pour 2023 (14 avril 2023)** et **décret n° 2023-754 du 10 août 2023** : relèvement du seuil de recouvrement de l'ASPA et de la condition de résidence à 9 mois (applicable au 1er septembre 2023).
@@ -73,4 +73,10 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Décret n° 2026-344 du 7 mai 2026** et **Décret n° 2026-345 du 7 mai 2026** : Application de la LFSS 2026 concernant l'âge d'ouverture des droits et la durée d'assurance requise pour certains assurés sociaux, notamment pour les carrières longues et travailleurs handicapés, à compter du 1er septembre 2026.
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
-*   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Loi du 11 juin 2026 relative à l'ASPA (adoptée par l'Assemblée Nationale, transmise au Sénat, en attente de promulgation et de décrets d'application)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026/17 du 12 juin 2026** : Retraite anticipée pour carrière longue à compter du 01/09/2026.
+*   **Circulaire Cnav 2026/18 du 15 juin 2026** : Retraite anticipée au profit des assurés handicapés à compter du 01/09/2026.
+*   **Circulaire Cnav 2026/21 du 23 juillet 2026** : Salaires forfaitaires des salariés des hôtels, cafés, restaurants et assimilés (HCR) 1ère catégorie au 01/06/2026.
+*   **Circulaire Cnav 2026/22 du 23 juillet 2026** : Majoration de durée d'assurance sapeur-pompier volontaire.
+*   **Décret n° 2026-699 du 29 juillet 2026 prévoyant diverses mesures relatives aux pensions de retraite des parents (JO du 31 juillet 2026)** : Impact sur le calcul du revenu annuel moyen pour les bénéficiaires de bonifications et majorations pour enfants, applicable aux pensions prenant effet à compter du 1er septembre 2026.
+*   **Décret n° 2026-700 du 29 juillet 2026 prévoyant diverses mesures relatives aux pensions de retraite des parents (JO du 31 juillet 2026)** : Prise en compte de bonifications ou majorations de durée d'assurance pour enfants dans la période réputée cotisée pour les carrières longues, applicable aux pensions prenant effet à compter du 1er septembre 2026.
