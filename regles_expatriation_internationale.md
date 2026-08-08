@@ -11,7 +11,7 @@ La coordination européenne s'applique pour garantir qu'aucun trimestre cotisé 
     *   *La pension nationale :* Calculée uniquement sur les années et salaires français, avec la décote éventuelle si la totalisation EEE ne suffit pas pour le taux plein.
     *   *La pension communautaire (proratisée) :* La caisse calcule une pension "théorique" comme si toute la carrière (France + Étranger) avait été faite en France, puis proratise ce montant selon la formule : `(Pension Théorique) * (Durée Française / Durée Totale UE)`.
 
-Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026, validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter. Un vote en plénière est attendu les 7 ou 8 juillet 2026 pour leur approbation définitive. L'entrée en application est prévue pour l'automne 2026, si le calendrier et les votes sont respectés.
+Des règles de coordination actualisées ont fait l'objet d'un accord provisoire entre le Parlement européen et le Conseil le 22 avril 2026. Cet accord a été validé par les ambassadeurs des États membres le 29 avril 2026 et la commission parlementaire EMPL le 6 mai 2026. Le Parlement européen a définitivement approuvé ces règles révisées lors d'un vote en plénière le 7 juillet 2026. Ce texte vise à rendre la législation existante plus claire, plus équitable et plus facile à faire respecter, notamment en matière de prestations de chômage, de prestations familiales et de lutte contre la fraude. L'adoption formelle par le Conseil est toujours attendue. L'entrée en application est prévue pour l'automne 2026.
 
 ## 2. Carrière hors EEE (Pays avec Convention Bilatérale)
 La France a signé des conventions de Sécurité Sociale avec une quarantaine de pays (ex: États-Unis, Canada, Japon, Maroc...).
@@ -45,10 +45,14 @@ L'expatrié peut cotiser volontairement à la CFE. Dans ce cas, les trimestres t
     *   **Circulaire Cnav 2026/16 du 12 juin 2026** : Concerne la revalorisation du Smic au 1er juin 2026 et ses incidences en matière de législation vieillesse.
     *   **Circulaire Cnav 2026/17 du 12 juin 2026** : Porte sur la retraite anticipée pour carrière longue (RACL) pour les retraites prenant effet à compter du 1er septembre 2026.
     *   **Circulaire Cnav 2026/18 du 15 juin 2026** : Relatif à la retraite anticipée au profit des assurés handicapés (RAAH) à compter du 1er septembre 2026.
+    *   **Circulaire Cnav 2026/21 du 23 juillet 2026** : Concerne les salaires forfaitaires HCR de 1ère catégorie au 1er juin 2026.
+    *   **Circulaire Cnav 2026/22 du 23 juillet 2026** : Relative à la majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire.
 *   **Circulaires Agirc-Arrco :**
     *   **Circulaire Agirc-Arrco 2023-9-DRJ du 5 octobre 2023** : Précise les orientations stratégiques de la période quadriennale 2023-2026, tenant compte de la réforme des retraites.
     *   **Circulaire Agirc-Arrco 2023-10-DT du 9 novembre 2023** : Arrête les paramètres du régime 2023-2024, y compris la valeur de service et la valeur d'achat du point, et la suppression du coefficient de solidarité.
     *   **Circulaire Agirc-Arrco 2026-1-SG-DRJ** : Concerne la retraite progressive 2026.
+    *   **Circulaire Agirc-Arrco 2025-16-SG-DRJ du 30 octobre 2025** : Définit les paramètres du régime Agirc-Arrco pour 2026, y compris les tranches de salaires soumises à cotisations.
 *   **Règles de validation des trimestres (2026)** : Pour valider un trimestre en 2026, il faut percevoir un revenu brut équivalant à 150 heures de SMIC. Le SMIC horaire brut étant de 12,31 € depuis le 1er juin 2026, cela représente 1 846,50 € brut par trimestre. Pour valider les 4 trimestres annuels, un revenu brut annuel minimal de 7 386 € est requis.
+*   **Cumul emploi-retraite (à partir de 2027)** : La LFSS 2026 modifie le dispositif de cumul emploi-retraite à compter du 1er janvier 2027. Les nouvelles règles prévoient, avant l'âge légal, la suspension totale de la pension en cas de reprise d'activité. Entre l'âge légal et 67 ans, la pension sera réduite de 50 % pour les revenus d'activité dépassant 7 000 euros par an. Le cumul intégral sans plafond avec acquisition de droits pour une seconde retraite ne sera possible qu'après 67 ans.
 
-**Date de mise à jour :** 5 juillet 2026.
+**Date de mise à jour :** 8 août 2026.
