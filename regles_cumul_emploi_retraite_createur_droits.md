@@ -41,16 +41,18 @@ Le cumul emploi-retraite génère également des points de retraite complémenta
 
 La Loi de financement de la Sécurité sociale pour 2026 (LFSS 2026), adoptée en décembre 2025, modifie en profondeur le dispositif de cumul emploi-retraite qui s'appliquera aux assurés dont la première pension prendra effet à compter du **1er janvier 2027**. À partir de cette date, la distinction entre cumul intégral et cumul plafonné sera remplacée par un système basé sur l'âge de l'assuré:
 
+*   **Suppression du délai de carence :** Le délai de carence de 6 mois pour la reprise d'activité chez le dernier employeur est supprimé pour les pensions prenant effet à compter du 1er janvier 2027.
 *   **Avant l'âge légal de départ à la retraite :** Les montants des revenus d'activité professionnelle et de remplacement seront déduits en totalité de la pension de retraite, dès le premier euro. Dans ce cas, il n'y aura pas de création de nouveaux droits à la retraite.
-*   **Entre l'âge légal de départ et l'âge de 67 ans (âge du taux plein automatique) :** Le cumul des pensions de retraite et des revenus d'activité (et de remplacement) sera plafonné à un seuil annuel qui devrait être fixé par décret à 7 000 € brut par an (décret non encore publié). Si ce seuil est dépassé, les pensions de retraite seront diminuées d'un montant égal à 50 % du dépassement. **Dans cette situation, les cotisations versées ne permettront pas d'acquérir de nouveaux droits à pension.**
-*   **À partir de 67 ans (âge du taux plein automatique) :** L'assuré pourra cumuler intégralement ses pensions de retraite et ses revenus d'activité et de remplacement sans plafond. Les cotisations versées dans le cadre de cette activité pourront continuer à permettre l'acquisition de nouveaux droits à retraite.
+*   **Entre l'âge légal de départ et l'âge de 67 ans (âge du taux plein automatique) :** Le cumul des pensions de retraite et des revenus d'activité (et de remplacement) sera plafonné à un seuil annuel qui devrait être fixé par décret à 7 000 € brut par an (décret non encore publié à la date du 9 août 2026). Si ce seuil est dépassé, les pensions de retraite seront diminuées d'un montant égal à 50 % du dépassement. Dans cette situation, les cotisations versées ne permettront pas d'acquérir de nouveaux droits à pension.
+*   **À partir de 67 ans (âge du taux plein automatique) :** L'assuré pourra cumuler intégralement ses pensions de retraite et ses revenus d'activité et de remplacement sans plafond. Les cotisations versées dans le cadre de cette activité pourront continuer à permettre l'acquisition de nouveaux droits à retraite. De plus, le plafonnement de la seconde pension de base à 5% du Plafond Annuel de la Sécurité Sociale est supprimé pour cette catégorie d'assurés.
 
 ### Mises à jour réglementaires
 
 *   **Loi n° 2023-270 du 14 avril 2023** de financement rectificative de la sécurité sociale pour 2023.
 *   **Décret n° 2023-751 du 10 août 2023** (précisant les conditions d'application pour le régime de base).
+*   **Décret n° 2023-753 du 10 août 2023** portant application de l'article 26 de la loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 relatif au cumul emploi retraite et à la retraite progressive (précisant notamment le plafond annuel du montant de la seconde liquidation de pension).
 *   **Accord national interprofessionnel du 5 octobre 2023** (fixant les orientations pour l'Agirc-Arrco) et **Circulaire Agirc-Arrco du 5 février 2024** (précisant les modalités d'application).
 *   **Arrêté du 22 décembre 2025** portant fixation du Plafond Annuel de la Sécurité Sociale (PASS) pour 2026 (publié au JO le 23 décembre 2025).
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025), réformant le cumul emploi-retraite à compter du 1er janvier 2027.
 
-Date de mise à jour : 5 juillet 2026.
+Date de mise à jour : 9 août 2026.
