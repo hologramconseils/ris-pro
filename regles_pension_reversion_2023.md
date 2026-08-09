@@ -13,6 +13,7 @@ La pension de réversion du régime de base correspond à **54%** de la retraite
     - **40 002,56 €** pour une personne vivant en couple (si le survivant s'est remarié, pacsé ou vit en concubinage).
     Dans le calcul des ressources, 70% des revenus professionnels sont pris en compte (un abattement de 30% s'applique après 55 ans), ainsi que 3% de la valeur des biens immobiliers (hors résidence principale et exploitation agricole) et des placements. Les allocations chômage, indemnités journalières, RSA et AAH sont comptabilisées. Les aides au logement et prestations familiales ne sont pas comptabilisées.
 - **Remariage :** Au régime général, le fait d'être remarié n'annule pas le droit à la réversion, mais les revenus du nouveau conjoint sont pris en compte dans le plafond de ressources.
+- **Résidence :** Le conjoint survivant doit résider de manière stable en France ou dans certaines collectivités d'outre-mer.
 
 ## 2. Pluralité de mariages (Divorces)
 Si le défunt a été marié plusieurs fois :
@@ -33,7 +34,7 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 - **Conditions d'attribution (CNRACL) :** Au moins une des conditions suivantes doit être remplie : 4 ans de mariage ; ou avoir un enfant issu de l'union ; ou 2 ans de services valables entre la date de mariage et la date de radiation des cadres de l'auteur du droit.
 - **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion.
 - **Majorations :** La pension peut être majorée de 10% si le conjoint décédé et le bénéficiaire ont élevé au moins trois enfants. Une majoration pour enfant à charge de 113,59 € par mois est également possible sous certaines conditions.
-- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire.
+- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire. Le droit peut être récupéré en cas de nouveau veuvage, divorce ou cessation de vie maritale.
 
 ### Mises à jour réglementaires
 - **Circulaire CNAV n° 2025-29 du 22/12/2025** : Fixe les plafonds de ressources du régime général pour 2026 à 25 001,60 € pour une personne seule et 40 002,56 € pour un couple, et le montant minimum de la pension de réversion du régime général à 334,92 € par mois au 1er janvier 2026.
@@ -42,3 +43,7 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 - La Loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 a apporté des modifications à l'âge légal de départ à la retraite, mais n'a pas directement modifié les conditions d'attribution des pensions de réversion.
 - Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur.
 - **Mise à jour du 04/07/2026** : Le montant maximal de la pension de réversion du régime général est de 1 081,35 € par mois en 2026.
+- **Loi de finances pour 2026** : Ajout d'une condition de résidence stable en France ou dans certaines collectivités d'outre-mer pour bénéficier de la pension de réversion du régime général.
+- **Circulaire CNAV 2026/22 du 23/07/2026** : Traite de la majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire, impactant potentiellement le calcul de la pension du défunt et, par ricochet, le montant de la pension de réversion.
+
+Date de mise à jour du document : 9 août 2026
