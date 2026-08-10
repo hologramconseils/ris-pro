@@ -4,7 +4,7 @@ Conformément à la documentation officielle, le moteur de règles intègre des 
 
 ## 1. Carrière Longue
 Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 21 ans.
-- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), et les périodes d'apprentissage entre 1972 et 2013, sont désormais prises en compte comme trimestres cotisés.
+- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), et les périodes d'apprentissage entre 1972 et 2013, sont désormais prises en compte comme trimestres cotisés. Depuis le 1er septembre 2026, deux trimestres de majoration de durée d'assurance attribués au titre des enfants peuvent également être pris en compte dans la durée d'assurance cotisée requise pour l'accès à ce dispositif.
 - **Âge de départ anticipé :**
   - **Dès 58 ans** (activité avant 16 ans)
   - **Dès 60 ans** (activité avant 18 ans)
@@ -38,5 +38,7 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 25 août 2025** officialisant l'ouverture du droit à retraite progressive dès 60 ans pour tous.
 - **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
+- **Décret n° 2026-699 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents (modifie la nature juridique d'un des deux trimestres existants pour enfants en bonification).
+- **Décret n° 2026-700 du 29 juillet 2026** prévoyant diverses mesures relatives aux pensions de retraite des parents (vise à réduire les inégalités d'accès à la retraite anticipée pour carrière longue en permettant la prise en compte de bonifications ou de majorations de durée d'assurance attribuées au titre des enfants dans la période réputée cotisée, dans la limite de deux trimestres par assuré; applicable aux pensions prenant effet à compter du 1er septembre 2026).
 
-**Date de mise à jour :** Juillet 2026
+**Date de mise à jour :** Août 2026

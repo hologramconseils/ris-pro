@@ -74,3 +74,7 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026/22 du 23 juillet 2026** : Majoration de durée d'assurance au titre des périodes d'engagement en tant que sapeur-pompier volontaire, applicable aux retraites prenant effet à compter du 1er juillet 2026.
+*   **Décret n° 2026-699 du 29 juillet 2026** et **Décret n° 2026-700 du 29 juillet 2026** : Prévoient diverses mesures relatives aux pensions de retraite des parents et d'autres modifications du code de la sécurité sociale, applicables aux pensions prenant effet à compter du 1er septembre 2026.
+
+Date de mise à jour : 10 août 2026
