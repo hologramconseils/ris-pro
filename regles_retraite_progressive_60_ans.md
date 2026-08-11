@@ -15,7 +15,7 @@ La retraite progressive est un dispositif qui permet à un assuré de cumuler un
 *   **Âge :** Avoir au moins 60 ans.
 *   **Durée d'assurance :** Justifier d'au moins 150 trimestres de cotisation tous régimes de base confondus.
 *   **Activité professionnelle :** Exercer une activité à temps partiel (ou à temps réduit) dont la durée doit être comprise entre 40 % et 80 % d'un temps complet pour les salariés du secteur privé. Pour les fonctionnaires, la quotité de travail doit être comprise entre 50 % et 90 % d'un temps complet.
-*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé.
+*   **Accord de l'employeur :** Pour les salariés, l'accord de l'employeur est requis, et son refus doit être motivé. La loi Séniors n° 2025-989 du 24 octobre 2025 a inversé la charge de la preuve en cas de refus de l'employeur.
 
 ## Bénéficiaires
 
@@ -40,8 +40,11 @@ L'abaissement de l'âge d'accès à la retraite progressive vise plusieurs objec
 
 ### Mises à jour réglementaires
 *   **Loi n° 2023-270 du 14 avril 2023** : Réforme des retraites universalisant le dispositif de retraite progressive.
+*   **Loi Séniors n° 2025-989 du 24 octobre 2025** : Inverse la charge de la preuve de refus de l'employeur pour la retraite progressive.
 *   **Décret n° 2025-680 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les assurés du régime des agents des collectivités locales et pour les ouvriers des établissements industriels de l'État.
 *   **Décret n° 2025-681 du 15 juillet 2025** : Fixe l'âge d'ouverture du droit à la retraite progressive à soixante ans pour les autres assurés, applicable aux pensions prenant effet à compter du 1er septembre 2025.
-*   **Circulaire Agirc-Arrco 2025-14-SG-DRJ du 1er août 2025 (annulée et remplacée par Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026)** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Circulaire CNAV 2025/29 du 22 décembre 2025** : Relative à la revalorisation des pensions de vieillesse, des minima sociaux et des minima de pension au 1er janvier 2026.
+*   **Circulaire Agirc-Arrco 2026-1-SG-DRJ du 16 janvier 2026** : Précise les modalités d'application et les coefficients pour la retraite progressive, en tenant compte de l'abaissement de l'âge d'ouverture du droit.
+*   **Décret n° 2026-700 du 29 juillet 2026** : Prévoit diverses mesures relatives aux pensions de retraite des parents, permettant la prise en compte de bonifications ou de majorations de durée d'assurance attribuées au titre des enfants dans la période réputée cotisée (dans la limite de deux trimestres par assuré), applicable aux pensions prenant effet à compter du 1er septembre 2026.
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 11 août 2026.
