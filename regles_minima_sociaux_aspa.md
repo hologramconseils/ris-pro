@@ -25,7 +25,7 @@ Le MICO se divise en deux niveaux :
 
 *Si l'assuré n'a pas tous ses trimestres mais part au taux plein (ex: à 67 ans ou invalidité), le montant du MICO est proratisé en fonction de ses trimestres réels au régime général.*
 
-*Le mode de revalorisation du MICO (avec ou sans majoration) a été modifié par la réforme de 2023 : il évolue désormais selon le SMIC lors de la liquidation initiale, mais après attribution avec la retraite personnelle, il évolue comme les retraites (c'est-à-dire selon l'inflation).*
+*Le mode de revalorisation du MICO (avec ou sans majoration) a été modifié par la réforme de 2023 : il évolue désormais selon le SMIC lors de la liquidation initiale et continue d'être revalorisé annuellement en fonction de la progression du SMIC.*
 
 ## 2. L'ASPA (Allocation de Solidarité aux Personnes Âgées)
 L'ASPA (ex-minimum vieillesse) est une prestation d'assistance (solidarité nationale) versée aux personnes âgées disposant de très faibles revenus, qu'elles aient cotisé à la retraite ou non.
@@ -57,7 +57,7 @@ Ce seuil est fixé à :
 -   108 586,14 € en métropole pour les décès survenus à compter du 1er janvier 2026.
 -   150 000 € dans les DROM, à Saint-Martin et Saint-Barthélémy jusqu'au 31 décembre 2029 inclus.
 
-Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets.
+Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 juin 2026 à l'Assemblée Nationale. Cette réforme vise à remplacer la récupération sur succession par une baisse mensuelle de l'allocation pour certains retraités propriétaires ou hébergés gratuitement, afin d'inciter un plus grand nombre de personnes éligibles à demander l'ASPA. Les détails d'application et le calendrier de mise en œuvre de cette nouvelle législation sont en attente de décrets et son entrée en vigueur est prévue neuf mois après son adoption définitive au Parlement.
 
 ### Mises à jour réglementaires
 *   **Loi de financement rectificative de la sécurité sociale (LFRSS) pour 2023 (14 avril 2023)** et **décret n° 2023-754 du 10 août 2023** : relèvement du seuil de recouvrement de l'ASPA et de la condition de résidence à 9 mois (applicable au 1er septembre 2023).

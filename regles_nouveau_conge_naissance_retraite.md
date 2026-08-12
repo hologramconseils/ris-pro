@@ -17,7 +17,10 @@ Pour les agents publics civils et militaires, le congé supplémentaire de naiss
 ### Mises à jour réglementaires
 
 *   **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026 (Journal officiel du 31 décembre 2025).
+*   **Décret n° 2026-419 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-425 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
+*   **Décret n° 2026-426 du 30 mai 2026** relatif au congé supplémentaire de naissance (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-427 du 30 mai 2026** relatif au congé supplémentaire de naissance des agents publics civils et militaires (Journal officiel du 31 mai 2026).
 *   **Décret n° 2026-428 du 30 mai 2026** portant diverses dispositions relatives au congé supplémentaire de naissance des agents publics (Journal officiel du 31 mai 2026).
 
-Date de mise à jour : 4 juillet 2026.
+Date de mise à jour : 12 août 2026.
