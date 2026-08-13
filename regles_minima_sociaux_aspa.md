@@ -74,3 +74,9 @@ Une réforme de l'ASPA concernant le "forfait logement" a été votée le 11 jui
 *   **Arrêté du 22 mai 2026 (publié le 24 mai 2026) portant relèvement du salaire minimum de croissance (Smic)** : Revalorisation du Smic au 1er juin 2026 (augmentation de 2,41%).
 *   **Circulaire Cnav 2026-16 du 12 juin 2026** : Incidences de la revalorisation du Smic au 1er juin 2026, notamment la modification du plafond mensuel de retraites personnelles pour l'attribution du minimum contributif à 1 444,89 €.
 *   **Loi du 11 juin 2026 (non encore publiée au JO)** : Réforme de l'ASPA instituant un "forfait logement" et modifiant le mécanisme de recouvrement sur succession.
+*   **Circulaire Cnav 2026/21 du 23 juillet 2026** : Salaires forfaitaires HCR de 1ère catégorie au 1er juin 2026.
+*   **Décrets n° 2026-699 et 2026-700 du 29 juillet 2026** : Précisions sur les droits à la retraite des parents, notamment pour les carrières longues (application au 1er septembre 2026).
+*   **Circulaire Cnav 2026/24 du 06 août 2026** : Plafond de la sécurité sociale – Montant au 01/01/2025 – Incidences en matière d'assurance vieillesse (hors cotisations).
+*   **Circulaire Cnav 2026/25 du 07 août 2026** : Plafond de la sécurité sociale à Mayotte – Montant au 01/01/2025 – Incidences en matière d'assurance vieillesse (hors cotisations).
+*   **Circulaire Cnav 2026/26 du 07 août 2026** : Plafond de la sécurité sociale à Mayotte – Montant au 01/01/2026 – Incidences en matière d'assurance vieillesse (hors cotisations).
+*   **Circulaire Cnav 2026/27 du 10 août 2026** : Plafond de la sécurité sociale – Montant au 01/01/2026 – Incidences en matière d'assurance vieillesse (hors cotisations).
