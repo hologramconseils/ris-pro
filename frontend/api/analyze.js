@@ -436,8 +436,9 @@ export default async function handler(req, res) {
 Ces montants sont CALCULÉS (pas une estimation de ta part) — approximation simplifiée (sans revalorisation historique des salaires, sans plafond de sécurité sociale, sans décote/surcote) :
 - Salaire Annuel Moyen (SAM), moyenne des 25 meilleures années : ${pensionEstimate.sam}€
 - Pension de base annuelle estimée : ${pensionEstimate.base_pension_annual}€
-- Pension complémentaire Agirc-Arrco annuelle estimée : ${pensionEstimate.complementary_pension_annual}€
-- ESTIMATION MENSUELLE TOTALE ACTUELLE : ${pensionEstimate.total_monthly_estimate}€/mois
+- Pension complémentaire Agirc-Arrco annuelle estimée : ${pensionEstimate.complementary_pension_annual}€${pensionEstimate.complementary_pension_reliable ? '' : " (⚠️ mise à 0 : les points Agirc-Arrco extraits du document étaient incohérents avec le salaire, donnée à ne pas exploiter)"}
+- ESTIMATION MENSUELLE TOTALE ACTUELLE : ${pensionEstimate.total_monthly_estimate}€/mois${pensionEstimate.complementary_pension_reliable ? '' : ' (base uniquement, hors complémentaire)'}
+${pensionEstimate.complementary_pension_reliable ? '' : 'IMPORTANT : Dans le bilan, précise explicitement que la pension complémentaire Agirc-Arrco n\'a pas pu être estimée de façon fiable faute de points exploitables dans le document, et recommande au client de vérifier son relevé de points Agirc-Arrco directement.'}
 </estimation_pension>
 
 <regles_constitutionnelles>
