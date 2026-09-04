@@ -1,6 +1,7 @@
 import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
+import { buildRestrictedResults, resolvePremiumAccess } from "./analysisRestriction.js";
 
 export const maxDuration = 300;
 
@@ -571,9 +572,10 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         let currentCredits = profile?.analysis_credits || 0;
         const isAdmin = profile?.role === 'admin' || profile?.email === 'btsaulnerond@icloud.com';
 
-        if (isAdmin || currentCredits > 0) hasPremiumAccess = true;
+        const access = resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, currentCredits });
+        hasPremiumAccess = access.hasPremiumAccess;
 
-        if (!isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted)) {
+        if (access.shouldDeductCredit) {
           await pool.query(`UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`, [targetUserId]);
         }
       } catch (dbError) {
@@ -584,46 +586,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
     let clientResponse = analysisResults;
 
     if (!hasPremiumAccess) {
-      clientResponse = JSON.parse(JSON.stringify(analysisResults));
-      clientResponse.is_restricted = true;
-      const rawAnomalies = clientResponse.anomalies || [];
-      const currentYear = new Date().getFullYear();
-
-      const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
-        const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
-        const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0');
-        return yearA - yearB;
-      });
-
-      const validAnomalies = sortedAnomalies.filter(a => parseInt(String(a.year).match(/\d{4}/)?.[0] || '0') < currentYear);
-
-      const freemiumIndices = new Set();
-      if (validAnomalies.length > 0) {
-        freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[0]));
-        freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[validAnomalies.length - 1]));
-      }
-
-      clientResponse.anomalies = rawAnomalies.map((anom, idx) => {
-        if (freemiumIndices.has(idx)) {
-          return { ...anom, is_premium: false };
-        } else {
-          return {
-            year: anom.year || "Année masquée",
-            severity: anom.severity || "medium",
-            title: "Anomalie additionnelle détectée",
-            description: "Débloquez votre bilan détaillé pour afficher cette anomalie ainsi que la solution corrective.",
-            is_restricted: true,
-            is_premium: true,
-            employer: "Masqué (Premium)",
-            reason: "Masqué (Premium)",
-            solution: "Masqué (Premium)",
-            docs: ["Pièces justificatives masquées"],
-            salary: "Masqué",
-            trimesters: "X/4",
-            points: "X.XX"
-          };
-        }
-      });
+      clientResponse = buildRestrictedResults(analysisResults);
     }
 
     const dbResults = { ...analysisResults };

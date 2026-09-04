@@ -1,5 +1,6 @@
 import { getDb } from "./db.js";
 import { createClerkClient } from "@clerk/backend";
+import { buildRestrictedResults } from "./analysisRestriction.js";
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;
@@ -93,6 +94,14 @@ export default async function handler(req, res) {
       } catch (e) {
         console.error("Erreur lors de l'association de l'analyse au compte:", e);
       }
+    }
+
+    // L'accès premium est acquis une fois pour toutes lors de l'analyse (analyze.js) et persisté
+    // via le flag is_restricted. On ne le recalcule pas ici à partir du solde de crédits courant :
+    // sinon un utilisateur ayant déjà débloqué ce document perdrait l'accès dès que son solde
+    // retombe à 0 (crédit dépensé sur un autre document).
+    if (analysisRecord.status === 'completed' && analysisRecord.results && analysisRecord.results.is_restricted === true) {
+      analysisRecord.results = buildRestrictedResults(analysisRecord.results);
     }
 
     return res.status(200).json(analysisRecord);
