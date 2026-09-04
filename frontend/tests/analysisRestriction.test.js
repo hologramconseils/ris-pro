@@ -1,6 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess } from '../api/analysisRestriction.js';
+import { resolvePremiumAccess, buildRestrictedResults } from '../api/analysisRestriction.js';
+
+function makeAnomaly(year, overrides = {}) {
+  return {
+    year: String(year),
+    title: `Anomalie ${year}`,
+    employer: 'ACME',
+    reason: 'Explication réglementaire',
+    solution: 'Fournir les justificatifs',
+    docs: ['Bulletin de paie'],
+    salary: '1000',
+    trimesters: '2',
+    points: '0',
+    severity: 'high',
+    ...overrides
+  };
+}
 
 test('identité déjà débloquée + 0 crédit => reste premium, aucun crédit débité', () => {
   const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
@@ -72,4 +88,64 @@ test('admin => toujours premium, jamais de crédit débité, même sans crédit'
 
   assert.equal(hasPremiumAccess, true);
   assert.equal(shouldDeductCredit, false);
+});
+
+test('buildRestrictedResults : 5 anomalies désordonnées => seules la plus ancienne et la plus récente restent visibles', () => {
+  const anomalies = [makeAnomaly(2010), makeAnomaly(1995), makeAnomaly(2005), makeAnomaly(2000), makeAnomaly(2015)];
+  const restricted = buildRestrictedResults({ anomalies });
+
+  assert.equal(restricted.is_restricted, true);
+  assert.equal(restricted.anomalies.length, 5, 'aucune anomalie ne doit être supprimée du tableau, seulement masquée');
+
+  const visible = restricted.anomalies.filter(a => a.is_premium === false);
+  const masked = restricted.anomalies.filter(a => a.is_premium === true);
+
+  assert.equal(visible.length, 2, 'exactement 2 anomalies visibles en freemium');
+  assert.equal(masked.length, 3);
+  assert.deepEqual(visible.map(a => a.year).sort(), ['1995', '2015'], 'la plus ancienne (1995) et la plus récente (2015)');
+
+  masked.forEach(a => {
+    assert.equal(a.is_restricted, true);
+    assert.equal(a.employer, 'Masqué (Premium)');
+    assert.equal(a.solution, 'Masqué (Premium)');
+  });
+
+  visible.forEach(a => {
+    assert.notEqual(a.employer, 'Masqué (Premium)', 'les anomalies visibles conservent leurs vraies données');
+  });
+});
+
+test('buildRestrictedResults : une seule anomalie => elle reste visible, rien à masquer', () => {
+  const restricted = buildRestrictedResults({ anomalies: [makeAnomaly(2010)] });
+  assert.equal(restricted.anomalies.length, 1);
+  assert.equal(restricted.anomalies[0].is_premium, false);
+});
+
+test('buildRestrictedResults : deux anomalies => les deux restent visibles (première = plus ancienne = plus récente)', () => {
+  const restricted = buildRestrictedResults({ anomalies: [makeAnomaly(2010), makeAnomaly(1995)] });
+  const visible = restricted.anomalies.filter(a => a.is_premium === false);
+  assert.equal(visible.length, 2);
+});
+
+test('buildRestrictedResults : aucune anomalie => tableau vide, pas d\'erreur', () => {
+  const restricted = buildRestrictedResults({ anomalies: [] });
+  assert.deepEqual(restricted.anomalies, []);
+});
+
+test('buildRestrictedResults : une anomalie de l\'année en cours est exclue du choix "plus récente"', () => {
+  const currentYear = new Date().getFullYear();
+  const anomalies = [makeAnomaly(2010), makeAnomaly(currentYear)];
+  const restricted = buildRestrictedResults({ anomalies });
+  const visible = restricted.anomalies.filter(a => a.is_premium === false);
+
+  assert.equal(visible.length, 1, "l'année en cours ne doit pas compter comme anomalie exploitable");
+  assert.equal(visible[0].year, '2010');
+});
+
+test('buildRestrictedResults : une plage d\'années ("1992 à 2019") se trie sur sa première année', () => {
+  const anomalies = [makeAnomaly(2020), makeAnomaly('1992 à 2019'), makeAnomaly(1991)];
+  const restricted = buildRestrictedResults({ anomalies });
+  const visible = restricted.anomalies.filter(a => a.is_premium === false).map(a => a.year);
+
+  assert.deepEqual(visible.sort(), ['1991', '2020'], "1992 à 2019 se classe par sa première année (1992), donc n'est ni la plus ancienne (1991) ni la plus récente (2020)");
 });
