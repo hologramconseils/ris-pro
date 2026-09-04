@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 import { buildRestrictedResults, resolvePremiumAccess } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
+import { reconcileAnomalies } from "./anomalyReconciliation.js";
 
 export const maxDuration = 300;
 
@@ -544,6 +545,13 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 
       const writerData = JSON.parse(writerResult.choices[0].message.content);
 
+      const finalAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
+      if (finalAnomalies.length !== rawAnomalies.length) {
+        console.error(`[Anomalies] Incohérence après réconciliation : ${rawAnomalies.length} brutes, ${finalAnomalies.length} finales.`);
+      } else if ((writerData.anomalies || []).length !== rawAnomalies.length) {
+        console.error(`[Anomalies] L'IA a omis ${rawAnomalies.length - (writerData.anomalies || []).length} anomalie(s) brute(s), complétée(s) automatiquement.`);
+      }
+
       // Assemblage final
       analysisResults = {
         is_valid_document: true,
@@ -551,7 +559,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         pension_estimate: pensionEstimate,
         trimestres_valides: trimestres_valides,
         trimestres_requis: trimestres_requis,
-        anomalies: writerData.anomalies || [],
+        anomalies: finalAnomalies,
         summary: writerData.summary || "",
         strategies: writerData.strategies || [],
         action_plan: writerData.action_plan || []
