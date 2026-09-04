@@ -167,12 +167,19 @@ export default function Diagnostic() {
 
     // Sinon -> Paiement
     try {
+      let token = null;
+      if (typeof window.Clerk !== 'undefined') {
+        token = await window.Clerk.session?.getToken();
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: user.id, 
-          userEmail: user.email,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          userEmail: userEmail,
           filePath: filePath
         })
       });
