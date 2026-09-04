@@ -82,8 +82,13 @@ export default async function handler(req, res) {
 
           const filePath = session.metadata?.filePath;
           if (filePath) {
+            // Retirer is_restricted du JSONB stocké débloque immédiatement le document payé :
+            // Bilan.jsx ne rappelle jamais /api/analyze après un paiement, il relit
+            // /api/get-analysis, qui se fie au flag déjà stocké. Sans cette mise à jour ici, le
+            // document resterait affiché masqué indéfiniment malgré le paiement, jusqu'à ce
+            // qu'une nouvelle analyse soit relancée depuis /diagnostic.
             await db.query(
-              'UPDATE analyses SET user_id = $1 WHERE file_path = $2',
+              `UPDATE analyses SET user_id = $1, results = results - 'is_restricted' WHERE file_path = $2`,
               [finalUserId, filePath]
             );
           }
