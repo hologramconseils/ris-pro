@@ -382,23 +382,19 @@ export default async function handler(req, res) {
           
           if (yearTrim < 4 || yearPoints <= 0) {
              if (totalSalary > 0 || yearTrim > 0 || yearPoints > 0) {
-               // Filtrage intelligent : on ne remonte au LLM que les années avec une vraie incohérence mathématique
-               const isPotentialAnomaly = 
-                  (totalSalary > 1500 && yearTrim === 0) || 
-                  (totalSalary > 6000 && yearTrim < 4) ||
-                  (totalSalary > 2000 && yearPoints === 0) || 
-                  (yearTrim === 0 && employers.size > 0 && Array.from(employers)[0] !== "Aucun");
-
-               if (isPotentialAnomaly) {
-                 rawAnomalies.push({
-                   year: y.toString(),
-                   employer: Array.from(employers).join(", "),
-                   trimesters: yearTrim,
-                   points: yearPoints,
-                   salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
-                   reason_code: yearTrim < 4 ? "Suspicion de trimestres manquants (salaire significatif)" : "Suspicion de points manquants (salaire significatif)"
-                 });
-               }
+               // Toute année présente dans le relevé avec moins de 4 trimestres ou 0 point est
+               // remontée au LLM (Agent 3), qui juge au cas par cas avec le salaire réel de
+               // l'année et son contexte. Pas de seuil fixe ici : un seuil en euros courants
+               // ignorerait systématiquement les années en francs (avant 2002), là où les
+               // erreurs administratives sont les plus fréquentes.
+               rawAnomalies.push({
+                 year: y.toString(),
+                 employer: Array.from(employers).join(", ") || "Aucun",
+                 trimesters: yearTrim,
+                 points: yearPoints,
+                 salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
+                 reason_code: yearTrim < 4 ? "Suspicion de trimestres manquants" : "Suspicion de points manquants"
+               });
              }
           }
         }
@@ -429,7 +425,7 @@ export default async function handler(req, res) {
 <regles_constitutionnelles>
 1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis).
 2. Les anomalies détectées (brutes) te sont fournies. Ton rôle est de les ANALYSER et de NE CONSERVER QUE LES VÉRITABLES ERREURS de l'administration. 
-- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h au SMIC (soit environ 1500€). Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie.
+- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h au SMIC (soit environ 1500€). Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie. EXCEPTION : cette règle ne s'applique PAS aux anomalies "CAS 5: Année absente du relevé" — leur salaire "0" signifie "aucune donnée", pas "salaire faible constaté". Une année totalement absente du relevé est TOUJOURS à conserver comme anomalie, quel que soit le salaire indiqué.
 - Règle B : Ne garde une anomalie "Moins de 4 trimestres" QUE SI le salaire est manifestement assez élevé pour justifier plus de trimestres.
 - Règle C : Ne garde une anomalie "0 point" QUE SI le régime du travailleur attribue normalement des points (ex: cadre, salarié privé) et que le salaire est significatif.
 3. Tu ne dois renvoyer dans le JSON QUE les anomalies que tu estimes pertinentes et justifiées après ton tri d'expert. Il est tout à fait normal de renvoyer une liste vide \`[]\` si aucune anomalie n'est avérée.
