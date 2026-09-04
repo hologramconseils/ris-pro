@@ -382,21 +382,19 @@ export default async function handler(req, res) {
           calculated_trimestres += yearTrim;
           
           if (yearTrim < 4 || yearPoints <= 0) {
-             if (totalSalary > 0 || yearTrim > 0 || yearPoints > 0) {
-               // Toute année présente dans le relevé avec moins de 4 trimestres ou 0 point est
-               // remontée au LLM (Agent 3), qui juge au cas par cas avec le salaire réel de
-               // l'année et son contexte. Pas de seuil fixe ici : un seuil en euros courants
-               // ignorerait systématiquement les années en francs (avant 2002), là où les
-               // erreurs administratives sont les plus fréquentes.
-               rawAnomalies.push({
-                 year: y.toString(),
-                 employer: Array.from(employers).join(", ") || "Aucun",
-                 trimesters: yearTrim,
-                 points: yearPoints,
-                 salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
-                 reason_code: yearTrim < 4 ? "Suspicion de trimestres manquants" : "Suspicion de points manquants"
-               });
-             }
+             // Anomalie si et seulement si : moins de 4 trimestres, 0 point de retraite
+             // complémentaire, ou année absente (CAS 5, gérée plus haut). Aucun autre critère
+             // (salaire, présence d'un employeur) ne conditionne la remontée à l'Agent 3 — y
+             // compris une année confirmée totalement vide (0 trimestre, 0 point, 0€), qui reste
+             // une anomalie au même titre que les autres.
+             rawAnomalies.push({
+               year: y.toString(),
+               employer: Array.from(employers).join(", ") || "Aucun",
+               trimesters: yearTrim,
+               points: yearPoints,
+               salary: totalSalary > 0 ? totalSalary.toString() : "N/A",
+               reason_code: yearTrim < 4 ? "Suspicion de trimestres manquants" : "Suspicion de points manquants"
+             });
           }
         }
       }
@@ -443,12 +441,10 @@ ${pensionEstimate.complementary_pension_reliable ? '' : 'IMPORTANT : Dans le bil
 
 <regles_constitutionnelles>
 1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis, et les montants de <estimation_pension>).
-2. Les anomalies détectées (brutes) te sont fournies. Ton rôle est de les ANALYSER et de NE CONSERVER QUE LES VÉRITABLES ERREURS de l'administration. 
-- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h de travail rémunéré au SMIC horaire EN VIGUEUR CETTE ANNÉE-LÀ — le SMIC a énormément varié depuis les années 1970, donc juge au cas par cas si le salaire de l'année semble cohérent avec 4 trimestres, sans t'appuyer sur un montant fixe. Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie. INTERDICTION ABSOLUE dans le champ 'reason' : ne mentionne JAMAIS un montant précis en euros ou en francs pour le SMIC ou le seuil d'une année qui n'est pas l'année en cours (${currentYear}) — tu n'as pas ces données historiques exactes en mémoire de façon fiable, et un chiffre inventé (même formulé avec assurance) induit le client en erreur. Décris le critère uniquement en termes qualitatifs (ex: "un salaire annuel jugé insuffisant au regard du SMIC en vigueur en [année]", "un salaire ne permettant pas de valider 4 trimestres selon les règles en vigueur cette année-là"), jamais de valeur chiffrée du SMIC lui-même. EXCEPTION : cette règle ne s'applique PAS aux anomalies "CAS 5: Année absente du relevé" — leur salaire "0" signifie "aucune donnée", pas "salaire faible constaté". Une année totalement absente du relevé est TOUJOURS à conserver comme anomalie, quel que soit le salaire indiqué.
-- Règle B : Ne garde une anomalie "Moins de 4 trimestres" QUE SI le salaire est manifestement assez élevé pour justifier plus de trimestres.
-- Règle C : Ne garde une anomalie "0 point" QUE SI le régime du travailleur attribue normalement des points (ex: cadre, salarié privé) et que le salaire est significatif.
-3. Tu ne dois renvoyer dans le JSON QUE les anomalies que tu estimes pertinentes et justifiées après ton tri d'expert. Il est tout à fait normal de renvoyer une liste vide \`[]\` si aucune anomalie n'est avérée.
-4. Pour chaque anomalie retenue, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire (expliquant par exemple le seuil de validation du trimestre pour cette année-là), la solution, et les documents à réclamer au client. Conserve scrupuleusement l'année et les chiffres.
+2. Les anomalies détectées (brutes) te sont fournies. Une anomalie apparaît SI ET SEULEMENT SI l'année a moins de 4 trimestres, 0 point de retraite complémentaire, ou est absente du relevé — ce tri est déjà fait en amont, AVANT que tu reçoives la liste. Tu DOIS conserver et enrichir TOUTES les anomalies brutes fournies ci-dessus, sans exception : tu n'as PAS le pouvoir d'en écarter une, quels que soient le salaire de l'année, le contexte (début de carrière, chômage, stage) ou ton propre jugement sur la plausibilité. Ta mission ici est uniquement de rédiger l'enrichissement de chaque anomalie fournie, jamais de décider si elle doit figurer ou non dans le bilan.
+- Dans le champ 'reason' des anomalies "Suspicion de trimestres manquants" : n'indique JAMAIS un montant précis en euros ou en francs pour le SMIC ou le seuil d'une année qui n'est pas l'année en cours (${currentYear}) — tu n'as pas ces données historiques exactes en mémoire de façon fiable, et un chiffre inventé (même formulé avec assurance) induit le client en erreur. Décris le critère uniquement en termes qualitatifs (ex: "un salaire annuel jugé insuffisant au regard du SMIC en vigueur en [année]", "un trimestre nécessite un salaire minimal fixé par le SMIC en vigueur cette année-là"), jamais de valeur chiffrée du SMIC lui-même.
+3. Le tableau JSON 'anomalies' doit contenir EXACTEMENT le même nombre d'entrées que la liste brute fournie ci-dessus — ni plus, ni moins. Une liste vide \`[]\` n'est possible QUE SI la liste brute fournie était elle-même vide.
+4. Pour chaque anomalie, enrichis-la avec un titre professionnel, une description (le constat), une explication réglementaire (expliquant par exemple le seuil de validation du trimestre pour cette année-là), la solution, et les documents à réclamer au client. Conserve scrupuleusement l'année et les chiffres.
 5. Ne mentionne JAMAIS les mots "agent", "IA", ou "algorithme". Utilise "expert", "bilan", "notre analyse".
 6. Tu n'as PAS accès à internet. Fonde-toi EXCLUSIVEMENT sur les règles réglementaires fournies ci-dessous dans <regles_reglementaires> ; n'invente et ne suppose aucune loi ou seuil qui n'y figure pas.
 </regles_constitutionnelles>
@@ -464,7 +460,7 @@ Le champ 'summary' DOIT être un 'BILAN RETRAITE' ou 'ANALYSE DE CARRIÈRE' exha
 Rédige des paragraphes fluides, aérés, formels et humains. N'hésite pas à utiliser le gras (**) pour mettre en évidence les chiffres, les mots clés et les âges importants.
 Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*').
 Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
-TRÈS IMPORTANT : Dans ton bilan textuel (summary), ne mentionne des anomalies QUE SI tu as décidé de les valider et de les inclure dans le tableau JSON 'anomalies'. Si tu as rejeté toutes les anomalies brutes selon les règles, indique explicitement dans le bilan qu'aucune erreur n'a été détectée.
+TRÈS IMPORTANT : Le bilan textuel (summary) doit couvrir TOUTES les anomalies du tableau JSON 'anomalies' (elles y figurent toutes obligatoirement, cf. règle 3 ci-dessus). Si ce tableau est vide, indique explicitement dans le bilan qu'aucune erreur n'a été détectée.
 </format_summary>
 
 <strategies_et_plan>
