@@ -55,8 +55,8 @@ export default async function handler(req, res) {
 
   try {
     const { rows: analysisRows } = await pool.query(
-      `SELECT user_id, status, file_path, results FROM analyses WHERE file_path ILIKE $1 ORDER BY created_at DESC LIMIT 1`,
-      [`%${filePath}%`]
+      `SELECT user_id, status, file_path, results FROM analyses WHERE file_path = $1 LIMIT 1`,
+      [filePath]
     );
 
     const analysisRecord = analysisRows.length > 0 ? analysisRows[0] : null;

@@ -83,7 +83,7 @@ export default async function handler(req, res) {
           const filePath = session.metadata?.filePath;
           if (filePath) {
             await db.query(
-              'UPDATE analyses SET user_id = $1 WHERE file_path ILIKE $2',
+              'UPDATE analyses SET user_id = $1 WHERE file_path = $2',
               [finalUserId, filePath]
             );
           }

@@ -1,11 +1,26 @@
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 
 export const maxDuration = 300;
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const MISTRAL_API_URL = "https://api.mistral.ai";
+
+async function mistralRequest(path, body) {
+  const response = await fetch(`${MISTRAL_API_URL}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
+    },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Erreur API Mistral (${response.status}): ${errText}`);
+  }
+  return response.json();
+}
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;
@@ -35,7 +50,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
-  const { filePath, userId } = req.body;
+  const { filePath } = req.body;
 
   const nirSalt = process.env.NIR_SALT;
   if (!nirSalt && process.env.NODE_ENV === 'production') {
@@ -175,57 +190,64 @@ export default async function handler(req, res) {
       `;
 
       const extractorSchema = {
-        type: SchemaType.OBJECT,
+        type: "object",
         properties: {
-          is_valid_document: { type: SchemaType.BOOLEAN, description: "True si le document est un relevé de carrière (RIS, EIG ou autre document de retraite officiel) valide, false sinon." },
-          nir: { type: SchemaType.STRING, description: "Numéro de sécurité sociale (sans les clés)." },
-          total_trimestres_enregistres: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres déjà enregistrés/validés par les différents régimes, indiqué globalement dans le document." },
-          total_trimestres_requis: { type: SchemaType.INTEGER, description: "Le nombre total de trimestres requis/nécessaires pour pouvoir partir à taux plein, indiqué globalement dans le document." },
+          is_valid_document: { type: "boolean", description: "True si le document est un relevé de carrière (RIS, EIG ou autre document de retraite officiel) valide, false sinon." },
+          nir: { type: "string", description: "Numéro de sécurité sociale (sans les clés)." },
+          total_trimestres_enregistres: { type: "integer", description: "Le nombre total de trimestres déjà enregistrés/validés par les différents régimes, indiqué globalement dans le document." },
+          total_trimestres_requis: { type: "integer", description: "Le nombre total de trimestres requis/nécessaires pour pouvoir partir à taux plein, indiqué globalement dans le document." },
           synthese_annees: {
-            type: SchemaType.ARRAY,
+            type: "array",
             description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
             items: {
-              type: SchemaType.OBJECT,
+              type: "object",
               properties: {
-                year: { type: SchemaType.INTEGER, description: "L'année (ex: 1998)" },
-                trimesters: { type: SchemaType.INTEGER, description: "Nombre total de trimestres validés pour cette année (0 à 4)" },
-                points: { type: SchemaType.NUMBER, description: "Nombre de points de retraite acquis (ex: 34.5)" }
+                year: { type: "integer", description: "L'année (ex: 1998)" },
+                trimesters: { type: "integer", description: "Nombre total de trimestres validés pour cette année (0 à 4)" },
+                points: { type: "number", description: "Nombre de points de retraite acquis (ex: 34.5)" }
               },
+              additionalProperties: false,
               required: ["year", "trimesters", "points"]
             }
           },
           detail_employeurs: {
-            type: SchemaType.ARRAY,
+            type: "array",
             description: "Tableau des employeurs avec dates de début, dates de fin et revenus.",
             items: {
-              type: SchemaType.OBJECT,
+              type: "object",
               properties: {
-                employer: { type: SchemaType.STRING, description: "Nom de l'employeur ou de l'activité (CHÔMAGE, MALADIE...)" },
-                start_year: { type: SchemaType.INTEGER, description: "Année de début (ex: 2000)" },
-                end_year: { type: SchemaType.INTEGER, description: "Année de fin (ex: 2001)" },
-                salary: { type: SchemaType.STRING, description: "Revenus bruts (exactement comme écrit, ex: '3 744 FRF', '25 €' ou 'N/A')" }
+                employer: { type: "string", description: "Nom de l'employeur ou de l'activité (CHÔMAGE, MALADIE...)" },
+                start_year: { type: "integer", description: "Année de début (ex: 2000)" },
+                end_year: { type: "integer", description: "Année de fin (ex: 2001)" },
+                salary: { type: "string", description: "Revenus bruts (exactement comme écrit, ex: '3 744 FRF', '25 €' ou 'N/A')" }
               },
+              additionalProperties: false,
               required: ["employer", "start_year", "end_year", "salary"]
             }
           }
         },
+        additionalProperties: false,
         required: ["is_valid_document", "nir", "synthese_annees", "detail_employeurs"]
       };
 
-      const extractorModel = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-pro",
-        generationConfig: { 
-          responseMimeType: "application/json",
-          responseSchema: extractorSchema 
-        }
-      });
-
       const runExtraction = async () => {
-        const extractorResult = await extractorModel.generateContent([
-          { inlineData: { data: base64Data, mimeType: "application/pdf" } },
-          { text: extractorPrompt }
-        ]);
-        return JSON.parse(extractorResult.response.text());
+        const ocrResult = await mistralRequest("/v1/ocr", {
+          model: "mistral-ocr-latest",
+          document: {
+            type: "document_url",
+            document_url: `data:application/pdf;base64,${base64Data}`
+          },
+          document_annotation_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "extraction_releve_carriere",
+              schema: extractorSchema,
+              strict: true
+            }
+          },
+          document_annotation_prompt: extractorPrompt
+        });
+        return JSON.parse(ocrResult.document_annotation);
       };
 
       let extractedData = await runExtraction();
@@ -437,71 +459,78 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
       `;
 
       const writerSchema = {
-        type: SchemaType.OBJECT,
+        type: "object",
         properties: {
           anomalies: {
-            type: SchemaType.ARRAY,
+            type: "array",
             description: "Liste des anomalies enrichies",
             items: {
-              type: SchemaType.OBJECT,
+              type: "object",
               properties: {
-                id: { type: SchemaType.STRING },
-                year: { type: SchemaType.STRING },
-                employer: { type: SchemaType.STRING },
-                title: { type: SchemaType.STRING, description: "Titre synthétique du problème" },
-                description: { type: SchemaType.STRING, description: "Description courte (constat)" },
-                reason: { type: SchemaType.STRING, description: "Explication réglementaire" },
-                solution: { type: SchemaType.STRING, description: "Action de correction spécifique" },
-                docs: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: "Documents justificatifs" },
-                salary: { type: SchemaType.STRING },
-                trimesters: { type: SchemaType.STRING },
-                points: { type: SchemaType.STRING },
-                severity: { type: SchemaType.STRING, description: "high, medium, ou low" }
+                id: { type: "string" },
+                year: { type: "string" },
+                employer: { type: "string" },
+                title: { type: "string", description: "Titre synthétique du problème" },
+                description: { type: "string", description: "Description courte (constat)" },
+                reason: { type: "string", description: "Explication réglementaire" },
+                solution: { type: "string", description: "Action de correction spécifique" },
+                docs: { type: "array", items: { type: "string" }, description: "Documents justificatifs" },
+                salary: { type: "string" },
+                trimesters: { type: "string" },
+                points: { type: "string" },
+                severity: { type: "string", description: "high, medium, ou low" }
               },
+              additionalProperties: false,
               required: ["year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
             }
           },
-          summary: { type: SchemaType.STRING, description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
+          summary: { type: "string", description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
           strategies: {
-            type: SchemaType.ARRAY,
+            type: "array",
             items: {
-              type: SchemaType.OBJECT,
+              type: "object",
               properties: {
-                title: { type: SchemaType.STRING },
-                description: { type: SchemaType.STRING },
-                priority: { type: SchemaType.STRING },
-                impact: { type: SchemaType.STRING, description: "Impact estimé et chiffré sur la situation retraite (ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois')." }
+                title: { type: "string" },
+                description: { type: "string" },
+                priority: { type: "string" },
+                impact: { type: "string", description: "Impact estimé et chiffré sur la situation retraite (ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois')." }
               },
+              additionalProperties: false,
               required: ["title", "description", "priority", "impact"]
             }
           },
           action_plan: {
-            type: SchemaType.ARRAY,
+            type: "array",
             items: {
-              type: SchemaType.OBJECT,
+              type: "object",
               properties: {
-                step: { type: SchemaType.INTEGER },
-                title: { type: SchemaType.STRING },
-                description: { type: SchemaType.STRING }
+                step: { type: "integer" },
+                title: { type: "string" },
+                description: { type: "string" }
               },
+              additionalProperties: false,
               required: ["step", "title", "description"]
             }
           }
         },
+        additionalProperties: false,
         required: ["anomalies", "summary", "strategies", "action_plan"]
       };
 
-      const writerModel = genAI.getGenerativeModel({
-        model: "gemini-2.5-pro",
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: writerSchema
+      const writerResult = await mistralRequest("/v1/chat/completions", {
+        model: "mistral-large-latest",
+        messages: [{ role: "user", content: writerPrompt }],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "bilan_retraite",
+            schema: writerSchema,
+            strict: true
+          }
         }
       });
 
-      const writerResult = await writerModel.generateContent(writerPrompt);
-
-      const writerData = JSON.parse(writerResult.response.text());
+      const writerData = JSON.parse(writerResult.choices[0].message.content);
 
       // Assemblage final
       analysisResults = {
@@ -522,7 +551,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
     const nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
 
     let hasPremiumAccess = false;
-    const targetUserId = authenticatedUser?.id || userId;
+    const targetUserId = authenticatedUser?.id;
 
     if (targetUserId) {
       try {
