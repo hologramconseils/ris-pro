@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess, buildRestrictedResults } from '../api/analysisRestriction.js';
+import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically } from '../api/analysisRestriction.js';
 
 function makeAnomaly(year, overrides = {}) {
   return {
@@ -148,4 +148,26 @@ test('buildRestrictedResults : une plage d\'années ("1992 à 2019") se trie sur
   const visible = restricted.anomalies.filter(a => a.is_premium === false).map(a => a.year);
 
   assert.deepEqual(visible.sort(), ['1991', '2020'], "1992 à 2019 se classe par sa première année (1992), donc n'est ni la plus ancienne (1991) ni la plus récente (2020)");
+});
+
+test('sortAnomaliesChronologically : trie de la plus ancienne à la plus récente, quel que soit l\'ordre d\'entrée', () => {
+  const anomalies = [makeAnomaly(2010), makeAnomaly(1995), makeAnomaly(2005)];
+  const sorted = sortAnomaliesChronologically(anomalies);
+  assert.deepEqual(sorted.map(a => a.year), ['1995', '2005', '2010']);
+});
+
+test('buildRestrictedResults : le tableau final (pas seulement le choix des 2 visibles) est trié chronologiquement même si l\'entrée ne l\'était pas', () => {
+  // Reproduit le cas réel : l'IA (ou le filet de réconciliation) peut renvoyer les anomalies
+  // dans un ordre différent de l'ordre chronologique.
+  const anomalies = [makeAnomaly(2015), makeAnomaly(1995), makeAnomaly(2005), makeAnomaly(2000), makeAnomaly(2010)];
+  const restricted = buildRestrictedResults({ anomalies });
+
+  assert.deepEqual(
+    restricted.anomalies.map(a => a.year),
+    ['1995', '2000', '2005', '2010', '2015'],
+    'le tableau retourné doit être trié, pas seulement les 2 entrées visibles'
+  );
+
+  const visible = restricted.anomalies.filter(a => a.is_premium === false).map(a => a.year);
+  assert.deepEqual(visible, ['1995', '2015']);
 });
