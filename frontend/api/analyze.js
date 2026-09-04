@@ -2,6 +2,7 @@ import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
 import { buildRestrictedResults, resolvePremiumAccess } from "./analysisRestriction.js";
+import { estimateMonthlyPension } from "./pensionEstimate.js";
 
 export const maxDuration = 300;
 
@@ -405,12 +406,21 @@ export default async function handler(req, res) {
       let trimestres_requis = extractedData.total_trimestres_requis || fallback_trimestres_requis;
 
       // --- AGENT 3 : RÉDACTEUR (IA) ---
-      const simplifiedCarrieres = carrieres.filter(c => parseInt(c.year) <= currentYear).map(c => ({
+      const careerUpToNow = carrieres.filter(c => parseInt(c.year) <= currentYear);
+      const simplifiedCarrieres = careerUpToNow.map(c => ({
         year: c.year,
         employer: c.employer,
         salary: c.salary,
         trimesters: c.trimesters
       }));
+
+      const totalPoints = careerUpToNow.reduce((sum, c) => sum + (parseFloat(c.points) || 0), 0);
+      const pensionEstimate = estimateMonthlyPension({
+        careerData: careerUpToNow,
+        validatedQuarters: trimestres_valides,
+        requiredQuarters: trimestres_requis,
+        totalPoints
+      });
 
       const writerPrompt = `
 <role>Tu es le conseiller expert en retraite de RIS Pro. Tu rédiges le bilan final en te basant STRICTEMENT sur les données calculées.</role>
@@ -422,8 +432,16 @@ export default async function handler(req, res) {
 - Historique de carrière détaillé du client (pour personnaliser les stratégies) : ${JSON.stringify(simplifiedCarrieres)}
 </contexte_et_donnees>
 
+<estimation_pension>
+Ces montants sont CALCULÉS (pas une estimation de ta part) — approximation simplifiée (sans revalorisation historique des salaires, sans plafond de sécurité sociale, sans décote/surcote) :
+- Salaire Annuel Moyen (SAM), moyenne des 25 meilleures années : ${pensionEstimate.sam}€
+- Pension de base annuelle estimée : ${pensionEstimate.base_pension_annual}€
+- Pension complémentaire Agirc-Arrco annuelle estimée : ${pensionEstimate.complementary_pension_annual}€
+- ESTIMATION MENSUELLE TOTALE ACTUELLE : ${pensionEstimate.total_monthly_estimate}€/mois
+</estimation_pension>
+
 <regles_constitutionnelles>
-1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis).
+1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis, et les montants de <estimation_pension>).
 2. Les anomalies détectées (brutes) te sont fournies. Ton rôle est de les ANALYSER et de NE CONSERVER QUE LES VÉRITABLES ERREURS de l'administration. 
 - Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h au SMIC (soit environ 1500€). Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie. EXCEPTION : cette règle ne s'applique PAS aux anomalies "CAS 5: Année absente du relevé" — leur salaire "0" signifie "aucune donnée", pas "salaire faible constaté". Une année totalement absente du relevé est TOUJOURS à conserver comme anomalie, quel que soit le salaire indiqué.
 - Règle B : Ne garde une anomalie "Moins de 4 trimestres" QUE SI le salaire est manifestement assez élevé pour justifier plus de trimestres.
@@ -450,7 +468,7 @@ TRÈS IMPORTANT : Dans ton bilan textuel (summary), ne mentionne des anomalies Q
 
 <strategies_et_plan>
 Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir AU MOINS 2 stratégies d'optimisation pertinentes (rachat de trimestres, cumul emploi-retraite, surcote, retraite progressive, etc.) dans le tableau 'strategies'. Adapte le nombre de stratégies à la richesse réelle de la carrière : une situation complexe (plusieurs statuts, anomalies multiples, carrière longue ou fragmentée) mérite davantage de stratégies (jusqu'à 5) qu'une carrière simple. Ne te limite JAMAIS artificiellement à 2 ou 3 si la situation du client en justifie plus.
-Pour CHAQUE stratégie, renseigne obligatoirement le champ 'impact' avec une estimation concrète et chiffrée de l'effet sur la situation retraite du client (ex : "+250€ de pension mensuelle estimée", "+8 trimestres validés", "Départ anticipé possible de 6 mois"). Base cette estimation sur les données réelles de la carrière fournie ; si un chiffrage précis est impossible, donne au minimum un ordre de grandeur qualifié — n'écris jamais une valeur vide ou générique comme "à déterminer".
+Pour CHAQUE stratégie, renseigne obligatoirement le champ 'impact' avec une estimation concrète de l'effet sur la situation retraite du client. TOUT chiffrage en euros doit partir de l'ESTIMATION MENSUELLE TOTALE ACTUELLE fournie dans <estimation_pension> (ex : si elle est de 850€/mois et qu'une stratégie ajoute 8 trimestres validés sur les ${trimestres_requis} requis, calcule l'augmentation proportionnelle de la pension de base qui en découle) — n'invente JAMAIS un montant en euros déconnecté de ce calcul. Si un chiffrage en euros n'est pas déductible de cette base, exprime l'impact en trimestres, en mois de décote évités, ou en âge de départ anticipé plutôt qu'en euros inventés (ex : "+8 trimestres validés", "Départ anticipé possible de 6 mois"). N'écris jamais une valeur vide ou générique comme "à déterminer".
 Fournis également un 'action_plan' exhaustif avec des étapes claires pour préparer le départ à la retraite. Ne laisse jamais ces champs vides.
 </strategies_et_plan>
       `;
@@ -533,6 +551,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
       analysisResults = {
         is_valid_document: true,
         nir: extractedData.nir,
+        pension_estimate: pensionEstimate,
         trimestres_valides: trimestres_valides,
         trimestres_requis: trimestres_requis,
         anomalies: writerData.anomalies || [],
