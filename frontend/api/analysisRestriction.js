@@ -22,27 +22,43 @@ export function resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, cu
   return { hasPremiumAccess, shouldDeductCredit };
 }
 
+function extractYear(anomalyYear) {
+  return parseInt(String(anomalyYear).match(/\d{4}/)?.[0] || '0');
+}
+
+// Consigne de restitution : le premium affiche TOUTES les anomalies de la plus ancienne à la
+// plus récente ; le freemium n'affiche que la plus ancienne et la plus récente, en détail. Les
+// deux dépendent d'un ordre chronologique garanti — on trie ici plutôt que de faire confiance à
+// l'ordre renvoyé par l'IA (jamais garanti) ou à l'ordre d'ajout du filet de sécurité de
+// réconciliation (qui ajoute les entrées manquantes en fin de tableau).
+export function sortAnomaliesChronologically(anomalies) {
+  return [...(anomalies || [])].sort((a, b) => extractYear(a.year) - extractYear(b.year));
+}
+
 export function buildRestrictedResults(analysisResults) {
   const clientResponse = JSON.parse(JSON.stringify(analysisResults));
   clientResponse.is_restricted = true;
-  const rawAnomalies = clientResponse.anomalies || [];
+  // L'entrée peut déjà être triée (analyze.js trie avant assemblage), mais on retrie ici aussi :
+  // cette fonction doit garantir l'ordre chronologique par elle-même, sans dépendre de ce que
+  // fait l'appelant.
+  const sortedAnomalies = sortAnomaliesChronologically(clientResponse.anomalies);
   const currentYear = new Date().getFullYear();
 
-  const sortedAnomalies = [...rawAnomalies].sort((a, b) => {
-    const yearA = parseInt(String(a.year).match(/\d{4}/)?.[0] || '0');
-    const yearB = parseInt(String(b.year).match(/\d{4}/)?.[0] || '0');
-    return yearA - yearB;
-  });
+  const validAnomalies = sortedAnomalies.filter(a => extractYear(a.year) < currentYear);
 
-  const validAnomalies = sortedAnomalies.filter(a => parseInt(String(a.year).match(/\d{4}/)?.[0] || '0') < currentYear);
-
+  // Index (dans sortedAnomalies) de la plus ancienne et de la plus récente anomalie valide —
+  // comparaison par référence d'objet (pas par année) pour rester correct même si deux
+  // anomalies distinctes partagent la même année.
   const freemiumIndices = new Set();
   if (validAnomalies.length > 0) {
-    freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[0]));
-    freemiumIndices.add(rawAnomalies.indexOf(validAnomalies[validAnomalies.length - 1]));
+    freemiumIndices.add(sortedAnomalies.indexOf(validAnomalies[0]));
+    freemiumIndices.add(sortedAnomalies.indexOf(validAnomalies[validAnomalies.length - 1]));
   }
 
-  clientResponse.anomalies = rawAnomalies.map((anom, idx) => {
+  // La plus ancienne et la plus récente sont affichées en détail (données intactes) ; le reste
+  // est masqué. On mappe sur sortedAnomalies (pas clientResponse.anomalies) pour que le tableau
+  // final soit lui-même dans l'ordre chronologique, pas seulement le choix des 2 visibles.
+  clientResponse.anomalies = sortedAnomalies.map((anom, idx) => {
     if (freemiumIndices.has(idx)) {
       return { ...anom, is_premium: false };
     } else {

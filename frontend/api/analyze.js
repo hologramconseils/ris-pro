@@ -1,7 +1,7 @@
 import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess } from "./analysisRestriction.js";
+import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
 import { reconcileAnomalies } from "./anomalyReconciliation.js";
 
@@ -545,12 +545,17 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 
       const writerData = JSON.parse(writerResult.choices[0].message.content);
 
-      const finalAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
-      if (finalAnomalies.length !== rawAnomalies.length) {
-        console.error(`[Anomalies] Incohérence après réconciliation : ${rawAnomalies.length} brutes, ${finalAnomalies.length} finales.`);
+      const reconciledAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
+      if (reconciledAnomalies.length !== rawAnomalies.length) {
+        console.error(`[Anomalies] Incohérence après réconciliation : ${rawAnomalies.length} brutes, ${reconciledAnomalies.length} finales.`);
       } else if ((writerData.anomalies || []).length !== rawAnomalies.length) {
         console.error(`[Anomalies] L'IA a omis ${rawAnomalies.length - (writerData.anomalies || []).length} anomalie(s) brute(s), complétée(s) automatiquement.`);
       }
+      // Consigne de restitution : premium = toutes les anomalies de la plus ancienne à la plus
+      // récente. L'ordre renvoyé par l'IA n'est pas garanti, et le filet de réconciliation
+      // ajoute les entrées manquantes en fin de tableau — on trie explicitement plutôt que de
+      // dépendre de l'un ou l'autre.
+      const finalAnomalies = sortAnomaliesChronologically(reconciledAnomalies);
 
       // Assemblage final
       analysisResults = {
