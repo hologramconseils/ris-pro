@@ -444,7 +444,7 @@ ${pensionEstimate.complementary_pension_reliable ? '' : 'IMPORTANT : Dans le bil
 <regles_constitutionnelles>
 1. Interdiction formelle de modifier les totaux calculés fournis (Trimestres validés, requis, et les montants de <estimation_pension>).
 2. Les anomalies détectées (brutes) te sont fournies. Ton rôle est de les ANALYSER et de NE CONSERVER QUE LES VÉRITABLES ERREURS de l'administration. 
-- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h au SMIC (soit environ 1500€). Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie. EXCEPTION : cette règle ne s'applique PAS aux anomalies "CAS 5: Année absente du relevé" — leur salaire "0" signifie "aucune donnée", pas "salaire faible constaté". Une année totalement absente du relevé est TOUJOURS à conserver comme anomalie, quel que soit le salaire indiqué.
+- Règle A : Moins de 4 trimestres N'EST PAS une anomalie si le salaire est faible ou si c'est une année incomplète logique (début de carrière, chômage, stage). Un trimestre nécessite environ 150h de travail rémunéré au SMIC horaire EN VIGUEUR CETTE ANNÉE-LÀ — le SMIC a énormément varié depuis les années 1970 (montant très inférieur en francs anciens, bien avant l'euro), donc n'utilise JAMAIS un montant fixe unique comme référence pour juger toutes les années de la carrière. Si le salaire de l'année justifie moins de 4 trimestres, IGNORE l'anomalie. Dans le champ 'reason', si tu n'es pas certain du montant exact du seuil pour cette année précise, décris le critère sans donner de chiffre en euros que tu ne peux pas garantir exact pour cette année-là (ex: "un salaire annuel jugé insuffisant au regard du SMIC en vigueur en [année]" plutôt qu'un montant inventé). EXCEPTION : cette règle ne s'applique PAS aux anomalies "CAS 5: Année absente du relevé" — leur salaire "0" signifie "aucune donnée", pas "salaire faible constaté". Une année totalement absente du relevé est TOUJOURS à conserver comme anomalie, quel que soit le salaire indiqué.
 - Règle B : Ne garde une anomalie "Moins de 4 trimestres" QUE SI le salaire est manifestement assez élevé pour justifier plus de trimestres.
 - Règle C : Ne garde une anomalie "0 point" QUE SI le régime du travailleur attribue normalement des points (ex: cadre, salarié privé) et que le salaire est significatif.
 3. Tu ne dois renvoyer dans le JSON QUE les anomalies que tu estimes pertinentes et justifiées après ton tri d'expert. Il est tout à fait normal de renvoyer une liste vide \`[]\` si aucune anomalie n'est avérée.
@@ -509,7 +509,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
                 title: { type: "string" },
                 description: { type: "string" },
                 priority: { type: "string" },
-                impact: { type: "string", description: "Impact estimé et chiffré sur la situation retraite (ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois')." }
+                impact: { type: "string", description: "Impact chiffré sur la situation retraite, calculé à partir de l'ESTIMATION MENSUELLE TOTALE ACTUELLE fournie dans <estimation_pension> (jamais un montant en euros inventé). Ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois'." }
               },
               additionalProperties: false,
               required: ["title", "description", "priority", "impact"]
