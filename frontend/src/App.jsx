@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { frFR } from '@clerk/localizations'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { AuthProvider } from './AuthContext'
@@ -33,7 +34,7 @@ function App() {
   }
   
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} localization={frFR}>
       <AuthProvider>
         <Router>
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
