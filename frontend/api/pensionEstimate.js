@@ -47,13 +47,26 @@ export function calculateComplementaryPension(totalPoints, pointValue = AGIRC_AR
 export function estimateMonthlyPension({ careerData, validatedQuarters, requiredQuarters, totalPoints }) {
   const sam = calculateSAM(careerData);
   const basePensionAnnual = calculateBasePension(sam, validatedQuarters, requiredQuarters);
-  const complementaryPensionAnnual = calculateComplementaryPension(totalPoints);
+  let complementaryPensionAnnual = calculateComplementaryPension(totalPoints);
+
+  // Garde-fou auto-cohérent (sans constante externe non sourcée dans ce repo) : une pension
+  // complémentaire réelle provient des cotisations versées sur le salaire de la personne, elle
+  // ne peut donc pas dépasser son propre SAM. Si le total de points extrait du document (souvent
+  // halluciné par l'IA d'extraction quand le document ne fournit pas de colonne points
+  // explicite) produit un montant supérieur au SAM, la donnée d'entrée est incohérente : on
+  // l'exclut du calcul plutôt que d'afficher un chiffre faux avec une fausse confiance.
+  const reliable = !(sam > 0 && complementaryPensionAnnual > sam);
+  if (!reliable) {
+    complementaryPensionAnnual = 0;
+  }
+
   const totalAnnual = basePensionAnnual + complementaryPensionAnnual;
 
   return {
     sam: Math.round(sam),
     base_pension_annual: Math.round(basePensionAnnual),
     complementary_pension_annual: Math.round(complementaryPensionAnnual),
-    total_monthly_estimate: Math.round(totalAnnual / 12)
+    total_monthly_estimate: Math.round(totalAnnual / 12),
+    complementary_pension_reliable: reliable
   };
 }
