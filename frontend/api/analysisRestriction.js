@@ -3,12 +3,21 @@
 // que les deux endpoints divergent et qu'un utilisateur freemium récupère les
 // données complètes via l'un des deux chemins.
 //
-// L'accès premium n'est décidé qu'à un seul endroit (analyze.js, à partir des
-// crédits/statut admin) et persisté via le flag `is_restricted` sur l'analyse.
-// get-analysis.js se contente ensuite de respecter ce flag déjà tranché : il ne
-// doit pas le recalculer à partir du solde de crédits courant, sinon un document
-// déjà débloqué redeviendrait restreint dès que l'utilisateur dépense ses crédits
-// ailleurs.
+// L'accès premium PAYANT (crédits) n'est décidé qu'à un seul endroit (analyze.js) et
+// persisté via le flag `is_restricted` sur l'analyse. get-analysis.js se contente ensuite
+// de respecter ce flag déjà tranché plutôt que de le recalculer à partir du solde de crédits
+// courant, sinon un document déjà débloqué redeviendrait restreint dès que l'utilisateur
+// dépense ses crédits ailleurs.
+// L'admin est une exception distincte : il voit TOUJOURS tout, y compris sur un document dont
+// le flag stocké dit "restreint" (ex: analysé une première fois par un autre utilisateur ou
+// en session anonyme) — isAdminProfile() doit être vérifié séparément de ce flag, aux DEUX
+// endroits (génération et relecture), jamais en se fiant à l'un pour déduire l'autre.
+
+// Un compte administrateur (rôle `admin` en base, ou l'email de contact/support ci-dessous)
+// a toujours accès premium, indépendamment des crédits ou de tout flag déjà stocké.
+export function isAdminProfile(profile) {
+  return Boolean(profile?.role === 'admin' || profile?.email === 'btsaulnerond@icloud.com');
+}
 
 // Décide de l'accès premium et de la consommation d'un crédit pour une requête d'analyse.
 // - isNewIdentity : aucune analyse "completed" n'existe encore pour ce user+nir_hash.

@@ -1,6 +1,6 @@
 import { getDb } from "./db.js";
 import { createClerkClient } from "@clerk/backend";
-import { buildRestrictedResults } from "./analysisRestriction.js";
+import { buildRestrictedResults, isAdminProfile } from "./analysisRestriction.js";
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;
@@ -66,22 +66,22 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Document introuvable dans la base de données' });
     }
 
+    // Profil chargé une seule fois : sert à la fois pour l'exception IDOR admin ci-dessous et
+    // pour décider si le masquage freemium doit s'appliquer plus bas. isAdminProfile()
+    // couvre le rôle ET l'email de contact — l'ancienne vérification IDOR ne testait que le
+    // rôle, ce qui aurait pu refuser l'accès admin si la colonne `role` n'était pas renseignée.
+    let isAdmin = false;
+    if (authenticatedUser) {
+      const { rows: profileRows } = await pool.query(
+        `SELECT role, email FROM profiles WHERE id = $1 LIMIT 1`,
+        [authenticatedUser.id]
+      );
+      isAdmin = isAdminProfile(profileRows.length > 0 ? profileRows[0] : null);
+    }
+
     // Protection IDOR
-    if (analysisRecord.user_id && (!authenticatedUser || authenticatedUser.id !== analysisRecord.user_id)) {
-      let isAdmin = false;
-      if (authenticatedUser) {
-        const { rows: profileRows } = await pool.query(
-          `SELECT role FROM profiles WHERE id = $1 LIMIT 1`,
-          [authenticatedUser.id]
-        );
-        if (profileRows.length > 0 && profileRows[0].role === 'admin') {
-          isAdmin = true;
-        }
-      }
-      
-      if (!isAdmin) {
-        return res.status(403).json({ error: 'Accès non autorisé à ce document' });
-      }
+    if (analysisRecord.user_id && (!authenticatedUser || authenticatedUser.id !== analysisRecord.user_id) && !isAdmin) {
+      return res.status(403).json({ error: 'Accès non autorisé à ce document' });
     }
 
     // Associer l'analyse au compte utilisateur s'il était déconnecté lors de la soumission mais est connecté maintenant
@@ -96,11 +96,14 @@ export default async function handler(req, res) {
       }
     }
 
-    // L'accès premium est acquis une fois pour toutes lors de l'analyse (analyze.js) et persisté
-    // via le flag is_restricted. On ne le recalcule pas ici à partir du solde de crédits courant :
-    // sinon un utilisateur ayant déjà débloqué ce document perdrait l'accès dès que son solde
-    // retombe à 0 (crédit dépensé sur un autre document).
-    if (analysisRecord.status === 'completed' && analysisRecord.results && analysisRecord.results.is_restricted === true) {
+    // L'accès premium payant est acquis une fois pour toutes lors de l'analyse (analyze.js) et
+    // persisté via le flag is_restricted. On ne le recalcule pas ici à partir du solde de
+    // crédits courant : sinon un utilisateur ayant déjà débloqué ce document perdrait l'accès
+    // dès que son solde retombe à 0 (crédit dépensé sur un autre document).
+    // L'admin est une exception distincte et voit TOUJOURS tout, y compris un document dont le
+    // flag stocké dit "restreint" (ex: analysé une première fois par un autre utilisateur ou en
+    // session anonyme, avant que l'admin ne le consulte).
+    if (!isAdmin && analysisRecord.status === 'completed' && analysisRecord.results && analysisRecord.results.is_restricted === true) {
       analysisRecord.results = buildRestrictedResults(analysisRecord.results);
     }
 
