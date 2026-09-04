@@ -2,10 +2,12 @@ import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { dark } from '@clerk/themes'
 import { frFR } from '@clerk/localizations'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { AuthProvider } from './AuthContext'
+import { ThemeProvider, useTheme } from './ThemeContext'
 
 // Lazy loading of page components to reduce initial bundle size
 const Home = lazy(() => import('./pages/Home'))
@@ -28,36 +30,52 @@ function PageLoader() {
   )
 }
 
+function ThemedClerkProvider({ children }) {
+  const { resolvedTheme } = useTheme()
+
+  return (
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      localization={frFR}
+      appearance={{ baseTheme: resolvedTheme === 'dark' ? dark : undefined }}
+    >
+      {children}
+    </ClerkProvider>
+  )
+}
+
 function App() {
   if (!PUBLISHABLE_KEY) {
     return <div>Missing Publishable Key</div>
   }
-  
+
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} localization={frFR}>
-      <AuthProvider>
-        <Router>
-          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header />
-            <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/diagnostic" element={<Diagnostic />} />
-                  <Route path="/bilan" element={<Bilan />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/mentions-legales" element={<MentionsLegales />} />
-                  <Route path="/cgv" element={<CGV />} />
-                  <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-                  <Route path="/securite" element={<Securite />} />
-                </Routes>
-              </Suspense>
-            </main>
-            <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
-    </ClerkProvider>
+    <ThemeProvider>
+      <ThemedClerkProvider>
+        <AuthProvider>
+          <Router>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <Header />
+              <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/diagnostic" element={<Diagnostic />} />
+                    <Route path="/bilan" element={<Bilan />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/mentions-legales" element={<MentionsLegales />} />
+                    <Route path="/cgv" element={<CGV />} />
+                    <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+                    <Route path="/securite" element={<Securite />} />
+                  </Routes>
+                </Suspense>
+              </main>
+              <Footer />
+            </div>
+          </Router>
+        </AuthProvider>
+      </ThemedClerkProvider>
+    </ThemeProvider>
   )
 }
 

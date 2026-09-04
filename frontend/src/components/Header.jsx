@@ -1,31 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { UserButton } from '@clerk/clerk-react'
 import { LABELS } from '../config/labels'
+import { useTheme } from '../ThemeContext'
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system')
-
-  useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      root.classList.add(systemTheme)
-    } else {
-      root.classList.add(theme)
-    }
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const cycleTheme = () => {
-    if (theme === 'light') setTheme('dark')
-    else if (theme === 'dark') setTheme('system')
-    else setTheme('light')
-  }
+  const { theme, cycleTheme } = useTheme()
 
   return (
     <button onClick={cycleTheme} className="btn-secondary" style={{ width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title={`Thème: ${theme}`}>
