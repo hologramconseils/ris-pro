@@ -4,6 +4,8 @@
   /* Brand Colors */
   --primary: hsl(220, 25%, 20%);
   --primary-hover: hsl(220, 25%, 15%);
+  --primary-text: var(--primary);
+  --primary-text-hover: var(--primary-hover);
   --secondary: hsl(210, 20%, 96%);
   --border: hsl(214, 20%, 89%);
   
@@ -50,10 +52,21 @@
   --text-main: hsl(210, 40%, 98%);
   --text-muted: hsl(215, 20%, 65%);
   --secondary: hsl(222, 47%, 15%);
-  --border: hsl(222, 47%, 15%);
+  --border: hsl(222, 30%, 22%);
   --success-bg: rgba(22, 163, 74, 0.15);
   --warning-bg: rgba(234, 179, 8, 0.15);
   --error-bg: rgba(220, 38, 38, 0.15);
+
+  /* --primary stayed a near-black navy in the original dark theme
+     (tuned for white text on white/near-white backgrounds), so it was
+     nearly invisible against this near-black page — ~1.5:1 contrast
+     for links/borders. Lifted here so it actually reads as an accent. */
+  --primary: hsl(220, 65%, 58%);
+  --primary-hover: hsl(220, 70%, 67%);
+  /* Lighter still for plain text/links directly on the page background,
+     which need more contrast than a color sitting on a filled button. */
+  --primary-text: hsl(220, 90%, 78%);
+  --primary-text-hover: hsl(220, 95%, 86%);
 }
 
 .dark .brand-logo {
@@ -110,13 +123,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--primary-hover);
+  color: var(--primary-text-hover);
 }
 
 /* Layout Utilities */
@@ -417,7 +430,7 @@ a:hover {
   display: inline-block;
 }
 .btn-link-bold:hover {
-  color: var(--primary);
+  color: var(--primary-text);
   opacity: 0.85;
 }
 
