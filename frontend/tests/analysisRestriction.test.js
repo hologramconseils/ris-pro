@@ -1,6 +1,21 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically } from '../api/analysisRestriction.js';
+import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, isAdminProfile } from '../api/analysisRestriction.js';
+
+test('isAdminProfile : rôle admin => true', () => {
+  assert.equal(isAdminProfile({ role: 'admin', email: 'quelquun@example.com' }), true);
+});
+
+test('isAdminProfile : email de contact admin => true, même sans rôle admin en base', () => {
+  assert.equal(isAdminProfile({ role: 'user', email: 'btsaulnerond@icloud.com' }), true);
+  assert.equal(isAdminProfile({ role: null, email: 'btsaulnerond@icloud.com' }), true);
+});
+
+test('isAdminProfile : profil normal ou absent => false', () => {
+  assert.equal(isAdminProfile({ role: 'user', email: 'quelquun@example.com' }), false);
+  assert.equal(isAdminProfile(null), false);
+  assert.equal(isAdminProfile(undefined), false);
+});
 
 function makeAnomaly(year, overrides = {}) {
   return {

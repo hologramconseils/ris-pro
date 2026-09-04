@@ -1,7 +1,7 @@
 import { getDb } from "./db.js";
 import crypto from "crypto";
 import { createClerkClient } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically } from "./analysisRestriction.js";
+import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
 import { reconcileAnomalies } from "./anomalyReconciliation.js";
 
@@ -595,7 +595,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         const { rows: profileRows } = await pool.query(`SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`, [targetUserId]);
         const profile = profileRows.length > 0 ? profileRows[0] : null;
         let currentCredits = profile?.analysis_credits || 0;
-        const isAdmin = profile?.role === 'admin' || profile?.email === 'btsaulnerond@icloud.com';
+        const isAdmin = isAdminProfile(profile);
 
         const access = resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, currentCredits });
         hasPremiumAccess = access.hasPremiumAccess;
