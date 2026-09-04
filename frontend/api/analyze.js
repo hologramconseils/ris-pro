@@ -469,7 +469,7 @@ TRÈS IMPORTANT : Dans ton bilan textuel (summary), ne mentionne des anomalies Q
 
 <strategies_et_plan>
 Même si aucune anomalie n'a été détectée, tu DOIS IMPÉRATIVEMENT fournir AU MOINS 2 stratégies d'optimisation pertinentes (rachat de trimestres, cumul emploi-retraite, surcote, retraite progressive, etc.) dans le tableau 'strategies'. Adapte le nombre de stratégies à la richesse réelle de la carrière : une situation complexe (plusieurs statuts, anomalies multiples, carrière longue ou fragmentée) mérite davantage de stratégies (jusqu'à 5) qu'une carrière simple. Ne te limite JAMAIS artificiellement à 2 ou 3 si la situation du client en justifie plus.
-Pour CHAQUE stratégie, renseigne obligatoirement le champ 'impact' avec une estimation concrète de l'effet sur la situation retraite du client. TOUT chiffrage en euros doit partir de l'ESTIMATION MENSUELLE TOTALE ACTUELLE fournie dans <estimation_pension> (ex : si elle est de 850€/mois et qu'une stratégie ajoute 8 trimestres validés sur les ${trimestres_requis} requis, calcule l'augmentation proportionnelle de la pension de base qui en découle) — n'invente JAMAIS un montant en euros déconnecté de ce calcul. Si un chiffrage en euros n'est pas déductible de cette base, exprime l'impact en trimestres, en mois de décote évités, ou en âge de départ anticipé plutôt qu'en euros inventés (ex : "+8 trimestres validés", "Départ anticipé possible de 6 mois"). N'écris jamais une valeur vide ou générique comme "à déterminer".
+Pour CHAQUE stratégie, renseigne obligatoirement le champ 'impact' avec un effet concret et exprimé UNIQUEMENT en trimestres validés, en mois/années de décote évités, ou en âge de départ anticipé (ex : "+8 trimestres validés", "Départ anticipé possible de 6 mois", "Passage de 172 à 164 trimestres requis pour le taux plein"). N'INDIQUE JAMAIS de montant en euros dans ce champ, même en partant de l'ESTIMATION MENSUELLE TOTALE ACTUELLE fournie dans <estimation_pension> — tu n'es pas fiable pour calculer toi-même une projection proportionnelle (un test réel a montré une erreur de plus de 30% sur ce type de calcul). Le seul montant en euros que tu peux citer dans TOUT le bilan est l'ESTIMATION MENSUELLE TOTALE ACTUELLE elle-même, reproduite telle quelle sans recalcul, jamais une valeur dérivée ou projetée. N'écris jamais une valeur vide ou générique comme "à déterminer".
 Fournis également un 'action_plan' exhaustif avec des étapes claires pour préparer le départ à la retraite. Ne laisse jamais ces champs vides.
 </strategies_et_plan>
       `;
@@ -509,7 +509,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
                 title: { type: "string" },
                 description: { type: "string" },
                 priority: { type: "string" },
-                impact: { type: "string", description: "Impact chiffré sur la situation retraite, calculé à partir de l'ESTIMATION MENSUELLE TOTALE ACTUELLE fournie dans <estimation_pension> (jamais un montant en euros inventé). Ex: '+250€/mois', '+8 trimestres', 'Départ anticipé de 6 mois'." }
+                impact: { type: "string", description: "Impact concret exprimé en trimestres, en mois/années de décote évités, ou en âge de départ anticipé. JAMAIS de montant en euros (l'IA n'est pas fiable pour recalculer une projection monétaire). Ex: '+8 trimestres', 'Départ anticipé de 6 mois'." }
               },
               additionalProperties: false,
               required: ["title", "description", "priority", "impact"]
