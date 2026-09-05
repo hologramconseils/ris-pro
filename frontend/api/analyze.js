@@ -1,6 +1,6 @@
 import { getDb, ensureProfilesEmailColumn } from "./db.js";
 import crypto from "crypto";
-import { createClerkClient } from "@clerk/backend";
+import { verifyToken } from "@clerk/backend";
 import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
 import { reconcileAnomalies } from "./anomalyReconciliation.js";
@@ -72,8 +72,7 @@ export default async function handler(req, res) {
 
   if (token) {
     try {
-      const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-      const verified = await clerk.verifyToken(token);
+      const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
       if (verified && verified.sub) {
         authenticatedUser = { id: verified.sub };
       }

@@ -1,6 +1,6 @@
 import { put } from '@vercel/blob';
 import { getDb } from './db.js';
-import { createClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 
 export const config = {
   api: {
@@ -35,8 +35,7 @@ export default async function handler(req, res) {
     if (authHeader && authHeader.startsWith('Bearer ') && process.env.CLERK_SECRET_KEY) {
       const token = authHeader.split(' ')[1];
       try {
-        const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-        const verified = await clerk.verifyToken(token);
+        const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
         userId = verified.sub;
       } catch (e) {
         console.warn('Token invalide, upload en mode anonyme:', e.message);
