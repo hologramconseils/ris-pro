@@ -1,4 +1,4 @@
-import { getDb } from "./db.js";
+import { getDb, ensureProfilesEmailColumn } from "./db.js";
 import { createClerkClient } from "@clerk/backend";
 import { buildRestrictedResults, isAdminProfile } from "./analysisRestriction.js";
 
@@ -72,11 +72,18 @@ export default async function handler(req, res) {
     // rôle, ce qui aurait pu refuser l'accès admin si la colonne `role` n'était pas renseignée.
     let isAdmin = false;
     if (authenticatedUser) {
-      const { rows: profileRows } = await pool.query(
-        `SELECT role, email FROM profiles WHERE id = $1 LIMIT 1`,
-        [authenticatedUser.id]
-      );
-      isAdmin = isAdminProfile(profileRows.length > 0 ? profileRows[0] : null);
+      try {
+        await ensureProfilesEmailColumn(pool);
+        const { rows: profileRows } = await pool.query(
+          `SELECT role, email FROM profiles WHERE id = $1 LIMIT 1`,
+          [authenticatedUser.id]
+        );
+        isAdmin = isAdminProfile(profileRows.length > 0 ? profileRows[0] : null);
+      } catch (profileErr) {
+        // Ne jamais laisser une erreur sur cette requête annexe faire échouer toute la
+        // récupération de l'analyse avec un 500 — on continue simplement sans statut admin.
+        console.error("[Admin check] Erreur DB:", profileErr.message);
+      }
     }
 
     // Protection IDOR
