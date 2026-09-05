@@ -44,25 +44,41 @@ export function sortAnomaliesChronologically(anomalies) {
   return [...(anomalies || [])].sort((a, b) => extractYear(a.year) - extractYear(b.year));
 }
 
+// Les anomalies visibles en freemium : la plus ancienne et la plus récente parmi celles
+// d'années révolues (pas l'année en cours, dont les données sont incomplètes). Fonction
+// partagée entre buildRestrictedResults (quelles anomalies masquer) et analyze.js (sur quelles
+// anomalies le résumé freemium doit se limiter), pour que les deux ne puissent jamais diverger.
+export function selectFreemiumAnomalies(anomalies) {
+  const sorted = sortAnomaliesChronologically(anomalies);
+  const currentYear = new Date().getFullYear();
+  const valid = sorted.filter(a => extractYear(a.year) < currentYear);
+  if (valid.length === 0) return [];
+  if (valid.length === 1) return [valid[0]];
+  return [valid[0], valid[valid.length - 1]];
+}
+
 export function buildRestrictedResults(analysisResults) {
   const clientResponse = JSON.parse(JSON.stringify(analysisResults));
   clientResponse.is_restricted = true;
+  // Le résumé complet ('summary') discute potentiellement toutes les anomalies, y compris
+  // celles masquées ci-dessous — l'afficher tel quel en freemium contournerait le masquage par
+  // le texte. On le remplace par la version condensée générée en même temps par l'IA, centrée
+  // uniquement sur les anomalies qui restent visibles.
+  if (clientResponse.summary_freemium) {
+    clientResponse.summary = clientResponse.summary_freemium;
+  }
+  delete clientResponse.summary_freemium;
+
   // L'entrée peut déjà être triée (analyze.js trie avant assemblage), mais on retrie ici aussi :
   // cette fonction doit garantir l'ordre chronologique par elle-même, sans dépendre de ce que
   // fait l'appelant.
   const sortedAnomalies = sortAnomaliesChronologically(clientResponse.anomalies);
-  const currentYear = new Date().getFullYear();
-
-  const validAnomalies = sortedAnomalies.filter(a => extractYear(a.year) < currentYear);
+  const freemiumAnomalies = selectFreemiumAnomalies(sortedAnomalies);
 
   // Index (dans sortedAnomalies) de la plus ancienne et de la plus récente anomalie valide —
   // comparaison par référence d'objet (pas par année) pour rester correct même si deux
   // anomalies distinctes partagent la même année.
-  const freemiumIndices = new Set();
-  if (validAnomalies.length > 0) {
-    freemiumIndices.add(sortedAnomalies.indexOf(validAnomalies[0]));
-    freemiumIndices.add(sortedAnomalies.indexOf(validAnomalies[validAnomalies.length - 1]));
-  }
+  const freemiumIndices = new Set(freemiumAnomalies.map(a => sortedAnomalies.indexOf(a)));
 
   // La plus ancienne et la plus récente sont affichées en détail (données intactes) ; le reste
   // est masqué. On mappe sur sortedAnomalies (pas clientResponse.anomalies) pour que le tableau
