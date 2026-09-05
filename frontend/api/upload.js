@@ -23,24 +23,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
+  // Authentification obligatoire : aucune analyse ne doit pouvoir être lancée sans compte.
+  // Rejetée avant tout traitement (avant l'écriture du fichier sur Vercel Blob) plutôt que de
+  // retomber silencieusement sur un mode invité comme c'était le cas auparavant.
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+  if (!token || !process.env.CLERK_SECRET_KEY) {
+    return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
+  }
+
+  let userId;
   try {
-    const filename = req.query.filename 
-      ? decodeURIComponent(req.query.filename) 
+    const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
+    userId = verified.sub;
+  } catch (e) {
+    console.warn('Token invalide:', e.message);
+    return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
+  }
+
+  try {
+    const filename = req.query.filename
+      ? decodeURIComponent(req.query.filename)
       : `upload_${Date.now()}.pdf`;
     const safeName = `ris-pro/${Date.now()}_${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-
-    // Auth Clerk (optionnel)
-    let userId = null;
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ') && process.env.CLERK_SECRET_KEY) {
-      const token = authHeader.split(' ')[1];
-      try {
-        const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-        userId = verified.sub;
-      } catch (e) {
-        console.warn('Token invalide, upload en mode anonyme:', e.message);
-      }
-    }
 
     // Lire le body en Buffer
     const chunks = [];
@@ -76,18 +81,16 @@ export default async function handler(req, res) {
     // séparé de l'INSERT dans `analyses` ci-dessous : un profil qui échoue à se créer (ex.
     // décalage de schéma) ne doit jamais empêcher l'enregistrement du document lui-même, sinon
     // /api/analyze ne le retrouve jamais ensuite (404 "Document introuvable").
-    if (userId) {
-      try {
-        await ensureProfilesSchema(pool);
-        await pool.query(
-          `INSERT INTO profiles (id, analysis_credits, is_paid, created_at, updated_at)
-           VALUES ($1, 0, false, NOW(), NOW())
-           ON CONFLICT (id) DO NOTHING`,
-          [userId]
-        );
-      } catch (dbError) {
-        console.error('Erreur création profil (non bloquante):', dbError.message);
-      }
+    try {
+      await ensureProfilesSchema(pool);
+      await pool.query(
+        `INSERT INTO profiles (id, analysis_credits, is_paid, created_at, updated_at)
+         VALUES ($1, 0, false, NOW(), NOW())
+         ON CONFLICT (id) DO NOTHING`,
+        [userId]
+      );
+    } catch (dbError) {
+      console.error('Erreur création profil (non bloquante):', dbError.message);
     }
 
     try {

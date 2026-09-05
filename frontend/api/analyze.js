@@ -66,6 +66,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
 
+  // Authentification obligatoire : aucune analyse ne doit pouvoir être lancée sans compte.
+  // Rejetée avant de démarrer le pipeline (coûteux) plutôt que de retomber silencieusement sur
+  // un mode invité comme c'était le cas auparavant.
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
   let authenticatedUser = null;
@@ -79,6 +82,10 @@ export default async function handler(req, res) {
     } catch (authErr) {
       console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
     }
+  }
+
+  if (!authenticatedUser) {
+    return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
   }
 
   const pool = getDb();
