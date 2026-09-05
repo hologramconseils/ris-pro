@@ -338,26 +338,28 @@ export default function Diagnostic() {
             Diagnostic Freemium
           </div>
           <h1 className="text-3xl font-bold">{LABELS.ANALYSIS_READY}</h1>
-          <div className="text-lg text-muted" style={{ marginTop: '0.5rem' }}>
+
+          <div className="card" style={{
+            marginTop: '1.5rem',
+            padding: '1rem 1.25rem',
+            background: 'var(--warning-bg)',
+            border: '1px solid rgba(217, 119, 6, 0.25)',
+            borderRadius: '10px',
+            display: 'flex',
+            gap: '0.75rem',
+            alignItems: 'flex-start',
+            textAlign: 'left'
+          }}>
+            <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+            <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>
+              <strong>À lire avant de poursuivre : </strong>
+              cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
+            </p>
+          </div>
+
+          <div className="text-lg text-muted" style={{ marginTop: '1.5rem' }}>
             {results.summary ? <MarkdownRenderer content={results.summary} /> : "Nous avons audité votre document. Voici un aperçu des erreurs identifiées."}
           </div>
-        </div>
-
-        <div className="card" style={{
-          padding: '1rem 1.25rem',
-          background: 'var(--warning-bg)',
-          border: '1px solid rgba(217, 119, 6, 0.25)',
-          borderRadius: '10px',
-          display: 'flex',
-          gap: '0.75rem',
-          alignItems: 'flex-start',
-          textAlign: 'left'
-        }}>
-          <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
-          <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>
-            <strong>À lire avant de poursuivre : </strong>
-            cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
-          </p>
         </div>
 
         <div className="flex flex-col gap-4">
