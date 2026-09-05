@@ -1,5 +1,5 @@
 import { getDb } from './db.js';
-import { createClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 
 export default async function handler(req, res) {
   // CORS setup
@@ -39,13 +39,8 @@ export default async function handler(req, res) {
     const token = authHeader.split(' ')[1];
     let verified = null;
     try {
-      const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-      verified = await clerk.verifyToken(token);
+      verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
     } catch (authErr) {
-      // clerk.verifyToken lève une exception (pas juste null) sur un token invalide/expiré.
-      // analyze.js et get-analysis.js l'attrapent déjà localement pour retomber sur "anonyme" ;
-      // ici cette même exception remontait jusqu'au catch global et renvoyait un 500 au lieu
-      // d'un 401 propre, empêchant le frontend de distinguer "pas connecté" de "erreur serveur".
       console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
     }
 

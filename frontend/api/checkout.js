@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { createClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 import { getDb } from './db.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -25,8 +25,7 @@ export default async function handler(req, res) {
 
   if (token) {
     try {
-      const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-      const verified = await clerk.verifyToken(token);
+      const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
       if (verified && verified.sub) {
         authenticatedUser = { id: verified.sub };
       }
