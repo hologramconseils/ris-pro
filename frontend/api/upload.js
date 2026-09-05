@@ -1,5 +1,5 @@
 import { put } from '@vercel/blob';
-import { getDb } from './db.js';
+import { getDb, ensureProfilesSchema } from './db.js';
 import { verifyToken } from '@clerk/backend';
 
 export const config = {
@@ -63,22 +63,34 @@ export default async function handler(req, res) {
     const filePath = blob.url;
 
     // Enregistrement en base Neon
+    const pool = getDb();
+
     try {
-      const pool = getDb();
-      
       // S'assurer que la colonne file_base64 existe (migration auto)
       await pool.query('ALTER TABLE analyses ADD COLUMN IF NOT EXISTS file_base64 TEXT;');
-      
-      // Créer le profil si inexistant (premier upload)
-      if (userId) {
+    } catch (dbError) {
+      console.error('Erreur migration analyses (non bloquante):', dbError.message);
+    }
+
+    // Créer le profil si inexistant (premier upload). Volontairement dans son propre try/catch,
+    // séparé de l'INSERT dans `analyses` ci-dessous : un profil qui échoue à se créer (ex.
+    // décalage de schéma) ne doit jamais empêcher l'enregistrement du document lui-même, sinon
+    // /api/analyze ne le retrouve jamais ensuite (404 "Document introuvable").
+    if (userId) {
+      try {
+        await ensureProfilesSchema(pool);
         await pool.query(
           `INSERT INTO profiles (id, analysis_credits, is_paid, created_at, updated_at)
            VALUES ($1, 0, false, NOW(), NOW())
            ON CONFLICT (id) DO NOTHING`,
           [userId]
         );
+      } catch (dbError) {
+        console.error('Erreur création profil (non bloquante):', dbError.message);
       }
+    }
 
+    try {
       const base64Data = buffer.toString('base64');
 
       await pool.query(

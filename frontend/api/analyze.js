@@ -1,4 +1,4 @@
-import { getDb, ensureProfilesEmailColumn } from "./db.js";
+import { getDb, ensureProfilesSchema } from "./db.js";
 import crypto from "crypto";
 import { verifyToken } from "@clerk/backend";
 import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
@@ -591,7 +591,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         const isNewIdentity = !existingAnalysis;
         const wasRestricted = existingAnalysis && existingAnalysis.results && existingAnalysis.results.is_restricted === true;
 
-        await ensureProfilesEmailColumn(pool);
+        await ensureProfilesSchema(pool);
         const { rows: profileRows } = await pool.query(`SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`, [targetUserId]);
         const profile = profileRows.length > 0 ? profileRows[0] : null;
         let currentCredits = profile?.analysis_credits || 0;
