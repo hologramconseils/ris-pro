@@ -1,7 +1,7 @@
 import { getDb, ensureProfilesSchema } from "./db.js";
 import crypto from "crypto";
 import { verifyToken } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
+import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
 import { reconcileAnomalies } from "./anomalyReconciliation.js";
 
@@ -427,6 +427,11 @@ export default async function handler(req, res) {
         totalPoints
       });
 
+      // Mêmes anomalies que celles qui resteront visibles en freemium (buildRestrictedResults
+      // applique exactement le même calcul) : le résumé condensé demandé à l'IA doit s'y limiter
+      // pour rester cohérent avec le tableau d'anomalies réellement affiché.
+      const freemiumAnomalyYears = selectFreemiumAnomalies(rawAnomalies).map(a => a.year);
+
       const writerPrompt = `
 <role>Tu es le conseiller expert en retraite de RIS Pro. Tu rédiges le bilan final en te basant STRICTEMENT sur les données calculées.</role>
 
@@ -468,6 +473,8 @@ Rédige des paragraphes fluides, aérés, formels et humains. N'hésite pas à u
 Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun astérisque '*').
 Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
 TRÈS IMPORTANT : Le bilan textuel (summary) doit couvrir TOUTES les anomalies du tableau JSON 'anomalies' (elles y figurent toutes obligatoirement, cf. règle 3 ci-dessus). Si ce tableau est vide, indique explicitement dans le bilan qu'aucune erreur n'a été détectée.
+
+En plus de 'summary', rédige un second champ 'summary_freemium' : une version du même bilan, même ton et même format, mais qui ne mentionne QUE l'anomalie ou les anomalies de${freemiumAnomalyYears.length > 1 ? 's' : ''} année(s) ${freemiumAnomalyYears.length > 0 ? freemiumAnomalyYears.join(' et ') : '(aucune, tableau vide)'} — ce sont les seules qu'un utilisateur non-premium pourra voir dans le tableau 'anomalies'. N'évoque JAMAIS, même vaguement ("d'autres anomalies ont été détectées", "plusieurs erreurs supplémentaires"), l'existence d'anomalies concernant d'autres années : ce serait une fuite d'information vers un utilisateur qui n'a pas payé pour les voir. Les chiffres globaux (trimestres validés/requis, estimation de pension) restent identiques dans les deux versions, ce sont les vrais totaux de la carrière entière, pas seulement des années citées.
 </format_summary>
 
 <strategies_et_plan>
@@ -504,6 +511,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
             }
           },
           summary: { type: "string", description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
+          summary_freemium: { type: "string", description: "Même bilan que 'summary', mais limité aux seules anomalies visibles en freemium (voir <format_summary>). Ne mentionne jamais l'existence d'autres anomalies." },
           strategies: {
             type: "array",
             items: {
@@ -533,7 +541,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
           }
         },
         additionalProperties: false,
-        required: ["anomalies", "summary", "strategies", "action_plan"]
+        required: ["anomalies", "summary", "summary_freemium", "strategies", "action_plan"]
       };
 
       const writerResult = await mistralRequest("/v1/chat/completions", {
@@ -572,6 +580,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         trimestres_requis: trimestres_requis,
         anomalies: finalAnomalies,
         summary: writerData.summary || "",
+        summary_freemium: writerData.summary_freemium || writerData.summary || "",
         strategies: writerData.strategies || [],
         action_plan: writerData.action_plan || []
       };

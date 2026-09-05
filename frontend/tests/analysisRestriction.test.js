@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, isAdminProfile } from '../api/analysisRestriction.js';
+import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from '../api/analysisRestriction.js';
 
 test('isAdminProfile : rôle admin => true', () => {
   assert.equal(isAdminProfile({ role: 'admin', email: 'quelquun@example.com' }), true);
@@ -185,4 +185,38 @@ test('buildRestrictedResults : le tableau final (pas seulement le choix des 2 vi
 
   const visible = restricted.anomalies.filter(a => a.is_premium === false).map(a => a.year);
   assert.deepEqual(visible, ['1995', '2015']);
+});
+
+test('selectFreemiumAnomalies : renvoie la plus ancienne et la plus récente, dans cet ordre', () => {
+  const anomalies = [makeAnomaly(2015), makeAnomaly(1995), makeAnomaly(2005)];
+  const selected = selectFreemiumAnomalies(anomalies);
+  assert.deepEqual(selected.map(a => a.year), ['1995', '2015']);
+});
+
+test('selectFreemiumAnomalies : une seule anomalie => elle seule, pas de doublon', () => {
+  const selected = selectFreemiumAnomalies([makeAnomaly(2010)]);
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].year, '2010');
+});
+
+test('selectFreemiumAnomalies : aucune anomalie => tableau vide', () => {
+  assert.deepEqual(selectFreemiumAnomalies([]), []);
+});
+
+test('buildRestrictedResults : remplace summary par summary_freemium et ne renvoie jamais summary_freemium tel quel', () => {
+  const anomalies = [makeAnomaly(1995), makeAnomaly(2005), makeAnomaly(2015)];
+  const restricted = buildRestrictedResults({
+    anomalies,
+    summary: 'Résumé complet mentionnant 1995, 2005 ET 2015.',
+    summary_freemium: 'Résumé condensé ne mentionnant que 1995 et 2015.'
+  });
+
+  assert.equal(restricted.summary, 'Résumé condensé ne mentionnant que 1995 et 2015.');
+  assert.equal('summary_freemium' in restricted, false, 'summary_freemium ne doit jamais apparaître dans la réponse');
+});
+
+test('buildRestrictedResults : sans summary_freemium fourni, garde le summary complet tel quel (non-régression)', () => {
+  const anomalies = [makeAnomaly(1995), makeAnomaly(2015)];
+  const restricted = buildRestrictedResults({ anomalies, summary: 'Résumé complet.' });
+  assert.equal(restricted.summary, 'Résumé complet.');
 });
