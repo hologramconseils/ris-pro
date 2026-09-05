@@ -400,9 +400,9 @@ export default function Bilan() {
 
           {/* Synthèse textuelle de l'expert - Design Premium Consistant */}
           {results?.summary && (
-            <div className="card" style={{ 
-              padding: '2rem', 
-              borderTop: '4px solid var(--primary)', 
+            <div className="card" style={{
+              padding: '2rem',
+              borderTop: '4px solid var(--primary)',
               background: 'var(--bg-card)',
               boxShadow: '0 10px 30px -10px rgba(0,0,0,0.08)',
               borderRadius: '16px',
@@ -420,6 +420,24 @@ export default function Bilan() {
                   <h3 className="text-sm font-extrabold uppercase tracking-widest" style={{ color: 'var(--primary)', margin: 0 }}>Synthèse de l'Expert</h3>
                   <p className="text-xs text-muted" style={{ margin: 0 }}>Audit vérifié par un conseiller RIS Pro</p>
                 </div>
+              </div>
+              <div style={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'flex',
+                gap: '0.75rem',
+                alignItems: 'flex-start',
+                background: 'var(--warning-bg)',
+                border: '1px solid rgba(217, 119, 6, 0.25)',
+                borderRadius: '10px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.5rem'
+              }}>
+                <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+                <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>
+                  <strong>À lire avant de poursuivre : </strong>
+                  cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
+                </p>
               </div>
               <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1.25rem', borderLeft: '3px solid rgba(37, 99, 235, 0.4)' }}>
                 <MarkdownRenderer content={results.summary} />
