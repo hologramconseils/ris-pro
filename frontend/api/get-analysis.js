@@ -1,4 +1,4 @@
-import { getDb, ensureProfilesEmailColumn } from "./db.js";
+import { getDb, ensureProfilesSchema } from "./db.js";
 import { verifyToken } from "@clerk/backend";
 import { buildRestrictedResults, isAdminProfile } from "./analysisRestriction.js";
 
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
     let isAdmin = false;
     if (authenticatedUser) {
       try {
-        await ensureProfilesEmailColumn(pool);
+        await ensureProfilesSchema(pool);
         const { rows: profileRows } = await pool.query(
           `SELECT role, email FROM profiles WHERE id = $1 LIMIT 1`,
           [authenticatedUser.id]
