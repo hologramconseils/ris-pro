@@ -44,6 +44,10 @@ export default function Bilan() {
   const [hasAttemptedAgent, setHasAttemptedAgent] = useState(false)
   const [openAnomalyIndex, setOpenAnomalyIndex] = useState(0) // Premier accordéon ouvert par défaut
   const [openDocsIndex, setOpenDocsIndex] = useState(null) // Gestion du tiroir de justificatifs
+  // Si le webhook Stripe met plus longtemps que le polling automatique (rare, ex. pic de
+  // charge), on ne doit pas rester bloqué indéfiniment sur l'écran "Validation de votre
+  // paiement..." sans aucune action possible.
+  const [paymentPollTimedOut, setPaymentPollTimedOut] = useState(false)
 
   useEffect(() => {
     if (filePath) {
@@ -51,13 +55,14 @@ export default function Bilan() {
     }
 
     // Polling automatique pour gérer la latence du webhook de paiement
-    if (isSuccess && user && profile && profile.analysis_credits === 0) {
+    if (isSuccess && user && profile && profile.analysis_credits === 0 && !paymentPollTimedOut) {
       let attempts = 0;
       const interval = setInterval(() => {
         attempts += 1;
         refreshProfile();
         if (attempts >= 6) {
           clearInterval(interval);
+          setPaymentPollTimedOut(true);
         }
       }, 2000);
       return () => clearInterval(interval);
@@ -166,8 +171,12 @@ export default function Bilan() {
   // LOGIQUE D'ACCÈS : Autorisé si (Admin) OU (Mode Mock) OU (Accès payé legacy) OU (Crédits > 0) OU (Retour immédiat de paiement réussi) OU (Résultats déjà premium/non-restreints)
   const isAuthorized = profile?.role === 'admin' || isMock || profile?.is_paid || (profile?.analysis_credits > 0) || isSuccess || (results && !results.is_restricted)
 
-  // Polling / attente intermédiaire si retour de paiement réussi mais profil non mis à jour
-  const waitingForPayment = isSuccess && profile && profile.analysis_credits === 0 && !isMock && profile?.role !== 'admin'
+  // Polling / attente intermédiaire si retour de paiement réussi mais profil non mis à jour.
+  // Une fois le polling automatique épuisé sans résultat (paymentPollTimedOut), on ne reste
+  // plus indéfiniment sur ce spinner : on bascule vers un écran avec une action manuelle.
+  const paymentPendingBase = isSuccess && profile && profile.analysis_credits === 0 && !isMock && profile?.role !== 'admin'
+  const waitingForPayment = paymentPendingBase && !paymentPollTimedOut
+  const paymentTakingLonger = paymentPendingBase && paymentPollTimedOut
 
   if (waitingForPayment) {
     return (
@@ -177,6 +186,21 @@ export default function Bilan() {
         <p className="text-muted max-w-lg">
           Nous préparons votre espace Premium. Cette opération prend généralement quelques secondes.
         </p>
+      </div>
+    )
+  }
+
+  if (paymentTakingLonger) {
+    return (
+      <div className="container flex flex-col items-center justify-center gap-6" style={{ minHeight: '60vh', padding: '4rem 1.5rem', textAlign: 'center' }}>
+        <AlertTriangle size={48} className="text-warning mx-auto mb-4" />
+        <h1 className="text-2xl font-bold">La validation prend plus de temps que prévu</h1>
+        <p className="text-muted max-w-lg">
+          Votre paiement a bien été enregistré par Stripe, mais l'activation de votre espace Premium tarde un peu plus que d'habitude. Réessayez dans quelques instants, ou consultez l'email de confirmation envoyé après votre paiement.
+        </p>
+        <button className="btn btn-primary" onClick={() => refreshProfile()}>
+          {LABELS.CTA_REFRESH_STATUS}
+        </button>
       </div>
     )
   }
