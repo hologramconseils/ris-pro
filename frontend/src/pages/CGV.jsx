@@ -1,8 +1,15 @@
 import React from 'react'
 import { LABELS } from '../config/labels'
+import SEO from '../components/SEO'
 
 export default function CGV() {
   return (
+    <>
+      <SEO
+        title="Conditions Générales de Vente | RIS Pro"
+        description="Conditions générales de vente applicables à l'utilisation et à l'achat de bilans sur RIS Pro, par Hologram Conseils."
+        path="/cgv"
+      />
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1, maxWidth: '800px' }}>
       <h1 className="text-3xl font-bold mb-6">Conditions Générales de Vente (CGV)</h1>
       
@@ -56,5 +63,6 @@ export default function CGV() {
         </section>
       </div>
     </div>
+    </>
   )
 }

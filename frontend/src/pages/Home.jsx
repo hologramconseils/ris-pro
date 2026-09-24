@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert, CreditCard } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
+import SEO from '../components/SEO'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -115,6 +116,12 @@ export default function Home() {
   }
 
   return (
+    <>
+      <SEO
+        title="RIS Pro – Audit IA de votre relevé de carrière"
+        description="Déposez votre relevé de carrière : RIS Pro détecte gratuitement les trimestres manquants et anomalies de retraite en quelques minutes."
+        path="/"
+      />
     <div className="container" style={{ padding: '4rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
@@ -229,5 +236,6 @@ export default function Home() {
         }
       `}</style>
     </div>
+    </>
   )
 }

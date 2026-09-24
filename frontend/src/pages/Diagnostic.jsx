@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award, Loader2, AlertTriangle, UserPlus, ShieldAlert, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
+import { useNoIndex } from '../hooks/useNoIndex'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -28,6 +29,7 @@ const MarkdownRenderer = ({ content }) => {
 };
 
 export default function Diagnostic() {
+  useNoIndex()
   const navigate = useNavigate()
   const { user, profile } = useAuth()
   const [searchParams] = useSearchParams()
