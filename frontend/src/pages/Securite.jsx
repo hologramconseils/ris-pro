@@ -1,8 +1,15 @@
 import React from 'react'
 import { LABELS } from '../config/labels'
+import SEO from '../components/SEO'
 
 export default function Securite() {
   return (
+    <>
+      <SEO
+        title="Sécurité des données | RIS Pro"
+        description="Comment RIS Pro protège vos données de carrière et de retraite : chiffrement, hébergement et bonnes pratiques de sécurité."
+        path="/securite"
+      />
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1, maxWidth: '800px' }}>
       <h1 className="text-3xl font-bold mb-6">{LABELS.DATA_SECURITY}</h1>
       
@@ -38,5 +45,6 @@ export default function Securite() {
         </section>
       </div>
     </div>
+    </>
   )
 }

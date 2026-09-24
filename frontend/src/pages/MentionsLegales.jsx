@@ -1,8 +1,15 @@
 import React from 'react'
 import { LABELS } from '../config/labels'
+import SEO from '../components/SEO'
 
 export default function MentionsLegales() {
   return (
+    <>
+      <SEO
+        title="Mentions légales | RIS Pro"
+        description="Mentions légales du site RIS Pro, édité par Hologram Conseils : éditeur, hébergement et informations légales."
+        path="/mentions-legales"
+      />
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1, maxWidth: '800px' }}>
       <h1 className="text-3xl font-bold mb-6">{LABELS.LEGAL_MENTIONS}</h1>
       
@@ -41,5 +48,6 @@ export default function MentionsLegales() {
         </section>
       </div>
     </div>
+    </>
   )
 }

@@ -1,8 +1,15 @@
 import React from 'react'
 import { LABELS } from '../config/labels'
+import SEO from '../components/SEO'
 
 export default function PolitiqueConfidentialite() {
   return (
+    <>
+      <SEO
+        title="Politique de confidentialité | RIS Pro"
+        description="Politique de confidentialité de RIS Pro : données collectées, finalités, durée de conservation et vos droits RGPD."
+        path="/politique-confidentialite"
+      />
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1, maxWidth: '800px', lineHeight: '1.6' }}>
       <h1 className="text-3xl font-bold mb-6">{LABELS.PRIVACY_POLICY}</h1>
       
@@ -127,5 +134,6 @@ export default function PolitiqueConfidentialite() {
         </section>
       </div>
     </div>
+    </>
   )
 }

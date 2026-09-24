@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SignIn, SignUp } from '@clerk/clerk-react'
 import { LABELS } from '../config/labels'
+import { useNoIndex } from '../hooks/useNoIndex'
 
 export default function Login() {
+  useNoIndex()
   const [searchParams] = useSearchParams()
   const redirect = searchParams.get('redirect') || '/'
   const isSignup = searchParams.get('signup') === 'true'
