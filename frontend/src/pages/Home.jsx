@@ -4,6 +4,7 @@ import { UploadCloud, FileText, CheckCircle2, ShieldCheck, ShieldAlert, CreditCa
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 import SEO from '../components/SEO'
+import { SEO_ROUTES_BY_PATH } from '../seoRoutes'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -117,11 +118,7 @@ export default function Home() {
 
   return (
     <>
-      <SEO
-        title="RIS Pro – Audit IA de votre relevé de carrière"
-        description="Déposez votre relevé de carrière : RIS Pro détecte gratuitement les trimestres manquants et anomalies de retraite en quelques minutes."
-        path="/"
-      />
+      <SEO {...SEO_ROUTES_BY_PATH['/']} />
     <div className="container" style={{ padding: '4rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col items-center text-center animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', gap: '1.5rem' }}>
         
@@ -131,7 +128,6 @@ export default function Home() {
         
         <p className="text-xl text-muted" style={{ maxWidth: '600px', marginBottom: '2rem' }}>
           {LABELS.TAGLINE}
-          <span style={{ display: 'none' }}>v2.2-20260507 (Restored UI)</span>
         </p>
 
         {error && (
@@ -147,7 +143,7 @@ export default function Home() {
               <ShieldCheck size={48} />
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-2">Connectez-vous pour commencer l'analyse</h3>
+              <h2 className="text-xl font-bold mb-2">Connectez-vous pour commencer l'analyse</h2>
               <p className="text-muted max-w-md mx-auto">
                 Afin de garantir la sécurité et la confidentialité de vos données, une identification est requise avant tout traitement de votre relevé de carrière.
               </p>
@@ -167,7 +163,7 @@ export default function Home() {
               <ShieldCheck size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--primary)' }} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{LABELS.ANALYZING}</h3>
+              <h2 className="text-lg font-semibold">{LABELS.ANALYZING}</h2>
               <p className="text-sm text-muted">Analyse et chiffrement de votre document en cours…</p>
             </div>
           </div>
@@ -185,7 +181,7 @@ export default function Home() {
                 <UploadCloud size={32} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Uploader mon relevé de carrière</h3>
+                <h2 className="text-lg font-semibold">Uploader mon relevé de carrière</h2>
                 <p className="text-sm text-muted">
                   <span className="hidden md:inline">Glissez-déposez votre RIS / EIG au format PDF ou </span>
                   <span>cliquez pour parcourir et analyser votre relevé.</span>
