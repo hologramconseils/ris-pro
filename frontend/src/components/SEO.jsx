@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async'
 
 const SITE_URL = 'https://ris.hologramconseils.com'
 
-export default function SEO({ title, description, path = '/', noIndex = false }) {
+export default function SEO({ title, description, path = '/', noIndex = false, type = 'website', jsonLd = null }) {
   const canonical = `${SITE_URL}${path}`
 
   return (
@@ -13,9 +13,15 @@ export default function SEO({ title, description, path = '/', noIndex = false })
       {title && <meta property="og:title" content={title} />}
       {description && <meta property="og:description" content={description} />}
       <meta property="og:url" content={canonical} />
+      <meta property="og:type" content={type} />
       {title && <meta property="twitter:title" content={title} />}
       {description && <meta property="twitter:description" content={description} />}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      {jsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
+      )}
     </Helmet>
   )
 }

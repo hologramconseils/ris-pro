@@ -33,6 +33,7 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-4 items-center">
           <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">Accueil</Link>
+          <Link to="/guides" className="text-sm font-medium hover:text-primary transition-colors">Guides retraite</Link>
           <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:text-primary transition-colors">
             {LABELS.BRAND_NAME}
           </a>
@@ -72,6 +73,7 @@ export default function Header() {
           
           <div className="flex flex-col gap-4">
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-base font-medium p-2 hover:bg-secondary rounded-md">Accueil</Link>
+            <Link to="/guides" onClick={() => setIsMenuOpen(false)} className="text-base font-medium p-2 hover:bg-secondary rounded-md">Guides retraite</Link>
             <a href="https://www.hologramconseils.com/nos-prestations/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} className="text-base font-medium p-2 hover:bg-secondary rounded-md">
               {LABELS.BRAND_NAME}
             </a>

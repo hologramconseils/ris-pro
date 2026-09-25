@@ -19,6 +19,11 @@ const MentionsLegales = lazy(() => import('./pages/MentionsLegales'))
 const CGV = lazy(() => import('./pages/CGV'))
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'))
 const Securite = lazy(() => import('./pages/Securite'))
+const Guides = lazy(() => import('./pages/Guides'))
+const GuideTrimestresManquants = lazy(() => import('./pages/guides/TrimestresManquants'))
+const GuideCumulEmploiRetraite = lazy(() => import('./pages/guides/CumulEmploiRetraite'))
+const GuideDepartAnticipeRetraiteProgressive = lazy(() => import('./pages/guides/DepartAnticipeRetraiteProgressive'))
+const GuidePensionReversionPolypensionnesExpatriation = lazy(() => import('./pages/guides/PensionReversionPolypensionnesExpatriation'))
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -68,6 +73,11 @@ function App() {
                     <Route path="/cgv" element={<CGV />} />
                     <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                     <Route path="/securite" element={<Securite />} />
+                    <Route path="/guides" element={<Guides />} />
+                    <Route path="/guides/trimestres-manquants-releve-de-carriere" element={<GuideTrimestresManquants />} />
+                    <Route path="/guides/cumul-emploi-retraite" element={<GuideCumulEmploiRetraite />} />
+                    <Route path="/guides/depart-anticipe-retraite-progressive" element={<GuideDepartAnticipeRetraiteProgressive />} />
+                    <Route path="/guides/pension-reversion-polypensionnes-expatriation" element={<GuidePensionReversionPolypensionnesExpatriation />} />
                   </Routes>
                 </Suspense>
               </main>
