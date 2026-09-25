@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+/* Fonts are loaded from index.html (non-blocking), not via @import here. */
 
 :root {
   /* Brand Colors */
@@ -873,7 +873,7 @@ a:hover {
   body {
     background-color: #ffffff !important;
     color: #0f172a !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-family: 'Outfit', -apple-system, sans-serif !important;
     font-size: 11pt;
     line-height: 1.5;
     -webkit-print-color-adjust: exact !important;

@@ -1,4 +1,7 @@
 User-agent: *
-Allow: /
+Disallow: /login
+Disallow: /diagnostic
+Disallow: /bilan
+Disallow: /api/
 
 Sitemap: https://ris.hologramconseils.com/sitemap.xml
