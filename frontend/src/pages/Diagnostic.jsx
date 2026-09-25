@@ -4,29 +4,6 @@ import { AlertCircle, ChevronRight, Lock, Calendar, Building, DollarSign, Award,
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 import { useNoIndex } from '../hooks/useNoIndex'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-
-const MarkdownRenderer = ({ content }) => {
-  if (!content) return null;
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        h1: ({node, ...props}) => <h1 className="text-3xl font-extrabold my-6 text-main print-text-black" style={{ letterSpacing: '-0.02em', borderBottom: '2px solid var(--primary)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }} {...props} />,
-        h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-8 mb-4 text-primary print-text-black" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '0.5rem', fontFamily: 'var(--font-sans)' }} {...props} />,
-        h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-6 mb-3 text-main print-text-black" style={{ fontFamily: 'var(--font-sans)' }} {...props} />,
-        p: ({node, ...props}) => <p className="text-base my-3 print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
-        ul: ({node, ...props}) => <ul className="list-disc pl-5 my-3 text-base print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
-        ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-3 text-base print-text-black" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--text-muted)', lineHeight: '1.75', textAlign: 'left' }} {...props} />,
-        li: ({node, ...props}) => <li className="mb-1" {...props} />,
-        strong: ({node, ...props}) => <strong className="font-bold text-main" style={{ color: 'var(--text-main)', fontFamily: 'var(--font-sans)' }} {...props} />
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  );
-};
 
 export default function Diagnostic() {
   useNoIndex()
@@ -357,10 +334,6 @@ export default function Diagnostic() {
               <strong>À lire avant de poursuivre : </strong>
               cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
             </p>
-          </div>
-
-          <div className="text-lg text-muted" style={{ marginTop: '1.5rem' }}>
-            {results.summary ? <MarkdownRenderer content={results.summary} /> : "Nous avons audité votre document. Voici un aperçu des erreurs identifiées."}
           </div>
         </div>
 

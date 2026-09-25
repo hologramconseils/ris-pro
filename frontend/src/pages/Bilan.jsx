@@ -400,90 +400,22 @@ export default function Bilan() {
             </div>
           </div>
 
-          {/* Synthèse textuelle de l'expert - Design Premium Consistant */}
-          {results?.summary && (
-            <div className="card" style={{
-              padding: '2rem',
-              borderTop: '4px solid var(--primary)',
-              background: 'var(--bg-card)',
-              boxShadow: '0 10px 30px -10px rgba(0,0,0,0.08)',
-              borderRadius: '16px',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05, transform: 'scale(2)' }}>
-                <Award size={120} />
-              </div>
-              <div className="flex items-center gap-4 mb-5" style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ background: 'var(--primary)', color: 'white', padding: '0.6rem', borderRadius: '12px', flexShrink: 0 }}>
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-extrabold uppercase tracking-widest" style={{ color: 'var(--primary)', margin: 0 }}>Synthèse de l'Expert</h3>
-                  <p className="text-xs text-muted" style={{ margin: 0 }}>Audit vérifié par un conseiller RIS Pro</p>
-                </div>
-              </div>
-              <div style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                gap: '0.75rem',
-                alignItems: 'flex-start',
-                background: 'var(--warning-bg)',
-                border: '1px solid rgba(217, 119, 6, 0.25)',
-                borderRadius: '10px',
-                padding: '1rem 1.25rem',
-                marginBottom: '1.5rem'
-              }}>
-                <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
-                <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>
-                  <strong>À lire avant de poursuivre : </strong>
-                  cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
-                </p>
-              </div>
-              <div style={{ position: 'relative', zIndex: 1, paddingLeft: '1.25rem', borderLeft: '3px solid rgba(37, 99, 235, 0.4)' }}>
-                <MarkdownRenderer content={results.summary} />
-              </div>
-            </div>
-          )}
-
-          {/* Stratégies d'optimisation (si disponibles) */}
-          {Array.isArray(results?.strategies) && results.strategies.length > 0 && (
-            <div className="mt-2">
-              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <TrendingUp size={18} className="text-success" />
-                Opportunités & Stratégies d'Optimisation
-              </h3>
-              <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', display: 'grid' }}>
-                {results.strategies.map((strat, sIdx) => (
-                  <div key={sIdx} className="card" style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', background: 'var(--bg-card)' }}>
-                    <div className="badge badge-success text-xs font-bold mb-2" style={{ width: 'fit-content' }}>
-                      {strat.priority ? `Priorité : ${strat.priority}` : "Opportunité"}
-                    </div>
-                    <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-main)' }}>{strat.title || strat.titre}</h4>
-                    <div className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>
-                      <MarkdownRenderer content={strat.description} />
-                    </div>
-                    {strat.impact && (
-                      <div
-                        className="text-xs font-bold"
-                        style={{
-                          marginTop: '0.75rem',
-                          width: 'fit-content',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '999px',
-                          background: 'rgba(22, 163, 74, 0.12)',
-                          color: 'var(--success)'
-                        }}
-                      >
-                        {strat.impact}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Avertissement retraite */}
+          <div className="card" style={{
+            padding: '1rem 1.25rem',
+            background: 'var(--warning-bg)',
+            border: '1px solid rgba(217, 119, 6, 0.25)',
+            borderRadius: '10px',
+            display: 'flex',
+            gap: '0.75rem',
+            alignItems: 'flex-start'
+          }}>
+            <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+            <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>
+              <strong>À lire avant de poursuivre : </strong>
+              cette estimation est fournie à titre indicatif, sur la base des informations actuellement disponibles dans votre relevé de carrière. Elle ne saurait en aucun cas préjuger de la décision finale de vos caisses de retraite, seules compétentes pour statuer sur vos droits. Ce calcul peut ne pas intégrer l'ensemble des revalorisations, décotes et surcotes propres à chaque régime. Nous vous invitons à considérer ce bilan comme un point de repère, à confirmer auprès de vos organismes de retraite.
+            </p>
+          </div>
         </section>
 
         {/* SECTION 2 : TABLEAU DES ANOMALIES PLIABLES (ACCORDÉON) */}
@@ -637,11 +569,49 @@ export default function Bilan() {
           )}
         </section>
 
-        {/* SECTION 3 : PLAN D'ACTION CHRONOLOGIQUE CONSOLIDÉ */}
+        {/* SECTION 3 : OPPORTUNITÉS & STRATÉGIES D'OPTIMISATION */}
+        {Array.isArray(results?.strategies) && results.strategies.length > 0 && (
+          <section className="flex flex-col gap-6">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-main" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
+              <TrendingUp className="text-primary" size={22} />
+              SECTION 3 — Opportunités & Stratégies d'Optimisation
+            </h2>
+            <div className="synthesis-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', display: 'grid' }}>
+              {results.strategies.map((strat, sIdx) => (
+                <div key={sIdx} className="card" style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', background: 'var(--bg-card)' }}>
+                  <div className="badge badge-success text-xs font-bold mb-2" style={{ width: 'fit-content' }}>
+                    {strat.priority ? `Priorité : ${strat.priority}` : "Opportunité"}
+                  </div>
+                  <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-main)' }}>{strat.title || strat.titre}</h4>
+                  <div className="text-xs text-muted leading-relaxed" style={{ margin: 0 }}>
+                    <MarkdownRenderer content={strat.description} />
+                  </div>
+                  {strat.impact && (
+                    <div
+                      className="text-xs font-bold"
+                      style={{
+                        marginTop: '0.75rem',
+                        width: 'fit-content',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '999px',
+                        background: 'rgba(22, 163, 74, 0.12)',
+                        color: 'var(--success)'
+                      }}
+                    >
+                      {strat.impact}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 4 : PLAN D'ACTION CHRONOLOGIQUE CONSOLIDÉ */}
         <section className="flex flex-col gap-6">
           <h2 className="text-xl font-bold flex items-center gap-2 text-main" style={{ borderBottom: '2px solid rgba(0,0,0,0.05)', paddingBottom: '0.75rem' }}>
             <Sparkles className="text-primary" size={22} />
-            SECTION 3 — Plan d'Action Chronologique
+            SECTION 4 — Plan d'Action Chronologique
           </h2>
 
           <div className="timeline-container" style={{ position: 'relative', paddingLeft: '1rem', marginTop: '1rem' }}>
