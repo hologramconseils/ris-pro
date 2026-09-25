@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Non-blocking load of the fonts actually used site-wide (Plus Jakarta Sans / Outfit / Playfair Display,
+         see src/index.css). Loaded as "print" then swapped to "all" on load so it never blocks first paint. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" /></noscript>
     <title>RIS Pro – Audit IA de votre relevé de carrière</title>
-    <meta name="description" content="Auditez votre relevé de carrière en quelques secondes avec RIS Pro. Détectez vos anomalies de retraite et sécurisez vos droits, gratuitement." />
+    <meta name="description" content="Déposez votre relevé de carrière : RIS Pro détecte gratuitement les trimestres manquants et anomalies de retraite en quelques minutes." />
     <meta name="keywords" content="retraite, RIS, relevé de carrière, audit retraite, calcul retraite, hologram conseils, anomalies retraite" />
     <link rel="canonical" href="https://ris.hologramconseils.com/" />
 
