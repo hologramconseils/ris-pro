@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { FileSearch, Briefcase, Clock, Globe, ArrowRight } from 'lucide-react'
 import SEO from '../components/SEO'
+import { SEO_ROUTES_BY_PATH } from '../seoRoutes'
 
 const GUIDES = [
   {
@@ -46,12 +47,7 @@ export default function Guides() {
 
   return (
     <>
-      <SEO
-        title="Guides retraite 2026 : trimestres manquants, cumul emploi-retraite, départ anticipé | RIS Pro"
-        description="Guides pratiques et à jour de la réglementation 2026 : trimestres manquants, cumul emploi-retraite, départ anticipé, retraite progressive, réversion, polypensionnés, expatriation."
-        path="/guides"
-        jsonLd={jsonLd}
-      />
+      <SEO {...SEO_ROUTES_BY_PATH['/guides']} jsonLd={jsonLd} />
       <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
         <div className="flex flex-col" style={{ maxWidth: '700px', gap: '1rem', marginBottom: '3rem' }}>
           <span

@@ -1,5 +1,6 @@
 import React from 'react'
 import SEO from '../../components/SEO'
+import { SEO_ROUTES_BY_PATH } from '../../seoRoutes'
 import GuideArticle, { FactTable } from './GuideArticle'
 
 const PATH = '/guides/cumul-emploi-retraite'
@@ -50,7 +51,7 @@ export default function CumulEmploiRetraite() {
 
   return (
     <>
-      <SEO title={`${TITLE} | RIS Pro`} description={DESCRIPTION} path={PATH} type="article" jsonLd={jsonLd} />
+      <SEO {...SEO_ROUTES_BY_PATH[PATH]} type="article" jsonLd={jsonLd} />
       <GuideArticle
         title={TITLE}
         updated="25 septembre 2026"
