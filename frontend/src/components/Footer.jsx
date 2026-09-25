@@ -12,6 +12,7 @@ export default function Footer() {
         </p>
 
         <div className="flex gap-6 flex-wrap justify-center text-sm text-muted font-medium">
+          <Link to="/guides" className="hover:text-main">Guides retraite</Link>
           <Link to="/mentions-legales" className="hover:text-main">{LABELS.LEGAL_MENTIONS}</Link>
           <Link to="/cgv" className="hover:text-main">{LABELS.CGV}</Link>
           <Link to="/politique-confidentialite" className="hover:text-main">{LABELS.PRIVACY_POLICY}</Link>
