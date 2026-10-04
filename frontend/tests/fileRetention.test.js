@@ -4,7 +4,7 @@ import { purgeExpiredFiles, RETENTION_MONTHS } from '../lib/fileRetention.js';
 
 // Base simulée : `expired` = relevés de plus de 6 mois encore présents.
 function fakePool(expired) {
-  const rows = expired.map((r) => ({ ...r, file_base64: 'JVBERi0=', file_deleted_at: null }));
+  const rows = expired.map((r) => ({ ...r, file_base64: 'JVBERi0=', extraction: { synthese_annees: [] }, file_deleted_at: null }));
   const queries = [];
   return {
     rows,
@@ -19,6 +19,7 @@ function fakePool(expired) {
         const [id, blobDeleted] = params;
         const row = rows.find((r) => r.id === id);
         row.file_base64 = null;
+        if (/extraction = NULL/.test(sql)) row.extraction = null;
         if (blobDeleted) row.file_deleted_at = 'now';
       }
       return { rows: [] };
@@ -36,7 +37,7 @@ test('purgeExpiredFiles : supprime le fichier Blob et la copie en base des relev
 
   assert.deepEqual(summary, { deleted: 2, blobFailures: 0 });
   assert.deepEqual(deletedUrls, ['https://blob.example/ris-pro/a.pdf', 'https://blob.example/ris-pro/b.pdf']);
-  assert.ok(pool.rows.every((r) => r.file_base64 === null && r.file_deleted_at));
+  assert.ok(pool.rows.every((r) => r.file_base64 === null && r.extraction === null && r.file_deleted_at));
   assert.equal(pool.queries.find((q) => /SELECT id/.test(q.sql)).params[0], RETENTION_MONTHS);
 });
 

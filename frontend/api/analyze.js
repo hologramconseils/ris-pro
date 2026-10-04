@@ -6,6 +6,7 @@ import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
 import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "../lib/security.js";
 import { FILE_DELETED_MESSAGE } from "../lib/fileRetention.js";
+import { ensureExtractionSchema, toCachedExtraction, isUsableExtraction } from "../lib/extractionCache.js";
 
 export const maxDuration = 300;
 
@@ -63,6 +64,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Erreur de configuration serveur" });
   }
   const salt = nirSalt || 'ris_pro_v2_salt_2026';
+  const hashNir = (nir) => {
+    const cleanNir = (nir || "").replace(/\s/g, '') || "000000000000000";
+    return crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
+  };
 
   if (!filePath) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
@@ -100,8 +105,9 @@ export default async function handler(req, res) {
   let dbFilePath = filePath;
 
   try {
+    await ensureExtractionSchema(pool);
     const { rows: analysisRows } = await pool.query(
-      `SELECT user_id, status, file_path, results, nir_hash FROM analyses WHERE file_path = $1 LIMIT 1`,
+      `SELECT user_id, status, file_path, results, nir_hash, extraction FROM analyses WHERE file_path = $1 LIMIT 1`,
       [filePath]
     );
     
@@ -126,7 +132,7 @@ export default async function handler(req, res) {
     // Renseignés quand une nouvelle analyse est nécessaire : l'extraction et le calcul sont faits
     // d'abord, la rédaction (IA en premium, textes modèles en freemium) attend que l'accès soit
     // connu, ce qui demande le NIR extrait.
-    let pendingNir = null;
+    let pendingNirHash = null;
     let generateResults = null;
 
     // Un résultat "completed" dégénéré (extraction passée précédemment vide malgré un
@@ -146,15 +152,6 @@ export default async function handler(req, res) {
     ) {
       analysisResults = analysisRecord.results;
     } else {
-      // Le PDF n'est lu que si une nouvelle analyse est nécessaire : un bilan déjà calculé reste
-      // consultable même après la suppression du relevé (6 mois après son dépôt, cf.
-      // lib/fileRetention.js).
-      const { rows: fileRows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
-      const base64Data = fileRows.length > 0 ? fileRows[0].file_base64 : null;
-      if (!base64Data) {
-        throw new UserFacingError(FILE_DELETED_MESSAGE, 410);
-      }
-      
       const fs = await import('fs');
       const path = await import('path');
       
@@ -190,8 +187,25 @@ export default async function handler(req, res) {
       }
 
       // --- AGENT 1 : EXTRACTEUR (IA) ---
-      console.log("Démarrage Agent 1 : Extracteur...");
-      const extractorPrompt = `
+      // Les données déjà extraites de ce relevé sont réutilisées (cf. lib/extractionCache.js) :
+      // relire le PDF ne servirait qu'à repayer Mistral OCR pour obtenir le même résultat.
+      let extractedData;
+      if (isUsableExtraction(analysisRecord.extraction) && analysisRecord.nir_hash) {
+        console.log("Agent 1 : données extraites déjà disponibles, relecture du PDF évitée.");
+        extractedData = analysisRecord.extraction;
+        pendingNirHash = analysisRecord.nir_hash;
+      } else {
+        // Le PDF n'est lu que si une nouvelle analyse est nécessaire : un bilan déjà calculé reste
+        // consultable même après la suppression du relevé (6 mois après son dépôt, cf.
+        // lib/fileRetention.js).
+        const { rows: fileRows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
+        const base64Data = fileRows.length > 0 ? fileRows[0].file_base64 : null;
+        if (!base64Data) {
+          throw new UserFacingError(FILE_DELETED_MESSAGE, 410);
+        }
+
+        console.log("Démarrage Agent 1 : Extracteur...");
+        const extractorPrompt = `
 <role>Tu es un outil d'extraction de données automatisé (Extracteur expert). Ta tâche exclusive est d'analyser le document PDF (Relevé de Carrière, RIS ou EIG) et d'en extraire deux tableaux distincts sans essayer de les fusionner.</role>
 
 <instructions>
@@ -211,84 +225,99 @@ export default async function handler(req, res) {
 </regles_strictes>
       `;
 
-      const extractorSchema = {
-        type: "object",
-        properties: {
-          is_valid_document: { type: "boolean", description: "True si le document est un relevé de carrière (RIS, EIG ou autre document de retraite officiel) valide, false sinon." },
-          nir: { type: "string", description: "Numéro de sécurité sociale (sans les clés)." },
-          total_trimestres_enregistres: { type: "integer", description: "Le nombre total de trimestres déjà enregistrés/validés par les différents régimes, indiqué globalement dans le document." },
-          total_trimestres_requis: { type: "integer", description: "Le nombre total de trimestres requis/nécessaires pour pouvoir partir à taux plein, indiqué globalement dans le document." },
-          synthese_annees: {
-            type: "array",
-            description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
-            items: {
-              type: "object",
-              properties: {
-                year: { type: "integer", description: "L'année (ex: 1998)" },
-                trimesters: { type: "integer", description: "Nombre total de trimestres validés pour cette année (0 à 4)" },
-                points: { type: "number", description: "Nombre de points de retraite acquis (ex: 34.5)" }
-              },
-              additionalProperties: false,
-              required: ["year", "trimesters", "points"]
+        const extractorSchema = {
+          type: "object",
+          properties: {
+            is_valid_document: { type: "boolean", description: "True si le document est un relevé de carrière (RIS, EIG ou autre document de retraite officiel) valide, false sinon." },
+            nir: { type: "string", description: "Numéro de sécurité sociale (sans les clés)." },
+            total_trimestres_enregistres: { type: "integer", description: "Le nombre total de trimestres déjà enregistrés/validés par les différents régimes, indiqué globalement dans le document." },
+            total_trimestres_requis: { type: "integer", description: "Le nombre total de trimestres requis/nécessaires pour pouvoir partir à taux plein, indiqué globalement dans le document." },
+            synthese_annees: {
+              type: "array",
+              description: "Tableau de synthèse donnant le nombre total de trimestres par année (Durée tous régimes).",
+              items: {
+                type: "object",
+                properties: {
+                  year: { type: "integer", description: "L'année (ex: 1998)" },
+                  trimesters: { type: "integer", description: "Nombre total de trimestres validés pour cette année (0 à 4)" },
+                  points: { type: "number", description: "Nombre de points de retraite acquis (ex: 34.5)" }
+                },
+                additionalProperties: false,
+                required: ["year", "trimesters", "points"]
+              }
+            },
+            detail_employeurs: {
+              type: "array",
+              description: "Tableau des employeurs avec dates de début, dates de fin et revenus.",
+              items: {
+                type: "object",
+                properties: {
+                  employer: { type: "string", description: "Nom de l'employeur ou de l'activité (CHÔMAGE, MALADIE...)" },
+                  start_year: { type: "integer", description: "Année de début (ex: 2000)" },
+                  end_year: { type: "integer", description: "Année de fin (ex: 2001)" },
+                  salary: { type: "string", description: "Revenus bruts (exactement comme écrit, ex: '3 744 FRF', '25 €' ou 'N/A')" }
+                },
+                additionalProperties: false,
+                required: ["employer", "start_year", "end_year", "salary"]
+              }
             }
           },
-          detail_employeurs: {
-            type: "array",
-            description: "Tableau des employeurs avec dates de début, dates de fin et revenus.",
-            items: {
-              type: "object",
-              properties: {
-                employer: { type: "string", description: "Nom de l'employeur ou de l'activité (CHÔMAGE, MALADIE...)" },
-                start_year: { type: "integer", description: "Année de début (ex: 2000)" },
-                end_year: { type: "integer", description: "Année de fin (ex: 2001)" },
-                salary: { type: "string", description: "Revenus bruts (exactement comme écrit, ex: '3 744 FRF', '25 €' ou 'N/A')" }
-              },
-              additionalProperties: false,
-              required: ["employer", "start_year", "end_year", "salary"]
-            }
-          }
-        },
-        additionalProperties: false,
-        required: ["is_valid_document", "nir", "synthese_annees", "detail_employeurs"]
-      };
+          additionalProperties: false,
+          required: ["is_valid_document", "nir", "synthese_annees", "detail_employeurs"]
+        };
 
-      const runExtraction = async () => {
-        const ocrResult = await mistralRequest("/v1/ocr", {
-          model: "mistral-ocr-latest",
-          document: {
-            type: "document_url",
-            document_url: `data:application/pdf;base64,${base64Data}`
-          },
-          document_annotation_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "extraction_releve_carriere",
-              schema: extractorSchema,
-              strict: true
-            }
-          },
-          document_annotation_prompt: extractorPrompt
-        });
-        return JSON.parse(ocrResult.document_annotation);
-      };
+        const runExtraction = async () => {
+          const ocrResult = await mistralRequest("/v1/ocr", {
+            model: "mistral-ocr-latest",
+            document: {
+              type: "document_url",
+              document_url: `data:application/pdf;base64,${base64Data}`
+            },
+            document_annotation_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "extraction_releve_carriere",
+                schema: extractorSchema,
+                strict: true
+              }
+            },
+            document_annotation_prompt: extractorPrompt
+          });
+          return JSON.parse(ocrResult.document_annotation);
+        };
 
-      let extractedData = await runExtraction();
-      if (!extractedData.is_valid_document) {
-        throw new UserFacingError("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
-      }
-
-      // Un document valide doit contenir au moins un total global ou une synthèse par année.
-      // Si l'extraction est vide malgré is_valid_document=true, l'IA a échoué silencieusement :
-      // on retente une fois avant d'échouer explicitement plutôt que de produire un bilan à 0.
-      const isExtractionEmpty = (data) =>
-        !(data.total_trimestres_enregistres > 0) &&
-        !(Array.isArray(data.synthese_annees) && data.synthese_annees.length > 0);
-
-      if (isExtractionEmpty(extractedData)) {
-        console.warn("[Extracteur] Extraction vide malgré un document valide, nouvelle tentative...");
         extractedData = await runExtraction();
+        if (!extractedData.is_valid_document) {
+          throw new UserFacingError("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+        }
+
+        // Un document valide doit contenir au moins un total global ou une synthèse par année.
+        // Si l'extraction est vide malgré is_valid_document=true, l'IA a échoué silencieusement :
+        // on retente une fois avant d'échouer explicitement plutôt que de produire un bilan à 0.
+        const isExtractionEmpty = (data) =>
+          !(data.total_trimestres_enregistres > 0) &&
+          !(Array.isArray(data.synthese_annees) && data.synthese_annees.length > 0);
+
         if (isExtractionEmpty(extractedData)) {
-          throw new UserFacingError("L'extraction n'a pas pu identifier de données de trimestres dans ce document. Le fichier est peut-être illisible ou mal numérisé.");
+          console.warn("[Extracteur] Extraction vide malgré un document valide, nouvelle tentative...");
+          extractedData = await runExtraction();
+          if (isExtractionEmpty(extractedData)) {
+            throw new UserFacingError("L'extraction n'a pas pu identifier de données de trimestres dans ce document. Le fichier est peut-être illisible ou mal numérisé.");
+          }
+        }
+
+        // Mémorisé dès maintenant, avant la rédaction : si celle-ci échoue, la nouvelle tentative
+        // repart de ces données. Le NIR est retiré ici et n'existe plus ensuite que sous forme
+        // d'empreinte.
+        pendingNirHash = hashNir(extractedData.nir);
+        extractedData = toCachedExtraction(extractedData);
+        try {
+          await pool.query(
+            `UPDATE analyses SET extraction = $1, nir_hash = $2, updated_at = NOW() WHERE file_path = $3`,
+            [JSON.stringify(extractedData), pendingNirHash, dbFilePath]
+          );
+        } catch (dbError) {
+          console.error("[Extracteur] Mémorisation de l'extraction impossible (non bloquant) :", dbError.message);
         }
       }
 
@@ -343,20 +372,7 @@ export default async function handler(req, res) {
       let rawAnomalies = [];
       let earliestYear = 9999;
       let latestYear = 0;
-      let fallback_trimestres_requis = 172;
-      
-      if (extractedData.nir) {
-        const cleanNirStr = extractedData.nir.replace(/\s/g, '');
-        if (cleanNirStr.length >= 3) {
-           const birthYearSuffix = parseInt(cleanNirStr.substring(1, 3));
-           const birthYear = birthYearSuffix > 26 ? 1900 + birthYearSuffix : 2000 + birthYearSuffix;
-           if (birthYear >= 1973) fallback_trimestres_requis = 172;
-           else if (birthYear >= 1968) fallback_trimestres_requis = 172;
-           else if (birthYear === 1967) fallback_trimestres_requis = 171;
-           else if (birthYear >= 1964) fallback_trimestres_requis = 171;
-           else fallback_trimestres_requis = 170;
-        }
-      }
+      const fallback_trimestres_requis = extractedData.trimestres_requis_par_defaut;
       
       const currentYear = new Date().getFullYear();
 
@@ -439,8 +455,6 @@ export default async function handler(req, res) {
         requiredQuarters: trimestres_requis,
         totalPoints
       });
-
-      pendingNir = extractedData.nir;
 
       // L'Agent 3 (IA rédactrice) n'est appelé qu'une fois l'accès premium établi. En freemium,
       // les anomalies sont décrites par des textes modèles (un par type d'anomalie, cf.
@@ -618,10 +632,9 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
     // empreinte salée (nir_hash) est conservée, pour reconnaître une même identité. Pour un
     // résultat déjà en base, on reprend l'empreinte stockée ; un ancien résultat qui contenait
     // encore le NIR en clair est nettoyé ci-dessous et réenregistré sans lui.
-    let nirHash = analysisResults ? analysisRecord.nir_hash : null;
+    let nirHash = analysisResults ? analysisRecord.nir_hash : pendingNirHash;
     if (!nirHash) {
-      const cleanNir = ((analysisResults ? analysisResults.nir : pendingNir) || "").replace(/\s/g, '') || "000000000000000";
-      nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
+      nirHash = hashNir(analysisResults?.nir);
     }
 
     let hasPremiumAccess = false;
