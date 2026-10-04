@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Regulatory Watch Agent
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           REGULATORY_REPORT_PATH: ${{ runner.temp }}/regulatory_report.md
         run: python backend/regulatory_watch_agent.py
 

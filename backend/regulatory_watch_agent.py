@@ -5,10 +5,11 @@ sont transmis tels quels à l'IA rédactrice du bilan premium (frontend/api/anal
 modification doit donc être sourcée et vérifiable par un humain avant fusion.
 
 Principes (pour éviter les réécritures quotidiennes sans changement de loi constatées jusqu'ici) :
-- l'IA ne réécrit jamais un fichier : elle propose des remplacements ciblés d'un passage existant,
+- l'IA (Mistral, avec son outil de recherche web) ne réécrit jamais un fichier : elle propose des remplacements ciblés d'un passage existant,
   cité mot pour mot ;
 - chaque remplacement doit s'appuyer sur un texte officiel (loi, décret, arrêté, circulaire)
-  publié sur un site officiel, et pas déjà cité dans le fichier ;
+  publié sur un site officiel, pas déjà cité dans le fichier, et dont l'URL figure parmi les
+  pages réellement renvoyées par la recherche web (pas de source inventée) ;
 - tout ce qui ne respecte pas ces règles est écarté, et le rapport des modifications retenues
   (avec leurs sources) sert de description à la pull request.
 """
@@ -66,7 +67,7 @@ Voici le document de référence « {filename} », utilisé pour rédiger des bi
 {content}
 ---
 
-MISSION : à l'aide de la recherche Google, vérifiez si un TEXTE OFFICIEL (loi, décret, arrêté,
+MISSION : à l'aide de la recherche web, vérifiez si un TEXTE OFFICIEL (loi, décret, arrêté,
 ordonnance, circulaire Cnav / Agirc-Arrco / MSA) publié ou entré en vigueur rend FAUSSE une
 affirmation précise de ce document.
 
@@ -76,7 +77,7 @@ RÈGLES STRICTES :
 2. Ignorez tout texte déjà cité dans le document (section « Mises à jour réglementaires » ou
    corps du texte).
 3. Chaque modification doit citer un texte officiel précis (type, numéro, date) et une URL vers
-   un site officiel (legifrance.gouv.fr, securite-sociale.fr, service-public.fr, info-retraite.fr,
+   un site officiel, consultée lors de votre recherche (legifrance.gouv.fr, securite-sociale.fr, service-public.fr, info-retraite.fr,
    lassuranceretraite.fr, agirc-arrco.fr, msa.fr, urssaf.fr, boss.gouv.fr).
 4. "old_text" doit être un extrait COPIÉ MOT POUR MOT du document (une phrase ou un élément de
    liste), et "new_text" son remplacement corrigé, au même format Markdown.
@@ -105,6 +106,20 @@ def parse_model_json(text):
     return changes
 
 
+def normalize_url(url):
+    """Forme comparable d'une URL : hôte en minuscules sans « www. », sans fragment ni « / » final."""
+    try:
+        parsed = urlparse(url.strip())
+    except ValueError:
+        return ""
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = parsed.path.rstrip("/")
+    query = f"?{parsed.query}" if parsed.query else ""
+    return f"{host}{path}{query}"
+
+
 def is_official_url(url):
     try:
         host = (urlparse(url).hostname or "").lower()
@@ -122,8 +137,11 @@ def is_already_cited(reference, content):
     return reference.lower() in content.lower()
 
 
-def validate_change(change, content):
-    """Renvoie None si la modification est recevable, sinon la raison du rejet."""
+def validate_change(change, content, consulted_urls):
+    """Renvoie None si la modification est recevable, sinon la raison du rejet.
+
+    consulted_urls : URL des pages renvoyées par la recherche web pour ce fichier ; la source
+    citée doit en faire partie, sinon elle a pu être inventée par le modèle."""
     old_text = (change.get("old_text") or "").strip()
     new_text = (change.get("new_text") or "").strip()
     reference = (change.get("source_reference") or "").strip()
@@ -144,14 +162,16 @@ def validate_change(change, content):
         return f"source déjà citée dans le fichier : {reference!r}"
     if not is_official_url(url):
         return f"URL hors site officiel : {url!r}"
+    if normalize_url(url) not in {normalize_url(u) for u in consulted_urls}:
+        return f"URL absente des pages consultées par la recherche web : {url!r}"
     return None
 
 
-def apply_changes(content, changes, today):
+def apply_changes(content, changes, today, consulted_urls):
     """Applique les modifications recevables. Renvoie (nouveau contenu, retenues, rejetées)."""
     accepted, rejected = [], []
     for change in changes:
-        reason = validate_change(change, content)
+        reason = validate_change(change, content, consulted_urls)
         if reason:
             rejected.append((change, reason))
             continue
@@ -194,29 +214,55 @@ def build_report(results):
     return "\n".join(lines)
 
 
-def ask_model(client, types, prompt):
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            tools=[types.Tool(google_search=types.GoogleSearch())],
-            temperature=0,
-        ),
+MISTRAL_CONVERSATIONS_URL = "https://api.mistral.ai/v1/conversations"
+MISTRAL_MODEL = "mistral-medium-latest"
+
+
+def extract_conversation_output(response_json):
+    """Texte de la réponse et URL des pages consultées (références de l'outil web_search)."""
+    texts, urls = [], []
+    for entry in response_json.get("outputs", []):
+        if entry.get("type") != "message.output":
+            continue
+        content = entry.get("content")
+        if isinstance(content, str):
+            texts.append(content)
+            continue
+        for chunk in content or []:
+            if chunk.get("type") == "text":
+                texts.append(chunk.get("text", ""))
+            elif chunk.get("type") == "tool_reference" and chunk.get("url"):
+                urls.append(chunk["url"])
+    return "".join(texts), urls
+
+
+def ask_model(http, api_key, prompt):
+    response = http.post(
+        MISTRAL_CONVERSATIONS_URL,
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model": MISTRAL_MODEL,
+            "inputs": [{"role": "user", "content": prompt}],
+            "tools": [{"type": "web_search"}],
+            "completion_args": {"temperature": 0},
+            "store": False,
+        },
     )
-    return response.text or ""
+    if response.status_code != 200:
+        raise RuntimeError(f"API Mistral {response.status_code} : {response.text[:300]}")
+    return extract_conversation_output(response.json())
 
 
 def main():
+    import httpx
     from dotenv import load_dotenv
-    from google import genai
-    from google.genai import types
 
     load_dotenv()
-    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    api_key = os.environ.get("MISTRAL_API_KEY")
     if not api_key:
-        print("[Error] Aucune clé GEMINI_API_KEY ou GOOGLE_API_KEY dans l'environnement.")
+        print("[Error] Aucune clé MISTRAL_API_KEY dans l'environnement.")
         sys.exit(1)
-    client = genai.Client(api_key=api_key)
+    http = httpx.Client(timeout=180)
 
     print("=== Veille réglementaire (retraite France) ===")
     today = date.today()
@@ -233,13 +279,14 @@ def main():
 
         checked += 1
         try:
-            changes = parse_model_json(ask_model(client, types, build_prompt(filename, content)))
+            text, consulted_urls = ask_model(http, api_key, build_prompt(filename, content))
+            changes = parse_model_json(text)
         except Exception as err:
             print(f"[Error] {filename} : réponse inexploitable ({err}), aucun changement appliqué.")
             failed += 1
             continue
 
-        new_content, accepted, rejected = apply_changes(content, changes, today)
+        new_content, accepted, rejected = apply_changes(content, changes, today, consulted_urls)
         for change, reason in rejected:
             print(f"[Rejeté] {filename} : {reason}")
         if accepted:
