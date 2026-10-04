@@ -1,7 +1,6 @@
 # Dépendances de l'agent de veille réglementaire (backend/regulatory_watch_agent.py),
 # exécuté chaque jour par .github/workflows/regulatory-watch-v2.yml.
+# L'agent appelle directement l'API Mistral (Conversations + recherche web) via httpx.
 # Le reste de l'application tourne en JavaScript sur Vercel (frontend/api).
-google-genai
-python-dotenv
-pydantic
 httpx
+python-dotenv
