@@ -2,7 +2,15 @@ import Stripe from 'stripe';
 import { verifyToken } from '@clerk/backend';
 import { getDb } from './db.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Version de l'API Stripe figée : chaque version majeure du SDK `stripe` change par défaut la
+// version d'API appelée. On garde la dernière de la famille « acacia » (celle du SDK 17.x) pour
+// que la mise à jour du SDK ne modifie pas le comportement des paiements ; Stripe ne fait pas de
+// changement cassant au sein d'une même famille. Même valeur dans checkout.js et webhook.js
+// (vérifié par tests/stripeApiVersion.test.js) : pas de fichier partagé, car chaque fichier de
+// api/ compte comme une fonction Vercel et le plan Hobby en limite le nombre à 12.
+// Passer à une version plus récente doit être un choix volontaire, suivi d'un paiement test.
+const STRIPE_API_VERSION = '2025-02-24.acacia';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
