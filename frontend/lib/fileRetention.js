@@ -1,7 +1,10 @@
 // Durée de conservation des relevés PDF déposés (RGPD) : 6 mois après le dépôt, le fichier est
-// supprimé de Vercel Blob et sa copie en base (colonne file_base64) est effacée. Les résultats de
+// supprimé de Vercel Blob, et sa copie en base (colonne file_base64) ainsi que les données qui en
+// ont été extraites (colonne extraction, cf. extractionCache.js) sont effacées. Les résultats de
 // l'analyse restent consultables ; seule une nouvelle analyse du même document devient impossible.
 // Exécuté chaque jour par la tâche planifiée Vercel /api/cleanup-files (vercel.json, « crons »).
+
+import { ensureExtractionSchema } from './extractionCache.js';
 
 export const RETENTION_MONTHS = 6;
 
@@ -11,6 +14,7 @@ export const FILE_DELETED_MESSAGE =
 let retentionSchemaEnsured = false;
 async function ensureRetentionSchema(pool) {
   if (retentionSchemaEnsured) return;
+  await ensureExtractionSchema(pool);
   await pool.query(`
     ALTER TABLE analyses ADD COLUMN IF NOT EXISTS file_deleted_at TIMESTAMPTZ;
     CREATE INDEX IF NOT EXISTS idx_analyses_retention
@@ -21,7 +25,7 @@ async function ensureRetentionSchema(pool) {
 
 // Supprime les relevés déposés il y a plus de RETENTION_MONTHS mois, par lots.
 // - deleteBlob(url) : supprime le fichier de Vercel Blob (injecté pour pouvoir tester sans réseau).
-// - La copie en base est effacée dans tous les cas. Le relevé n'est marqué comme supprimé
+// - La copie en base et les données extraites sont effacées dans tous les cas. Le relevé n'est marqué comme supprimé
 //   (file_deleted_at) que si la suppression Blob a réussi ; sinon il sera retenté le lendemain.
 // - maxBatches borne le travail d'un passage, pour rester dans la durée maximale de la fonction.
 export async function purgeExpiredFiles(pool, deleteBlob, { batchSize = 100, maxBatches = 20 } = {}) {
@@ -58,6 +62,7 @@ export async function purgeExpiredFiles(pool, deleteBlob, { batchSize = 100, max
       await pool.query(
         `UPDATE analyses
          SET file_base64 = NULL,
+             extraction = NULL,
              file_deleted_at = CASE WHEN $2 THEN NOW() ELSE file_deleted_at END
          WHERE id = $1`,
         [row.id, blobDeleted]

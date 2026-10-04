@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS public.analyses (
   results JSONB DEFAULT '{}'::jsonb,          -- Résultats de l'analyse IA
   nir_hash TEXT,                              -- Hash anonymisé du NIR (RGPD)
   error_message TEXT,                         -- Message d'erreur si status = error
+  file_base64 TEXT,                           -- Copie du PDF, effacée après 6 mois (RGPD)
+  file_deleted_at TIMESTAMPTZ,                -- Date de suppression automatique du PDF
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

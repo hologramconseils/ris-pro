@@ -198,9 +198,9 @@ Nous vous recommandons d'exporter votre bilan en PDF dès réception, afin d'en 
 
 ### Qui héberge vos données
 
-L'infrastructure de stockage et d'authentification repose sur **Supabase** (certifié ISO 27001), l'un des acteurs de référence dans ce domaine. L'application elle-même est déployée sur **Vercel**, plateforme reconnue pour sa fiabilité et ses standards de sécurité.
+L'application est déployée sur **Vercel**, qui stocke aussi les relevés PDF dans un espace privé (Vercel Blob). La base de données est hébergée par **Neon** et l'authentification est assurée par **Clerk**.
 
-Vos données sont hébergées dans des environnements cloisonnés, avec contrôle d'accès strict par utilisateur (Row-Level Security). Un système d'alerte automatique par email informe l'administrateur en cas d'accès anormal.
+Vos données sont hébergées dans des environnements cloisonnés, avec contrôle d'accès strict par utilisateur, vérifié côté serveur à chaque requête. Un système d'alerte automatique par email informe l'administrateur en cas d'accès anormal.
 
 ### Protection contre l'accès non autorisé
 
@@ -266,8 +266,11 @@ Directeur de la publication : Bertrand Saulnerond
 **Hébergeur**
 Vercel Inc. · San Francisco, CA, États-Unis
 
-**Infrastructure de données**
-Supabase Inc. · certifié ISO 27001
+**Base de données**
+Neon Inc.
+
+**Authentification**
+Clerk Inc.
 
 **Paiement**
 Stripe Payments Europe, Ltd.
