@@ -69,6 +69,12 @@ export function buildRestrictedResults(analysisResults) {
   }
   delete clientResponse.summary_freemium;
 
+  // Les stratégies et le plan d'action sont du contenu premium : la page freemium ne les affiche
+  // pas, mais ils ne doivent pas non plus transiter dans la réponse API, sinon ils restent
+  // lisibles depuis les outils de développement du navigateur.
+  clientResponse.strategies = [];
+  clientResponse.action_plan = [];
+
   // L'entrée peut déjà être triée (analyze.js trie avant assemblage), mais on retrie ici aussi :
   // cette fonction doit garantir l'ordre chronologique par elle-même, sans dépendre de ce que
   // fait l'appelant.
