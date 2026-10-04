@@ -220,3 +220,14 @@ test('buildRestrictedResults : sans summary_freemium fourni, garde le summary co
   const restricted = buildRestrictedResults({ anomalies, summary: 'Résumé complet.' });
   assert.equal(restricted.summary, 'Résumé complet.');
 });
+
+test('buildRestrictedResults : ne renvoie jamais les stratégies ni le plan d\'action (contenu premium)', () => {
+  const restricted = buildRestrictedResults({
+    anomalies: [makeAnomaly(1995), makeAnomaly(2015)],
+    summary: 'Résumé.',
+    strategies: [{ title: 'Rachat de trimestres', description: 'Détail premium', priority: 'Haute', impact: '+4 trimestres' }],
+    action_plan: [{ step: 1, title: 'Étape premium', description: 'Détail premium' }]
+  });
+  assert.deepEqual(restricted.strategies, []);
+  assert.deepEqual(restricted.action_plan, []);
+});

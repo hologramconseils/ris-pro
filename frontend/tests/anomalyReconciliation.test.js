@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { reconcileAnomalies } from '../api/anomalyReconciliation.js';
+import { reconcileAnomalies, buildTemplateAnomaly } from '../api/anomalyReconciliation.js';
 
 function rawAnomaly(year, overrides = {}) {
   return {
@@ -72,4 +72,22 @@ test('reconcileAnomalies : writerData.anomalies undefined (réponse IA malformé
   const result = reconcileAnomalies(raw, undefined);
   assert.equal(result.length, 1);
   assert.equal(result[0].year, '2000');
+});
+
+test('buildTemplateAnomaly : chaque type d\'anomalie produit un contenu complet, sans IA', () => {
+  const codes = ['CAS 5: Année absente du relevé', 'Suspicion de trimestres manquants', 'Suspicion de points manquants'];
+  for (const reason_code of codes) {
+    const result = buildTemplateAnomaly(rawAnomaly(2003, { reason_code }));
+    assert.equal(result.year, '2003');
+    assert.ok(result.title && result.description && result.reason && result.solution, `texte complet pour ${reason_code}`);
+    assert.ok(Array.isArray(result.docs) && result.docs.length > 0);
+    assert.equal(result.trimesters, '2');
+    assert.ok(['high', 'medium', 'low'].includes(result.severity));
+  }
+});
+
+test('buildTemplateAnomaly : type inconnu => contenu générique exploitable', () => {
+  const result = buildTemplateAnomaly(rawAnomaly(2003, { reason_code: 'Autre cas' }));
+  assert.equal(result.title, 'Autre cas');
+  assert.ok(result.solution);
 });

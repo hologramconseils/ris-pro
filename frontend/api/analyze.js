@@ -1,9 +1,9 @@
 import { getDb, ensureProfilesSchema } from "./db.js";
 import crypto from "crypto";
 import { verifyToken } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from "./analysisRestriction.js";
+import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
-import { reconcileAnomalies } from "./anomalyReconciliation.js";
+import { reconcileAnomalies, buildTemplateAnomaly } from "./anomalyReconciliation.js";
 
 export const maxDuration = 300;
 
@@ -123,6 +123,11 @@ export default async function handler(req, res) {
     }
 
     let analysisResults = null;
+    // Renseignés quand une nouvelle analyse est nécessaire : l'extraction et le calcul sont faits
+    // d'abord, la rédaction (IA en premium, textes modèles en freemium) attend que l'accès soit
+    // connu, ce qui demande le NIR extrait.
+    let pendingNir = null;
+    let generateResults = null;
 
     // Un résultat "completed" dégénéré (extraction passée précédemment vide malgré un
     // document valide) ne doit jamais être resservi indéfiniment : on force une nouvelle
@@ -427,12 +432,30 @@ export default async function handler(req, res) {
         totalPoints
       });
 
-      // Mêmes anomalies que celles qui resteront visibles en freemium (buildRestrictedResults
-      // applique exactement le même calcul) : le résumé condensé demandé à l'IA doit s'y limiter
-      // pour rester cohérent avec le tableau d'anomalies réellement affiché.
-      const freemiumAnomalyYears = selectFreemiumAnomalies(rawAnomalies).map(a => a.year);
+      pendingNir = extractedData.nir;
 
-      const writerPrompt = `
+      // L'Agent 3 (IA rédactrice) n'est appelé qu'une fois l'accès premium établi. En freemium,
+      // les anomalies sont décrites par des textes modèles (un par type d'anomalie, cf.
+      // anomalyReconciliation.js) : la page freemium n'affiche que deux anomalies et aucune
+      // stratégie, ce qui ne justifie pas un appel à Mistral Large pour chaque utilisateur gratuit.
+      generateResults = async (withWriter) => {
+        if (!withWriter) {
+          const freemiumSummary = `Votre relevé de carrière fait apparaître **${trimestres_valides} trimestres validés** sur les **${trimestres_requis} trimestres requis** pour obtenir le taux plein. ${rawAnomalies.length > 0 ? "Les anomalies détectées par notre analyse sont présentées ci-dessous." : "Notre analyse n'a détecté aucune anomalie sur votre relevé."}`;
+          return {
+            is_valid_document: true,
+            nir: extractedData.nir,
+            pension_estimate: pensionEstimate,
+            trimestres_valides: trimestres_valides,
+            trimestres_requis: trimestres_requis,
+            anomalies: sortAnomaliesChronologically(rawAnomalies.map(buildTemplateAnomaly)),
+            summary: freemiumSummary,
+            summary_freemium: freemiumSummary,
+            strategies: [],
+            action_plan: []
+          };
+        }
+
+        const writerPrompt = `
 <role>Tu es le conseiller expert en retraite de RIS Pro. Tu rédiges le bilan final en te basant STRICTEMENT sur les données calculées.</role>
 
 <contexte_et_donnees>
@@ -474,7 +497,6 @@ Bannis totalement les listes à puces (aucun tiret '-', aucune puce '•', aucun
 Dans le bilan, indique explicitement l'âge d'annulation de la décote à 67 ans.
 TRÈS IMPORTANT : Le bilan textuel (summary) doit couvrir TOUTES les anomalies du tableau JSON 'anomalies' (elles y figurent toutes obligatoirement, cf. règle 3 ci-dessus). Si ce tableau est vide, indique explicitement dans le bilan qu'aucune erreur n'a été détectée.
 
-En plus de 'summary', rédige un second champ 'summary_freemium' : une version du même bilan, même ton et même format, mais qui ne mentionne QUE l'anomalie ou les anomalies de${freemiumAnomalyYears.length > 1 ? 's' : ''} année(s) ${freemiumAnomalyYears.length > 0 ? freemiumAnomalyYears.join(' et ') : '(aucune, tableau vide)'} — ce sont les seules qu'un utilisateur non-premium pourra voir dans le tableau 'anomalies'. N'évoque JAMAIS, même vaguement ("d'autres anomalies ont été détectées", "plusieurs erreurs supplémentaires"), l'existence d'anomalies concernant d'autres années : ce serait une fuite d'information vers un utilisateur qui n'a pas payé pour les voir. Les chiffres globaux (trimestres validés/requis, estimation de pension) restent identiques dans les deux versions, ce sont les vrais totaux de la carrière entière, pas seulement des années citées.
 </format_summary>
 
 <strategies_et_plan>
@@ -484,114 +506,113 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 </strategies_et_plan>
       `;
 
-      const writerSchema = {
-        type: "object",
-        properties: {
-          anomalies: {
-            type: "array",
-            description: "Liste des anomalies enrichies",
-            items: {
-              type: "object",
-              properties: {
-                id: { type: "string" },
-                year: { type: "string" },
-                employer: { type: "string" },
-                title: { type: "string", description: "Titre synthétique du problème" },
-                description: { type: "string", description: "Description courte (constat)" },
-                reason: { type: "string", description: "Explication réglementaire" },
-                solution: { type: "string", description: "Action de correction spécifique" },
-                docs: { type: "array", items: { type: "string" }, description: "Documents justificatifs" },
-                salary: { type: "string" },
-                trimesters: { type: "string" },
-                points: { type: "string" },
-                severity: { type: "string", description: "high, medium, ou low" }
-              },
-              additionalProperties: false,
-              required: ["year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
+        const writerSchema = {
+          type: "object",
+          properties: {
+            anomalies: {
+              type: "array",
+              description: "Liste des anomalies enrichies",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  year: { type: "string" },
+                  employer: { type: "string" },
+                  title: { type: "string", description: "Titre synthétique du problème" },
+                  description: { type: "string", description: "Description courte (constat)" },
+                  reason: { type: "string", description: "Explication réglementaire" },
+                  solution: { type: "string", description: "Action de correction spécifique" },
+                  docs: { type: "array", items: { type: "string" }, description: "Documents justificatifs" },
+                  salary: { type: "string" },
+                  trimesters: { type: "string" },
+                  points: { type: "string" },
+                  severity: { type: "string", description: "high, medium, ou low" }
+                },
+                additionalProperties: false,
+                required: ["year", "employer", "title", "description", "reason", "solution", "docs", "salary", "trimesters", "points", "severity"]
+              }
+            },
+            summary: { type: "string", description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
+            strategies: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  priority: { type: "string" },
+                  impact: { type: "string", description: "Impact concret exprimé en trimestres, en mois/années de décote évités, ou en âge de départ anticipé. JAMAIS de montant en euros (l'IA n'est pas fiable pour recalculer une projection monétaire). Ex: '+8 trimestres', 'Départ anticipé de 6 mois'." }
+                },
+                additionalProperties: false,
+                required: ["title", "description", "priority", "impact"]
+              }
+            },
+            action_plan: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  step: { type: "integer" },
+                  title: { type: "string" },
+                  description: { type: "string" }
+                },
+                additionalProperties: false,
+                required: ["step", "title", "description"]
+              }
             }
           },
-          summary: { type: "string", description: "BILAN RETRAITE PREMIUM rédigé en Markdown (sans listes à puces)." },
-          summary_freemium: { type: "string", description: "Même bilan que 'summary', mais limité aux seules anomalies visibles en freemium (voir <format_summary>). Ne mentionne jamais l'existence d'autres anomalies." },
-          strategies: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                title: { type: "string" },
-                description: { type: "string" },
-                priority: { type: "string" },
-                impact: { type: "string", description: "Impact concret exprimé en trimestres, en mois/années de décote évités, ou en âge de départ anticipé. JAMAIS de montant en euros (l'IA n'est pas fiable pour recalculer une projection monétaire). Ex: '+8 trimestres', 'Départ anticipé de 6 mois'." }
-              },
-              additionalProperties: false,
-              required: ["title", "description", "priority", "impact"]
-            }
-          },
-          action_plan: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                step: { type: "integer" },
-                title: { type: "string" },
-                description: { type: "string" }
-              },
-              additionalProperties: false,
-              required: ["step", "title", "description"]
-            }
-          }
-        },
-        additionalProperties: false,
-        required: ["anomalies", "summary", "summary_freemium", "strategies", "action_plan"]
-      };
+          additionalProperties: false,
+          required: ["anomalies", "summary", "strategies", "action_plan"]
+        };
 
-      const writerResult = await mistralRequest("/v1/chat/completions", {
-        model: "mistral-large-latest",
-        messages: [{ role: "user", content: writerPrompt }],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "bilan_retraite",
-            schema: writerSchema,
-            strict: true
+        const writerResult = await mistralRequest("/v1/chat/completions", {
+          model: "mistral-large-latest",
+          messages: [{ role: "user", content: writerPrompt }],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "bilan_retraite",
+              schema: writerSchema,
+              strict: true
+            }
           }
+        });
+
+        const writerData = JSON.parse(writerResult.choices[0].message.content);
+
+        const reconciledAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
+        if (reconciledAnomalies.length !== rawAnomalies.length) {
+          console.error(`[Anomalies] Incohérence après réconciliation : ${rawAnomalies.length} brutes, ${reconciledAnomalies.length} finales.`);
+        } else if ((writerData.anomalies || []).length !== rawAnomalies.length) {
+          console.error(`[Anomalies] L'IA a omis ${rawAnomalies.length - (writerData.anomalies || []).length} anomalie(s) brute(s), complétée(s) automatiquement.`);
         }
-      });
+        // Consigne de restitution : premium = toutes les anomalies de la plus ancienne à la plus
+        // récente. L'ordre renvoyé par l'IA n'est pas garanti, et le filet de réconciliation
+        // ajoute les entrées manquantes en fin de tableau — on trie explicitement plutôt que de
+        // dépendre de l'un ou l'autre.
+        const finalAnomalies = sortAnomaliesChronologically(reconciledAnomalies);
 
-      const writerData = JSON.parse(writerResult.choices[0].message.content);
-
-      const reconciledAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
-      if (reconciledAnomalies.length !== rawAnomalies.length) {
-        console.error(`[Anomalies] Incohérence après réconciliation : ${rawAnomalies.length} brutes, ${reconciledAnomalies.length} finales.`);
-      } else if ((writerData.anomalies || []).length !== rawAnomalies.length) {
-        console.error(`[Anomalies] L'IA a omis ${rawAnomalies.length - (writerData.anomalies || []).length} anomalie(s) brute(s), complétée(s) automatiquement.`);
-      }
-      // Consigne de restitution : premium = toutes les anomalies de la plus ancienne à la plus
-      // récente. L'ordre renvoyé par l'IA n'est pas garanti, et le filet de réconciliation
-      // ajoute les entrées manquantes en fin de tableau — on trie explicitement plutôt que de
-      // dépendre de l'un ou l'autre.
-      const finalAnomalies = sortAnomaliesChronologically(reconciledAnomalies);
-
-      // Assemblage final
-      analysisResults = {
-        is_valid_document: true,
-        nir: extractedData.nir,
-        pension_estimate: pensionEstimate,
-        trimestres_valides: trimestres_valides,
-        trimestres_requis: trimestres_requis,
-        anomalies: finalAnomalies,
-        summary: writerData.summary || "",
-        summary_freemium: writerData.summary_freemium || writerData.summary || "",
-        strategies: writerData.strategies || [],
-        action_plan: writerData.action_plan || []
+        // Assemblage final
+        console.log("Analyse à 3 agents réussie !");
+        return {
+          is_valid_document: true,
+          nir: extractedData.nir,
+          pension_estimate: pensionEstimate,
+          trimestres_valides: trimestres_valides,
+          trimestres_requis: trimestres_requis,
+          anomalies: finalAnomalies,
+          summary: writerData.summary || "",
+          strategies: writerData.strategies || [],
+          action_plan: writerData.action_plan || []
+        };
       };
-
-      console.log("Analyse à 3 agents réussie !");
     }
 
-    const cleanNir = (analysisResults.nir || "").replace(/\s/g, '') || "000000000000000";
+    const cleanNir = ((analysisResults ? analysisResults.nir : pendingNir) || "").replace(/\s/g, '') || "000000000000000";
     const nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
 
     let hasPremiumAccess = false;
+    let shouldDeductCredit = false;
     const targetUserId = authenticatedUser?.id;
 
     if (targetUserId) {
@@ -615,12 +636,23 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 
         const access = resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, currentCredits });
         hasPremiumAccess = access.hasPremiumAccess;
-
-        if (access.shouldDeductCredit) {
-          await pool.query(`UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`, [targetUserId]);
-        }
+        shouldDeductCredit = access.shouldDeductCredit;
       } catch (dbError) {
         console.error("[Credits] Erreur DB:", dbError.message);
+      }
+    }
+
+    if (!analysisResults) {
+      analysisResults = await generateResults(hasPremiumAccess);
+    }
+
+    // Le crédit n'est débité qu'après une génération réussie : si la rédaction échoue, l'erreur
+    // remonte au catch global et l'utilisateur conserve son crédit.
+    if (shouldDeductCredit) {
+      try {
+        await pool.query(`UPDATE profiles SET analysis_credits = analysis_credits - 1 WHERE id = $1`, [targetUserId]);
+      } catch (dbError) {
+        console.error("[Credits] Erreur DB lors du débit:", dbError.message);
       }
     }
 
