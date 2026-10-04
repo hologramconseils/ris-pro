@@ -4,6 +4,7 @@ import { verifyToken } from "@clerk/backend";
 import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
 import { estimateMonthlyPension } from "./pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "./anomalyReconciliation.js";
+import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "./security.js";
 
 export const maxDuration = 300;
 
@@ -89,11 +90,17 @@ export default async function handler(req, res) {
   }
 
   const pool = getDb();
+
+  // Chaque nouvelle analyse coûte un appel Mistral OCR : on limite le nombre de demandes par
+  // utilisateur pour éviter les abus.
+  if (!(await checkRateLimit(pool, authenticatedUser.id, 'analyze'))) {
+    return res.status(429).json({ error: RATE_LIMIT_MESSAGE, message: RATE_LIMIT_MESSAGE });
+  }
   let dbFilePath = filePath;
 
   try {
     const { rows: analysisRows } = await pool.query(
-      `SELECT user_id, status, file_path, results FROM analyses WHERE file_path = $1 LIMIT 1`,
+      `SELECT user_id, status, file_path, results, nir_hash FROM analyses WHERE file_path = $1 LIMIT 1`,
       [filePath]
     );
     
@@ -266,7 +273,7 @@ export default async function handler(req, res) {
 
       let extractedData = await runExtraction();
       if (!extractedData.is_valid_document) {
-        throw new Error("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
+        throw new UserFacingError("Le document fourni n'est pas un relevé de carrière (RIS) officiel ou exploitable.");
       }
 
       // Un document valide doit contenir au moins un total global ou une synthèse par année.
@@ -280,7 +287,7 @@ export default async function handler(req, res) {
         console.warn("[Extracteur] Extraction vide malgré un document valide, nouvelle tentative...");
         extractedData = await runExtraction();
         if (isExtractionEmpty(extractedData)) {
-          throw new Error("L'extraction n'a pas pu identifier de données de trimestres dans ce document. Le fichier est peut-être illisible ou mal numérisé.");
+          throw new UserFacingError("L'extraction n'a pas pu identifier de données de trimestres dans ce document. Le fichier est peut-être illisible ou mal numérisé.");
         }
       }
 
@@ -443,7 +450,6 @@ export default async function handler(req, res) {
           const freemiumSummary = `Votre relevé de carrière fait apparaître **${trimestres_valides} trimestres validés** sur les **${trimestres_requis} trimestres requis** pour obtenir le taux plein. ${rawAnomalies.length > 0 ? "Les anomalies détectées par notre analyse sont présentées ci-dessous." : "Notre analyse n'a détecté aucune anomalie sur votre relevé."}`;
           return {
             is_valid_document: true,
-            nir: extractedData.nir,
             pension_estimate: pensionEstimate,
             trimestres_valides: trimestres_valides,
             trimestres_requis: trimestres_requis,
@@ -596,7 +602,6 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         console.log("Analyse à 3 agents réussie !");
         return {
           is_valid_document: true,
-          nir: extractedData.nir,
           pension_estimate: pensionEstimate,
           trimestres_valides: trimestres_valides,
           trimestres_requis: trimestres_requis,
@@ -608,8 +613,15 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
       };
     }
 
-    const cleanNir = ((analysisResults ? analysisResults.nir : pendingNir) || "").replace(/\s/g, '') || "000000000000000";
-    const nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
+    // Le NIR (numéro de sécurité sociale) n'est ni stocké ni renvoyé au navigateur : seule son
+    // empreinte salée (nir_hash) est conservée, pour reconnaître une même identité. Pour un
+    // résultat déjà en base, on reprend l'empreinte stockée ; un ancien résultat qui contenait
+    // encore le NIR en clair est nettoyé ci-dessous et réenregistré sans lui.
+    let nirHash = analysisResults ? analysisRecord.nir_hash : null;
+    if (!nirHash) {
+      const cleanNir = ((analysisResults ? analysisResults.nir : pendingNir) || "").replace(/\s/g, '') || "000000000000000";
+      nirHash = crypto.createHash('sha256').update(cleanNir + salt).digest('hex');
+    }
 
     let hasPremiumAccess = false;
     let shouldDeductCredit = false;
@@ -656,6 +668,8 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
       }
     }
 
+    delete analysisResults.nir;
+
     let clientResponse = analysisResults;
 
     if (!hasPremiumAccess) {
@@ -679,13 +693,16 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
+    // Le détail technique (base de données, API Mistral...) reste dans les journaux serveur ;
+    // seul un message rédigé pour l'utilisateur est renvoyé et enregistré.
+    const publicMessage = publicErrorMessage(error, "Une erreur technique est survenue pendant l'analyse. Merci de réessayer plus tard.");
     try {
       await pool.query(
         `UPDATE analyses SET status = 'failed', results = $1, updated_at = NOW() WHERE file_path = $2`,
-        [JSON.stringify({ error: error.message }), dbFilePath]
+        [JSON.stringify({ error: publicMessage }), dbFilePath]
       );
     } catch (e) {}
 
-    return res.status(500).json({ error: "L'analyse a échoué", message: error.message });
+    return res.status(error instanceof UserFacingError ? error.status : 500).json({ error: "L'analyse a échoué", message: publicMessage });
   }
 }

@@ -85,7 +85,11 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de l'upload du document");
+        // Message rédigé côté serveur (fichier trop volumineux, pas un PDF, trop de demandes...).
+        const errData = await response.json().catch(() => ({}));
+        const uploadError = new Error(errData.error || "Erreur lors de l'upload du document");
+        uploadError.userMessage = errData.error;
+        throw uploadError;
       }
 
       const data = await response.json();
@@ -97,7 +101,7 @@ export default function Home() {
       
     } catch (err) {
       console.error("Erreur d'upload :", err)
-      setError(LABELS.ERROR_UPLOAD)
+      setError(err.userMessage || LABELS.ERROR_UPLOAD)
     } finally {
       setIsUploading(false)
     }

@@ -1,6 +1,7 @@
 import { put } from '@vercel/blob';
 import { getDb, ensureProfilesSchema } from './db.js';
 import { verifyToken } from '@clerk/backend';
+import { MAX_UPLOAD_BYTES, isPdfBuffer, checkRateLimit, RATE_LIMIT_MESSAGE } from './security.js';
 
 export const config = {
   api: {
@@ -9,9 +10,17 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  // CORS : mêmes origines autorisées que les autres points d'API (et non plus « * »).
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    'https://ris.hologramconseils.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ].filter(Boolean);
+  res.setHeader('Access-Control-Allow-Origin', origin && allowedOrigins.includes(origin) ? origin : 'https://ris.hologramconseils.com');
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -41,21 +50,34 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
   }
 
+  if (!(await checkRateLimit(getDb(), userId, 'upload'))) {
+    return res.status(429).json({ error: RATE_LIMIT_MESSAGE });
+  }
+
   try {
     const filename = req.query.filename
       ? decodeURIComponent(req.query.filename)
       : `upload_${Date.now()}.pdf`;
     const safeName = `ris-pro/${Date.now()}_${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-    // Lire le body en Buffer
+    // Lire le body en Buffer, en s'arrêtant dès que la taille maximale est dépassée.
     const chunks = [];
+    let size = 0;
     for await (const chunk of req) {
+      size += chunk.length;
+      if (size > MAX_UPLOAD_BYTES) {
+        return res.status(413).json({ error: 'Fichier trop volumineux : 4 Mo maximum.' });
+      }
       chunks.push(chunk);
     }
     const buffer = Buffer.concat(chunks);
 
     if (buffer.length === 0) {
       return res.status(400).json({ error: 'Fichier vide reçu.' });
+    }
+    // Le contenu doit réellement être un PDF, quel que soit le nom ou le type annoncé.
+    if (!isPdfBuffer(buffer)) {
+      return res.status(415).json({ error: 'Seuls les fichiers PDF sont acceptés.' });
     }
 
     // Upload vers Vercel Blob (store configuré en private)

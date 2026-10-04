@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "regions": ["cdg1"],
+  "regions": [
+    "cdg1"
+  ],
   "builds": [
     {
       "src": "frontend/api/*.js",
       "use": "@vercel/node"
-
     },
     {
       "src": "frontend/package.json",
@@ -16,9 +17,28 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/frontend/api/$1" },
-    { "handle": "filesystem" },
-    { "src": "/((?!api|assets|src|node_modules|@vite|@react-refresh|logo.png|favicon.ico).*)", "dest": "/frontend/dist/index.html" }
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()"
+      },
+      "continue": true
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/frontend/api/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/((?!api|assets|src|node_modules|@vite|@react-refresh|logo.png|favicon.ico).*)",
+      "dest": "/frontend/dist/index.html"
+    }
   ],
   "functions": {
     "frontend/api/*.js": {

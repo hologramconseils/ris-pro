@@ -45,7 +45,6 @@ export const AuthProvider = ({ children }) => {
 
   const refreshProfile = async () => {
     if (session) {
-      console.log("Rafraîchissement manuel du profil pour:", clerkUser?.id);
       await fetchProfile(session);
     }
   };
