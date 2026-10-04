@@ -1,11 +1,12 @@
 import { buffer } from 'micro';
 import Stripe from 'stripe';
+import { STRIPE_API_VERSION } from './stripeConfig.js';
 import { createClerkClient } from '@clerk/backend';
 import { Resend } from 'resend';
 import { getDb } from './db.js';
 import { maskEmail } from './security.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 const resend = new Resend(process.env.RESEND_API_KEY);
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 

@@ -1,8 +1,9 @@
 import Stripe from 'stripe';
+import { STRIPE_API_VERSION } from './stripeConfig.js';
 import { verifyToken } from '@clerk/backend';
 import { getDb } from './db.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
