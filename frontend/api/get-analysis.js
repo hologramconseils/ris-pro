@@ -113,6 +113,12 @@ export default async function handler(req, res) {
       analysisRecord.results = buildRestrictedResults(analysisRecord.results);
     }
 
+    // Les anciennes analyses enregistraient le NIR en clair dans les résultats : il n'est jamais
+    // renvoyé au navigateur (il est retiré de la base à la prochaine analyse du document).
+    if (analysisRecord.results && typeof analysisRecord.results === 'object') {
+      delete analysisRecord.results.nir;
+    }
+
     return res.status(200).json(analysisRecord);
 
   } catch (error) {

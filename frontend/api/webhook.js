@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/backend';
 import { Resend } from 'resend';
 import { getDb } from './db.js';
+import { maskEmail } from './security.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -40,12 +41,12 @@ export default async function handler(req, res) {
     let isNewUser = false;
     let magicLink = null;
 
-    console.log(`[Webhook] Session reçue. email: ${userEmail}`);
+    console.log(`[Webhook] Session reçue. email: ${maskEmail(userEmail)}`);
 
     if (userEmail) {
       if (!finalUserId) {
         try {
-          console.log(`[Webhook] Recherche utilisateur Clerk pour: ${userEmail}`);
+          console.log(`[Webhook] Recherche utilisateur Clerk pour: ${maskEmail(userEmail)}`);
           const usersResponse = await clerkClient.users.getUserList({ emailAddress: [userEmail] });
           
           if (usersResponse.data && usersResponse.data.length > 0) {

@@ -83,6 +83,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ url: session.url });
   } catch (error) {
     console.error('Erreur Stripe Session:', error);
-    return res.status(500).json({ error: error.message });
+    // Le message Stripe brut peut contenir des détails internes : il reste dans les journaux.
+    return res.status(500).json({ error: 'Impossible de créer la session de paiement. Merci de réessayer.' });
   }
 }
