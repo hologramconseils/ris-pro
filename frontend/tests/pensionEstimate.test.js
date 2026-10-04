@@ -5,7 +5,7 @@ import {
   calculateBasePension,
   calculateComplementaryPension,
   estimateMonthlyPension
-} from '../api/pensionEstimate.js';
+} from '../lib/pensionEstimate.js';
 
 test('calculateSAM : moyenne des salaires, années à 0€ ignorées', () => {
   const careerData = [

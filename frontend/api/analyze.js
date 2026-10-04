@@ -1,10 +1,10 @@
-import { getDb, ensureProfilesSchema } from "./db.js";
+import { getDb, ensureProfilesSchema } from "../lib/db.js";
 import crypto from "crypto";
 import { verifyToken } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "./analysisRestriction.js";
-import { estimateMonthlyPension } from "./pensionEstimate.js";
-import { reconcileAnomalies, buildTemplateAnomaly } from "./anomalyReconciliation.js";
-import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "./security.js";
+import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "../lib/analysisRestriction.js";
+import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
+import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
+import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "../lib/security.js";
 
 export const maxDuration = 300;
 

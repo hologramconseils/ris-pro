@@ -7,7 +7,7 @@ import {
   publicErrorMessage,
   maskEmail,
   checkRateLimit,
-} from '../api/security.js';
+} from '../lib/security.js';
 
 test('isPdfBuffer : accepte un contenu commençant par %PDF-', () => {
   assert.equal(isPdfBuffer(Buffer.from('%PDF-1.7\n...')), true);
