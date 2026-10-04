@@ -116,7 +116,7 @@ export default function PolitiqueConfidentialite() {
         <section>
           <h2 className="text-xl font-semibold mb-2">6. Durée de Conservation</h2>
           <p className="text-muted">
-            Les fichiers PDF importés sont conservés de manière sécurisée tant que votre compte est actif. Vous pouvez les supprimer définitivement à tout moment depuis votre espace membre. Les données de compte sont supprimées après 3 ans d'inactivité, et les données de paiement conservées 10 ans conformément aux obligations comptables.
+            Les fichiers PDF importés sont conservés de manière sécurisée pendant <strong>6 mois</strong> après leur dépôt, puis supprimés automatiquement et définitivement. Les résultats de l'analyse restent consultables dans votre espace. Vous pouvez demander la suppression anticipée de vos fichiers à tout moment en écrivant à bertrand.saulnerond@hologramconseils.com. Les données de compte sont supprimées après 3 ans d'inactivité, et les données de paiement conservées 10 ans conformément aux obligations comptables.
           </p>
         </section>
 

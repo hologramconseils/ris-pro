@@ -29,7 +29,7 @@ export default function Securite() {
         <section>
           <h2 className="text-xl font-semibold mb-2">3. Purge Automatique</h2>
           <p className="text-muted">
-            Le cœur de notre dispositif de sécurité repose sur la non-conservation. Les documents originaux (PDF) sont automatiquement et irrémédiablement effacés de nos serveurs de stockage sous <strong>48 heures</strong>. Nous vous invitons à télécharger une copie de votre analyse directement sur votre terminal afin de pouvoir y accéder ultérieurement et à tout moment.
+            Le cœur de notre dispositif de sécurité repose sur une conservation limitée. Les documents originaux (PDF) sont automatiquement et irrémédiablement effacés de nos serveurs de stockage <strong>6 mois</strong> après leur dépôt. Les résultats de votre analyse restent consultables dans votre espace ; nous vous invitons également à en télécharger une copie sur votre terminal.
           </p>
         </section>
 

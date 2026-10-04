@@ -5,6 +5,7 @@ import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologica
 import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
 import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "../lib/security.js";
+import { FILE_DELETED_MESSAGE } from "../lib/fileRetention.js";
 
 export const maxDuration = 300;
 
@@ -120,14 +121,6 @@ export default async function handler(req, res) {
       if (!isAdmin) return res.status(403).json({ error: 'Accès non autorisé à ce document' });
     }
 
-    let base64Data;
-    try {
-      const { rows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
-      if (rows.length > 0 && rows[0].file_base64) base64Data = rows[0].file_base64;
-      else throw new Error("Contenu du fichier introuvable dans la base de données.");
-    } catch (dbErr) {
-      throw new Error(`Impossible de récupérer le contenu du fichier: ${dbErr.message}`);
-    }
 
     let analysisResults = null;
     // Renseignés quand une nouvelle analyse est nécessaire : l'extraction et le calcul sont faits
@@ -153,6 +146,14 @@ export default async function handler(req, res) {
     ) {
       analysisResults = analysisRecord.results;
     } else {
+      // Le PDF n'est lu que si une nouvelle analyse est nécessaire : un bilan déjà calculé reste
+      // consultable même après la suppression du relevé (6 mois après son dépôt, cf.
+      // lib/fileRetention.js).
+      const { rows: fileRows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
+      const base64Data = fileRows.length > 0 ? fileRows[0].file_base64 : null;
+      if (!base64Data) {
+        throw new UserFacingError(FILE_DELETED_MESSAGE, 410);
+      }
       
       const fs = await import('fs');
       const path = await import('path');
@@ -696,12 +697,17 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
     // Le détail technique (base de données, API Mistral...) reste dans les journaux serveur ;
     // seul un message rédigé pour l'utilisateur est renvoyé et enregistré.
     const publicMessage = publicErrorMessage(error, "Une erreur technique est survenue pendant l'analyse. Merci de réessayer plus tard.");
-    try {
-      await pool.query(
-        `UPDATE analyses SET status = 'failed', results = $1, updated_at = NOW() WHERE file_path = $2`,
-        [JSON.stringify({ error: publicMessage }), dbFilePath]
-      );
-    } catch (e) {}
+    // Relevé supprimé (conservation de 6 mois écoulée) : on n'écrase surtout pas les résultats
+    // déjà enregistrés pour ce document, on se contente de refuser la nouvelle analyse.
+    const fileDeleted = error instanceof UserFacingError && error.status === 410;
+    if (!fileDeleted) {
+      try {
+        await pool.query(
+          `UPDATE analyses SET status = 'failed', results = $1, updated_at = NOW() WHERE file_path = $2`,
+          [JSON.stringify({ error: publicMessage }), dbFilePath]
+        );
+      } catch (e) {}
+    }
 
     return res.status(error instanceof UserFacingError ? error.status : 500).json({ error: "L'analyse a échoué", message: publicMessage });
   }
