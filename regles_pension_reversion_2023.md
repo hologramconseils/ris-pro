@@ -13,6 +13,10 @@ La pension de réversion du régime de base correspond à **54%** de la retraite
     - **40 002,56 €** pour une personne vivant en couple (si le survivant s'est remarié, pacsé ou vit en concubinage).
     Dans le calcul des ressources, 70% des revenus professionnels sont pris en compte (un abattement de 30% s'applique après 55 ans), ainsi que 3% de la valeur des biens immobiliers (hors résidence principale et exploitation agricole) et des placements. Les allocations chômage, indemnités journalières, RSA et AAH sont comptabilisées. Les aides au logement et prestations familiales ne sont pas comptabilisées.
 - **Remariage :** Au régime général, le fait d'être remarié n'annule pas le droit à la réversion, mais les revenus du nouveau conjoint sont pris en compte dans le plafond de ressources.
+- **Majorations :**
+    - Une majoration de 10% s'applique si le conjoint survivant a eu ou élevé au moins 3 enfants.
+    - Une majoration forfaitaire de **113,59 €** par mois et par enfant à charge s'applique si le conjoint survivant n'a pas encore fait valoir sa retraite personnelle.
+    - Une majoration de 11,1% peut être accordée si le conjoint survivant a au moins 67 ans, a liquidé tous ses droits à la retraite et que le total de toutes ses pensions ne dépasse pas 3 020,07 € par trimestre en 2026.
 
 ## 2. Pluralité de mariages (Divorces)
 Si le défunt a été marié plusieurs fois :
@@ -32,12 +36,12 @@ Les règles pour la complémentaire des salariés du privé diffèrent :
 - **Taux :** 50% de la pension du fonctionnaire.
 - **Conditions d'attribution (CNRACL) :** Au moins une des conditions suivantes doit être remplie : 4 ans de mariage ; ou avoir un enfant issu de l'union ; ou 2 ans de services valables entre la date de mariage et la date de radiation des cadres de l'auteur du droit.
 - **Âge / Ressources :** Il n'y a pas de condition d'âge ni de condition de ressources pour la pension de réversion.
-- **Majorations :** La pension peut être majorée de 10% si le conjoint décédé et le bénéficiaire ont élevé au moins trois enfants. Une majoration pour enfant à charge de 113,59 € par mois est également possible sous certaines conditions.
-- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire.
+- **Majorations :** La pension peut être majorée de 10% si le conjoint décédé et le bénéficiaire ont élevé au moins trois enfants. Une majoration pour enfants est également possible, équivalente à la moitié de la majoration pour enfants de la pension de retraite de base que touchait le défunt.
+- **Remariage / PACS / Concubinage :** Le droit à réversion est suspendu en cas de remariage, de PACS ou de concubinage notoire. Le PACS et le concubinage n'ouvrent pas de droit à réversion.
 
 ### Mises à jour réglementaires
 - **Circulaire CNAV n° 2025-29 du 22/12/2025** : Fixe les plafonds de ressources du régime général pour 2026 à 25 001,60 € pour une personne seule et 40 002,56 € pour un couple, et le montant minimum de la pension de réversion du régime général à 334,92 € par mois au 1er janvier 2026.
-- **Circulaire CNAV du 22 décembre 2025 / Instruction interministérielle n° DSS/3A/DB/6BRS/2025/174 du 15 décembre 2025** : Revalorisation des pensions de retraite de base de 0,9% au 1er janvier 2026, impactant indirectement la pension de réversion.
+- **Circulaire CNAV du 22 décembre 2025 / Instruction interministérielle n° DSS/3A/DB/6BRS/2025/174 du 15 décembre 2025** : Revalorisation des pensions de retraite de base au 1er janvier 2026, impactant indirectement la pension de réversion et ses plafonds.
 - **Circulaire Agirc-Arrco 2025-15-DT du 23 octobre 2025** : Gèle la valeur de service du point Agirc-Arrco à 1,4386 € jusqu'au 31 octobre 2026.
 - La Loi n° 2023-270 du 14 avril 2023 de financement rectificative de la sécurité sociale pour 2023 a apporté des modifications à l'âge légal de départ à la retraite, mais n'a pas directement modifié les conditions d'attribution des pensions de réversion.
 - Des pistes de réforme pour 2026-2027 concernant l'harmonisation des règles de réversion, l'élargissement aux PACS/concubins (notamment dans la fonction publique) et l'harmonisation des conditions de ressources sont à l'étude mais ne sont pas encore des lois en vigueur.

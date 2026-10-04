@@ -4,12 +4,15 @@ Conformément à la documentation officielle, le moteur de règles intègre des 
 
 ## 1. Carrière Longue
 Applicable pour les assurés ayant commencé à travailler avant 16, 18, 20 ou 21 ans.
-- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), et les périodes d'apprentissage entre 1972 et 2013, sont désormais prises en compte comme trimestres cotisés.
+- **Principe :** Nécessité d'avoir validé au moins 5 trimestres à la fin de l'année civile de cet anniversaire (4 trimestres pour ceux nés au cours du dernier trimestre de l'année concernée). Certaines périodes, telles que l'assurance vieillesse des parents au foyer (AVPF), l'assurance vieillesse des aidants (AVA) (dans la limite de 4 trimestres pour chacune), les périodes d'apprentissage entre 1972 et 2013, et, à compter du 1er septembre 2026, jusqu'à deux trimestres liés aux enfants, sont désormais prises en compte comme trimestres cotisés.
 - **Âge de départ anticipé :**
   - **Dès 58 ans** (activité avant 16 ans)
   - **Dès 60 ans** (activité avant 18 ans)
   - **Dès 60 ans ou 62 ans** (activité avant 20 ans). L'âge de départ varie entre 60 et 62 ans selon l'année de naissance, avec des adaptations spécifiques, notamment pour les générations nées entre 1964 et 1970, suite à la suspension de la réforme des retraites et au Décret n° 2026-345 du 7 mai 2026 s'appliquant aux pensions prenant effet à compter du 1er septembre 2026.
   - **Dès 63 ans** (activité avant 21 ans)
+- **Avantages pour les mères de famille (à compter du 1er septembre 2026) :**
+  - Jusqu'à deux trimestres liés aux enfants pourront être pris en compte dans le dispositif de carrière longue.
+  - La retraite de base des mères de famille éligibles au dispositif carrière longue pourra être calculée sur leurs 24 meilleures années (pour 1 enfant) ou 23 meilleures années (pour 2 enfants ou plus), au lieu des 25 meilleures années habituellement retenues.
 - **Clause de Sauvegarde :** Une clause de sauvegarde a été mise en place pour les assurés nés entre le 1er septembre 1961 et le 31 décembre 1963 qui remplissaient les conditions de durée cotisée avant le 1er septembre 2023, leur permettant de bénéficier des règles antérieures à la réforme de 2023.
 
 ## 2. Travailleur Handicapé
@@ -39,4 +42,4 @@ Ce dispositif permet de percevoir une fraction de sa retraite tout en poursuivan
 - **Loi n° 2025-1403 du 30 décembre 2025** de financement de la sécurité sociale pour 2026, dont l'article 105 est le fondement de la suspension partielle de la réforme des retraites de 2023.
 - **Décret n° 2026-345 du 7 mai 2026** portant application de l'article 105 de la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 (adapte l'âge de départ à la retraite anticipée pour carrière longue pour ceux ayant débuté leur activité avant 20 ans, ainsi que la durée d'assurance cotisée nécessaire pour les assurés handicapés, suite à la suspension de la réforme des retraites de 2023; applicable aux pensions prenant effet à compter du 1er septembre 2026).
 
-**Date de mise à jour :** Juillet 2026
+**Date de mise à jour :** Août 2026
