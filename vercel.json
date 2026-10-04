@@ -46,5 +46,11 @@
     "frontend/api/*.js": {
       "maxDuration": 300
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cleanup-files",
+      "schedule": "17 3 * * *"
+    }
+  ]
 }

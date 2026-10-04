@@ -58,7 +58,7 @@ Vos données personnelles ne sont jamais vendues ou cédées à des tiers. Elles
 ---
 
 ## 6. Durée de Conservation des Données
-*   **Fichiers PDF importés** : Conservés de manière sécurisée tant que votre compte est actif. Vous pouvez les supprimer définitivement à tout moment depuis votre espace membre.
+*   **Fichiers PDF importés** : Conservés de manière sécurisée pendant 6 mois après leur dépôt, puis supprimés automatiquement et définitivement. Les résultats de l'analyse restent consultables dans votre espace. Vous pouvez demander leur suppression anticipée à tout moment en écrivant à bertrand.saulnerond@hologramconseils.com.
 *   **Données de compte** : Conservées pendant toute la durée de vie du compte, puis supprimées après 3 ans d'inactivité.
 *   **Données de paiement** : Conservées pendant 10 ans conformément aux obligations comptables et fiscales françaises.
 
