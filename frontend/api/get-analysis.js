@@ -1,6 +1,6 @@
-import { getDb, ensureProfilesSchema } from "./db.js";
+import { getDb, ensureProfilesSchema } from "../lib/db.js";
 import { verifyToken } from "@clerk/backend";
-import { buildRestrictedResults, isAdminProfile } from "./analysisRestriction.js";
+import { buildRestrictedResults, isAdminProfile } from "../lib/analysisRestriction.js";
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;

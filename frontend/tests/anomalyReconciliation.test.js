@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { reconcileAnomalies, buildTemplateAnomaly } from '../api/anomalyReconciliation.js';
+import { reconcileAnomalies, buildTemplateAnomaly } from '../lib/anomalyReconciliation.js';
 
 function rawAnomaly(year, overrides = {}) {
   return {

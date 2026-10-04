@@ -1,4 +1,4 @@
-import { getDb } from './db.js';
+import { getDb } from '../lib/db.js';
 import { verifyToken } from '@clerk/backend';
 
 export default async function handler(req, res) {

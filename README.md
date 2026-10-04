@@ -2,7 +2,7 @@
 
 ## Architecture
 - **Frontend** : React + Vite (`frontend/src`)
-- **API** : fonctions serverless Node.js sur Vercel (`frontend/api`), déployées via `vercel.json`
+- **API** : fonctions serverless Node.js sur Vercel (`frontend/api`), déployées via `vercel.json`. Chaque fichier de `frontend/api/` est une fonction (12 au maximum sur le plan Hobby) : les modules partagés vont dans `frontend/lib/`.
 - **BDD** : PostgreSQL Neon (`neon_schema.sql`)
 - **Authentification** : Clerk
 - **Paiement** : Stripe

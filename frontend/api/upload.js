@@ -1,7 +1,7 @@
 import { put } from '@vercel/blob';
-import { getDb, ensureProfilesSchema } from './db.js';
+import { getDb, ensureProfilesSchema } from '../lib/db.js';
 import { verifyToken } from '@clerk/backend';
-import { MAX_UPLOAD_BYTES, isPdfBuffer, checkRateLimit, RATE_LIMIT_MESSAGE } from './security.js';
+import { MAX_UPLOAD_BYTES, isPdfBuffer, checkRateLimit, RATE_LIMIT_MESSAGE } from '../lib/security.js';
 
 export const config = {
   api: {

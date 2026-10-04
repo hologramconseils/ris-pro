@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from '../api/analysisRestriction.js';
+import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from '../lib/analysisRestriction.js';
 
 test('isAdminProfile : rôle admin => true', () => {
   assert.equal(isAdminProfile({ role: 'admin', email: 'quelquun@example.com' }), true);
