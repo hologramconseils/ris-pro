@@ -22,45 +22,48 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install google-genai python-dotenv pydantic httpx
+          pip install -r backend/requirements.txt
+
+      - name: Test the agent's safeguards
+        run: python -m unittest discover -s backend/tests -v
 
       - name: Run Regulatory Watch Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python backend/regulatory_watch_agent.py
+          REGULATORY_REPORT_PATH: ${{ runner.temp }}/regulatory_report.md
+        run: python backend/regulatory_watch_agent.py
 
-      - name: Check for changes & Open Pull Request
+      # Une seule pull request de veille à la fois, sur une branche fixe : chaque passage repart de
+      # main et remplace la proposition précédente, au lieu d'ouvrir une nouvelle PR par jour.
+      - name: Open or update the Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ${{ runner.temp }}/regulatory_report.md
         run: |
-          if [ -n "$(git status --porcelain *.md)" ]; then
-            echo "Des modifications réglementaires ont été détectées."
-            
-            git config --global user.name "RIS Pro Compliance Bot"
-            git config --global user.email "compliance-bot@hologramconseils.com"
-            
-            BRANCH_NAME="regulatory-update-$(date +'%Y%m%d')"
-            
-            git checkout -b "$BRANCH_NAME"
-            git add *.md
-            git commit -m "chore(compliance): mise à jour automatique de la réglementation retraite"
-            
-            git push origin "$BRANCH_NAME" --force
-            
-            set +e
+          if [ -z "$(git status --porcelain -- 'regles_*.md')" ]; then
+            echo "Aucun changement réglementaire sourcé. Fin du workflow."
+            exit 0
+          fi
+
+          BRANCH_NAME="regulatory-update"
+          git config --global user.name "RIS Pro Compliance Bot"
+          git config --global user.email "compliance-bot@hologramconseils.com"
+          git checkout -B "$BRANCH_NAME"
+          git add -- 'regles_*.md'
+          git commit -m "chore(compliance): mise à jour sourcée de la réglementation retraite"
+          git push origin "$BRANCH_NAME" --force
+
+          if gh pr view "$BRANCH_NAME" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$BRANCH_NAME" --body-file "$REPORT"
+          else
             gh pr create \
               --title "Veille Réglementaire : Mise à jour des règles de retraite" \
-              --body "Cette Pull Request a été ouverte automatiquement par l'Agent de Veille Réglementaire RIS Pro." \
+              --body-file "$REPORT" \
               --base main \
               --head "$BRANCH_NAME"
-            set -e
-            
-            echo "Opération terminée avec succès."
-          else
-            echo "Aucun changement réglementaire détecté. Fin du workflow."
           fi
