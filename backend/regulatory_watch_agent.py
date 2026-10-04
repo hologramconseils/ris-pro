@@ -221,6 +221,7 @@ def main():
     print("=== Veille réglementaire (retraite France) ===")
     today = date.today()
     results = []
+    checked = failed = 0
 
     for filename in FILES_TO_WATCH:
         path = os.path.join(REPO_ROOT, filename)
@@ -230,10 +231,12 @@ def main():
         with open(path, encoding="utf-8") as f:
             content = f.read()
 
+        checked += 1
         try:
             changes = parse_model_json(ask_model(client, types, build_prompt(filename, content)))
         except Exception as err:
             print(f"[Error] {filename} : réponse inexploitable ({err}), aucun changement appliqué.")
+            failed += 1
             continue
 
         new_content, accepted, rejected = apply_changes(content, changes, today)
@@ -253,6 +256,13 @@ def main():
             f.write(build_report(results))
 
     print(f"=== Veille terminée : {len(results)} fichier(s) modifié(s). ===")
+
+    # Si aucun fichier n'a pu être vérifié (clé API invalide, quota, panne), le passage doit
+    # échouer visiblement : sinon il se termine en « aucun changement » alors que rien n'a été
+    # vérifié, et la veille peut rester silencieusement hors service pendant des semaines.
+    if checked and failed == checked:
+        print(f"[Error] Aucun des {checked} fichiers n'a pu être vérifié : la veille n'a pas fonctionné.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
