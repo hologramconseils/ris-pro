@@ -1,6 +1,5 @@
-// Estimation déterministe du SAM et de la pension, portée depuis
-// backend/services/rules_engine.py (moteur non déployé) vers le pipeline JS réellement
-// en production. Approximation volontairement simplifiée : pas de revalorisation
+// Estimation déterministe du SAM et de la pension (portée depuis l'ancien moteur Python,
+// aujourd'hui supprimé). Approximation volontairement simplifiée : pas de revalorisation
 // historique des salaires par coefficient officiel, pas de plafonnement au PASS pour le
 // SAM, pas de décote/surcote sur le taux. Le but n'est pas d'être exact au centime près
 // (calcul CNAV réel), mais de donner à l'IA rédactrice une base chiffrée réelle plutôt que
