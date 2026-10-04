@@ -24,7 +24,9 @@
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "Referrer-Policy": "strict-origin-when-cross-origin",
-        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()"
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "Content-Security-Policy-Report-Only": "default-src 'self'; script-src 'self' https://clerk.hologramconseils.com https://clerk.ris.hologramconseils.com https://*.clerk.accounts.dev https://challenges.cloudflare.com https://*.protect.clerk.com https://va.vercel-scripts.com; connect-src 'self' https://clerk.hologramconseils.com https://clerk.ris.hologramconseils.com https://*.clerk.accounts.dev https://*.protect.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com; img-src 'self' data: blob: https://img.clerk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; report-uri /api/csp-report; report-to csp",
+        "Reporting-Endpoints": "csp=\"https://ris.hologramconseils.com/api/csp-report\""
       },
       "continue": true
     },
