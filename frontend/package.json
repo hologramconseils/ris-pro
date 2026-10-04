@@ -31,7 +31,7 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.18.4",
     "remark-gfm": "^4.0.1",
-    "resend": "^4.1.2",
+    "resend": "^6.31.0",
     "stripe": "^23.0.0"
   },
   "devDependencies": {
