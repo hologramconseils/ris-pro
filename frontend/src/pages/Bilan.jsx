@@ -427,7 +427,7 @@ export default function Bilan() {
             </h2>
 
             {/* Filtres par gravité */}
-            <div className="flex gap-2 print-hidden">
+            <div className="flex flex-wrap gap-2 print-hidden">
               <button
                 onClick={() => setFilter('all')}
                 className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
@@ -464,7 +464,7 @@ export default function Bilan() {
                 return (
                   <div 
                     key={idx} 
-                    className="card" 
+                    className="card card-flush" 
                     style={{ 
                       padding: '0', 
                       overflow: 'hidden', 
@@ -476,7 +476,7 @@ export default function Bilan() {
                     }}
                   >
                     {/* Entête toujours visible */}
-                    <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)', background: 'linear-gradient(to right, rgba(37, 99, 235, 0.02), transparent)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div className="anomaly-card-header" style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)', background: 'linear-gradient(to right, rgba(37, 99, 235, 0.02), transparent)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                       <div className="flex gap-4">
                         <div style={{
                           background: anom.severity === 'high' ? 'var(--error-bg)' : 'var(--warning-bg)',
@@ -512,7 +512,7 @@ export default function Bilan() {
                     </div>
 
                     {/* Contenu toujours ouvert (plus d'accordéon) */}
-                    <div style={{ padding: '1.5rem' }} className="flex flex-col gap-5">
+                    <div style={{ padding: '1.5rem' }} className="anomaly-card-body flex flex-col gap-5">
                       <div className="details-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', background: 'rgba(0,0,0,0.02)', padding: '1.25rem', borderRadius: '10px' }}>
                         <div>
                           <div className="text-xs font-bold uppercase tracking-wider text-muted mb-1">Salaire</div>
@@ -616,11 +616,11 @@ export default function Bilan() {
 
           <div className="timeline-container" style={{ position: 'relative', paddingLeft: '1rem', marginTop: '1rem' }}>
             {/* Ligne verticale */}
-            <div style={{ position: 'absolute', top: '24px', bottom: '24px', left: '33px', width: '2px', background: 'linear-gradient(to bottom, var(--primary) 0%, rgba(37, 99, 235, 0.2) 100%)', zIndex: 0 }} className="print-hidden"></div>
+            <div style={{ position: 'absolute', top: '24px', bottom: '24px', left: '33px', width: '2px', background: 'linear-gradient(to bottom, var(--primary) 0%, rgba(37, 99, 235, 0.2) 100%)', zIndex: 0 }} className="timeline-line print-hidden"></div>
             
             <div className="flex flex-col gap-6">
               {actionPlan.map((act, aIdx) => (
-                <div key={aIdx} style={{ display: 'flex', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
+                <div key={aIdx} className="timeline-step" style={{ display: 'flex', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
                   {/* Pastille / Numéro */}
                   <div style={{
                     background: 'var(--bg-page)',
