@@ -574,7 +574,11 @@ a:hover {
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
+  /* La page d'accueil est centrée : sans ceci, un libellé sur deux lignes se centrait
+     sous l'icône au lieu de rester aligné avec les autres. */
+  text-align: left;
 }
+.reassurance-item svg { flex-shrink: 0; }
 
 /* Upload zone */
 .upload-dropzone {
@@ -961,6 +965,9 @@ a:hover {
 /* Ajustements mobiles complémentaires */
 @media (max-width: 767px) {
   .mobile-text-xl { font-size: 1.25rem !important; }
+
+  /* Pied de page : liens plus serrés, sur plusieurs lignes si besoin. */
+  .footer-links { column-gap: 1.25rem; row-gap: 0.5rem; }
 
   /* Boutons : le texte revient à la ligne plutôt que de déborder de l'écran. */
   .btn {
