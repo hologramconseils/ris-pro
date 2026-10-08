@@ -34,7 +34,14 @@ export default function Securite() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-2">4. Signalement</h2>
+          <h2 className="text-xl font-semibold mb-2">4. Déconnexion automatique</h2>
+          <p className="text-muted">
+            Votre session est automatiquement fermée après <strong>10 minutes d'inactivité</strong>, avec un avertissement une minute avant. Les résultats d'analyse gardés temporairement par votre navigateur sont effacés à la déconnexion.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-semibold mb-2">5. Signalement</h2>
           <p className="text-muted">
             Si vous avez des questions sur la sécurité ou si vous identifiez une faille potentielle, merci de nous contacter urgemment à :<br/>
             <a href="mailto:bertrand.saulnerond@hologramconseils.com">bertrand.saulnerond@hologramconseils.com</a>

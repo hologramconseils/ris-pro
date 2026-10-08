@@ -7,6 +7,7 @@ import { dark } from '@clerk/themes'
 import { frFR } from '@clerk/localizations'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import IdleLogout from './components/IdleLogout'
 import { AuthProvider } from './AuthContext'
 import { ThemeProvider, useTheme } from './ThemeContext'
 
@@ -62,6 +63,7 @@ function App() {
           <Router>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               <Header />
+              <IdleLogout />
               <main style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
