@@ -236,7 +236,7 @@ export default function Diagnostic() {
           </p>
 
           {/* Liste des étapes de l'audit */}
-          <div className="flex flex-col gap-4 text-left" style={{ borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '2rem' }}>
+          <div className="flex flex-col gap-4 text-left" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
             {steps.map((step, idx) => {
               const isCompleted = currentStep > idx;
               const isActive = currentStep === idx;
@@ -250,7 +250,7 @@ export default function Diagnostic() {
                   ) : isActive ? (
                     <Loader2 size={20} className="animate-spin text-primary" style={{ flexShrink: 0 }} />
                   ) : (
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid rgba(0,0,0,0.1)', flexShrink: 0 }} />
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--border)', flexShrink: 0 }} />
                   )}
                   <span style={{ 
                     fontSize: '0.9rem', 

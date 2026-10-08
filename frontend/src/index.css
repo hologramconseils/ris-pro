@@ -72,6 +72,11 @@
   --primary-text: hsl(220, 90%, 78%);
   --primary-text-hover: hsl(220, 95%, 86%);
   --primary-bg: hsla(220, 65%, 58%, 0.15);
+  /* Couleurs d'état éclaircies : les teintes du thème clair (vert, orange, rouge foncés)
+     étaient presque illisibles sur fond sombre (libellés, badges, icônes). */
+  --success: hsl(150, 45%, 58%);
+  --warning: hsl(38, 75%, 62%);
+  --error: hsl(355, 70%, 70%);
 }
 
 .dark .brand-logo {
@@ -965,6 +970,15 @@ a:hover {
 /* Ajustements mobiles complémentaires */
 @media (max-width: 767px) {
   .mobile-text-xl { font-size: 1.25rem !important; }
+
+  /* Bilan : salaire, trimestres et points côte à côte plutôt qu'empilés. */
+  .details-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+    padding: 0.875rem !important;
+  }
+  .details-grid .text-xs { font-size: 0.65rem; letter-spacing: 0.02em; }
+  .anomaly-recommendation { padding: 1.1rem !important; }
 
   /* Pied de page : liens plus serrés, sur plusieurs lignes si besoin. */
   .footer-links { column-gap: 1.25rem; row-gap: 0.5rem; }
