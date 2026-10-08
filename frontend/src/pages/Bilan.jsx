@@ -535,11 +535,11 @@ export default function Bilan() {
                         <p className="text-sm text-main leading-relaxed" style={{ margin: 0 }}>{anom.reason || anom.description}</p>
                       </div>
 
-                      <div style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(22, 163, 74, 0.15)' }}>
+                      <div className="anomaly-recommendation" style={{ background: 'var(--success-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(22, 163, 74, 0.15)' }}>
                         <h4 className="font-bold text-xs uppercase tracking-wider text-success mb-2 flex items-center gap-1.5">
                           <CheckCircle2 size={16} /> Recommandation de l'expert
                         </h4>
-                        <p className="text-sm font-semibold mb-4" style={{ margin: 0, color: 'var(--text-main)' }}>{anom.solution}</p>
+                        <p className="text-sm font-semibold" style={{ margin: '0 0 1rem 0', color: 'var(--text-main)' }}>{anom.solution}</p>
                         
                         {/* Pièces Justificatives directement visibles */}
                         <div style={{ background: 'var(--bg-page)', padding: '1rem 1.25rem', borderRadius: '8px', borderLeft: '3px solid var(--success)' }}>
