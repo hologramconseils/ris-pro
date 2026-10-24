@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>RIS Pro – Intervention en cours</title>
+  <style>
+    :root { --primary: hsl(220, 25%, 20%); --text: hsl(222, 35%, 12%); --muted: hsl(215, 15%, 45%); --bg: hsl(210, 25%, 97%); --card: #fff; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --primary: hsl(220, 65%, 58%); --text: hsl(210, 40%, 98%); --muted: hsl(215, 20%, 65%); --bg: hsl(222, 47%, 5%); --card: hsl(222, 47%, 8%); }
+    }
+    :root[data-theme="dark"] { --primary: hsl(220, 65%, 58%); --text: hsl(210, 40%, 98%); --muted: hsl(215, 20%, 65%); --bg: hsl(222, 47%, 5%); --card: hsl(222, 47%, 8%); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .card { background: var(--card); border-radius: 20px; padding: 2.5rem 2rem; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.15); }
+    img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; background: #fff; }
+    h1 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; }
+    p { color: var(--muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .status { display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; border-radius: 999px; background: hsla(38, 80%, 55%, 0.15); color: hsl(38, 60%, 40%); font-weight: 600; font-size: 0.9rem; }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; margin-right: 0.5rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .contact { margin-top: 1.5rem; font-size: 0.9rem; }
+    .contact a { color: var(--primary); }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img src="/logo.png" alt="Hologram Conseils" />
+    <h1>RIS Pro rencontre une difficulté temporaire</h1>
+    <p>Notre service d'analyse est momentanément indisponible. Notre équipe est mobilisée pour le rétablir au plus vite.</p>
+    <p>Les paiements déjà effectués sont pris en compte : votre accès sera rétabli dès le retour du service.</p>
+    <span class="status"><span class="dot"></span>Intervention en cours</span>
+    <p class="contact">Une question ? <a href="mailto:bertrand.saulnerond@hologramconseils.com">bertrand.saulnerond@hologramconseils.com</a></p>
+  </main>
+</body>
+</html>
