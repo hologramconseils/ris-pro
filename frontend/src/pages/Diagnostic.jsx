@@ -7,7 +7,7 @@ import { useNoIndex } from '../hooks/useNoIndex'
 
 // Bandeau d'information affiché en haut de la page diagnostic (ex. analyse momentanément
 // indisponible). Laisser vide pour ne rien afficher. Les paiements restent accessibles.
-export const ANALYSIS_NOTICE = ''
+export const ANALYSIS_NOTICE = "L'analyse est momentanément indisponible, merci de réessayer plus tard."
 
 function AnalysisNotice() {
   if (!ANALYSIS_NOTICE) return null
