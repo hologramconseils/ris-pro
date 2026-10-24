@@ -5,6 +5,20 @@ import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 import { useNoIndex } from '../hooks/useNoIndex'
 
+// Bandeau d'information affiché en haut de la page diagnostic (ex. analyse momentanément
+// indisponible). Laisser vide pour ne rien afficher. Les paiements restent accessibles.
+export const ANALYSIS_NOTICE = "L'analyse est momentanément indisponible, merci de réessayer plus tard."
+
+function AnalysisNotice() {
+  if (!ANALYSIS_NOTICE) return null
+  return (
+    <div role="status" className="card" style={{ padding: '1rem 1.25rem', background: 'var(--warning-bg)', border: '1px solid rgba(217, 119, 6, 0.25)', borderRadius: '10px', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', textAlign: 'left' }}>
+      <AlertTriangle size={18} className="text-warning" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+      <p className="text-sm" style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.6' }}>{ANALYSIS_NOTICE}</p>
+    </div>
+  )
+}
+
 export default function Diagnostic() {
   useNoIndex()
   const navigate = useNavigate()
@@ -272,6 +286,8 @@ export default function Diagnostic() {
   if (error || (!results && !loading)) {
     return (
       <div className="container" style={{ padding: '4rem 1.5rem' }}>
+        <div className="flex flex-col gap-6" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <AnalysisNotice />
         <div className="card glass text-center p-8">
           <AlertTriangle size={48} className="text-warning mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">{error ? "Erreur d'analyse" : "Aucun document"}</h2>
@@ -279,6 +295,7 @@ export default function Diagnostic() {
             {error || "Veuillez d'abord uploader votre relevé de carrière sur la page d'accueil."}
           </p>
           <button onClick={() => navigate('/')} className="btn btn-primary mx-auto">{LABELS.CTA_RETRY}</button>
+        </div>
         </div>
       </div>
     )
@@ -311,6 +328,7 @@ export default function Diagnostic() {
   return (
     <div className="container animate-fade-in" style={{ padding: '3rem 1.5rem', flex: 1 }}>
       <div className="flex flex-col gap-8" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <AnalysisNotice />
         
         <div className="text-center">
           <div className="badge badge-warning" style={{ marginBottom: '1rem' }}>
