@@ -18,6 +18,13 @@ Les en-têtes de sécurité sont lus dans `vercel.json` : une seule source pour 
 2. **Clé de déploiement GitHub** : sur le serveur, créez une clé SSH dédiée, ajoutez la clé publique dans le dépôt GitHub (Settings → Deploy keys, en lecture seule), et configurez `~/.ssh/config` pour l'utiliser avec `github.com`.
 3. **Variables** : copiez `server/env.example` vers `/etc/ris-pro/env` et remplissez les valeurs. Ce fichier contient les secrets : ne le partagez jamais.
 
+## Tester avec le vrai domaine avant la bascule
+1. Dans `/etc/ris-pro/env`, mettre le vrai domaine dans `RIS_DOMAIN` et `RIS_TLS=internal` (certificat provisoire).
+2. Sur votre Mac, rediriger **uniquement votre poste** vers le serveur : `sudo nano /etc/hosts`, ajouter la ligne `89.167.64.150 ris.hologramconseils.com`, enregistrer.
+3. Ouvrir le domaine dans le navigateur : un avertissement de certificat apparaît (normal), cliquer sur « Avancé » puis continuer. Vos clients, eux, continuent d'utiliser Vercel.
+4. Après les tests, supprimer cette ligne de `/etc/hosts`.
+5. Pour la bascule : vider `RIS_TLS`, relancer `install.sh`, puis changer l'enregistrement DNS.
+
 ## Installation
 ```bash
 # en root, sur le serveur

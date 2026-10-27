@@ -47,7 +47,11 @@ systemctl enable --now ris-pro.service ris-pro-cleanup.timer
 echo "==> HTTPS (Caddy)"
 if [ -z "${RIS_DOMAIN:-}" ]; then echo "RIS_DOMAIN doit être renseigné dans /etc/ris-pro/env."; exit 1; fi
 # Caddy ne lit pas /etc/ris-pro/env : le domaine est écrit directement dans sa configuration.
-sed "s|{\$RIS_DOMAIN}|${RIS_DOMAIN}|" "$APP_DIR/server/Caddyfile" > /etc/caddy/Caddyfile
+# RIS_TLS=internal : certificat provisoire (auto-signé) pour tester avec le vrai domaine avant la bascule du DNS.
+# Vide : certificat Let's Encrypt (le domaine doit alors pointer vers ce serveur).
+TLS_LINE="# certificat Let's Encrypt automatique"
+if [ "${RIS_TLS:-}" = "internal" ]; then TLS_LINE="tls internal"; fi
+sed -e "s|{\$RIS_DOMAIN}|${RIS_DOMAIN}|" -e "s|# TLS_LINE|${TLS_LINE}|" "$APP_DIR/server/Caddyfile" > /etc/caddy/Caddyfile
 systemctl restart caddy
 
 echo "==> Pare-feu"
