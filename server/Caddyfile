@@ -1,0 +1,6 @@
+# HTTPS automatique (Let's Encrypt) pour le domaine de RIS Pro, relayé vers le serveur Node local.
+# Le domaine est fourni par la variable RIS_DOMAIN (fichier /etc/ris-pro/env).
+{$RIS_DOMAIN} {
+	reverse_proxy 127.0.0.1:3000
+	encode gzip zstd
+}
