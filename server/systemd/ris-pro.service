@@ -1,0 +1,15 @@
+[Unit]
+Description=RIS Pro (site et API)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ris
+WorkingDirectory=/opt/ris-pro
+EnvironmentFile=/etc/ris-pro/env
+ExecStart=/usr/bin/node server/index.mjs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

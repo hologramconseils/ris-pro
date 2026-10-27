@@ -1,0 +1,9 @@
+[Unit]
+Description=Lance la purge des relevés chaque jour à 3h17 UTC
+
+[Timer]
+OnCalendar=*-*-* 03:17:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
