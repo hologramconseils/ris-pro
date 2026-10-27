@@ -18,14 +18,17 @@ if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split("."
 fi
 
 echo "==> Utilisateur dédié"
-id ris >/dev/null 2>&1 || useradd --system --create-home --home-dir "$APP_DIR" --shell /usr/sbin/nologin ris
+# Le dossier personnel (cache npm) est séparé de celui de l'application, qui doit rester vide avant le clonage.
+id ris >/dev/null 2>&1 || useradd --system --create-home --home-dir /var/lib/ris --shell /usr/sbin/nologin ris
 
 echo "==> Code de l'application"
+# Le code est récupéré par root (qui détient la clé de déploiement), puis confié à l'utilisateur ris.
 if [ ! -d "$APP_DIR/.git" ]; then
-  sudo -u ris git clone "$REPO_URL" "$APP_DIR"
+  git clone "$REPO_URL" "$APP_DIR"
 else
-  sudo -u ris git -C "$APP_DIR" pull --ff-only
+  git -C "$APP_DIR" pull --ff-only
 fi
+chown -R ris:ris "$APP_DIR"
 
 echo "==> Compilation du site"
 set -a; . /etc/ris-pro/env; set +a

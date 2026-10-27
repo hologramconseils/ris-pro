@@ -37,8 +37,8 @@ journalctl -u ris-pro -n 50         # journaux du site et de l'API
 
 ## Mise à jour
 ```bash
-cd /opt/ris-pro && sudo -u ris git pull --ff-only
-cd frontend && set -a && . /etc/ris-pro/env && set +a && npm ci && npm run build
+git -C /opt/ris-pro pull --ff-only && chown -R ris:ris /opt/ris-pro
+cd /opt/ris-pro/frontend && set -a && . /etc/ris-pro/env && set +a && npm ci && npm run build
 sudo systemctl restart ris-pro
 ```
 
