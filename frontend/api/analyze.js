@@ -6,6 +6,7 @@ import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
 import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "../lib/security.js";
 import { FILE_DELETED_MESSAGE } from "../lib/fileRetention.js";
+import { isOvhRef, keyFromRef, getObject } from "../lib/ovhStorage.js";
 import { ensureExtractionSchema, toCachedExtraction, isUsableExtraction } from "../lib/extractionCache.js";
 
 export const maxDuration = 300;
@@ -198,8 +199,19 @@ export default async function handler(req, res) {
         // Le PDF n'est lu que si une nouvelle analyse est nécessaire : un bilan déjà calculé reste
         // consultable même après la suppression du relevé (6 mois après son dépôt, cf.
         // lib/fileRetention.js).
-        const { rows: fileRows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
-        const base64Data = fileRows.length > 0 ? fileRows[0].file_base64 : null;
+        let base64Data = null;
+        if (isOvhRef(dbFilePath)) {
+          // Relevé stocké chez OVHcloud : un fichier absent (supprimé après 6 mois) répond 404.
+          try {
+            base64Data = (await getObject(keyFromRef(dbFilePath))).toString('base64');
+          } catch (error) {
+            if (error.status !== 404) throw error;
+          }
+        } else {
+          // Anciens relevés (dépôt antérieur à la migration) : copie conservée en base.
+          const { rows: fileRows } = await pool.query('SELECT file_base64 FROM analyses WHERE file_path = $1 LIMIT 1', [dbFilePath]);
+          base64Data = fileRows.length > 0 ? fileRows[0].file_base64 : null;
+        }
         if (!base64Data) {
           throw new UserFacingError(FILE_DELETED_MESSAGE, 410);
         }

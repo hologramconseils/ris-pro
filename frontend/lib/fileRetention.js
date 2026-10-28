@@ -1,8 +1,9 @@
 // Durée de conservation des relevés PDF déposés (RGPD) : 6 mois après le dépôt, le fichier est
-// supprimé de Vercel Blob, et sa copie en base (colonne file_base64) ainsi que les données qui en
+// supprimé du stockage (OVHcloud ; Vercel Blob pour les dépôts antérieurs à la migration), et sa
+// copie en base éventuelle (colonne file_base64, anciens dépôts) ainsi que les données qui en
 // ont été extraites (colonne extraction, cf. extractionCache.js) sont effacées. Les résultats de
 // l'analyse restent consultables ; seule une nouvelle analyse du même document devient impossible.
-// Exécuté chaque jour par la tâche planifiée Vercel /api/cleanup-files (vercel.json, « crons »).
+// Exécuté chaque jour par /api/cleanup-files (minuteur systemd ris-pro-cleanup sur le serveur).
 
 import { ensureExtractionSchema } from './extractionCache.js';
 
@@ -24,7 +25,8 @@ async function ensureRetentionSchema(pool) {
 }
 
 // Supprime les relevés déposés il y a plus de RETENTION_MONTHS mois, par lots.
-// - deleteBlob(url) : supprime le fichier de Vercel Blob (injecté pour pouvoir tester sans réseau).
+// - deleteBlob(filePath) : supprime le fichier du stockage selon sa référence (injecté pour pouvoir
+//   tester sans réseau).
 // - La copie en base et les données extraites sont effacées dans tous les cas. Le relevé n'est marqué comme supprimé
 //   (file_deleted_at) que si la suppression Blob a réussi ; sinon il sera retenté le lendemain.
 // - maxBatches borne le travail d'un passage, pour rester dans la durée maximale de la fonction.
@@ -47,7 +49,7 @@ export async function purgeExpiredFiles(pool, deleteBlob, { batchSize = 100, max
 
     for (const row of rows) {
       let blobDeleted = true;
-      if (row.file_path && /^https:\/\//.test(row.file_path)) {
+      if (row.file_path && /^(https:\/\/|ovh:)/.test(row.file_path)) {
         try {
           await deleteBlob(row.file_path);
         } catch (error) {
