@@ -1,7 +1,10 @@
 import { buffer } from 'micro';
 import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../lib/stripeConfig.js';
-import { createClerkClient } from '@clerk/backend';
+import * as authStore from '../lib/authStore.js';
+import { resolvePaymentAccount, createPaymentLoginLink } from '../lib/paymentAccount.js';
+import { paymentConfirmationEmail } from '../lib/authEmails.js';
+import { siteOrigin } from '../lib/authRequest.js';
 import { sendEmail, isMailConfigured } from '../lib/mailer.js';
 import { getDb } from '../lib/db.js';
 import { maskEmail } from '../lib/security.js';
@@ -9,7 +12,6 @@ import { creditsToGrant, unlockPaidDocument } from '../lib/paymentCredits.js';
 import { ensureProcessedPaymentsSchema, claimPayment, releasePayment } from '../lib/paymentIdempotency.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 export const config = {
   api: {
@@ -61,32 +63,13 @@ export default async function handler(req, res) {
     }
 
     if (userEmail) {
-      if (!finalUserId) {
-        try {
-          console.log(`[Webhook] Recherche utilisateur Clerk pour: ${maskEmail(userEmail)}`);
-          const usersResponse = await clerkClient.users.getUserList({ emailAddress: [userEmail] });
-          
-          if (usersResponse.data && usersResponse.data.length > 0) {
-            finalUserId = usersResponse.data[0].id;
-            console.log(`[Webhook] Utilisateur trouvé: ${finalUserId}`);
-          } else {
-            isNewUser = true;
-            const newUser = await clerkClient.users.createUser({
-              emailAddress: [userEmail],
-              firstName: 'Client',
-              lastName: 'RIS Pro',
-              skipPasswordRequirement: true
-            });
-            finalUserId = newUser.id;
-            console.log(`[Webhook] Nouvel utilisateur Clerk créé: ${finalUserId}`);
-            
-            // Initialiser le profil dans Postgres
-            const db = getDb();
-            await db.query('INSERT INTO profiles (id, analysis_credits) VALUES ($1, 0) ON CONFLICT (id) DO NOTHING', [finalUserId]);
-          }
-        } catch (err) {
-          console.error("[Webhook] Erreur Clerk:", err);
-        }
+      try {
+        const db = getDb();
+        await authStore.ensureAuthSchema(db);
+        ({ userId: finalUserId, isNewUser } = await resolvePaymentAccount({ db, store: authStore, clientUserId: userId, email: userEmail }));
+        if (isNewUser) console.log(`[Webhook] Nouveau compte créé: ${finalUserId}`);
+      } catch (err) {
+        console.error("[Webhook] Erreur lors de la recherche ou de la création du compte:", err);
       }
 
       if (finalUserId) {
@@ -113,59 +96,22 @@ export default async function handler(req, res) {
             [finalUserId, creditsToGrant(unlockedDocument)]
           );
 
-          // Création du lien magique
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.host}`;
+          // Lien de connexion à usage unique menant au bilan payé
+          const siteUrl = siteOrigin() || `https://${req.headers.host}`;
           try {
-            const signInToken = await clerkClient.signInTokens.createSignInToken({
-              userId: finalUserId,
-              expiresInSeconds: 7 * 24 * 60 * 60
-            });
-            
-            // signInToken.url permet de se connecter automatiquement
-            // On peut ajouter un paramètre de redirection après connexion
-            const redirectUrl = encodeURIComponent(`${siteUrl}/bilan?success=true&file=${encodeURIComponent(filePath || '')}`);
-            magicLink = `${signInToken.url}?redirect_url=${redirectUrl}`;
+            magicLink = await createPaymentLoginLink({ db, store: authStore, userId: finalUserId, origin: siteOrigin(), filePath });
           } catch (err) {
-            console.error("[Webhook] Erreur génération lien Clerk:", err);
+            console.error("[Webhook] Erreur génération du lien de connexion:", err);
           }
 
           if (isMailConfigured()) {
-            let emailHtml = '';
-            if (magicLink) {
-              emailHtml = `
-                <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
-                  <h1 style="color: #1a56db;">Merci pour votre confiance !</h1>
-                  <p>Votre paiement a bien été validé et votre accès <strong>RIS Pro</strong> est actif.</p>
-                  <p>Vous disposez désormais de :</p>
-                  <ul style="background: #f3f4f6; padding: 1.5rem 2.5rem; border-radius: 8px; list-style: none;">
-                    <li>✅ <strong>4 analyses détaillées</strong> de relevés de carrière</li>
-                  </ul>
-                  <p>Pour consulter le bilan complet et détaillé de votre analyse immédiatement sans mot de passe, cliquez sur ce lien sécurisé :</p>
-                  <p style="text-align: center; margin: 2rem 0;">
-                    <a href="${magicLink}" style="background-color: #1a56db; color: white; padding: 0.8rem 1.8rem; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block;">Consulter mon Bilan Premium</a>
-                  </p>
-                  <p style="font-size: 0.9rem; color: #666;">Ce lien est à usage unique et sécurisé. ${
-                    isNewUser 
-                      ? 'Lors de vos prochaines visites, vous pourrez configurer un mot de passe ou vous connecter directement avec votre email.' 
-                      : 'Vous pouvez également vous connecter avec votre méthode habituelle.'
-                  }</p>
-                </div>
-              `;
-            } else {
-              emailHtml = `
-                <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
-                  <h1 style="color: #1a56db;">Merci pour votre confiance !</h1>
-                  <p>Vos 4 analyses détaillées ont été ajoutées à votre compte.</p>
-                  <p>Connectez-vous avec votre adresse email pour commencer : <a href="${siteUrl}" style="color: #1a56db; font-weight: bold;">Accéder à RIS Pro</a></p>
-                </div>
-              `;
-            }
+            const { subject, html: emailHtml } = paymentConfirmationEmail({ link: magicLink, isNewUser, siteUrl });
 
             // sendEmail ne lève pas d'exception quand l'envoi échoue : l'erreur est renvoyée dans
             // `error`. Sans cette vérification, un e-mail refusé passait totalement inaperçu.
             const { error: emailError } = await sendEmail({
               to: userEmail,
-              subject: 'Confirmation de votre accès RIS Pro',
+              subject,
               html: emailHtml
             });
             if (emailError) {

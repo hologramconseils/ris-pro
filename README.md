@@ -4,7 +4,7 @@
 - **Frontend** : React + Vite (`frontend/src`)
 - **API** : fonctions serverless Node.js sur Vercel (`frontend/api`), déployées via `vercel.json`. Chaque fichier de `frontend/api/` est une fonction (12 au maximum sur le plan Hobby) : les modules partagés vont dans `frontend/lib/`.
 - **BDD** : PostgreSQL Neon (`neon_schema.sql`)
-- **Authentification** : Clerk
+- **Authentification** : comptes gérés par RIS Pro (mots de passe scrypt, sessions par cookie, e-mails Brevo) — voir `server/AUTH.md`
 - **Paiement** : Stripe
 - **Analyse d'un relevé** (`frontend/api/analyze.js`) :
   1. Extraction du PDF par Mistral OCR

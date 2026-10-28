@@ -2,6 +2,7 @@ import { del } from '@vercel/blob';
 import { timingSafeEqual } from 'crypto';
 import { getDb } from '../lib/db.js';
 import { purgeExpiredFiles, RETENTION_MONTHS } from '../lib/fileRetention.js';
+import { ensureAuthSchema, purgeExpiredAuthData } from '../lib/authStore.js';
 import { isOvhRef, keyFromRef, deleteObject } from '../lib/ovhStorage.js';
 
 // Supprime un relevé selon l'endroit où il est stocké : OVHcloud (référence « ovh:… ») ou, pour les
@@ -33,6 +34,15 @@ export default async function handler(req, res) {
       `[Rétention] Relevés de plus de ${RETENTION_MONTHS} mois supprimés : ${summary.deleted}` +
       (summary.blobFailures ? `, échecs de suppression de fichier : ${summary.blobFailures}` : '')
     );
+    // Sessions et liens expirés, comptes jamais activés : un échec ici ne doit pas faire échouer la purge des relevés.
+    try {
+      const pool = getDb();
+      await ensureAuthSchema(pool);
+      const accounts = await purgeExpiredAuthData(pool);
+      if (accounts) console.log(`[Rétention] Comptes jamais activés supprimés : ${accounts}`);
+    } catch (authError) {
+      console.error('[Rétention] Purge des données de connexion en échec :', authError.message);
+    }
     return res.status(200).json(summary);
   } catch (error) {
     console.error('[Rétention] Échec de la purge :', error);

@@ -194,4 +194,22 @@ export async function findValidAuthToken(db, token, purpose) {
 export async function purgeExpiredAuthData(db) {
   await db.query('DELETE FROM user_sessions WHERE expires_at < NOW() OR last_seen_at < NOW() - make_interval(hours => $1)', [SESSION_IDLE_HOURS]);
   await db.query(`DELETE FROM auth_tokens WHERE expires_at < NOW() - INTERVAL '1 day'`);
+  return purgeUnactivatedAccounts(db);
+}
+
+export const UNACTIVATED_ACCOUNT_DAYS = 30;
+
+// Supprime les comptes créés il y a plus de 30 jours dont l'adresse n'a jamais été confirmée, qui n'ont ni
+// analyse ni crédit (inscription abandonnée : on ne garde pas l'adresse d'une personne qui n'a rien fait).
+// Un compte créé par un paiement porte des crédits ou des analyses : il n'est jamais supprimé ici.
+export async function purgeUnactivatedAccounts(db) {
+  const { rowCount } = await db.query(
+    `DELETE FROM users u
+     WHERE u.email_verified_at IS NULL
+       AND u.created_at < NOW() - make_interval(days => $1)
+       AND NOT EXISTS (SELECT 1 FROM analyses a WHERE a.user_id = u.id)
+       AND NOT EXISTS (SELECT 1 FROM profiles p WHERE p.id = u.id AND p.analysis_credits > 0)`,
+    [UNACTIVATED_ACCOUNT_DAYS]
+  );
+  return rowCount || 0;
 }

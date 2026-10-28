@@ -63,6 +63,41 @@ export function alreadyRegisteredEmail(origin) {
   };
 }
 
-export function magicLoginEmailLink(origin, token) {
-  return `${origin}${AUTH_PAGES.magic}?token=${token}`;
+// Lien de connexion envoyé après un paiement. `redirect` : chemin du site où arriver une fois connecté.
+export function magicLoginEmailLink(origin, token, redirect = null) {
+  const target = redirect ? `&redirect=${encodeURIComponent(redirect)}` : '';
+  return `${origin}${AUTH_PAGES.magic}?token=${token}${target}`;
+}
+
+// E-mail de confirmation de paiement. Avec `link` : accès direct au bilan ; sans lien (adresse du site non
+// configurée, ou création du lien en échec) : invitation à se connecter.
+export function paymentConfirmationEmail({ link, isNewUser, siteUrl }) {
+  const header = '<h1 style="color: #1a56db;">Merci pour votre confiance !</h1>';
+  const wrap = (inner) => `<div style="font-family: sans-serif; line-height: 1.6; color: #333;">${header}${inner}</div>`;
+  if (!link) {
+    return {
+      subject: 'Confirmation de votre accès RIS Pro',
+      html: wrap(`
+  <p>Vos 4 analyses détaillées ont été ajoutées à votre compte.</p>
+  <p>Pour commencer, ${siteUrl ? `<a href="${siteUrl}/login?forgot=true" style="color: #1a56db; font-weight: bold;">demandez votre lien de connexion</a>` : 'utilisez « Mot de passe oublié » sur la page de connexion'} avec cette adresse e-mail.</p>`),
+    };
+  }
+  return {
+    subject: 'Confirmation de votre accès RIS Pro',
+    html: wrap(`
+  <p>Votre paiement a bien été validé et votre accès <strong>RIS Pro</strong> est actif.</p>
+  <p>Vous disposez désormais de :</p>
+  <ul style="background: #f3f4f6; padding: 1.5rem 2.5rem; border-radius: 8px; list-style: none;">
+    <li>✅ <strong>4 analyses détaillées</strong> de relevés de carrière</li>
+  </ul>
+  <p>Pour consulter le bilan complet et détaillé de votre analyse immédiatement, sans mot de passe, cliquez sur ce lien sécurisé :</p>
+  <p style="text-align: center; margin: 2rem 0;">
+    <a href="${link}" style="background-color: #1a56db; color: white; padding: 0.8rem 1.8rem; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block;">Consulter mon Bilan Premium</a>
+  </p>
+  <p style="font-size: 0.9rem; color: #666;">Ce lien est à usage unique et valable 7 jours. ${
+    isNewUser
+      ? 'Un compte a été créé avec cette adresse : pour vous reconnecter plus tard, utilisez « Mot de passe oublié » sur la page de connexion afin de choisir votre mot de passe.'
+      : 'Vous pouvez aussi vous connecter avec votre mot de passe habituel.'
+  }</p>`),
+  };
 }

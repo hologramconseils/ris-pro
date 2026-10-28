@@ -55,8 +55,24 @@ Pages du site associées : `/activation`, `/reinitialisation`, `/connexion-lien`
    automatique ; les 5 fonctions d'API (`get-analysis`, `analyze`, `upload`, `profile`, `checkout`) lisent le cookie de
    session (`lib/sessionAuth.js`) à la place du jeton Clerk. Les POST qui s'appuient sur le cookie doivent venir du
    site lui-même (en-tête Origin). Le jeton des liens est retiré de la barre d'adresse dès l'ouverture de la page.
-4. **Paiement et bascule** : création du compte et lien de connexion après un paiement, reprise des comptes Clerk,
-   retrait de Clerk (dépendances, variables, texte légal).
+4. **Paiement et bascule** (`lib/paymentAccount.js`, `api/webhook.js`) : après un paiement, le compte est retrouvé ou créé
+   par l'adresse saisie chez Stripe (sans mot de passe, non vérifié), les crédits sont ajoutés, et un lien de connexion à
+   usage unique (7 jours) menant au bilan payé est envoyé par e-mail. Reprise des comptes Clerk
+   (`server/import-clerk-users.mjs`), retrait de Clerk (dépendances, variables, politique de sécurité du navigateur,
+   textes légaux), purge quotidienne des sessions et liens expirés et des comptes jamais activés depuis 30 jours
+   (sans analyse ni crédit).
+
+## Bascule en production (à faire dans cet ordre)
+
+1. Fusionner la pull request (la prévisualisation sert de premier contrôle de compilation).
+2. Sur le serveur : `git -C /opt/ris-pro pull && bash /opt/ris-pro/server/install.sh` (les tables sont créées au premier
+   appel). Les variables `CLERK_SECRET_KEY` et `VITE_CLERK_PUBLISHABLE_KEY` de `/etc/ris-pro/env` ne servent plus.
+3. Reprise des comptes existants : exporter les utilisateurs depuis le tableau de bord Clerk, copier le fichier sur le
+   serveur, puis `node server/import-clerk-users.mjs export.csv` (simulation) et `… --apply`. Chaque titulaire choisit
+   son mot de passe avec « Mot de passe oublié ». Supprimer ensuite le fichier d'export (il contient des adresses).
+4. Contrôles : inscription → e-mail → mot de passe → connexion ; mot de passe oublié ; paiement d'un invité → e-mail →
+   lien → bilan ; déconnexion. Puis supprimer l'application chez Clerk.
+5. Les sessions Clerk des visiteurs actuellement connectés cessent de fonctionner : ils se reconnectent une fois.
 
 ## Hors périmètre
 

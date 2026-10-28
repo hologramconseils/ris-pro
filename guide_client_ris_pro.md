@@ -198,7 +198,7 @@ Nous vous recommandons d'exporter votre bilan en PDF dès réception, afin d'en 
 
 ### Qui héberge vos données
 
-L'application est déployée sur **Vercel**, qui stocke aussi les relevés PDF dans un espace privé (Vercel Blob). La base de données est hébergée par **Neon** et l'authentification est assurée par **Clerk**.
+L'application et sa base de données sont hébergées sur un serveur **Hetzner** à Helsinki (Finlande). Les relevés PDF et les sauvegardes chiffrées sont stockés dans un espace privé **OVHcloud** à Gravelines (France). Les comptes sont gérés directement par RIS Pro.
 
 Vos données sont hébergées dans des environnements cloisonnés, avec contrôle d'accès strict par utilisateur, vérifié côté serveur à chaque requête. Un système d'alerte automatique par email informe l'administrateur en cas d'accès anormal.
 
@@ -263,14 +263,14 @@ SIREN : 899 864 318
 Contact : bertrand.saulnerond@hologramconseils.com
 Directeur de la publication : Bertrand Saulnerond
 
-**Hébergeur**
-Vercel Inc. · San Francisco, CA, États-Unis
+**Hébergeur (application et base de données)**
+Hetzner Online GmbH · Industriestr. 25, 91710 Gunzenhausen, Allemagne (serveurs à Helsinki, Finlande)
 
-**Base de données**
-Neon Inc.
+**Stockage des fichiers et sauvegardes**
+OVHcloud · Gravelines, France
 
 **Authentification**
-Clerk Inc.
+Comptes gérés par RIS Pro (aucun prestataire externe)
 
 **Paiement**
 Stripe Payments Europe, Ltd.
