@@ -2,11 +2,13 @@
 // française dont les serveurs sont dans l'Union européenne. Remplace Resend (États-Unis).
 // Appel direct de l'API HTTP de Brevo avec `fetch` : aucune dépendance.
 //
-// Variables d'environnement : BREVO_API_KEY (clé d'API v3), et facultativement MAIL_FROM_EMAIL /
-// MAIL_FROM_NAME. L'adresse expéditrice doit être validée dans Brevo (domaine authentifié SPF/DKIM).
+// Variables d'environnement : BREVO_API_KEY (clé d'API v3), et facultativement MAIL_FROM_EMAIL,
+// MAIL_FROM_NAME et MAIL_REPLY_TO. L'adresse expéditrice doit être sur un domaine authentifié dans
+// Brevo (ris.hologramconseils.com) ; les réponses des clients vont à l'adresse MAIL_REPLY_TO.
 
 const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
-const DEFAULT_FROM_EMAIL = 'bertrand.saulnerond@hologramconseils.com';
+const DEFAULT_FROM_EMAIL = 'ris@ris.hologramconseils.com';
+const DEFAULT_REPLY_TO = 'bertrand.saulnerond@hologramconseils.com';
 const DEFAULT_FROM_NAME = 'RIS Pro';
 
 export function isMailConfigured() {
@@ -30,7 +32,13 @@ export async function sendEmail({ to, subject, html }) {
     const response = await fetch(BREVO_URL, {
       method: 'POST',
       headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify({ sender, to: recipients, subject, htmlContent: html }),
+      body: JSON.stringify({
+        sender,
+        replyTo: { email: process.env.MAIL_REPLY_TO || DEFAULT_REPLY_TO },
+        to: recipients,
+        subject,
+        htmlContent: html,
+      }),
     });
     if (!response.ok) {
       const detail = (await response.text().catch(() => '')).slice(0, 200);

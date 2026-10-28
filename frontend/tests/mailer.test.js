@@ -10,6 +10,7 @@ beforeEach(() => {
   calls = [];
   delete process.env.MAIL_FROM_EMAIL;
   delete process.env.MAIL_FROM_NAME;
+  delete process.env.MAIL_REPLY_TO;
   process.env.BREVO_API_KEY = 'cle-de-test';
 });
 
@@ -36,7 +37,8 @@ test('sendEmail envoie la requête attendue à Brevo', async () => {
   assert.equal(init.method, 'POST');
   assert.equal(init.headers['api-key'], 'cle-de-test');
   const body = JSON.parse(init.body);
-  assert.deepEqual(body.sender, { name: 'RIS Pro', email: 'bertrand.saulnerond@hologramconseils.com' });
+  assert.deepEqual(body.sender, { name: 'RIS Pro', email: 'ris@ris.hologramconseils.com' });
+  assert.deepEqual(body.replyTo, { email: 'bertrand.saulnerond@hologramconseils.com' });
   assert.deepEqual(body.to, [{ email: 'client@example.org' }]);
   assert.equal(body.subject, 'Sujet');
   assert.equal(body.htmlContent, '<p>Bonjour</p>');
@@ -45,12 +47,14 @@ test('sendEmail envoie la requête attendue à Brevo', async () => {
 test('sendEmail accepte une liste de destinataires et un expéditeur personnalisé', async () => {
   process.env.MAIL_FROM_EMAIL = 'contact@exemple.fr';
   process.env.MAIL_FROM_NAME = 'Autre nom';
+  process.env.MAIL_REPLY_TO = 'support@exemple.fr';
   mockFetch(new Response('{}', { status: 201 }));
   await sendEmail({ to: ['a@example.org', 'b@example.org'], subject: 's', html: 'h' });
 
   const body = JSON.parse(calls[0].init.body);
   assert.deepEqual(body.to, [{ email: 'a@example.org' }, { email: 'b@example.org' }]);
   assert.deepEqual(body.sender, { name: 'Autre nom', email: 'contact@exemple.fr' });
+  assert.deepEqual(body.replyTo, { email: 'support@exemple.fr' });
 });
 
 test('sendEmail renvoie une erreur (sans lever d\'exception) quand Brevo refuse', async () => {
