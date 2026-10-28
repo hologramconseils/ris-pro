@@ -20,15 +20,26 @@ export function isAdminProfile(profile) {
 }
 
 // Décide de l'accès premium et de la consommation d'un crédit pour une requête d'analyse.
-// - isNewIdentity : aucune analyse "completed" n'existe encore pour ce user+nir_hash.
-// - wasRestricted : la dernière analyse connue pour cette identité était freemium (is_restricted === true).
-// Une identité déjà débloquée (!isNewIdentity && !wasRestricted) reste premium définitivement,
-// même si le solde de crédits courant est retombé à 0 depuis.
-export function resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, currentCredits }) {
-  const alreadyUnlocked = !isNewIdentity && !wasRestricted;
-  const hasPremiumAccess = Boolean(isAdmin || alreadyUnlocked || currentCredits > 0);
-  const shouldDeductCredit = Boolean(!isAdmin && currentCredits > 0 && (isNewIdentity || wasRestricted));
+// Règle : chaque relevé déposé (chaque document) consomme UN crédit, même si le même RIS a déjà été
+// analysé auparavant (même NIR) : les 4 analyses du pack sont 4 dépôts.
+// - documentAlreadyUnlocked : CE document est déjà débloqué (analyse terminée et non restreinte, soit
+//   parce qu'il a déjà consommé son crédit, soit parce qu'un paiement l'a débloqué). Le rouvrir, recharger
+//   la page ou relancer une analyse défaillante ne coûte donc jamais un second crédit, et il reste
+//   consultable même quand le solde est retombé à 0.
+export function resolvePremiumAccess({ isAdmin, documentAlreadyUnlocked, currentCredits }) {
+  const hasPremiumAccess = Boolean(isAdmin || documentAlreadyUnlocked || currentCredits > 0);
+  const shouldDeductCredit = Boolean(!isAdmin && !documentAlreadyUnlocked && currentCredits > 0);
   return { hasPremiumAccess, shouldDeductCredit };
+}
+
+// Un document est débloqué quand son analyse est terminée et que ses résultats ne sont pas restreints.
+export function isDocumentUnlocked(analysisRecord) {
+  return Boolean(
+    analysisRecord &&
+    analysisRecord.status === 'completed' &&
+    analysisRecord.results &&
+    analysisRecord.results.is_restricted !== true
+  );
 }
 
 function extractYear(anomalyYear) {
