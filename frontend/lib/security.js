@@ -57,7 +57,9 @@ async function ensureRateLimitSchema(pool) {
   rateLimitSchemaEnsured = true;
 }
 
-export async function checkRateLimit(pool, userId, endpoint, limits = RATE_LIMITS[endpoint]) {
+// failOpen (par défaut) : en cas de panne de la base, la requête est autorisée. Pour la connexion, on passe
+// failOpen: false : mieux vaut refuser pendant une panne que laisser essayer des mots de passe sans limite.
+export async function checkRateLimit(pool, userId, endpoint, limits = RATE_LIMITS[endpoint], { failOpen = true } = {}) {
   try {
     await ensureRateLimitSchema(pool);
     const { rows } = await pool.query(
@@ -74,8 +76,8 @@ export async function checkRateLimit(pool, userId, endpoint, limits = RATE_LIMIT
     );
     return true;
   } catch (error) {
-    console.error('[RateLimit] Vérification impossible, requête autorisée :', error.message);
-    return true;
+    console.error(`[RateLimit] Vérification impossible, requête ${failOpen ? 'autorisée' : 'refusée'} :`, error.message);
+    return failOpen;
   }
 }
 

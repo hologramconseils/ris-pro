@@ -173,6 +173,18 @@ export async function consumeAuthToken(db, token, purpose) {
   return rows[0]?.user_id || null;
 }
 
+// Vérifie qu'un jeton est valable SANS le consommer (pour contrôler le nouveau mot de passe avant de brûler le lien).
+// Renvoie l'identifiant du compte, ou null.
+export async function findValidAuthToken(db, token, purpose) {
+  if (!token) return null;
+  const { rows } = await db.query(
+    `SELECT user_id FROM auth_tokens
+     WHERE token_hash = $1 AND purpose = $2 AND used_at IS NULL AND expires_at > NOW() LIMIT 1`,
+    [hashToken(token), purpose]
+  );
+  return rows[0]?.user_id || null;
+}
+
 // Supprime les sessions et les jetons expirés (appelé par la purge quotidienne).
 export async function purgeExpiredAuthData(db) {
   await db.query('DELETE FROM user_sessions WHERE expires_at < NOW() OR last_seen_at < NOW() - make_interval(hours => $1)', [SESSION_IDLE_HOURS]);
