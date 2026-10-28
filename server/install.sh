@@ -56,7 +56,11 @@ install -m 0644 "$APP_DIR/server/systemd/ris-pro-mail-keepalive.timer" /etc/syst
 chmod 600 /etc/ris-pro/env
 chown root:root /etc/ris-pro/env
 systemctl daemon-reload
-systemctl enable --now ris-pro.service ris-pro-cleanup.timer ris-pro-mail-keepalive.timer
+systemctl enable --now ris-pro-cleanup.timer ris-pro-mail-keepalive.timer
+# « enable --now » ne relance pas un service déjà démarré, qui garderait l'ancien code en mémoire :
+# redémarrage explicite, pour que chaque déploiement soit réellement appliqué.
+systemctl enable ris-pro.service
+systemctl restart ris-pro.service
 
 echo "==> HTTPS (Caddy)"
 if [ -z "${RIS_DOMAIN:-}" ]; then echo "RIS_DOMAIN doit être renseigné dans /etc/ris-pro/env."; exit 1; fi
