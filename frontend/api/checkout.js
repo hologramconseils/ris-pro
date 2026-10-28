@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../lib/stripeConfig.js';
 import { verifyToken } from '@clerk/backend';
 import { getDb } from '../lib/db.js';
+import { resolveUnitAmount, STANDARD_AMOUNT_CENTS } from '../lib/checkoutPrice.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 
@@ -53,6 +54,12 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Accès non autorisé à ce document' });
     }
 
+    // Prix normal, sauf pour le compte de test défini sur le serveur (cf. lib/checkoutPrice.js).
+    const unitAmount = resolveUnitAmount(userId);
+    if (unitAmount !== STANDARD_AMOUNT_CENTS) {
+      console.warn(`[Checkout] Prix de test appliqué : ${unitAmount} centimes pour le compte de test.`);
+    }
+
     const idempotencyKey = `checkout_${userId || 'guest'}_${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -64,7 +71,7 @@ export default async function handler(req, res) {
               name: 'Pack 4 Analyses RIS Pro',
               description: 'Accès complet pour 4 analyses détaillées de relevés de carrière (RIS / EIG).',
             },
-            unit_amount: 3900,
+            unit_amount: unitAmount,
           },
           quantity: 1,
         },
