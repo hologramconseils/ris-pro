@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePremiumAccess, buildRestrictedResults, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from '../lib/analysisRestriction.js';
+import { resolvePremiumAccess, isDocumentUnlocked, buildRestrictedResults, sortAnomaliesChronologically, selectFreemiumAnomalies, isAdminProfile } from '../lib/analysisRestriction.js';
 
 test('isAdminProfile : rôle admin => true', () => {
   assert.equal(isAdminProfile({ role: 'admin', email: 'quelquun@example.com' }), true);
@@ -33,11 +33,10 @@ function makeAnomaly(year, overrides = {}) {
   };
 }
 
-test('identité déjà débloquée + 0 crédit => reste premium, aucun crédit débité', () => {
+test('document déjà débloqué + 0 crédit => reste premium, aucun crédit débité', () => {
   const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
     isAdmin: false,
-    isNewIdentity: false,
-    wasRestricted: false, // la dernière analyse connue pour cette identité était déjà premium
+    documentAlreadyUnlocked: true,
     currentCredits: 0
   });
 
@@ -45,11 +44,21 @@ test('identité déjà débloquée + 0 crédit => reste premium, aucun crédit d
   assert.equal(shouldDeductCredit, false, "un document déjà débloqué ne doit jamais être débité une seconde fois");
 });
 
-test('nouvelle identité + crédits disponibles => premium, un crédit débité', () => {
+test('document déjà débloqué + crédits restants => aucun crédit débité (rechargement de la page)', () => {
   const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
     isAdmin: false,
-    isNewIdentity: true,
-    wasRestricted: false,
+    documentAlreadyUnlocked: true,
+    currentCredits: 3
+  });
+
+  assert.equal(hasPremiumAccess, true);
+  assert.equal(shouldDeductCredit, false);
+});
+
+test('nouveau document + crédits disponibles => premium, un crédit débité, même si le même RIS a déjà été analysé', () => {
+  const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
+    isAdmin: false,
+    documentAlreadyUnlocked: false,
     currentCredits: 3
   });
 
@@ -57,35 +66,10 @@ test('nouvelle identité + crédits disponibles => premium, un crédit débité'
   assert.equal(shouldDeductCredit, true);
 });
 
-test('nouvelle identité + 0 crédit => freemium, rien à débiter', () => {
+test('nouveau document + 0 crédit => freemium, rien à débiter', () => {
   const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
     isAdmin: false,
-    isNewIdentity: true,
-    wasRestricted: false,
-    currentCredits: 0
-  });
-
-  assert.equal(hasPremiumAccess, false);
-  assert.equal(shouldDeductCredit, false);
-});
-
-test('identité déjà vue en freemium + crédits disponibles => premium, un crédit débité pour débloquer', () => {
-  const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
-    isAdmin: false,
-    isNewIdentity: false,
-    wasRestricted: true,
-    currentCredits: 1
-  });
-
-  assert.equal(hasPremiumAccess, true);
-  assert.equal(shouldDeductCredit, true);
-});
-
-test('identité déjà vue en freemium + 0 crédit => reste freemium, rien à débiter', () => {
-  const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
-    isAdmin: false,
-    isNewIdentity: false,
-    wasRestricted: true,
+    documentAlreadyUnlocked: false,
     currentCredits: 0
   });
 
@@ -96,13 +80,26 @@ test('identité déjà vue en freemium + 0 crédit => reste freemium, rien à d�
 test('admin => toujours premium, jamais de crédit débité, même sans crédit', () => {
   const { hasPremiumAccess, shouldDeductCredit } = resolvePremiumAccess({
     isAdmin: true,
-    isNewIdentity: true,
-    wasRestricted: false,
+    documentAlreadyUnlocked: false,
     currentCredits: 0
   });
 
   assert.equal(hasPremiumAccess, true);
   assert.equal(shouldDeductCredit, false);
+});
+
+test('isDocumentUnlocked : terminé et non restreint => débloqué', () => {
+  assert.equal(isDocumentUnlocked({ status: 'completed', results: { anomalies: [] } }), true);
+  assert.equal(isDocumentUnlocked({ status: 'completed', results: { is_restricted: false } }), true);
+});
+
+test('isDocumentUnlocked : restreint, en cours, sans résultat ou absent => pas débloqué', () => {
+  assert.equal(isDocumentUnlocked({ status: 'completed', results: { is_restricted: true } }), false);
+  assert.equal(isDocumentUnlocked({ status: 'pending', results: {} }), false);
+  assert.equal(isDocumentUnlocked({ status: 'failed', results: { x: 1 } }), false);
+  assert.equal(isDocumentUnlocked({ status: 'completed', results: null }), false);
+  assert.equal(isDocumentUnlocked(null), false);
+  assert.equal(isDocumentUnlocked(undefined), false);
 });
 
 test('buildRestrictedResults : 5 anomalies désordonnées => seules la plus ancienne et la plus récente restent visibles', () => {

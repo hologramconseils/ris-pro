@@ -1,7 +1,7 @@
 import { getDb, ensureProfilesSchema } from "../lib/db.js";
 import crypto from "crypto";
 import { verifyToken } from "@clerk/backend";
-import { buildRestrictedResults, resolvePremiumAccess, sortAnomaliesChronologically, isAdminProfile } from "../lib/analysisRestriction.js";
+import { buildRestrictedResults, resolvePremiumAccess, isDocumentUnlocked, sortAnomaliesChronologically, isAdminProfile } from "../lib/analysisRestriction.js";
 import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
 import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE } from "../lib/security.js";
@@ -658,21 +658,15 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
         if (analysisRecord && !analysisRecord.user_id) {
           await pool.query(`UPDATE analyses SET user_id = $1 WHERE file_path = $2`, [targetUserId, dbFilePath]);
         }
-        const { rows: existingAnalysisList } = await pool.query(
-          `SELECT id, results FROM analyses WHERE user_id = $1 AND nir_hash = $2 AND status = 'completed' LIMIT 1`,
-          [targetUserId, nirHash]
-        );
-        const existingAnalysis = existingAnalysisList.length > 0 ? existingAnalysisList[0] : null;
-        const isNewIdentity = !existingAnalysis;
-        const wasRestricted = existingAnalysis && existingAnalysis.results && existingAnalysis.results.is_restricted === true;
-
         await ensureProfilesSchema(pool);
         const { rows: profileRows } = await pool.query(`SELECT analysis_credits, role, email FROM profiles WHERE id = $1 LIMIT 1`, [targetUserId]);
         const profile = profileRows.length > 0 ? profileRows[0] : null;
         let currentCredits = profile?.analysis_credits || 0;
         const isAdmin = isAdminProfile(profile);
 
-        const access = resolvePremiumAccess({ isAdmin, isNewIdentity, wasRestricted, currentCredits });
+        // Un crédit par document déposé : un RIS déjà analysé auparavant (même NIR) mais redéposé consomme
+        // un nouveau crédit. Le document lui-même, une fois débloqué, ne coûte plus rien (cf. lib/analysisRestriction.js).
+        const access = resolvePremiumAccess({ isAdmin, documentAlreadyUnlocked: isDocumentUnlocked(analysisRecord), currentCredits });
         hasPremiumAccess = access.hasPremiumAccess;
         shouldDeductCredit = access.shouldDeductCredit;
       } catch (dbError) {
