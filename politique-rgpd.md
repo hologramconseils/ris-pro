@@ -41,19 +41,18 @@ Nous collectons et traitons les données suivantes :
 Conformément aux exigences du RGPD et suite aux optimisations de sécurité de l'Application, nous mettons en œuvre les mesures techniques suivantes :
 *   **Masquage du Numéro de Sécurité Sociale (NIR)** : Le NIR extrait du document PDF n'est jamais stocké en clair dans nos bases de données. Il est immédiatement haché de manière irréversible à des fins de vérification d'unicité, puis masqué sous la forme `1 77 05 XX XXX XXX XX` (seuls le genre, l'année et le mois de naissance indispensables au calcul de la retraite restent visibles).
 *   **Anonymisation des bilans pour l'administration** : Les noms de famille et les données textuelles brutes sont anonymisés à l'affichage pour les administrateurs du site afin d'empêcher toute fuite interne.
-*   **Sécurisation du Stockage** : Les fichiers PDF importés sont stockés dans un espace Vercel Blob privé. Chaque accès est vérifié côté serveur (compte Clerk du propriétaire) : seul le propriétaire connecté à son compte peut consulter ses propres analyses.
-*   **Chiffrement** : Les données transitent via le protocole sécurisé HTTPS (SSL/TLS) et sont chiffrées au repos dans la base de données.
-*   **Surveillance (Monitoring)** : Un système d'alerte automatique par e-mail informe immédiatement l'administrateur en cas de tentative d'accès non autorisé à vos données.
+*   **Sécurisation du Stockage** : Les fichiers PDF importés sont stockés dans un espace privé OVHcloud (Gravelines, France). Chaque accès est vérifié côté serveur : seul le propriétaire connecté à son compte peut consulter ses propres analyses. La base de données est hébergée sur notre serveur (Helsinki, Finlande) et n'est jamais accessible directement depuis Internet.
+*   **Chiffrement** : Les données transitent via le protocole sécurisé HTTPS (SSL/TLS). Les fichiers PDF sont chiffrés au repos par le service de stockage, et les sauvegardes de la base de données sont chiffrées (AES-256) avant d'être copiées hors du serveur.
+*   **Transferts hors de l'Union européenne** : Les documents et résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande, France). Clerk (authentification) et Stripe (paiement) peuvent traiter des données hors de l'Union européenne, avec les garanties prévues par le RGPD ; aucun document de carrière ne leur est transmis.
 
 ---
 
 ## 5. Destinataires et Sous-traitants des Données
 Vos données personnelles ne sont jamais vendues ou cédées à des tiers. Elles sont uniquement partagées avec nos sous-traitants techniques dans la limite nécessaire au bon fonctionnement de l'Application :
-*   **Vercel** : Hébergement du site web et de l'API.
-*   **Vercel Blob** : Stockage privé des fichiers PDF.
-*   **Neon** : Base de données sécurisée.
-*   **Clerk** : Authentification et gestion des comptes.
-*   **Stripe** : Traitement sécurisé des transactions de paiement.
+*   **Hetzner Online GmbH** (Allemagne, serveurs à Helsinki, Finlande) : Hébergement du site web, de l'API et de la base de données.
+*   **OVHcloud** (France, Gravelines) : Stockage privé des fichiers PDF et des sauvegardes chiffrées de la base de données.
+*   **Clerk** (société américaine) : Authentification et gestion des comptes.
+*   **Stripe** (Stripe Payments Europe, Irlande) : Traitement sécurisé des transactions de paiement.
 *   **Brevo** (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation de compte, réinitialisation de mot de passe, alertes).
 *   **Mistral AI (France)** : Lecture du relevé et rédaction de l'analyse, traitement temporaire du contenu du RIS pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).
 
