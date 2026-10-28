@@ -19,3 +19,28 @@ test('hors retour de paiement, aucune nouvelle tentative automatique', () => {
 test('une erreur serveur (500) n\'est pas réessayée en boucle', () => {
   assert.equal(nextRetryDelay({ status: 500, attempt: 0, isPaymentReturn: true }), null);
 });
+
+import { isPaymentPending } from '../src/bilanFetch.js';
+
+const base = { isSuccess: true, profile: { analysis_credits: 0 }, results: { is_restricted: true }, isMock: false, isAdmin: false };
+
+test('paiement en attente : retour de Stripe, 0 crédit et relevé encore restreint', () => {
+  assert.equal(isPaymentPending(base), true);
+});
+
+test('bilan déjà débloqué avec 0 crédit : pas de paiement en attente, le bilan reste affiché', () => {
+  assert.equal(isPaymentPending({ ...base, results: { anomalies: [] } }), false);
+  assert.equal(isPaymentPending({ ...base, results: { is_restricted: false } }), false);
+});
+
+test('résultats pas encore chargés : pas de paiement en attente (l\'écran de chargement prend le relais)', () => {
+  assert.equal(isPaymentPending({ ...base, results: null }), false);
+});
+
+test('crédits disponibles, hors retour de paiement, mode test ou administrateur : pas en attente', () => {
+  assert.equal(isPaymentPending({ ...base, profile: { analysis_credits: 3 } }), false);
+  assert.equal(isPaymentPending({ ...base, isSuccess: false }), false);
+  assert.equal(isPaymentPending({ ...base, isMock: true }), false);
+  assert.equal(isPaymentPending({ ...base, isAdmin: true }), false);
+  assert.equal(isPaymentPending({ ...base, profile: null }), false);
+});
