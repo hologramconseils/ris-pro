@@ -1,0 +1,10 @@
+[Unit]
+Description=RIS Pro : contrôle mensuel de l'envoi d'e-mails (garde la clé Brevo active)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ris
+WorkingDirectory=/opt/ris-pro
+EnvironmentFile=/etc/ris-pro/env
+ExecStart=/usr/bin/node server/mail-keepalive.mjs
