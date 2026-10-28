@@ -32,8 +32,8 @@ export default function MentionsLegales() {
         <section>
           <h2 className="text-xl font-semibold mb-2">3. Hébergement</h2>
           <p className="text-muted">
-            Ce site est hébergé par : <strong>Vercel Inc.</strong><br/>
-            Le stockage et le traitement des données (documents) sont gérés de manière sécurisée via <strong>Neon et Vercel Blob</strong>.
+            Ce site est hébergé par : <strong>Hetzner Online GmbH</strong>, Industriestr. 25, 91710 Gunzenhausen, Allemagne (téléphone : +49 9831 505-0). Les serveurs sont situés à Helsinki (Finlande), dans l'Union européenne.<br/>
+            Les fichiers PDF importés et les sauvegardes chiffrées de la base de données sont stockés chez <strong>OVHcloud</strong> (OVH SAS, 2 rue Kellermann, 59100 Roubaix, France), dans son centre de données de Gravelines (France).
           </p>
         </section>
 

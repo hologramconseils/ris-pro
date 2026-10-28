@@ -12,3 +12,17 @@ export function nextRetryDelay({ status, attempt, isPaymentReturn }) {
   if (!RETRYABLE_STATUS.includes(status)) return null;
   return attempt < RETRY_DELAYS_MS.length ? RETRY_DELAYS_MS[attempt] : null;
 }
+
+// Un paiement est « en attente de validation » seulement si, au retour de Stripe, le relevé payé est
+// encore restreint (le webhook ne l'a pas encore débloqué) et que le solde est à 0. Un solde à 0
+// ne suffit pas : un client qui a utilisé ses crédits garde l'accès aux bilans déjà débloqués.
+export function isPaymentPending({ isSuccess, profile, results, isMock, isAdmin }) {
+  return Boolean(
+    isSuccess &&
+    profile &&
+    profile.analysis_credits === 0 &&
+    !isMock &&
+    !isAdmin &&
+    results?.is_restricted === true
+  );
+}

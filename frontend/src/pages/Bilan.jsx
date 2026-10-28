@@ -4,7 +4,7 @@ import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 import { useNoIndex } from '../hooks/useNoIndex'
-import { nextRetryDelay } from '../bilanFetch'
+import { nextRetryDelay, isPaymentPending } from '../bilanFetch'
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -189,7 +189,8 @@ export default function Bilan() {
   // Polling / attente intermédiaire si retour de paiement réussi mais profil non mis à jour.
   // Une fois le polling automatique épuisé sans résultat (paymentPollTimedOut), on ne reste
   // plus indéfiniment sur ce spinner : on bascule vers un écran avec une action manuelle.
-  const paymentPendingBase = isSuccess && profile && profile.analysis_credits === 0 && !isMock && profile?.role !== 'admin'
+  // Le solde seul ne suffit pas (cf. isPaymentPending) : un bilan déjà débloqué reste affiché à 0 crédit.
+  const paymentPendingBase = isPaymentPending({ isSuccess, profile, results, isMock, isAdmin: profile?.role === 'admin' })
   const waitingForPayment = paymentPendingBase && !paymentPollTimedOut
   const paymentTakingLonger = paymentPendingBase && paymentPollTimedOut
 

@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
 import { Loader2 } from 'lucide-react'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { dark } from '@clerk/themes'
@@ -85,7 +84,6 @@ function App() {
               </main>
               <Footer />
             </div>
-            <Analytics />
           </Router>
         </AuthProvider>
       </ThemedClerkProvider>

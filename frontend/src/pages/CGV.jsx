@@ -41,7 +41,7 @@ export default function CGV() {
         <section>
           <h2 className="text-xl font-semibold mb-2">3. Délivrance du service</h2>
           <p className="text-muted">
-            Les crédits d'analyse sont crédités sur le compte de l'utilisateur instantanément après la validation du paiement par Stripe. Chaque analyse d'une nouvelle identité décompte un crédit.
+            Les crédits d'analyse sont crédités sur le compte de l'utilisateur instantanément après la validation du paiement par Stripe. Chaque relevé déposé et analysé décompte un crédit, y compris lorsqu'il s'agit d'une personne dont le relevé a déjà été analysé. Rouvrir ou recharger le bilan d'un relevé déjà analysé ne décompte pas de crédit supplémentaire.
           </p>
         </section>
 
