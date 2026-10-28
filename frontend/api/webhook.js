@@ -6,6 +6,7 @@ import { sendEmail, isMailConfigured } from '../lib/mailer.js';
 import { getDb } from '../lib/db.js';
 import { maskEmail } from '../lib/security.js';
 import { creditsToGrant, unlockPaidDocument } from '../lib/paymentCredits.js';
+import { ensureProcessedPaymentsSchema, claimPayment, releasePayment } from '../lib/paymentIdempotency.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
@@ -43,6 +44,21 @@ export default async function handler(req, res) {
     let magicLink = null;
 
     console.log(`[Webhook] Session reçue. email: ${maskEmail(userEmail)}`);
+
+    // Un même paiement n'est traité qu'une fois (cf. lib/paymentIdempotency.js). Si la base est
+    // injoignable, on traite quand même : un doublon se rattrape, un paiement perdu non.
+    let paymentClaimed = false;
+    try {
+      const claimDb = getDb();
+      await ensureProcessedPaymentsSchema(claimDb);
+      if (!(await claimPayment(claimDb, session.id))) {
+        console.warn(`[Webhook] Paiement déjà traité (session ${session.id}) : livraison en double ignorée.`);
+        return res.json({ received: true, duplicate: true });
+      }
+      paymentClaimed = true;
+    } catch (claimErr) {
+      console.error("[Webhook] Impossible d'enregistrer le paiement, traitement quand même :", claimErr.message);
+    }
 
     if (userEmail) {
       if (!finalUserId) {
@@ -160,7 +176,13 @@ export default async function handler(req, res) {
           }
         } catch (dbErr) {
            console.error("[Webhook] Erreur BDD Postgres:", dbErr);
+           // Rien n'a été accordé : on libère le paiement pour qu'un renvoi de l'événement (tableau de
+           // bord Stripe) puisse être traité au lieu d'être pris pour un doublon.
+           if (paymentClaimed) await releasePayment(db, session.id).catch(() => {});
         }
+      } else if (paymentClaimed) {
+        console.error(`[Webhook] Aucun compte pour le paiement ${session.id} : paiement libéré, à traiter manuellement.`);
+        await releasePayment(getDb(), session.id).catch(() => {});
       }
     }
   }
