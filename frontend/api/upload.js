@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { putObject, toRef } from '../lib/ovhStorage.js';
 import { getDb, ensureProfilesSchema } from '../lib/db.js';
 import { verifyToken } from '@clerk/backend';
 import { MAX_UPLOAD_BYTES, isPdfBuffer, checkRateLimit, RATE_LIMIT_MESSAGE } from '../lib/security.js';
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   }
 
   // Authentification obligatoire : aucune analyse ne doit pouvoir être lancée sans compte.
-  // Rejetée avant tout traitement (avant l'écriture du fichier sur Vercel Blob) plutôt que de
+  // Rejetée avant tout traitement (avant l'écriture du fichier dans le stockage) plutôt que de
   // retomber silencieusement sur un mode invité comme c'était le cas auparavant.
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
@@ -80,16 +80,12 @@ export default async function handler(req, res) {
       return res.status(415).json({ error: 'Seuls les fichiers PDF sont acceptés.' });
     }
 
-    // Upload vers Vercel Blob (store configuré en private)
-    const blob = await put(safeName, buffer, {
-      access: 'private',
-      contentType: 'application/pdf',
-      addRandomSuffix: false,
-    });
+    // Écriture dans OVHcloud Object Storage (Gravelines, conteneur privé). Le PDF n'est plus copié
+    // en base : seule la référence « ovh:<clé> » est conservée dans analyses.file_path.
+    await putObject(safeName, buffer, 'application/pdf');
+    const filePath = toRef(safeName);
 
-    const filePath = blob.url;
-
-    // Enregistrement en base Neon
+    // Enregistrement en base
     const pool = getDb();
 
     try {
@@ -116,15 +112,13 @@ export default async function handler(req, res) {
     }
 
     try {
-      const base64Data = buffer.toString('base64');
-
       await pool.query(
-        `INSERT INTO analyses (file_path, status, user_id, results, created_at, updated_at, file_base64)
-         VALUES ($1, 'pending', $2, '{}'::jsonb, NOW(), NOW(), $3)`,
-        [filePath, userId, base64Data]
+        `INSERT INTO analyses (file_path, status, user_id, results, created_at, updated_at)
+         VALUES ($1, 'pending', $2, '{}'::jsonb, NOW(), NOW())`,
+        [filePath, userId]
       );
     } catch (dbError) {
-      // L'upload Blob a réussi, on retourne quand même l'URL
+      // L'écriture dans le stockage a réussi, on retourne quand même la référence
       console.error('Erreur DB (non bloquante):', dbError.message);
     }
 
