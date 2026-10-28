@@ -36,7 +36,14 @@ chown -R ris:ris "$APP_DIR"
 echo "==> Compilation du site"
 # « npm ci » refuse de s'exécuter si package.json et le fichier de verrouillage divergent (ajout d'une
 # dépendance sans mise à jour du verrou) : dans ce cas « npm install » prend le relais.
-set -a; . /etc/ris-pro/env; set +a
+# Lecture du fichier de configuration SANS l'exécuter : « . fichier » interpréterait une valeur contenant
+# un espace ou un « & » (ex. un nom avec espace, une adresse de base avec options) comme des commandes.
+while IFS= read -r line || [ -n "$line" ]; do
+  case "$line" in ''|'#'*) continue ;; *=*) ;; *) continue ;; esac
+  name="${line%%=*}"; value="${line#*=}"
+  value="${value%\"}"; value="${value#\"}"
+  export "$name=$value"
+done < /etc/ris-pro/env
 sudo -u ris --preserve-env=VITE_CLERK_PUBLISHABLE_KEY,NEXT_PUBLIC_SITE_URL,DATABASE_URL,CLERK_SECRET_KEY \
   bash -c "cd $APP_DIR/frontend && (npm ci || npm install --no-audit --no-fund) && npm run build"
 
