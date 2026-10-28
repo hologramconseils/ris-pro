@@ -62,3 +62,13 @@ test('purgeExpiredFiles : rien à supprimer => aucun appel au stockage', async (
   assert.deepEqual(summary, { deleted: 0, blobFailures: 0 });
   assert.equal(calls, 0);
 });
+
+test('purgeExpiredFiles : supprime aussi les relevés stockés chez OVHcloud (référence ovh:)', async () => {
+  const pool = fakePool([{ id: 1, file_path: 'ovh:ris-pro/1_a.pdf' }]);
+  const deleted = [];
+  const summary = await purgeExpiredFiles(pool, async (filePath) => { deleted.push(filePath); });
+
+  assert.deepEqual(summary, { deleted: 1, blobFailures: 0 });
+  assert.deepEqual(deleted, ['ovh:ris-pro/1_a.pdf']);
+  assert.ok(pool.rows[0].file_deleted_at);
+});

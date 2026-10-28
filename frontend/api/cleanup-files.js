@@ -2,9 +2,17 @@ import { del } from '@vercel/blob';
 import { timingSafeEqual } from 'crypto';
 import { getDb } from '../lib/db.js';
 import { purgeExpiredFiles, RETENTION_MONTHS } from '../lib/fileRetention.js';
+import { isOvhRef, keyFromRef, deleteObject } from '../lib/ovhStorage.js';
 
-// Tâche planifiée (vercel.json, « crons ») : supprime chaque jour les relevés PDF déposés il y a
-// plus de 6 mois. Vercel appelle cette adresse avec l'en-tête « Authorization: Bearer <CRON_SECRET> » ;
+// Supprime un relevé selon l'endroit où il est stocké : OVHcloud (référence « ovh:… ») ou, pour les
+// dépôts antérieurs à la migration, Vercel Blob (adresse https).
+async function deleteStoredFile(filePath) {
+  if (isOvhRef(filePath)) return deleteObject(keyFromRef(filePath));
+  return del(filePath);
+}
+
+// Tâche planifiée (minuteur systemd sur le serveur) : supprime chaque jour les relevés PDF déposés
+// il y a plus de 6 mois. Le minuteur appelle cette adresse avec « Authorization: Bearer <CRON_SECRET> » ;
 // sans la variable d'environnement CRON_SECRET, la tâche refuse de s'exécuter, pour qu'aucun
 // visiteur ne puisse la déclencher.
 export default async function handler(req, res) {
@@ -20,10 +28,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const summary = await purgeExpiredFiles(getDb(), (url) => del(url));
+    const summary = await purgeExpiredFiles(getDb(), deleteStoredFile);
     console.log(
       `[Rétention] Relevés de plus de ${RETENTION_MONTHS} mois supprimés : ${summary.deleted}` +
-      (summary.blobFailures ? `, échecs de suppression Blob : ${summary.blobFailures}` : '')
+      (summary.blobFailures ? `, échecs de suppression de fichier : ${summary.blobFailures}` : '')
     );
     return res.status(200).json(summary);
   } catch (error) {
