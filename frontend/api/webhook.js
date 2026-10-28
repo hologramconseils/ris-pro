@@ -5,6 +5,7 @@ import { createClerkClient } from '@clerk/backend';
 import { sendEmail, isMailConfigured } from '../lib/mailer.js';
 import { getDb } from '../lib/db.js';
 import { maskEmail } from '../lib/security.js';
+import { creditsToGrant, unlockPaidDocument } from '../lib/paymentCredits.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
@@ -75,24 +76,26 @@ export default async function handler(req, res) {
       if (finalUserId) {
         const db = getDb();
         try {
-          // Incrémenter les crédits
-          await db.query(
-            'UPDATE profiles SET analysis_credits = analysis_credits + 4 WHERE id = $1',
-            [finalUserId]
-          );
-
+          // Débloque d'abord le relevé payé : le pack comprend 4 analyses EN TOUT, dont celle de ce
+          // relevé (cf. lib/paymentCredits.js). Retirer is_restricted du JSONB stocké le débloque
+          // immédiatement : Bilan.jsx ne rappelle jamais /api/analyze après un paiement, il relit
+          // /api/get-analysis, qui se fie au flag déjà stocké. Sans cette mise à jour ici, le
+          // document resterait affiché masqué indéfiniment malgré le paiement.
           const filePath = session.metadata?.filePath;
+          let unlockedDocument = false;
           if (filePath) {
-            // Retirer is_restricted du JSONB stocké débloque immédiatement le document payé :
-            // Bilan.jsx ne rappelle jamais /api/analyze après un paiement, il relit
-            // /api/get-analysis, qui se fie au flag déjà stocké. Sans cette mise à jour ici, le
-            // document resterait affiché masqué indéfiniment malgré le paiement, jusqu'à ce
-            // qu'une nouvelle analyse soit relancée depuis /diagnostic.
-            await db.query(
-              `UPDATE analyses SET user_id = $1, results = results - 'is_restricted' WHERE file_path = $2`,
-              [finalUserId, filePath]
-            );
+            try {
+              unlockedDocument = await unlockPaidDocument(db, finalUserId, filePath);
+            } catch (unlockErr) {
+              console.error("[Webhook] Erreur lors du déblocage du relevé:", unlockErr.message);
+            }
           }
+
+          // Incrémenter les crédits (4, moins 1 si le relevé payé vient d'être débloqué)
+          await db.query(
+            'UPDATE profiles SET analysis_credits = analysis_credits + $2 WHERE id = $1',
+            [finalUserId, creditsToGrant(unlockedDocument)]
+          );
 
           // Création du lien magique
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.host}`;
