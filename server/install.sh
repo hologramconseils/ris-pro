@@ -26,14 +26,19 @@ echo "==> Code de l'application"
 if [ ! -d "$APP_DIR/.git" ]; then
   git clone "$REPO_URL" "$APP_DIR"
 else
+  # Le fichier de verrouillage peut avoir été modifié ici par « npm install » (voir plus bas) : on le
+  # remet à l'état du dépôt pour que la mise à jour du code ne soit jamais bloquée.
+  git -C "$APP_DIR" checkout -- frontend/package-lock.json 2>/dev/null || true
   git -C "$APP_DIR" pull --ff-only
 fi
 chown -R ris:ris "$APP_DIR"
 
 echo "==> Compilation du site"
+# « npm ci » refuse de s'exécuter si package.json et le fichier de verrouillage divergent (ajout d'une
+# dépendance sans mise à jour du verrou) : dans ce cas « npm install » prend le relais.
 set -a; . /etc/ris-pro/env; set +a
 sudo -u ris --preserve-env=VITE_CLERK_PUBLISHABLE_KEY,NEXT_PUBLIC_SITE_URL,DATABASE_URL,CLERK_SECRET_KEY \
-  bash -c "cd $APP_DIR/frontend && npm ci && npm run build"
+  bash -c "cd $APP_DIR/frontend && (npm ci || npm install --no-audit --no-fund) && npm run build"
 
 echo "==> Services"
 install -m 0644 "$APP_DIR/server/systemd/ris-pro.service" /etc/systemd/system/

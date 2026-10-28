@@ -24,6 +24,7 @@
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^1.49.0",
     "micro": "^10.0.1",
+    "pg": "^8.13.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-helmet-async": "^3.0.0",

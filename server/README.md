@@ -53,3 +53,20 @@ sudo systemctl restart ris-pro
 1. Tester sur le domaine de test : analyse, paiement Stripe en mode test, e-mail, page bilan.
 2. Changer l'enregistrement DNS du domaine vers le serveur.
 3. Garder Vercel en réserve quelques jours, puis supprimer le projet.
+
+## Base de données PostgreSQL sur le serveur (remplace Neon)
+La base tourne sur le serveur lui-même, accessible depuis cette machine uniquement (le port 5432 n'est jamais ouvert).
+Le site accepte les deux types de base : une adresse `neon.tech` utilise le pilote Neon, toute autre adresse utilise PostgreSQL classique (`lib/db.js`).
+
+```bash
+# en root, dans cet ordre
+bash /opt/ris-pro/server/install.sh                   # installe le code qui sait parler à PostgreSQL local
+bash /opt/ris-pro/server/db/setup.sh                  # installe PostgreSQL, crée la base « ris »
+bash /opt/ris-pro/server/db/migrate-from-neon.sh      # copie Neon vers le serveur, vérifie, puis bascule
+bash /opt/ris-pro/server/db/setup-backups.sh          # sauvegardes chiffrées quotidiennes vers OVHcloud
+bash /opt/ris-pro/server/db/restore-test.sh           # prouve qu'une sauvegarde se restaure
+```
+
+- `migrate-from-neon.sh` demande l'adresse **directe** de Neon (sans `-pooler`), arrête le site pendant le transfert (quelques minutes), compare le nombre de lignes de chaque table et ne bascule que si tout correspond. En cas d'échec, le site repart sur Neon, qui n'est jamais modifié.
+- Les sauvegardes sont chiffrées (AES-256) avec une phrase secrète que vous choisissez et conservez **en dehors du serveur** ; sans elle, elles sont illisibles. Elles sont copiées chaque nuit (02:30 UTC) dans un conteneur OVHcloud privé : 14 jours conservés sur le serveur, 30 jours chez OVHcloud.
+- Neon n'est supprimé qu'après quelques jours de bon fonctionnement.

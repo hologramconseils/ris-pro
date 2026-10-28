@@ -1,6 +1,23 @@
-import { Pool } from '@neondatabase/serverless';
+import { createRequire } from 'node:module';
+import { Pool as NeonPool } from '@neondatabase/serverless';
+import { isNeonUrl } from './dbUrl.js';
 
-// Singleton pour éviter les fuites de connexions dans Vercel Serverless
+const requireCjs = createRequire(import.meta.url);
+
+// Deux types de base sont acceptés, selon DATABASE_URL :
+// - Neon (adresse en neon.tech) : pilote serverless, utilisé tant que la migration n'est pas faite ;
+// - PostgreSQL classique (serveur RIS, adresse locale) : pilote `pg`, chargé uniquement dans ce cas.
+// Les deux exposent la même interface (query → { rows }), le reste du code n'a pas à les distinguer.
+export function createPool(connectionString) {
+  if (isNeonUrl(connectionString)) return new NeonPool({ connectionString });
+  const { Pool } = requireCjs('pg');
+  const pool = new Pool({ connectionString, max: 10 });
+  // Sans écouteur, une connexion inactive coupée par le serveur ferait tomber tout le processus.
+  pool.on('error', (error) => console.error('[DB] Erreur sur une connexion inactive :', error.message));
+  return pool;
+}
+
+// Singleton : une seule réserve de connexions pour tout le processus
 let pool;
 
 export function getDb() {
@@ -8,7 +25,7 @@ export function getDb() {
     if (!process.env.DATABASE_URL) {
       console.warn("⚠️ DATABASE_URL n'est pas définie dans l'environnement.");
     }
-    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    pool = createPool(process.env.DATABASE_URL);
   }
   return pool;
 }
