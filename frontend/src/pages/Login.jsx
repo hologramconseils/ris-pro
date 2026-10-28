@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { Loader2, ShieldAlert, CheckCircle2 } from 'lucide-react'
+import { Loader2, ShieldAlert, CheckCircle2, Mail } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { authApi, safeRedirect } from '../authClient'
 import { useNoIndex } from '../hooks/useNoIndex'
@@ -65,10 +65,18 @@ export default function Login() {
           )}
 
           {notice ? (
-            <div className="flex items-start gap-2 text-sm p-3" role="status" style={{ borderRadius: '10px', background: 'rgba(16,185,129,0.1)' }}>
-              <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: '2px' }} className="text-success" />
-              <span>{notice}</span>
-            </div>
+            <>
+              <div className="flex items-start gap-2 text-sm p-3" role="status" style={{ borderRadius: '10px', background: 'rgba(16,185,129,0.1)' }}>
+                <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: '2px' }} className="text-success" />
+                <span>{notice}</span>
+              </div>
+              {mode === 'register' && (
+                <p className="flex items-start gap-2 text-xs text-muted" style={{ margin: 0 }}>
+                  <Mail size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
+                  <span>Vous ne le voyez pas d'ici quelques minutes ? Pensez à regarder dans vos courriers indésirables (spams).</span>
+                </p>
+              )}
+            </>
           ) : (
             <>
               <label className="text-sm font-medium" htmlFor="auth-email">Adresse e-mail</label>
