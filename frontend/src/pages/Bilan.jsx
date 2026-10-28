@@ -4,6 +4,7 @@ import { CheckCircle2, AlertTriangle, Download, FileText, FileSearch, HelpCircle
 import { useAuth } from '../AuthContext'
 import { LABELS } from '../config/labels'
 import { useNoIndex } from '../hooks/useNoIndex'
+import { nextRetryDelay } from '../bilanFetch'
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -52,7 +53,9 @@ export default function Bilan() {
   const [paymentPollTimedOut, setPaymentPollTimedOut] = useState(false)
 
   useEffect(() => {
-    if (filePath) {
+    // On attend que la connexion soit reconnue : sinon la demande part sans jeton et le serveur la refuse
+    // (surtout au retour d'un paiement, où la page ne bloque pas sur le chargement de l'authentification).
+    if (filePath && !authLoading) {
       fetchAnalysis(filePath)
     }
 
@@ -69,13 +72,14 @@ export default function Bilan() {
       }, 2000);
       return () => clearInterval(interval);
     }
-  }, [filePath, isSuccess, user, profile?.analysis_credits])
+  }, [filePath, isSuccess, user, authLoading, profile?.analysis_credits])
 
 
 
   const fetchAnalysis = async (path) => {
     try {
       setLoading(true)
+      setError(null)
 
       const cached = sessionStorage.getItem(`ris_pro_analysis_${path}`);
       if (cached) {
@@ -99,10 +103,19 @@ export default function Bilan() {
         }
       }
 
-      const response = await fetch(`/api/get-analysis?filePath=${encodeURIComponent(path)}`, {
-        method: 'GET',
-        headers
-      });
+      let response;
+      for (let attempt = 0; ; attempt++) {
+        response = await fetch(`/api/get-analysis?filePath=${encodeURIComponent(path)}`, {
+          method: 'GET',
+          headers
+        });
+        const delay = response.ok ? null : nextRetryDelay({ status: response.status, attempt, isPaymentReturn: isSuccess });
+        if (delay === null) break;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        // Le jeton a pu devenir disponible entre-temps.
+        const freshToken = await window.Clerk?.session?.getToken();
+        if (freshToken) headers['Authorization'] = `Bearer ${freshToken}`;
+      }
 
       if (!response.ok && !isMock) {
         throw new Error("Aucun résultat trouvé pour ce document.");
@@ -250,7 +263,7 @@ export default function Bilan() {
           <p className="text-muted mb-6">
             {error || LABELS.ERROR_FETCH}
           </p>
-          <button onClick={() => navigate('/')} className="btn btn-primary">{LABELS.CTA_RETRY}</button>
+          <button onClick={() => (filePath ? fetchAnalysis(filePath) : navigate('/'))} className="btn btn-primary">{LABELS.CTA_RETRY}</button>
         </div>
       </div>
     )

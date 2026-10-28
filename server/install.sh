@@ -51,10 +51,12 @@ echo "==> Services"
 install -m 0644 "$APP_DIR/server/systemd/ris-pro.service" /etc/systemd/system/
 install -m 0644 "$APP_DIR/server/systemd/ris-pro-cleanup.service" /etc/systemd/system/
 install -m 0644 "$APP_DIR/server/systemd/ris-pro-cleanup.timer" /etc/systemd/system/
+install -m 0644 "$APP_DIR/server/systemd/ris-pro-mail-keepalive.service" /etc/systemd/system/
+install -m 0644 "$APP_DIR/server/systemd/ris-pro-mail-keepalive.timer" /etc/systemd/system/
 chmod 600 /etc/ris-pro/env
 chown root:root /etc/ris-pro/env
 systemctl daemon-reload
-systemctl enable --now ris-pro.service ris-pro-cleanup.timer
+systemctl enable --now ris-pro.service ris-pro-cleanup.timer ris-pro-mail-keepalive.timer
 
 echo "==> HTTPS (Caddy)"
 if [ -z "${RIS_DOMAIN:-}" ]; then echo "RIS_DOMAIN doit être renseigné dans /etc/ris-pro/env."; exit 1; fi

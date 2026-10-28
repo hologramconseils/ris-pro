@@ -70,3 +70,12 @@ bash /opt/ris-pro/server/db/restore-test.sh           # prouve qu'une sauvegarde
 - `migrate-from-neon.sh` demande l'adresse **directe** de Neon (sans `-pooler`), arrête le site pendant le transfert (quelques minutes), compare le nombre de lignes de chaque table et ne bascule que si tout correspond. En cas d'échec, le site repart sur Neon, qui n'est jamais modifié.
 - Les sauvegardes sont chiffrées (AES-256) avec une phrase secrète que vous choisissez et conservez **en dehors du serveur** ; sans elle, elles sont illisibles. Elles sont copiées chaque nuit (02:30 UTC) dans un conteneur OVHcloud privé : 14 jours conservés sur le serveur, 30 jours chez OVHcloud.
 - Neon n'est supprimé qu'après quelques jours de bon fonctionnement.
+
+## Contrôle mensuel de l'envoi d'e-mails
+Brevo désactive une clé d'API restée 90 jours sans usage. `ris-pro-mail-keepalive.timer` envoie le 1er de chaque mois (9h UTC) un court message à `MAIL_REPLY_TO`, ce qui garde la clé active et prouve que l'envoi fonctionne.
+```bash
+systemctl list-timers ris-pro-mail-keepalive.timer --no-pager    # prochaine échéance
+systemctl start ris-pro-mail-keepalive.service                   # lancer un contrôle tout de suite
+journalctl -u ris-pro-mail-keepalive -n 5 --no-pager             # résultat (en cas d'échec : la cause)
+systemctl is-failed ris-pro-mail-keepalive.service               # « failed » si le dernier contrôle a échoué
+```

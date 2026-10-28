@@ -1,0 +1,9 @@
+[Unit]
+Description=Lance le contrôle des e-mails le 1er de chaque mois à 9h UTC
+
+[Timer]
+OnCalendar=*-*-01 09:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
