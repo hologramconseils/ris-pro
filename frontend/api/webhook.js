@@ -2,14 +2,11 @@ import { buffer } from 'micro';
 import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../lib/stripeConfig.js';
 import { createClerkClient } from '@clerk/backend';
-import { Resend } from 'resend';
+import { sendEmail, isMailConfigured } from '../lib/mailer.js';
 import { getDb } from '../lib/db.js';
 import { maskEmail } from '../lib/security.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
-// Créé seulement si la clé existe : le constructeur de Resend lève une erreur sans clé, ce qui
-// ferait échouer tout le webhook (et donc le crédit du paiement) au chargement du module.
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 export const config = {
@@ -113,7 +110,7 @@ export default async function handler(req, res) {
             console.error("[Webhook] Erreur génération lien Clerk:", err);
           }
 
-          if (resend) {
+          if (isMailConfigured()) {
             let emailHtml = '';
             if (magicLink) {
               emailHtml = `
@@ -145,11 +142,10 @@ export default async function handler(req, res) {
               `;
             }
 
-            // Resend ne lève pas d'exception quand l'envoi échoue : l'erreur est renvoyée dans
+            // sendEmail ne lève pas d'exception quand l'envoi échoue : l'erreur est renvoyée dans
             // `error`. Sans cette vérification, un e-mail refusé passait totalement inaperçu.
-            const { error: emailError } = await resend.emails.send({
-              from: 'RIS Pro <bertrand.saulnerond@hologramconseils.com>',
-              to: [userEmail],
+            const { error: emailError } = await sendEmail({
+              to: userEmail,
               subject: 'Confirmation de votre accès RIS Pro',
               html: emailHtml
             });
@@ -157,7 +153,7 @@ export default async function handler(req, res) {
               console.error(`[Webhook] Échec de l'envoi de l'e-mail à ${maskEmail(userEmail)} :`, emailError.name, emailError.message);
             }
           } else {
-            console.warn("[Webhook] RESEND_API_KEY absente : aucun e-mail de confirmation envoyé.");
+            console.warn("[Webhook] BREVO_API_KEY absente : aucun e-mail de confirmation envoyé.");
           }
         } catch (dbErr) {
            console.error("[Webhook] Erreur BDD Postgres:", dbErr);

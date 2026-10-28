@@ -54,7 +54,7 @@ Vos données personnelles ne sont jamais vendues ou cédées à des tiers. Elles
 *   **Neon** : Base de données sécurisée.
 *   **Clerk** : Authentification et gestion des comptes.
 *   **Stripe** : Traitement sécurisé des transactions de paiement.
-*   **Resend** : Envoi des e-mails transactionnels (confirmation de compte, réinitialisation de mot de passe, alertes).
+*   **Brevo** (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation de compte, réinitialisation de mot de passe, alertes).
 *   **Mistral AI (France)** : Lecture du relevé et rédaction de l'analyse, traitement temporaire du contenu du RIS pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).
 
 ---

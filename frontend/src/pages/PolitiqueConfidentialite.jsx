@@ -109,7 +109,7 @@ export default function PolitiqueConfidentialite() {
             <li><strong>Neon</strong> : Base de données sécurisée.</li>
             <li><strong>Clerk</strong> : Authentification et gestion des comptes.</li>
             <li><strong>Stripe</strong> : Traitement sécurisé des transactions de paiement.</li>
-            <li><strong>Resend</strong> : Envoi des e-mails transactionnels (confirmation, réinitialisation de mot de passe, alertes).</li>
+            <li><strong>Brevo</strong> (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation, réinitialisation de mot de passe, alertes).</li>
             <li><strong>Mistral AI (France)</strong> : Lecture du relevé et rédaction de l'analyse, traitement temporaire du relevé pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).</li>
           </ul>
         </section>
