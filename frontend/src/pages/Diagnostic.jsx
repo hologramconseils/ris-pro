@@ -103,16 +103,11 @@ export default function Diagnostic() {
   const performAnalysis = async (path) => {
     try {
       setLoading(true)
-      let token = null;
-      if (user && typeof window.Clerk !== 'undefined') {
-        token = await window.Clerk.session?.getToken();
-      }
-      
       const response = await fetch('/api/analyze', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ filePath: path, userId: user?.id })
       })
@@ -149,7 +144,7 @@ export default function Diagnostic() {
     }
 
     // Si admin ou a déjà payé (legacy) ou a des crédits restants ou analyse débloquée
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    const userEmail = user?.email;
     const isAdmin = profile?.role === 'admin' || userEmail === 'btsaulnerond@icloud.com';
     const isUnlocked = results && !results.is_restricted;
 
@@ -160,16 +155,11 @@ export default function Diagnostic() {
 
     // Sinon -> Paiement
     try {
-      let token = null;
-      if (typeof window.Clerk !== 'undefined') {
-        token = await window.Clerk.session?.getToken();
-      }
-
       const response = await fetch('/api/checkout', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           userEmail: userEmail,

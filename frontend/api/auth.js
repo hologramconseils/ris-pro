@@ -11,8 +11,7 @@ const passwords = { hashPassword, verifyPassword, needsRehash: passwordNeedsReha
 let schemaReady;
 const db = () => {
   const pool = getDb();
-  // En cas d'échec (base momentanément indisponible), la création sera retentée à la requête suivante.
-  schemaReady ??= store.ensureAuthSchema(pool).catch((error) => { schemaReady = undefined; throw error; });
+  schemaReady = store.ensureAuthSchema(pool);
   return pool;
 };
 

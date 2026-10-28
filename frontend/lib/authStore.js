@@ -8,9 +8,15 @@ export const SESSION_IDLE_HOURS = 12; // sans aucune requête pendant ce délai,
 export const TOKEN_TTL_MINUTES = { verify_email: 24 * 60, reset_password: 60, magic_login: 7 * 24 * 60 };
 const TOUCH_INTERVAL_MINUTES = 5; // la date de dernière activité n'est mise à jour qu'au plus toutes les 5 minutes
 
-let schemaEnsured = false;
-export async function ensureAuthSchema(db) {
-  if (schemaEnsured) return;
+// Création des tables, une seule fois par processus (les requêtes simultanées partagent la même promesse ;
+// en cas d'échec, la suivante réessaie).
+let schemaPromise = null;
+export function ensureAuthSchema(db) {
+  schemaPromise ??= createSchema(db).catch((error) => { schemaPromise = null; throw error; });
+  return schemaPromise;
+}
+
+async function createSchema(db) {
   await db.query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -43,7 +49,6 @@ export async function ensureAuthSchema(db) {
     );
     CREATE INDEX IF NOT EXISTS auth_tokens_user_idx ON auth_tokens (user_id, purpose);
   `);
-  schemaEnsured = true;
 }
 
 // --- Adresses e-mail ---

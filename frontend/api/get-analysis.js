@@ -1,5 +1,5 @@
 import { getDb, ensureProfilesSchema } from "../lib/db.js";
-import { verifyToken } from "@clerk/backend";
+import { getAuthenticatedUser } from "../lib/sessionAuth.js";
 import { buildRestrictedResults, isAdminProfile } from "../lib/analysisRestriction.js";
 
 export default async function handler(req, res) {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -36,19 +36,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
 
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
   let authenticatedUser = null;
-
-  if (token) {
-    try {
-      const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-      if (verified && verified.sub) {
-        authenticatedUser = { id: verified.sub };
-      }
-    } catch (authErr) {
-      console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
-    }
+  try {
+    authenticatedUser = await getAuthenticatedUser(req);
+  } catch (authErr) {
+    console.error("[Auth] Échec de la vérification de la session:", authErr.message);
   }
 
   const pool = getDb();

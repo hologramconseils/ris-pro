@@ -1,6 +1,6 @@
 import { putObject, toRef } from '../lib/ovhStorage.js';
 import { getDb, ensureProfilesSchema } from '../lib/db.js';
-import { verifyToken } from '@clerk/backend';
+import { getAuthenticatedUser, isTrustedPost } from '../lib/sessionAuth.js';
 import { MAX_UPLOAD_BYTES, isPdfBuffer, checkRateLimit, RATE_LIMIT_MESSAGE } from '../lib/security.js';
 
 export const config = {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', origin && allowedOrigins.includes(origin) ? origin : 'https://ris.hologramconseils.com');
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -35,18 +35,14 @@ export default async function handler(req, res) {
   // Authentification obligatoire : aucune analyse ne doit pouvoir être lancée sans compte.
   // Rejetée avant tout traitement (avant l'écriture du fichier dans le stockage) plutôt que de
   // retomber silencieusement sur un mode invité comme c'était le cas auparavant.
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  if (!token || !process.env.CLERK_SECRET_KEY) {
-    return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
-  }
-
   let userId;
   try {
-    const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-    userId = verified.sub;
+    const user = isTrustedPost(req) ? await getAuthenticatedUser(req) : null;
+    userId = user?.id;
   } catch (e) {
-    console.warn('Token invalide:', e.message);
+    console.warn('Session non vérifiable:', e.message);
+  }
+  if (!userId) {
     return res.status(401).json({ error: 'Authentification requise pour analyser un document.' });
   }
 

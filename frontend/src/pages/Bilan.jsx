@@ -94,27 +94,15 @@ export default function Bilan() {
         sessionStorage.removeItem(`ris_pro_analysis_${path}`);
       }
 
-      const headers = { 'Content-Type': 'application/json' };
-      if (user) {
-        // Clerk token if authenticated
-        const clerkToken = await window.Clerk?.session?.getToken();
-        if (clerkToken) {
-          headers['Authorization'] = `Bearer ${clerkToken}`;
-        }
-      }
-
       let response;
       for (let attempt = 0; ; attempt++) {
         response = await fetch(`/api/get-analysis?filePath=${encodeURIComponent(path)}`, {
           method: 'GET',
-          headers
+          credentials: 'same-origin'
         });
         const delay = response.ok ? null : nextRetryDelay({ status: response.status, attempt, isPaymentReturn: isSuccess });
         if (delay === null) break;
         await new Promise((resolve) => setTimeout(resolve, delay));
-        // Le jeton a pu devenir disponible entre-temps.
-        const freshToken = await window.Clerk?.session?.getToken();
-        if (freshToken) headers['Authorization'] = `Bearer ${freshToken}`;
       }
 
       if (!response.ok && !isMock) {

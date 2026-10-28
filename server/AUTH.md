@@ -49,8 +49,12 @@ Pages du site associées : `/activation`, `/reinitialisation`, `/connexion-lien`
 2. **Points d'accès** `/api/auth` : inscription, activation, connexion, déconnexion, utilisateur courant,
    mot de passe oublié et réinitialisation, connexion par lien, avec les e-mails Brevo (`lib/authApi.js`,
    `lib/authEmails.js`, `lib/authRequest.js`, `api/auth.js`).
-3. **Site** : écrans de connexion et d'inscription, menu du compte, déconnexion automatique ; vérification de session
-   dans les 5 fonctions d'API à la place du jeton Clerk.
+3. **Site** : écrans de connexion, d'inscription et de mot de passe oublié (`Login.jsx`), pages `/activation`,
+   `/reinitialisation` (`ChoosePassword.jsx`) et `/connexion-lien` (`MagicLogin.jsx`, la connexion n'a lieu qu'au clic
+   pour que les outils qui ouvrent les liens des e-mails ne les consomment pas), menu du compte, déconnexion
+   automatique ; les 5 fonctions d'API (`get-analysis`, `analyze`, `upload`, `profile`, `checkout`) lisent le cookie de
+   session (`lib/sessionAuth.js`) à la place du jeton Clerk. Les POST qui s'appuient sur le cookie doivent venir du
+   site lui-même (en-tête Origin). Le jeton des liens est retiré de la barre d'adresse dès l'ouverture de la page.
 4. **Paiement et bascule** : création du compte et lien de connexion après un paiement, reprise des comptes Clerk,
    retrait de Clerk (dépendances, variables, texte légal).
 

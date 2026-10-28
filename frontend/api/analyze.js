@@ -1,6 +1,6 @@
 import { getDb, ensureProfilesSchema } from "../lib/db.js";
 import crypto from "crypto";
-import { verifyToken } from "@clerk/backend";
+import { getAuthenticatedUser, isTrustedPost } from "../lib/sessionAuth.js";
 import { buildRestrictedResults, resolvePremiumAccess, isDocumentUnlocked, sortAnomaliesChronologically, isAdminProfile } from "../lib/analysisRestriction.js";
 import { estimateMonthlyPension } from "../lib/pensionEstimate.js";
 import { reconcileAnomalies, buildTemplateAnomaly } from "../lib/anomalyReconciliation.js";
@@ -77,18 +77,12 @@ export default async function handler(req, res) {
   // Authentification obligatoire : aucune analyse ne doit pouvoir être lancée sans compte.
   // Rejetée avant de démarrer le pipeline (coûteux) plutôt que de retomber silencieusement sur
   // un mode invité comme c'était le cas auparavant.
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
   let authenticatedUser = null;
-
-  if (token) {
+  if (isTrustedPost(req)) {
     try {
-      const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-      if (verified && verified.sub) {
-        authenticatedUser = { id: verified.sub };
-      }
+      authenticatedUser = await getAuthenticatedUser(req);
     } catch (authErr) {
-      console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
+      console.error("[Auth] Échec de la vérification de la session:", authErr.message);
     }
   }
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Sun, Moon, Monitor, Menu, X } from 'lucide-react'
+import { Sun, Moon, Monitor, Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '../AuthContext'
-import { UserButton } from '@clerk/clerk-react'
 import { LABELS } from '../config/labels'
 import { useTheme } from '../ThemeContext'
+import { clearLocalTraces } from '../idleTimeout'
 
 function ThemeToggle() {
   const { theme, cycleTheme } = useTheme()
@@ -19,7 +19,14 @@ function ThemeToggle() {
 }
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const signOut = async () => {
+    clearLocalTraces(localStorage, sessionStorage);
+    await logout();
+    setIsMenuOpen(false);
+    navigate('/');
+  };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -40,7 +47,12 @@ export default function Header() {
           <div className="h-4 w-px bg-border mx-1" />
           
           {user ? (
-            <UserButton afterSignOutUrl="/" />
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted" style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={user.email}>{user.email}</span>
+              <button onClick={signOut} className="btn btn-secondary btn-sm" style={{ padding: '0.5rem 1rem', height: 'auto', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <LogOut size={14} /> Se déconnecter
+              </button>
+            </div>
           ) : (
             <Link to="/login" className="btn btn-primary btn-sm animate-pulse-subtle" style={{ padding: '0.6rem 1.5rem', height: 'auto' }}>
               {LABELS.CTA_LOGIN}
@@ -82,8 +94,11 @@ export default function Header() {
           <div className="h-px w-full bg-border" />
           
           {user ? (
-            <div className="flex justify-center p-2">
-              <UserButton afterSignOutUrl="/" />
+            <div className="flex flex-col items-center gap-3 p-2">
+              <span className="text-sm text-muted" style={{ wordBreak: 'break-all' }}>{user.email}</span>
+              <button onClick={signOut} className="btn btn-secondary w-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <LogOut size={16} /> Se déconnecter
+              </button>
             </div>
           ) : (
             <Link to="/login" onClick={() => setIsMenuOpen(false)} className="btn btn-primary w-full animate-pulse-subtle">

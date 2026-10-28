@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useClerk, useSession } from '@clerk/clerk-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../AuthContext'
 import { Clock } from 'lucide-react'
 import {
   WARNING_MS,
@@ -15,14 +16,18 @@ const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchst
 // avec un avertissement une minute avant. Protège les données d'un relevé de carrière laissé
 // ouvert sur un ordinateur partagé ou un téléphone non verrouillé.
 export default function IdleLogout() {
-  const { session, isSignedIn } = useSession()
-  const { signOut } = useClerk()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [secondsLeft, setSecondsLeft] = useState(null)
   const signingOut = useRef(false)
-  const sessionId = session?.id
+  const sessionId = user?.id
+  const signOut = React.useCallback(async () => {
+    await logout()
+    navigate('/', { replace: true })
+  }, [logout, navigate])
 
   useEffect(() => {
-    if (!isSignedIn || !sessionId) {
+    if (!sessionId) {
       setSecondsLeft(null)
       return
     }
@@ -51,7 +56,7 @@ export default function IdleLogout() {
         if (!signingOut.current) {
           signingOut.current = true
           clearLocalTraces(localStorage, sessionStorage)
-          signOut({ redirectUrl: '/' })
+          signOut()
         }
         return
       }
@@ -68,7 +73,7 @@ export default function IdleLogout() {
       document.removeEventListener('visibilitychange', tick)
       clearInterval(interval)
     }
-  }, [isSignedIn, sessionId, signOut])
+  }, [sessionId, signOut])
 
   if (secondsLeft === null) return null
 
@@ -79,7 +84,7 @@ export default function IdleLogout() {
   const logoutNow = () => {
     signingOut.current = true
     clearLocalTraces(localStorage, sessionStorage)
-    signOut({ redirectUrl: '/' })
+    signOut()
   }
 
   return (
