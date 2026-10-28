@@ -1,0 +1,7 @@
+[Unit]
+Description=RIS Pro : sauvegarde chiffrée de la base vers OVHcloud
+After=postgresql.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/ris-pro/server/db/backup.sh

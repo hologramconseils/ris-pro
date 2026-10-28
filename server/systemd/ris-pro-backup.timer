@@ -1,0 +1,9 @@
+[Unit]
+Description=Lance la sauvegarde de la base chaque jour à 2h30 UTC
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target
