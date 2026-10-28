@@ -68,19 +68,13 @@ export default function Home() {
     setError(null)
     
     try {
-      // 1. Obtenir le token Clerk si l'utilisateur est connecté
-      let token = null;
-      if (user && typeof window.Clerk !== 'undefined') {
-        token = await window.Clerk.session?.getToken();
-      }
-
-      // 2. Upload vers notre nouvelle API
+      // Upload vers notre API (le cookie de session accompagne la requête)
       const response = await fetch(`/api/upload?filename=${encodeURIComponent(selectedFile.name)}`, {
         method: 'POST',
         body: selectedFile,
+        credentials: 'same-origin',
         headers: {
-          'Content-Type': 'application/pdf',
-          ...(token && { 'Authorization': `Bearer ${token}` })
+          'Content-Type': 'application/pdf'
         }
       });
 

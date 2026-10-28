@@ -44,7 +44,7 @@ while IFS= read -r line || [ -n "$line" ]; do
   value="${value%\"}"; value="${value#\"}"
   export "$name=$value"
 done < /etc/ris-pro/env
-sudo -u ris --preserve-env=VITE_CLERK_PUBLISHABLE_KEY,NEXT_PUBLIC_SITE_URL,DATABASE_URL,CLERK_SECRET_KEY \
+sudo -u ris --preserve-env=NEXT_PUBLIC_SITE_URL,DATABASE_URL \
   bash -c "cd $APP_DIR/frontend && (npm ci || npm install --no-audit --no-fund) && npm run build"
 
 echo "==> Services"

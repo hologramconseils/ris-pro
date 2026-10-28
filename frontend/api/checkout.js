@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../lib/stripeConfig.js';
-import { verifyToken } from '@clerk/backend';
+import { getAuthenticatedUser, isTrustedPost } from '../lib/sessionAuth.js';
 import { getDb } from '../lib/db.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: STRIPE_API_VERSION });
@@ -16,22 +16,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Chemin du fichier manquant' });
   }
 
-  // Seul un token Clerk vérifié peut établir l'identité de l'acheteur : un
+  // Seule une session vérifiée peut établir l'identité de l'acheteur : un
   // userId fourni par le client ne doit jamais être fait confiance tel quel
   // (il est ensuite utilisé par le webhook pour créditer un compte et
-  // générer un lien de connexion magique).
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+  // générer un lien de connexion).
   let authenticatedUser = null;
-
-  if (token) {
+  if (isTrustedPost(req)) {
     try {
-      const verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-      if (verified && verified.sub) {
-        authenticatedUser = { id: verified.sub };
-      }
+      authenticatedUser = await getAuthenticatedUser(req);
     } catch (authErr) {
-      console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
+      console.error("[Auth] Échec de la vérification de la session:", authErr.message);
     }
   }
 
@@ -70,7 +64,7 @@ export default async function handler(req, res) {
         },
       ],
       mode: 'payment',
-      customer_email: userEmail,
+      customer_email: authenticatedUser?.email || userEmail,
       ...(userId && { client_reference_id: userId }),
       metadata: {
         filePath: filePath

@@ -1,5 +1,5 @@
 import { getDb } from '../lib/db.js';
-import { verifyToken } from '@clerk/backend';
+import { getAuthenticatedUser } from '../lib/sessionAuth.js';
 
 export default async function handler(req, res) {
   // CORS setup
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -31,24 +31,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       return res.status(401).json({ error: 'Non autorisé' });
     }
 
-    const token = authHeader.split(' ')[1];
-    let verified = null;
-    try {
-      verified = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-    } catch (authErr) {
-      console.error("[Auth] Échec de la vérification du token JWT:", authErr.message);
-    }
-
-    if (!verified || !verified.sub) {
-      return res.status(401).json({ error: 'Token invalide' });
-    }
-
-    const userId = verified.sub;
+    const userId = user.id;
     const pool = getDb();
 
     // Fetch profile

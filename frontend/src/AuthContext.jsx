@@ -1,56 +1,73 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useUser, useSession } from '@clerk/clerk-react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { authApi } from './authClient';
 
 const AuthContext = createContext({});
 
+// Compte connecté (cookie de session géré par RIS Pro), profil et crédits. `user` vaut null sans session.
 export const AuthProvider = ({ children }) => {
-  const { user: clerkUser, isLoaded: userLoaded } = useUser();
-  const { session, isLoaded: sessionLoaded } = useSession();
-  
+  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const userId = useRef(null);
 
-  useEffect(() => {
-    if (userLoaded && sessionLoaded) {
-      if (clerkUser && session) {
-        fetchProfile(session);
-      } else {
-        setProfile(null);
-        setLoading(false);
-      }
-    }
-  }, [userLoaded, sessionLoaded, clerkUser, session]);
-
-  const fetchProfile = async (currentSession) => {
+  const fetchProfile = useCallback(async () => {
     try {
-      const token = await currentSession.getToken();
-      const response = await fetch('/api/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
+      const response = await fetch('/api/profile', { credentials: 'same-origin' });
       if (response.ok) {
-        const data = await response.json();
-        setProfile(data);
+        setProfile(await response.json());
       } else {
-        console.error("Failed to fetch profile");
+        console.error('Failed to fetch profile');
       }
     } catch (err) {
-      console.error("Erreur profile:", err);
-    } finally {
-      setLoading(false);
+      console.error('Erreur profile:', err);
     }
-  };
+  }, []);
 
-  const refreshProfile = async () => {
-    if (session) {
-      await fetchProfile(session);
+  const applyUser = useCallback(async (nextUser) => {
+    userId.current = nextUser?.id || null;
+    setUser(nextUser || null);
+    if (nextUser) {
+      await fetchProfile();
+    } else {
+      setProfile(null);
     }
-  };
+  }, [fetchProfile]);
+
+  // Au chargement du site : y a-t-il une session ouverte ?
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const result = await authApi.me();
+      if (!cancelled) await applyUser(result.ok ? result.data.user : null);
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [applyUser]);
+
+  const login = useCallback(async (email, password) => {
+    const result = await authApi.login(email, password);
+    if (result.ok) await applyUser(result.data.user);
+    return result;
+  }, [applyUser]);
+
+  // Connexion par le lien reçu après un paiement.
+  const loginWithLink = useCallback(async (token) => {
+    const result = await authApi.magic(token);
+    if (result.ok) await applyUser(result.data.user);
+    return result;
+  }, [applyUser]);
+
+  const logout = useCallback(async () => {
+    await authApi.logout();
+    await applyUser(null);
+  }, [applyUser]);
+
+  const refreshProfile = useCallback(async () => {
+    if (userId.current) await fetchProfile();
+  }, [fetchProfile]);
 
   return (
-    <AuthContext.Provider value={{ user: clerkUser, session, profile, loading, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, loginWithLink, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 // Déconnexion automatique après inactivité (cf. components/IdleLogout.jsx).
-// La date de dernière activité est gardée dans localStorage, par session Clerk : une activité
+// La date de dernière activité est gardée dans localStorage, par compte : une activité
 // dans un autre onglet du site compte aussi, et rouvrir le site après une longue absence avec
 // une session encore ouverte déconnecte immédiatement.
 

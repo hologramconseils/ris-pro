@@ -107,7 +107,6 @@ export default function PolitiqueConfidentialite() {
           <ul className="text-muted" style={{ paddingLeft: '1.5rem', listStyleType: 'disc' }}>
             <li><strong>Hetzner Online GmbH</strong> (Allemagne, serveurs à Helsinki, Finlande) : Hébergement de l'application et de la base de données.</li>
             <li><strong>OVHcloud</strong> (France, centre de données de Gravelines) : Stockage des fichiers PDF et des sauvegardes chiffrées de la base de données.</li>
-            <li><strong>Clerk</strong> (société américaine) : Authentification et gestion des comptes.</li>
             <li><strong>Stripe</strong> (Stripe Payments Europe, Irlande) : Traitement sécurisé des transactions de paiement.</li>
             <li><strong>Brevo</strong> (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation, réinitialisation de mot de passe, alertes).</li>
             <li><strong>Mistral AI (France)</strong> : Lecture du relevé et rédaction de l'analyse, traitement temporaire du relevé pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).</li>
@@ -117,7 +116,7 @@ export default function PolitiqueConfidentialite() {
         <section>
           <h2 className="text-xl font-semibold mb-2">Transferts hors de l'Union européenne</h2>
           <p className="text-muted">
-            Vos documents (relevés de carrière) et vos résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande et France). Deux prestataires peuvent en revanche traiter des données hors de l'Union européenne, dans la limite de leur fonction et avec les garanties prévues par le RGPD : <strong>Clerk</strong>, pour l'authentification (adresse e-mail, identifiant de compte, données de connexion), et <strong>Stripe</strong>, pour le paiement (aucune donnée bancaire ne transite par nos serveurs). Aucun document de carrière n'est transmis à ces deux prestataires.
+            Vos documents (relevés de carrière) et vos résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande et France). Les comptes (adresse e-mail, mot de passe chiffré de façon irréversible, sessions) sont gérés par RIS Pro sur son propre serveur, dans l'Union européenne. Un seul prestataire peut en revanche traiter des données hors de l'Union européenne, dans la limite de sa fonction et avec les garanties prévues par le RGPD : <strong>Stripe</strong>, pour le paiement (aucune donnée bancaire ne transite par nos serveurs). Aucun document de carrière n'est transmis à Stripe.
           </p>
         </section>
 

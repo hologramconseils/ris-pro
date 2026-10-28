@@ -22,7 +22,7 @@ export default function Securite() {
         <section>
           <h2 className="text-xl font-semibold mb-2">2. Hébergement Sécurisé</h2>
           <p className="text-muted">
-            L'application et sa base de données sont hébergées sur un serveur <strong>Hetzner</strong> situé à Helsinki (Finlande), protégé par un pare-feu : la base de données n'est jamais accessible directement depuis Internet. Les fichiers PDF et les sauvegardes chiffrées sont stockés chez <strong>OVHcloud</strong> à Gravelines (France), dans un espace privé. L'authentification des comptes est assurée par <strong>Clerk</strong>. Les données sont cloisonnées : chaque accès est vérifié côté serveur.
+            L'application et sa base de données sont hébergées sur un serveur <strong>Hetzner</strong> situé à Helsinki (Finlande), protégé par un pare-feu : la base de données n'est jamais accessible directement depuis Internet. Les fichiers PDF et les sauvegardes chiffrées sont stockés chez <strong>OVHcloud</strong> à Gravelines (France), dans un espace privé. Les comptes sont gérés directement par RIS Pro : les mots de passe sont chiffrés de façon irréversible (scrypt) et ne sont jamais lisibles, les sessions sont protégées par un cookie sécurisé inaccessible au code de la page, et les tentatives de connexion répétées sont limitées. Les données sont cloisonnées : chaque accès est vérifié côté serveur.
           </p>
         </section>
 

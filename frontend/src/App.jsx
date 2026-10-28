@@ -1,20 +1,19 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { ClerkProvider } from '@clerk/clerk-react'
-import { dark } from '@clerk/themes'
-import { frFR } from '@clerk/localizations'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import IdleLogout from './components/IdleLogout'
 import { AuthProvider } from './AuthContext'
-import { ThemeProvider, useTheme } from './ThemeContext'
+import { ThemeProvider } from './ThemeContext'
 
 // Lazy loading of page components to reduce initial bundle size
 const Home = lazy(() => import('./pages/Home'))
 const Diagnostic = lazy(() => import('./pages/Diagnostic'))
 const Bilan = lazy(() => import('./pages/Bilan'))
 const Login = lazy(() => import('./pages/Login'))
+const ChoosePassword = lazy(() => import('./pages/ChoosePassword'))
+const MagicLogin = lazy(() => import('./pages/MagicLogin'))
 const MentionsLegales = lazy(() => import('./pages/MentionsLegales'))
 const CGV = lazy(() => import('./pages/CGV'))
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'))
@@ -25,8 +24,6 @@ const GuideCumulEmploiRetraite = lazy(() => import('./pages/guides/CumulEmploiRe
 const GuideDepartAnticipeRetraiteProgressive = lazy(() => import('./pages/guides/DepartAnticipeRetraiteProgressive'))
 const GuidePensionReversionPolypensionnesExpatriation = lazy(() => import('./pages/guides/PensionReversionPolypensionnesExpatriation'))
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
 function PageLoader() {
   return (
     <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: '50vh', flexDirection: 'column', gap: '1rem' }}>
@@ -36,28 +33,9 @@ function PageLoader() {
   )
 }
 
-function ThemedClerkProvider({ children }) {
-  const { resolvedTheme } = useTheme()
-
-  return (
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY}
-      localization={frFR}
-      appearance={{ baseTheme: resolvedTheme === 'dark' ? dark : undefined }}
-    >
-      {children}
-    </ClerkProvider>
-  )
-}
-
 function App() {
-  if (!PUBLISHABLE_KEY) {
-    return <div>Missing Publishable Key</div>
-  }
-
   return (
     <ThemeProvider>
-      <ThemedClerkProvider>
         <AuthProvider>
           <Router>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -70,6 +48,9 @@ function App() {
                     <Route path="/diagnostic" element={<Diagnostic />} />
                     <Route path="/bilan" element={<Bilan />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/activation" element={<ChoosePassword kind="activation" />} />
+                    <Route path="/reinitialisation" element={<ChoosePassword kind="reset" />} />
+                    <Route path="/connexion-lien" element={<MagicLogin />} />
                     <Route path="/mentions-legales" element={<MentionsLegales />} />
                     <Route path="/cgv" element={<CGV />} />
                     <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
@@ -86,7 +67,6 @@ function App() {
             </div>
           </Router>
         </AuthProvider>
-      </ThemedClerkProvider>
     </ThemeProvider>
   )
 }
