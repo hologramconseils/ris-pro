@@ -1,6 +1,6 @@
 """Agent de veille réglementaire (retraite France).
 
-Exécuté chaque jour par .github/workflows/regulatory-watch-v2.yml. Les fichiers regles_*.md
+Exécuté chaque lundi par .github/workflows/regulatory-watch-v2.yml. Les fichiers regles_*.md
 sont transmis tels quels à l'IA rédactrice du bilan premium (frontend/api/analyze.js) : toute
 modification doit donc être sourcée et vérifiable par un humain avant fusion.
 
