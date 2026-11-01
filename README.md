@@ -10,7 +10,7 @@
   1. Lecture du PDF par Gemini (Vertex AI, point d'accès Union européenne)
   2. Calcul des trimestres, des anomalies et de l'estimation de pension en JavaScript
   3. Rédaction du bilan par Gemini, en premium uniquement (textes modèles en freemium) — configuration : `server/GEMINI.md`
-- **Conservation des relevés (RGPD)** : les PDF déposés sont supprimés automatiquement 6 mois après leur dépôt (stockage OVHcloud, anciens dépôts sur Vercel Blob, et copie en base) par `/api/cleanup-files`, appelé chaque jour par le minuteur systemd `ris-pro-cleanup` et protégé par la variable d'environnement `CRON_SECRET`.
+- **Conservation des relevés (RGPD)** : les PDF déposés sont supprimés automatiquement 6 mois après leur dépôt (stockage OVHcloud, et copie en base pour les anciens dépôts) par `/api/cleanup-files`, appelé chaque jour par le minuteur systemd `ris-pro-cleanup` et protégé par la variable d'environnement `CRON_SECRET`.
 - **Veille réglementaire** : `backend/regulatory_watch_agent.py` (Gemini sur Vertex AI, avec la recherche Google), exécuté chaque lundi par `.github/workflows/regulatory-watch-v2.yml`. Il met à jour les fichiers `regles_*.md` via une pull request.
 
 ## Développement
