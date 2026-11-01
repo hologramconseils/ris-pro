@@ -1,5 +1,5 @@
 // Durée de conservation des relevés PDF déposés (RGPD) : 6 mois après le dépôt, le fichier est
-// supprimé du stockage (OVHcloud ; Vercel Blob pour les dépôts antérieurs à la migration), et sa
+// supprimé du stockage (OVHcloud), et sa
 // copie en base éventuelle (colonne file_base64, anciens dépôts) ainsi que les données qui en
 // ont été extraites (colonne extraction, cf. extractionCache.js) sont effacées. Les résultats de
 // l'analyse restent consultables ; seule une nouvelle analyse du même document devient impossible.

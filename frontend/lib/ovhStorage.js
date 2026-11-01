@@ -7,7 +7,7 @@
 // (ex. gra), OVH_S3_BUCKET, OVH_S3_ACCESS_KEY, OVH_S3_SECRET_KEY.
 //
 // Dans la colonne analyses.file_path, un fichier stocké ici est référencé par « ovh:<clé> » : le site
-// traite cette valeur comme un identifiant opaque. Les anciens relevés (adresse https de Vercel Blob)
+// traite cette valeur comme un identifiant opaque. Les anciens relevés (adresse https, fichiers retirés de Vercel Blob)
 // gardent leur valeur d'origine et leur copie en base (file_base64) jusqu'à leur suppression à 6 mois.
 
 import { createHash, createHmac } from 'node:crypto';

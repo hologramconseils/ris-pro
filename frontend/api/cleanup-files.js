@@ -1,15 +1,14 @@
-import { del } from '@vercel/blob';
 import { timingSafeEqual } from 'crypto';
 import { getDb } from '../lib/db.js';
 import { purgeExpiredFiles, RETENTION_MONTHS } from '../lib/fileRetention.js';
 import { ensureAuthSchema, purgeExpiredAuthData } from '../lib/authStore.js';
 import { isOvhRef, keyFromRef, deleteObject } from '../lib/ovhStorage.js';
 
-// Supprime un relevé selon l'endroit où il est stocké : OVHcloud (référence « ovh:… ») ou, pour les
-// dépôts antérieurs à la migration, Vercel Blob (adresse https).
+// Supprime un relevé du stockage OVHcloud (référence « ovh:… »). Les dépôts antérieurs à la migration
+// (adresse https) n'existent plus chez Vercel Blob depuis novembre 2026 : leur seule copie est en base
+// (file_base64), effacée par la purge elle-même.
 async function deleteStoredFile(filePath) {
   if (isOvhRef(filePath)) return deleteObject(keyFromRef(filePath));
-  return del(filePath);
 }
 
 // Tâche planifiée (minuteur systemd sur le serveur) : supprime chaque jour les relevés PDF déposés
