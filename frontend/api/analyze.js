@@ -8,26 +8,9 @@ import { UserFacingError, publicErrorMessage, checkRateLimit, RATE_LIMIT_MESSAGE
 import { FILE_DELETED_MESSAGE } from "../lib/fileRetention.js";
 import { isOvhRef, keyFromRef, getObject } from "../lib/ovhStorage.js";
 import { ensureExtractionSchema, toCachedExtraction, isUsableExtraction } from "../lib/extractionCache.js";
+import { generateJson } from "../lib/vertexAI.js";
 
 export const maxDuration = 300;
-
-const MISTRAL_API_URL = "https://api.mistral.ai";
-
-async function mistralRequest(path, body) {
-  const response = await fetch(`${MISTRAL_API_URL}${path}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-    },
-    body: JSON.stringify(body)
-  });
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Erreur API Mistral (${response.status}): ${errText}`);
-  }
-  return response.json();
-}
 
 export default async function handler(req, res) {
   const origin = req.headers.origin;
@@ -92,7 +75,7 @@ export default async function handler(req, res) {
 
   const pool = getDb();
 
-  // Chaque nouvelle analyse coûte un appel Mistral OCR : on limite le nombre de demandes par
+  // Chaque nouvelle analyse coûte une lecture du PDF par Gemini : on limite le nombre de demandes par
   // utilisateur pour éviter les abus.
   if (!(await checkRateLimit(pool, authenticatedUser.id, 'analyze'))) {
     return res.status(429).json({ error: RATE_LIMIT_MESSAGE, message: RATE_LIMIT_MESSAGE });
@@ -183,7 +166,7 @@ export default async function handler(req, res) {
 
       // --- AGENT 1 : EXTRACTEUR (IA) ---
       // Les données déjà extraites de ce relevé sont réutilisées (cf. lib/extractionCache.js) :
-      // relire le PDF ne servirait qu'à repayer Mistral OCR pour obtenir le même résultat.
+      // relire le PDF ne servirait qu'à repayer sa lecture par Gemini pour obtenir le même résultat.
       let extractedData;
       if (isUsableExtraction(analysisRecord.extraction) && analysisRecord.nir_hash) {
         console.log("Agent 1 : données extraites déjà disponibles, relecture du PDF évitée.");
@@ -273,23 +256,15 @@ export default async function handler(req, res) {
         };
 
         const runExtraction = async () => {
-          const ocrResult = await mistralRequest("/v1/ocr", {
-            model: "mistral-ocr-latest",
-            document: {
-              type: "document_url",
-              document_url: `data:application/pdf;base64,${base64Data}`
-            },
-            document_annotation_format: {
-              type: "json_schema",
-              json_schema: {
-                name: "extraction_releve_carriere",
-                schema: extractorSchema,
-                strict: true
-              }
-            },
-            document_annotation_prompt: extractorPrompt
+          // Gemini lit directement le PDF (texte et pages numérisées) et renvoie les données au format imposé.
+          return generateJson({
+            model: process.env.GEMINI_EXTRACT_MODEL,
+            parts: [
+              { inlineData: { mimeType: "application/pdf", data: base64Data } },
+              { text: extractorPrompt }
+            ],
+            schema: extractorSchema
           });
-          return JSON.parse(ocrResult.document_annotation);
         };
 
         extractedData = await runExtraction();
@@ -465,7 +440,7 @@ export default async function handler(req, res) {
       // L'Agent 3 (IA rédactrice) n'est appelé qu'une fois l'accès premium établi. En freemium,
       // les anomalies sont décrites par des textes modèles (un par type d'anomalie, cf.
       // anomalyReconciliation.js) : la page freemium n'affiche que deux anomalies et aucune
-      // stratégie, ce qui ne justifie pas un appel à Mistral Large pour chaque utilisateur gratuit.
+      // stratégie, ce qui ne justifie pas un appel à Gemini pour chaque utilisateur gratuit.
       generateResults = async (withWriter) => {
         if (!withWriter) {
           const freemiumSummary = `Votre relevé de carrière fait apparaître **${trimestres_valides} trimestres validés** sur les **${trimestres_requis} trimestres requis** pour obtenir le taux plein. ${rawAnomalies.length > 0 ? "Les anomalies détectées par notre analyse sont présentées ci-dessous." : "Notre analyse n'a détecté aucune anomalie sur votre relevé."}`;
@@ -592,20 +567,11 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
           required: ["anomalies", "summary", "strategies", "action_plan"]
         };
 
-        const writerResult = await mistralRequest("/v1/chat/completions", {
-          model: "mistral-large-latest",
-          messages: [{ role: "user", content: writerPrompt }],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "bilan_retraite",
-              schema: writerSchema,
-              strict: true
-            }
-          }
+        const writerData = await generateJson({
+          model: process.env.GEMINI_WRITER_MODEL,
+          parts: [{ text: writerPrompt }],
+          schema: writerSchema
         });
-
-        const writerData = JSON.parse(writerResult.choices[0].message.content);
 
         const reconciledAnomalies = reconcileAnomalies(rawAnomalies, writerData.anomalies);
         if (reconciledAnomalies.length !== rawAnomalies.length) {
@@ -707,7 +673,7 @@ Fournis également un 'action_plan' exhaustif avec des étapes claires pour pré
 
   } catch (error) {
     console.error("CRITICAL API ERROR:", error);
-    // Le détail technique (base de données, API Mistral...) reste dans les journaux serveur ;
+    // Le détail technique (base de données, API Gemini...) reste dans les journaux serveur ;
     // seul un message rédigé pour l'utilisateur est renvoyé et enregistré.
     const publicMessage = publicErrorMessage(error, "Une erreur technique est survenue pendant l'analyse. Merci de réessayer plus tard.");
     // Relevé supprimé (conservation de 6 mois écoulée) : on n'écrase surtout pas les résultats

@@ -11,7 +11,7 @@ export function isPdfBuffer(buffer) {
 }
 
 // Erreur dont le message est rédigé pour l'utilisateur et peut lui être affiché tel quel.
-// Toute autre erreur (base de données, API Mistral, Stripe...) ne doit jamais sortir de l'API :
+// Toute autre erreur (base de données, API Gemini, Stripe...) ne doit jamais sortir de l'API :
 // son message peut contenir des détails internes.
 export class UserFacingError extends Error {
   constructor(message, status = 400) {
@@ -35,7 +35,7 @@ export function maskEmail(email) {
 // Limite de requêtes par utilisateur et par point d'API, stockée dans Neon (pas de Redis dans
 // ce projet). Chaque appel autorisé est enregistré ; au-delà de `max` appels sur la fenêtre, la
 // requête est refusée. En cas d'erreur de base, on laisse passer : la limite protège les coûts
-// (OCR Mistral) et ne doit jamais bloquer un utilisateur légitime à cause d'une panne.
+// (lecture du PDF par Gemini) et ne doit jamais bloquer un utilisateur légitime à cause d'une panne.
 export const RATE_LIMITS = {
   upload: { max: 15, windowMinutes: 60 },
   analyze: { max: 30, windowMinutes: 60 },

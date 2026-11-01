@@ -1,5 +1,5 @@
 // Mémorisation des données extraites d'un relevé (colonne analyses.extraction).
-// La lecture du PDF par Mistral OCR est l'étape la plus coûteuse de l'analyse : une fois faite,
+// La lecture du PDF par Gemini est l'étape la plus coûteuse de l'analyse : une fois faite,
 // son résultat est conservé pour que toute nouvelle analyse du même document (rechargement de la
 // page freemium, passage en premium après achat, nouvelle tentative après une erreur de
 // rédaction) reparte de ces données au lieu de relire le PDF.
