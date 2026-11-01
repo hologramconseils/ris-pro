@@ -9,7 +9,9 @@ from regulatory_watch_agent import (  # noqa: E402
     UPDATES_HEADING,
     apply_changes,
     build_report,
-    extract_conversation_output,
+    extract_gemini_output,
+    resolve_source_url,
+    vertex_url,
     is_official_url,
     parse_model_json,
     validate_change,
@@ -113,24 +115,69 @@ class ParseModelJsonTest(unittest.TestCase):
             parse_model_json("NO_CHANGE")
 
 
-class ExtractConversationOutputTest(unittest.TestCase):
-    def test_collects_text_and_web_search_references(self):
-        response = {"outputs": [
-            {"type": "tool.execution", "name": "web_search"},
-            {"type": "message.output", "content": [
-                {"type": "text", "text": '{"changes": '},
-                {"type": "tool_reference", "tool": "web_search", "title": "Légifrance", "url": SOURCE_URL},
-                {"type": "text", "text": "[]}"},
+class ExtractGeminiOutputTest(unittest.TestCase):
+    def test_collects_text_and_search_sources_ignoring_thoughts(self):
+        response = {"candidates": [{
+            "finishReason": "STOP",
+            "content": {"parts": [
+                {"text": "réflexion interne", "thought": True},
+                {"text": '{"changes": '},
+                {"text": "[]}"},
             ]},
-        ]}
-        text, urls = extract_conversation_output(response)
+            "groundingMetadata": {"groundingChunks": [
+                {"web": {"uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc", "title": "legifrance.gouv.fr"}},
+                {"retrievedContext": {"uri": "gs://x"}},
+            ]},
+        }]}
+        text, uris = extract_gemini_output(response)
         self.assertEqual(parse_model_json(text), [])
-        self.assertEqual(urls, [SOURCE_URL])
+        self.assertEqual(uris, ["https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc"])
 
-    def test_accepts_plain_string_content(self):
-        text, urls = extract_conversation_output({"outputs": [{"type": "message.output", "content": '{"changes": []}'}]})
-        self.assertEqual(text, '{"changes": []}')
-        self.assertEqual(urls, [])
+    def test_incomplete_or_empty_answer_is_an_error(self):
+        with self.assertRaises(RuntimeError):
+            extract_gemini_output({"candidates": [{"finishReason": "MAX_TOKENS", "content": {"parts": [{"text": "{"}]}}]})
+        with self.assertRaises(RuntimeError):
+            extract_gemini_output({"promptFeedback": {"blockReason": "SAFETY"}})
+
+
+class FakeResponse:
+    def __init__(self, headers):
+        self.headers = headers
+
+
+class FakeHttp:
+    def __init__(self, location=None, error=False):
+        self.location, self.error, self.calls = location, error, []
+
+    def get(self, url, follow_redirects=True, timeout=None):
+        self.calls.append((url, follow_redirects))
+        if self.error:
+            raise OSError("réseau")
+        return FakeResponse({"location": self.location} if self.location else {})
+
+
+class ResolveSourceUrlTest(unittest.TestCase):
+    def test_google_redirect_is_followed_one_step_without_download(self):
+        http = FakeHttp(location=SOURCE_URL)
+        self.assertEqual(resolve_source_url(http, "https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc"), SOURCE_URL)
+        self.assertEqual(http.calls, [("https://vertexaisearch.cloud.google.com/grounding-api-redirect/abc", False)])
+
+    def test_direct_url_is_kept_and_failures_give_none(self):
+        self.assertEqual(resolve_source_url(FakeHttp(), SOURCE_URL), SOURCE_URL)
+        self.assertIsNone(resolve_source_url(FakeHttp(error=True), "https://vertexaisearch.cloud.google.com/x"))
+        self.assertIsNone(resolve_source_url(FakeHttp(), "https://vertexaisearch.cloud.google.com/x"))
+
+
+class VertexUrlTest(unittest.TestCase):
+    def test_endpoints(self):
+        self.assertEqual(
+            vertex_url("projet-test", "global", "gemini-3.5-flash"),
+            "https://aiplatform.googleapis.com/v1/projects/projet-test/locations/global/publishers/google/models/gemini-3.5-flash:generateContent",
+        )
+        self.assertTrue(vertex_url("p", "eu", "m").startswith("https://aiplatform.eu.rep.googleapis.com/v1/projects/p/locations/eu/"))
+        self.assertTrue(vertex_url("p", "europe-west9", "m").startswith("https://europe-west9-aiplatform.googleapis.com/"))
+        with self.assertRaises(ValueError):
+            vertex_url("p", "evil.com/x", "m")
 
 
 class BuildReportTest(unittest.TestCase):

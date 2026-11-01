@@ -109,14 +109,14 @@ export default function PolitiqueConfidentialite() {
             <li><strong>OVHcloud</strong> (France, centre de données de Gravelines) : Stockage des fichiers PDF et des sauvegardes chiffrées de la base de données.</li>
             <li><strong>Stripe</strong> (Stripe Payments Europe, Irlande) : Traitement sécurisé des transactions de paiement.</li>
             <li><strong>Brevo</strong> (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation, réinitialisation de mot de passe, alertes).</li>
-            <li><strong>Mistral AI (France)</strong> : Lecture du relevé et rédaction de l'analyse, traitement temporaire du relevé pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).</li>
+            <li><strong>Google Cloud</strong> (Google Cloud EMEA Limited, Irlande) : Lecture du relevé et rédaction de l'analyse par le modèle d'IA Gemini (service Vertex AI), traitement temporaire du relevé dans l'Union européenne pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold mb-2">Transferts hors de l'Union européenne</h2>
           <p className="text-muted">
-            Vos documents (relevés de carrière) et vos résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande et France). Les comptes (adresse e-mail, mot de passe chiffré de façon irréversible, sessions) sont gérés par RIS Pro sur son propre serveur, dans l'Union européenne. Un seul prestataire peut en revanche traiter des données hors de l'Union européenne, dans la limite de sa fonction et avec les garanties prévues par le RGPD : <strong>Stripe</strong>, pour le paiement (aucune donnée bancaire ne transite par nos serveurs). Aucun document de carrière n'est transmis à Stripe.
+            Vos documents (relevés de carrière) et vos résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande et France). Les comptes (adresse e-mail, mot de passe chiffré de façon irréversible, sessions) sont gérés par RIS Pro sur son propre serveur, dans l'Union européenne. Le relevé est lu et analysé par Google Cloud (filiale européenne du groupe américain Google) sur son point d'accès Union européenne : le traitement a lieu dans l'Union européenne. Un seul prestataire peut en revanche traiter des données hors de l'Union européenne, dans la limite de sa fonction et avec les garanties prévues par le RGPD : <strong>Stripe</strong>, pour le paiement (aucune donnée bancaire ne transite par nos serveurs). Aucun document de carrière n'est transmis à Stripe.
           </p>
         </section>
 

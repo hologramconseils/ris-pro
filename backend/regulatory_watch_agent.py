@@ -5,7 +5,7 @@ sont transmis tels quels à l'IA rédactrice du bilan premium (frontend/api/anal
 modification doit donc être sourcée et vérifiable par un humain avant fusion.
 
 Principes (pour éviter les réécritures quotidiennes sans changement de loi constatées jusqu'ici) :
-- l'IA (Mistral, avec son outil de recherche web) ne réécrit jamais un fichier : elle propose des remplacements ciblés d'un passage existant,
+- l'IA (Gemini sur Vertex AI, avec la recherche Google) ne réécrit jamais un fichier : elle propose des remplacements ciblés d'un passage existant,
   cité mot pour mot ;
 - chaque remplacement doit s'appuyer sur un texte officiel (loi, décret, arrêté, circulaire)
   publié sur un site officiel, pas déjà cité dans le fichier, et dont l'URL figure parmi les
@@ -214,43 +214,79 @@ def build_report(results):
     return "\n".join(lines)
 
 
-MISTRAL_CONVERSATIONS_URL = "https://api.mistral.ai/v1/conversations"
-MISTRAL_MODEL = "mistral-medium-latest"
+# Gemini sur Vertex AI (Google Cloud), avec la recherche Google comme source. Les fichiers envoyés ne
+# contiennent que des règles publiques (aucune donnée personnelle) : le point d'accès « global », où la
+# recherche Google est la plus largement disponible, est utilisé par défaut (VERTEX_WATCH_LOCATION).
+GEMINI_WATCH_MODEL = os.environ.get("GEMINI_WATCH_MODEL") or "gemini-3.5-flash"
+SCOPE = "https://www.googleapis.com/auth/cloud-platform"
+# Les sources renvoyées par la recherche Google passent par une adresse de redirection de Google.
+GROUNDING_REDIRECT_HOST = "vertexaisearch.cloud.google.com"
 
 
-def extract_conversation_output(response_json):
-    """Texte de la réponse et URL des pages consultées (références de l'outil web_search)."""
-    texts, urls = [], []
-    for entry in response_json.get("outputs", []):
-        if entry.get("type") != "message.output":
-            continue
-        content = entry.get("content")
-        if isinstance(content, str):
-            texts.append(content)
-            continue
-        for chunk in content or []:
-            if chunk.get("type") == "text":
-                texts.append(chunk.get("text", ""))
-            elif chunk.get("type") == "tool_reference" and chunk.get("url"):
-                urls.append(chunk["url"])
-    return "".join(texts), urls
+def vertex_url(project, location, model):
+    if location == "global":
+        base = "https://aiplatform.googleapis.com"
+    elif location == "eu":
+        base = "https://aiplatform.eu.rep.googleapis.com"
+    elif re.fullmatch(r"[a-z]+-[a-z]+[0-9]+", location or ""):
+        base = f"https://{location}-aiplatform.googleapis.com"
+    else:
+        raise ValueError(f"VERTEX_WATCH_LOCATION invalide : {location!r}")
+    return f"{base}/v1/projects/{project}/locations/{location}/publishers/google/models/{model}:generateContent"
 
 
-def ask_model(http, api_key, prompt):
+def extract_gemini_output(response_json):
+    """Texte de la réponse (hors « pensées ») et adresses des pages trouvées par la recherche Google."""
+    candidates = response_json.get("candidates") or []
+    if not candidates:
+        raise RuntimeError("réponse Gemini vide")
+    candidate = candidates[0]
+    reason = candidate.get("finishReason")
+    if reason and reason != "STOP":
+        raise RuntimeError(f"réponse Gemini incomplète ({reason})")
+    parts = (candidate.get("content") or {}).get("parts") or []
+    text = "".join(p.get("text", "") for p in parts if isinstance(p.get("text"), str) and not p.get("thought"))
+    chunks = (candidate.get("groundingMetadata") or {}).get("groundingChunks") or []
+    uris = [c["web"]["uri"] for c in chunks if isinstance(c.get("web"), dict) and c["web"].get("uri")]
+    return text, uris
+
+
+def resolve_source_url(http, uri):
+    """Adresse réelle d'une source : les liens de redirection de Google sont suivis d'un pas, sans
+    télécharger la page. None si l'adresse réelle ne peut pas être obtenue."""
+    if (urlparse(uri).hostname or "").lower() != GROUNDING_REDIRECT_HOST:
+        return uri
+    try:
+        response = http.get(uri, follow_redirects=False, timeout=20)
+    except Exception:
+        return None
+    return response.headers.get("location") or None
+
+
+def ask_model(http, token, url, prompt):
     response = http.post(
-        MISTRAL_CONVERSATIONS_URL,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        url,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
         json={
-            "model": MISTRAL_MODEL,
-            "inputs": [{"role": "user", "content": prompt}],
-            "tools": [{"type": "web_search"}],
-            "completion_args": {"temperature": 0},
-            "store": False,
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "tools": [{"googleSearch": {}}],
         },
     )
     if response.status_code != 200:
-        raise RuntimeError(f"API Mistral {response.status_code} : {response.text[:300]}")
-    return extract_conversation_output(response.json())
+        raise RuntimeError(f"API Gemini {response.status_code} : {response.text[:300]}")
+    text, uris = extract_gemini_output(response.json())
+    consulted = [u for u in (resolve_source_url(http, uri) for uri in uris) if u]
+    return text, consulted
+
+
+def google_access_token(service_account_json):
+    from google.auth.transport.requests import Request
+    from google.oauth2 import service_account
+
+    info = json.loads(service_account_json)
+    credentials = service_account.Credentials.from_service_account_info(info, scopes=[SCOPE])
+    credentials.refresh(Request())
+    return credentials.token, info.get("project_id")
 
 
 def main():
@@ -258,10 +294,13 @@ def main():
     from dotenv import load_dotenv
 
     load_dotenv()
-    api_key = os.environ.get("MISTRAL_API_KEY")
-    if not api_key:
-        print("[Error] Aucune clé MISTRAL_API_KEY dans l'environnement.")
+    service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if not service_account_json:
+        print("[Error] Aucun compte de service GOOGLE_SERVICE_ACCOUNT_JSON dans l'environnement.")
         sys.exit(1)
+    token, key_project = google_access_token(service_account_json)
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT") or key_project
+    url = vertex_url(project, os.environ.get("VERTEX_WATCH_LOCATION") or "global", GEMINI_WATCH_MODEL)
     http = httpx.Client(timeout=180)
 
     print("=== Veille réglementaire (retraite France) ===")
@@ -279,7 +318,7 @@ def main():
 
         checked += 1
         try:
-            text, consulted_urls = ask_model(http, api_key, build_prompt(filename, content))
+            text, consulted_urls = ask_model(http, token, url, build_prompt(filename, content))
             changes = parse_model_json(text)
         except Exception as err:
             print(f"[Error] {filename} : réponse inexploitable ({err}), aucun changement appliqué.")
@@ -304,7 +343,7 @@ def main():
 
     print(f"=== Veille terminée : {len(results)} fichier(s) modifié(s). ===")
 
-    # Si aucun fichier n'a pu être vérifié (clé API invalide, quota, panne), le passage doit
+    # Si aucun fichier n'a pu être vérifié (compte de service invalide, quota, panne), le passage doit
     # échouer visiblement : sinon il se termine en « aucun changement » alors que rien n'a été
     # vérifié, et la veille peut rester silencieusement hors service pendant des semaines.
     if checked and failed == checked:

@@ -43,7 +43,7 @@ Conformément aux exigences du RGPD et suite aux optimisations de sécurité de 
 *   **Anonymisation des bilans pour l'administration** : Les noms de famille et les données textuelles brutes sont anonymisés à l'affichage pour les administrateurs du site afin d'empêcher toute fuite interne.
 *   **Sécurisation du Stockage** : Les fichiers PDF importés sont stockés dans un espace privé OVHcloud (Gravelines, France). Chaque accès est vérifié côté serveur : seul le propriétaire connecté à son compte peut consulter ses propres analyses. La base de données est hébergée sur notre serveur (Helsinki, Finlande) et n'est jamais accessible directement depuis Internet.
 *   **Chiffrement** : Les données transitent via le protocole sécurisé HTTPS (SSL/TLS). Les fichiers PDF sont chiffrés au repos par le service de stockage, et les sauvegardes de la base de données sont chiffrées (AES-256) avant d'être copiées hors du serveur.
-*   **Transferts hors de l'Union européenne** : Les documents et résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande, France). Les comptes (adresse e-mail, mot de passe chiffré de façon irréversible, sessions) sont gérés par RIS Pro sur son propre serveur. Seul Stripe (paiement) peut traiter des données hors de l'Union européenne, avec les garanties prévues par le RGPD ; aucun document de carrière ne lui est transmis.
+*   **Transferts hors de l'Union européenne** : Les documents et résultats d'analyse sont hébergés exclusivement dans l'Union européenne (Finlande, France). Les comptes (adresse e-mail, mot de passe chiffré de façon irréversible, sessions) sont gérés par RIS Pro sur son propre serveur. Le relevé est lu et analysé par Google Cloud (filiale européenne du groupe américain Google) sur son point d'accès Union européenne : le traitement a lieu dans l'Union européenne. Seul Stripe (paiement) peut traiter des données hors de l'Union européenne, avec les garanties prévues par le RGPD ; aucun document de carrière ne lui est transmis.
 
 ---
 
@@ -53,7 +53,7 @@ Vos données personnelles ne sont jamais vendues ou cédées à des tiers. Elles
 *   **OVHcloud** (France, Gravelines) : Stockage privé des fichiers PDF et des sauvegardes chiffrées de la base de données.
 *   **Stripe** (Stripe Payments Europe, Irlande) : Traitement sécurisé des transactions de paiement.
 *   **Brevo** (société française, serveurs dans l’Union européenne) : Envoi des e-mails transactionnels (confirmation de compte, réinitialisation de mot de passe, alertes).
-*   **Mistral AI (France)** : Lecture du relevé et rédaction de l'analyse, traitement temporaire du contenu du RIS pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).
+*   **Google Cloud** (Google Cloud EMEA Limited, Irlande) : Lecture du relevé et rédaction de l'analyse par le modèle d'IA Gemini (service Vertex AI), traitement temporaire du contenu du RIS dans l'Union européenne pour l'analyse des anomalies (les données envoyées ne sont pas utilisées pour entraîner les modèles d'IA).
 
 ---
 
