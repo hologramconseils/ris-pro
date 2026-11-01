@@ -275,8 +275,22 @@ def ask_model(http, token, url, prompt):
     if response.status_code != 200:
         raise RuntimeError(f"API Gemini {response.status_code} : {response.text[:300]}")
     text, uris = extract_gemini_output(response.json())
-    consulted = [u for u in (resolve_source_url(http, uri) for uri in uris) if u]
-    return text, consulted
+    resolved = [resolve_source_url(http, uri) for uri in uris]
+    consulted = [u for u in resolved if u]
+    return text, consulted, len(resolved) - len(consulted)
+
+
+def format_sources(filename, consulted_urls, unresolved=0):
+    """Ligne de journal listant les pages trouvées par la recherche Google pour un fichier : permet de
+    comprendre un rejet « URL absente des pages consultées » (source réellement absente, ou autre page
+    du même site)."""
+    unique = list(dict.fromkeys(consulted_urls))
+    line = f"[Sources] {filename} : {len(unique)} page(s) consultée(s)"
+    if unresolved:
+        line += f" ({unresolved} lien(s) de redirection non résolu(s))"
+    if unique:
+        line += "\n" + "\n".join(f"  - {u}" for u in unique)
+    return line
 
 
 def google_access_token(service_account_json):
@@ -318,7 +332,8 @@ def main():
 
         checked += 1
         try:
-            text, consulted_urls = ask_model(http, token, url, build_prompt(filename, content))
+            text, consulted_urls, unresolved = ask_model(http, token, url, build_prompt(filename, content))
+            print(format_sources(filename, consulted_urls, unresolved))
             changes = parse_model_json(text)
         except Exception as err:
             print(f"[Error] {filename} : réponse inexploitable ({err}), aucun changement appliqué.")
