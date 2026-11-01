@@ -1,15 +1,9 @@
 import { createRequire } from 'node:module';
-import { Pool as NeonPool } from '@neondatabase/serverless';
-import { isNeonUrl } from './dbUrl.js';
 
 const requireCjs = createRequire(import.meta.url);
 
-// Deux types de base sont acceptés, selon DATABASE_URL :
-// - Neon (adresse en neon.tech) : pilote serverless, utilisé tant que la migration n'est pas faite ;
-// - PostgreSQL classique (serveur RIS, adresse locale) : pilote `pg`, chargé uniquement dans ce cas.
-// Les deux exposent la même interface (query → { rows }), le reste du code n'a pas à les distinguer.
+// Base PostgreSQL du serveur RIS (pilote `pg`). Neon n'est plus utilisé depuis la migration.
 export function createPool(connectionString) {
-  if (isNeonUrl(connectionString)) return new NeonPool({ connectionString });
   const { Pool } = requireCjs('pg');
   const pool = new Pool({ connectionString, max: 10 });
   // Sans écouteur, une connexion inactive coupée par le serveur ferait tomber tout le processus.
