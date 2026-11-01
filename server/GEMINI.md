@@ -24,8 +24,15 @@ La lecture des relevés PDF et la rédaction du bilan premium (`frontend/api/ana
    rôle **Vertex AI User** (`roles/aiplatform.user`) et rien d'autre.
 4. **Clé** : sur ce compte de service, « Clés » → « Ajouter une clé » → JSON. Le fichier téléchargé est
    un secret : ne jamais l'envoyer par e-mail, ni dans une conversation, ni le déposer dans le dépôt.
-   (Si Google refuse la création de clé, une règle d'organisation `iam.disableServiceAccountKeyCreation`
-   est active : la désactiver pour ce projet.)
+   Si Google refuse la création de clé (règle d'organisation `iam.disableServiceAccountKeyCreation`), la
+   lever pour ce seul projet depuis Cloud Shell (fait le 1er novembre 2026) :
+   ```
+   gcloud organizations add-iam-policy-binding <ID_ORGANISATION> --member=user:<votre-adresse> --role=roles/orgpolicy.policyAdmin --condition=None
+   gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKeyCreation --project=ris-pro
+   gcloud config set project ris-pro && gcloud services enable orgpolicy.googleapis.com
+   printf 'name: projects/ris-pro/policies/iam.managed.disableServiceAccountKeyCreation\nspec:\n  rules:\n  - enforce: false\n' > /tmp/regle.yaml
+   gcloud org-policies set-policy /tmp/regle.yaml --billing-project=ris-pro
+   ```
 5. **Serveur** : copier la clé depuis le Mac, puis la protéger :
    ```
    scp ~/Downloads/<fichier-de-cle>.json root@89.167.64.150:/etc/ris-pro/google-service-account.json
@@ -40,9 +47,15 @@ La lecture des relevés PDF et la rédaction du bilan premium (`frontend/api/ana
 6. **Veille (GitHub)** : dépôt → Settings → Secrets and variables → Actions → nouveau secret
    `GOOGLE_SERVICE_ACCOUNT_JSON` contenant le texte complet du fichier de clé. Lancer le workflow
    « Veille Réglementaire Automatique » à la main (Actions → Run workflow) pour vérifier.
-7. **Recommandé — aucune conservation chez Google** : Vertex AI peut garder les requêtes en cache quelques
-   heures pour accélérer les réponses. Ce cache se désactive par projet (documentation Vertex AI, page
-   « Zero data retention ») ; à faire avant d'envoyer de vrais relevés.
+7. **Aucune conservation chez Google** : Vertex AI garde par défaut les requêtes en cache (jusqu'à 24 h). Cache
+   désactivé pour le projet le 1er novembre 2026 (documentation Vertex AI, page « Zero data retention »),
+   depuis Cloud Shell :
+   ```
+   curl -s -X PATCH -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "Content-Type: application/json" \
+     https://us-central1-aiplatform.googleapis.com/v1/projects/ris-pro/cacheConfig \
+     -d '{"name":"projects/ris-pro/cacheConfig","disableCache":true}'
+   ```
+   Vérification : la même adresse en GET doit répondre `"disableCache": true`.
 
 ## Après la bascule
 
