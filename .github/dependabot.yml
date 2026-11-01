@@ -8,6 +8,13 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     groups:
+      # Vite et son plugin React évoluent ensemble (chaque version majeure du plugin exige la version
+      # de Vite correspondante) : une seule pull request pour les deux, sinon chacune échoue seule.
+      vite:
+        patterns: ["vite", "@vitejs/*"]
+      # Même logique pour ESLint et sa configuration recommandée (@eslint/js).
+      eslint:
+        patterns: ["eslint", "@eslint/*"]
       minor-and-patch:
         update-types: ["minor", "patch"]
 
