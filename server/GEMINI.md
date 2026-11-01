@@ -1,7 +1,7 @@
 # Gemini sur Vertex AI (remplace Mistral)
 
 La lecture des relevés PDF et la rédaction du bilan premium (`frontend/api/analyze.js`, via
-`frontend/lib/vertexAI.js`) ainsi que la veille réglementaire quotidienne
+`frontend/lib/vertexAI.js`) ainsi que la veille réglementaire hebdomadaire
 (`backend/regulatory_watch_agent.py`) utilisent Gemini sur **Vertex AI** (Google Cloud).
 
 - **Relevés de carrière** : point d'accès **« eu »** (multi-région Union européenne,

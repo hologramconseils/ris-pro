@@ -1,5 +1,5 @@
 # Dépendances de l'agent de veille réglementaire (backend/regulatory_watch_agent.py),
-# exécuté chaque jour par .github/workflows/regulatory-watch-v2.yml.
+# exécuté chaque lundi par .github/workflows/regulatory-watch-v2.yml.
 # L'agent appelle Gemini sur Vertex AI (Google Cloud, recherche Google) via httpx ; google-auth
 # obtient le jeton d'accès du compte de service.
 httpx
