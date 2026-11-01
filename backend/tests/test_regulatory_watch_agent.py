@@ -10,6 +10,7 @@ from regulatory_watch_agent import (  # noqa: E402
     apply_changes,
     build_report,
     extract_gemini_output,
+    format_sources,
     resolve_source_url,
     vertex_url,
     is_official_url,
@@ -166,6 +167,17 @@ class ResolveSourceUrlTest(unittest.TestCase):
         self.assertEqual(resolve_source_url(FakeHttp(), SOURCE_URL), SOURCE_URL)
         self.assertIsNone(resolve_source_url(FakeHttp(error=True), "https://vertexaisearch.cloud.google.com/x"))
         self.assertIsNone(resolve_source_url(FakeHttp(), "https://vertexaisearch.cloud.google.com/x"))
+
+
+class FormatSourcesTest(unittest.TestCase):
+    def test_lists_unique_pages_and_unresolved_count(self):
+        line = format_sources("regles_x.md", [SOURCE_URL, SOURCE_URL, "https://www.service-public.fr/a"], unresolved=1)
+        self.assertIn("regles_x.md : 2 page(s) consultée(s) (1 lien(s) de redirection non résolu(s))", line)
+        self.assertEqual(line.count(SOURCE_URL), 1)
+        self.assertIn("  - https://www.service-public.fr/a", line)
+
+    def test_no_page(self):
+        self.assertEqual(format_sources("regles_x.md", []), "[Sources] regles_x.md : 0 page(s) consultée(s)")
 
 
 class VertexUrlTest(unittest.TestCase):
