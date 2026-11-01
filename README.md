@@ -2,15 +2,15 @@
 
 ## Architecture
 - **Frontend** : React + Vite (`frontend/src`)
-- **API** : fonctions serverless Node.js sur Vercel (`frontend/api`), déployées via `vercel.json`. Chaque fichier de `frontend/api/` est une fonction (12 au maximum sur le plan Hobby) : les modules partagés vont dans `frontend/lib/`.
-- **BDD** : PostgreSQL Neon (`neon_schema.sql`)
+- **API** : fonctions Node.js (`frontend/api`), servies sur `/api/<nom>` par `server/index.mjs` sur le serveur Hetzner (Helsinki) ; les modules partagés vont dans `frontend/lib/`. Déploiement : `bash /opt/ris-pro/server/install.sh` (cf. `server/README.md`).
+- **BDD** : PostgreSQL 16 sur le serveur (`server/db/`), sauvegardes chiffrées chez OVHcloud
 - **Authentification** : comptes gérés par RIS Pro (mots de passe scrypt, sessions par cookie, e-mails Brevo) — voir `server/AUTH.md`
 - **Paiement** : Stripe
 - **Analyse d'un relevé** (`frontend/api/analyze.js`) :
   1. Lecture du PDF par Gemini (Vertex AI, point d'accès Union européenne)
   2. Calcul des trimestres, des anomalies et de l'estimation de pension en JavaScript
   3. Rédaction du bilan par Gemini, en premium uniquement (textes modèles en freemium) — configuration : `server/GEMINI.md`
-- **Conservation des relevés (RGPD)** : les PDF déposés sont supprimés automatiquement 6 mois après leur dépôt (Vercel Blob et copie en base) par la tâche planifiée Vercel `/api/cleanup-files` (`vercel.json`, « crons »), protégée par la variable d'environnement `CRON_SECRET`.
+- **Conservation des relevés (RGPD)** : les PDF déposés sont supprimés automatiquement 6 mois après leur dépôt (stockage OVHcloud, anciens dépôts sur Vercel Blob, et copie en base) par `/api/cleanup-files`, appelé chaque jour par le minuteur systemd `ris-pro-cleanup` et protégé par la variable d'environnement `CRON_SECRET`.
 - **Veille réglementaire** : `backend/regulatory_watch_agent.py` (Gemini sur Vertex AI, avec la recherche Google), exécuté chaque lundi par `.github/workflows/regulatory-watch-v2.yml`. Il met à jour les fichiers `regles_*.md` via une pull request.
 
 ## Développement

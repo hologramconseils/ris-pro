@@ -32,7 +32,7 @@ export function maskEmail(email) {
   return `${local.slice(0, 1)}***@${domain}`;
 }
 
-// Limite de requêtes par utilisateur et par point d'API, stockée dans Neon (pas de Redis dans
+// Limite de requêtes par utilisateur et par point d'API, stockée dans PostgreSQL (pas de Redis dans
 // ce projet). Chaque appel autorisé est enregistré ; au-delà de `max` appels sur la fenêtre, la
 // requête est refusée. En cas d'erreur de base, on laisse passer : la limite protège les coûts
 // (lecture du PDF par Gemini) et ne doit jamais bloquer un utilisateur légitime à cause d'une panne.
